@@ -26,7 +26,7 @@ void rootFrame::ShowCalc(wxCommandEvent& e) {
 
 void rootFrame::OnIdle(wxIdleEvent& e) {
     glTick();
-   // e.RequestMore();
+    e.RequestMore();
 }
 
 

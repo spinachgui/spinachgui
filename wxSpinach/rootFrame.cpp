@@ -3,19 +3,19 @@
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {
     mGLCanvas = new wxGLCanvas(this,-1,wxDefaultPosition,wxDefaultSize);
-    mSpinPropGrid = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+    mSpinPropGrid = new wxPropertyGrid(mLeftPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
 	mSpinPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
-	mCouplingPropGrid = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+	mCouplingPropGrid = new wxPropertyGrid(mRightPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
 	mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
     this->popSpinPropGrid();
     this->popCouplingGrid();
 
   //Add everything to the sizer
-	this->GetSizer()->Add( mSpinPropGrid,     0, wxALL|wxEXPAND, 5 );
-    this->GetSizer()->Add( mGLCanvas,         1, wxALL|wxEXPAND, 5 );
-	this->GetSizer()->Add( mCouplingPropGrid, 0, wxALL|wxEXPAND, 5 );
+	mLeftPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
+    this->GetSizer()->Insert(1, mGLCanvas,         1, wxALL|wxEXPAND, 5 );
+	mRightPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
 
 	this->Layout();
 }

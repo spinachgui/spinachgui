@@ -1,4 +1,5 @@
 #include "rootFrame.h"
+#include "rotationDialog.h"
 
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {
@@ -25,11 +26,11 @@ void rootFrame::popSpinPropGrid() {
     // (isotropic shielding, anisotropic shilding... etc)
     mSpinPropGrid->Append( new wxPropertyCategory(wxT("Sheilding")) );
     mSpinPropGrid->Append( new wxFloatProperty(wxT("Isotropic (ppm)"), wxPG_LABEL, 0) );
-    mSpinPropGrid->Append( new wxFloatProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL, 0) );
+    mSpinPropGrid->Append( new RotationProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL,  wxT("eu 1.1,2.3,0.3")) );
 
     mSpinPropGrid->Append( new wxPropertyCategory(wxT("Relaxation")) );
     mSpinPropGrid->Append( new wxBoolProperty(wxT("Redfield"), wxPG_LABEL, false) );
-    mSpinPropGrid->Append( new wxFloatProperty(wxT("Rate"), wxPG_LABEL, 0) );
+    mSpinPropGrid->Append( new wxFloatProperty(wxT("Rate"), wxPG_LABEL,0) );
 
     mSpinPropGrid->Append( new wxPropertyCategory(wxT("Coordinates")) );
     mSpinPropGrid->Append( new wxFloatProperty(wxT("x"), wxPG_LABEL, 0) );

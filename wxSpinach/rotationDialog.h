@@ -14,25 +14,8 @@ public:
 
 class rotationDialogAdapter : public wxPGEditorDialogAdapter {
     public:
-
-        rotationDialogAdapter()
-            : wxPGEditorDialogAdapter() {
-        }
-
-        virtual bool DoShowDialog( wxPropertyGrid* WXUNUSED(propGrid),
-                                   wxPGProperty* WXUNUSED(property) ) {
-            wxString s = GetValue();
-
-            rotationDialog dialog(NULL);
-            if (dialog.ShowModal() == wxID_OK) {
-                s = dialog.getAsString();
-            }
-
-            SetValue(s);
-
-            return true;
-        }
-
+        rotationDialogAdapter();
+        virtual bool DoShowDialog( wxPropertyGrid* WXUNUSED(propGrid),wxPGProperty* WXUNUSED(property) );
     protected:
 };
 
@@ -40,23 +23,10 @@ class rotationDialogAdapter : public wxPGEditorDialogAdapter {
 class RotationProperty : public wxLongStringProperty {
         DECLARE_DYNAMIC_CLASS(RotationProperty)
     public:
-        RotationProperty() {
-            RotationProperty("Default Rotation");
-        }
-        // Normal property constructor.
-        RotationProperty(const wxString& label,
-                         const wxString& name = wxPG_LABEL,
-                         const wxString& value = wxEmptyString)
-            : wxLongStringProperty(label,name,value) {
+        RotationProperty();
+        RotationProperty(const wxString& label, const wxString& name = wxPG_LABEL, const wxString& value = wxEmptyString);
 
-        }
-
-        // Do something special when button is clicked.
-        virtual wxPGEditorDialogAdapter* GetEditorDialog() const
-        {
-            return new rotationDialogAdapter();
-        }
-
+        virtual wxPGEditorDialogAdapter* GetEditorDialog() const;
     protected:
 };
 

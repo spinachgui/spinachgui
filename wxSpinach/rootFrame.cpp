@@ -3,12 +3,48 @@
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {
     mGLCanvas = new wxGLCanvas(this,-1,wxDefaultPosition,wxDefaultSize);
-    this->GetSizer()->Insert(1, mGLCanvas, wxALL|wxEXPAND);
+    mSpinPropGrid = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+	mSpinPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
-    mSpinPropGrid->Append( new wxPropertyCategory(wxT("Main")) );
-    mSpinPropGrid->Append( new wxIntProperty(wxT("IntProperty"), wxPG_LABEL, 12345678) );
+	mCouplingPropGrid = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+	mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
+
+    this->popSpinPropGrid();
+    this->popCouplingGrid();
+
+  //Add everything to the sizer
+	this->GetSizer()->Add( mSpinPropGrid,     0, wxALL|wxEXPAND, 5 );
+    this->GetSizer()->Add( mGLCanvas,         1, wxALL|wxEXPAND, 5 );
+	this->GetSizer()->Add( mCouplingPropGrid, 0, wxALL|wxEXPAND, 5 );
 
 	this->Layout();
+}
+
+void rootFrame::popSpinPropGrid() {
+    // Populate all the fields in mSpinPropGrid
+    // (isotropic shielding, anisotropic shilding... etc)
+    mSpinPropGrid->Append( new wxPropertyCategory(wxT("Sheilding")) );
+    mSpinPropGrid->Append( new wxFloatProperty(wxT("Isotropic (ppm)"), wxPG_LABEL, 0) );
+    mSpinPropGrid->Append( new wxFloatProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL, 0) );
+
+    mSpinPropGrid->Append( new wxPropertyCategory(wxT("Relaxation")) );
+    mSpinPropGrid->Append( new wxBoolProperty(wxT("Redfield"), wxPG_LABEL, false) );
+    mSpinPropGrid->Append( new wxFloatProperty(wxT("Rate"), wxPG_LABEL, 0) );
+
+    mSpinPropGrid->Append( new wxPropertyCategory(wxT("Coordinates")) );
+    mSpinPropGrid->Append( new wxFloatProperty(wxT("x"), wxPG_LABEL, 0) );
+    mSpinPropGrid->Append( new wxFloatProperty(wxT("y"), wxPG_LABEL, 0) );
+    mSpinPropGrid->Append( new wxFloatProperty(wxT("z"), wxPG_LABEL, 0) );
+}
+
+
+void rootFrame::popCouplingGrid() {
+    // Populate all the fields in mSpinPairPropGrid
+    // (isotropic shielding, anisotropic shilding... etc)
+    mCouplingPropGrid->Append( new wxPropertyCategory(wxT("Coupling")) );
+    mCouplingPropGrid->Append( new wxFloatProperty(wxT("J-coupling"), wxPG_LABEL, 0) );
+    mCouplingPropGrid->Append( new wxFloatProperty(wxT("Dipole coupling"), wxPG_LABEL, 0) );
+
 }
 
 

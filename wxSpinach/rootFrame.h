@@ -4,6 +4,8 @@
 #include <gl/gl.h>
 #include <wx/glcanvas.h>
 #include <wx/odcombo.h>
+#include <wx/propgrid/propgrid.h>
+#include <wx/propgrid/advprops.h>
 
 #include "spinachGUI.h"
 #include "optionFrame.h"
@@ -34,6 +36,11 @@ public:
 	void glTick();
 
 protected:
+    void popSpinPropGrid();
+    void popCouplingGrid();
+
+    wxPropertyGrid* mSpinPropGrid;
+	wxPropertyGrid* mCouplingPropGrid;
     wxGLCanvas* mGLCanvas;
     DECLARE_EVENT_TABLE()
 

@@ -16,11 +16,11 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="C:\lib\wxWidgets-2.8.9\lib\gcc_lib\mswd" />
-					<Add directory="C:\lib\propgrid\include" />
+					<Add directory="..\lib\wxWidgets-2.8.9\lib\gcc_lib\mswd" />
+					<Add directory="..\lib\propgrid\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:\lib\wxWidgets2.9\lib\gcc_lib\mswd" />
+					<Add directory="..\lib\wxWidgets2.9\lib\gcc_lib\mswd" />
 				</ResourceCompiler>
 				<Linker>
 					<Add library="libwxcode_msw28d_propgrid.a" />
@@ -32,8 +32,8 @@
 					<Add library="libwxmsw28d_adv.a" />
 					<Add library="libwxmsw28d_core.a" />
 					<Add library="libwxbase28d.a" />
-					<Add directory="C:\lib\wxWidgets-2.8.9\lib\gcc_lib" />
-					<Add directory="C:\lib\propgrid\lib\gcc_lib\" />
+					<Add directory="..\lib\wxWidgets-2.8.9\lib\gcc_lib" />
+					<Add directory="..\lib\propgrid\lib\gcc_lib\" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -44,10 +44,10 @@
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="C:\libs\wxWidgets2.9\lib\gcc_lib\msw" />
+					<Add directory="..\libs\wxWidgets2.9\lib\gcc_lib\msw" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:\wxWidgets-2.8.9\lib\gcc_lib\msw" />
+					<Add directory="..\wxWidgets-2.8.9\lib\gcc_lib\msw" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
@@ -56,7 +56,7 @@
 					<Add library="libwxjpeg.a" />
 					<Add library="libwxtiff.a" />
 					<Add library="libwxzlib.a" />
-					<Add directory="C:\wxWidgets-2.8.9\lib\gcc_lib" />
+					<Add directory="..\wxWidgets-2.8.9\lib\gcc_lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -67,11 +67,11 @@
 			<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
-			<Add directory="C:\lib\wxWidgets-2.8.9\include" />
-			<Add directory="C:\lib\wxWidgets-2.8.9\contrib\include" />
+			<Add directory="..\lib\wxWidgets-2.8.9\include" />
+			<Add directory="..\lib\wxWidgets-2.8.9\contrib\include" />
 		</Compiler>
 		<ResourceCompiler>
-			<Add directory="C:\lib\wxWidgets-2.8.9\include" />
+			<Add directory="..\lib\wxWidgets-2.8.9\include" />
 		</ResourceCompiler>
 		<Linker>
 			<Add library="libkernel32.a" />
@@ -88,11 +88,15 @@
 			<Add library="libwsock32.a" />
 			<Add library="libodbc32.a" />
 			<Add library="libopengl32.a" />
+			<Add library="libglu32.a" />
+			<Add library="libglut32.a" />
 		</Linker>
 		<Unit filename="SpinachApp.cpp" />
 		<Unit filename="SpinachApp.h" />
 		<Unit filename="calcFrame.cpp" />
 		<Unit filename="calcFrame.h" />
+		<Unit filename="glMolDisplay.cpp" />
+		<Unit filename="glMolDisplay.h" />
 		<Unit filename="optionFrame.cpp" />
 		<Unit filename="optionFrame.h" />
 		<Unit filename="resource.rc">

@@ -100,6 +100,8 @@
 		</Unit>
 		<Unit filename="rootFrame.cpp" />
 		<Unit filename="rootFrame.h" />
+		<Unit filename="rotationDialog.cpp" />
+		<Unit filename="rotationDialog.h" />
 		<Unit filename="spinachGUI.cpp">
 			<Option virtualFolder="Automatically Generated Files\" />
 		</Unit>

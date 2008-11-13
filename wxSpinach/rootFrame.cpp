@@ -26,7 +26,12 @@ void rootFrame::popSpinPropGrid() {
     // (isotropic shielding, anisotropic shilding... etc)
     mSpinPropGrid->Append( new wxPropertyCategory(wxT("Sheilding")) );
     mSpinPropGrid->Append( new wxFloatProperty(wxT("Isotropic (ppm)"), wxPG_LABEL, 0) );
-    mSpinPropGrid->Append( new RotationProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL,  wxT("eu 1.1,2.3,0.3")) );
+    wxPGId pid=mSpinPropGrid->Append( new wxStringProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL,  wxT("<composed>")) );
+      mSpinPropGrid->AppendIn(pid,new RotationProperty(wxT("Rotation"), wxPG_LABEL,  wxT("ax 0,0,0")) );
+      mSpinPropGrid->AppendIn(pid,new wxFloatProperty(wxT("x"),wxPG_LABEL,1.0) );
+      mSpinPropGrid->AppendIn(pid,new wxFloatProperty(wxT("y"),wxPG_LABEL,1.0) );
+      mSpinPropGrid->AppendIn(pid,new wxFloatProperty(wxT("z"),wxPG_LABEL,1.0) );
+
 
     mSpinPropGrid->Append( new wxPropertyCategory(wxT("Relaxation")) );
     mSpinPropGrid->Append( new wxBoolProperty(wxT("Redfield"), wxPG_LABEL, false) );

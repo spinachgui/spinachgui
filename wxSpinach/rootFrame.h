@@ -1,8 +1,7 @@
 #ifndef __rootFrame__
 #define __rootFrame__
 
-#include <gl/gl.h>
-#include <wx/glcanvas.h>
+
 #include <wx/odcombo.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
@@ -10,6 +9,7 @@
 #include "spinachGUI.h"
 #include "optionFrame.h"
 #include "calcFrame.h"
+#include "glMolDisplay.h"
 
 
 /*
@@ -27,10 +27,12 @@ public:
 
 	rootFrame(wxWindow* parent);
 
+
   //Event Handling functions
     void OnIdle(wxIdleEvent& e);
     void ShowOptions(wxCommandEvent& e);
     void ShowCalc(wxCommandEvent& e);
+    void OnMouseMove(wxMouseEvent& e);
 
   //Graphics functions
 	void enableGL();
@@ -42,7 +44,7 @@ protected:
 
     wxPropertyGrid* mSpinPropGrid;
 	wxPropertyGrid* mCouplingPropGrid;
-    wxGLCanvas* mGLCanvas;
+    glMolDisplay* mMolDisplay;
     DECLARE_EVENT_TABLE()
 
 };

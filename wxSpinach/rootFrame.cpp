@@ -1,11 +1,11 @@
-#include <gl/glu.h>
+
 #include "rootFrame.h"
 #include "rotationDialog.h"
 
 
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {
-    mGLCanvas = new wxGLCanvas(this,-1,wxDefaultPosition,wxDefaultSize);
+    mMolDisplay = new glMolDisplay(this);
     mSpinPropGrid = new wxPropertyGrid(mLeftPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
 	mSpinPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
@@ -17,7 +17,7 @@ rootFrame::rootFrame( wxWindow* parent )
 
   //Add everything to the sizer
 	mLeftPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
-    this->GetSizer()->Insert(1, mGLCanvas,         1, wxALL|wxEXPAND, 5 );
+    this->GetSizer()->Insert(1, mMolDisplay,         1, wxALL|wxEXPAND, 5 );
 	mRightPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
 
 	this->Layout();
@@ -68,57 +68,29 @@ void rootFrame::ShowCalc(wxCommandEvent& e) {
     frame->Show();
 }
 
-void rootFrame::OnIdle(wxIdleEvent& e) {
-    glTick();
-    e.RequestMore();
-}
-
-
 void rootFrame::enableGL() {
-    mGLCanvas->SetCurrent();
+     mMolDisplay->enableGL();
+}
+////////////////////////////////////>> Event Handlers <<==================//
 
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glColor3f(0.0, 0.0, 1.0);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-
-    mGLCanvas->SwapBuffers();
+void rootFrame::OnIdle(wxIdleEvent& e) {
+    mMolDisplay->glTick();
+   // e.RequestMore();
 }
 
-void rootFrame::glTick() {
- 	glClear(GL_COLOR_BUFFER_BIT);
-
-  //This should really be done with a onResize event
-    int w,h;
-    mGLCanvas->GetClientSize(&w,&h);
-    glViewport(0,0,w,h);
-
-	static float coord=5.0;
-	coord+=0.1;
-	if(coord>5.0){coord=-5.0;}
-
-    GLuint list;
-
-    GLUquadricObj* qobj= gluNewQuadric();
-    gluQuadricDrawStyle(qobj,GLU_FILL);
-    gluQuadricNormals(qobj,GLU_SMOOTH);
-
-    list = glGenLists(1);
-
-    glNewList(list,GL_COMPILE);
-    gluSphere(qobj,3,20,20);
-    glEndList();
-    glCallList(list);
-
-    gluDeleteQuadric(qobj);
-
-
-	mGLCanvas->SwapBuffers();
+void rootFrame::OnMouseMove(wxMouseEvent& e) {
+    long x=e.GetX();
+    long y=e.GetY();
+    wxString msg="";
+    msg << "x=" << x << " y=" << y;
+    mRootStatusBar->SetStatusText(msg);
+    e.Skip();
 }
+
 
 BEGIN_EVENT_TABLE(rootFrame, wxFrame)
   EVT_IDLE    (rootFrame::OnIdle)
+  EVT_MOTION  (rootFrame::OnMouseMove)
 END_EVENT_TABLE()
 
 

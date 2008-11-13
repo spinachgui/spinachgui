@@ -1,5 +1,7 @@
+#include <gl/glu.h>
 #include "rootFrame.h"
 #include "rotationDialog.h"
+
 
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {
@@ -96,7 +98,22 @@ void rootFrame::glTick() {
 	coord+=0.1;
 	if(coord>5.0){coord=-5.0;}
 
-	glRectf(-5.0, coord, 5.0, -5.0);
+    GLuint list;
+
+    GLUquadricObj* qobj= gluNewQuadric();
+    gluQuadricDrawStyle(qobj,GLU_FILL);
+    gluQuadricNormals(qobj,GLU_SMOOTH);
+
+    list = glGenLists(1);
+
+    glNewList(list,GL_COMPILE);
+    gluSphere(qobj,3,20,20);
+    glEndList();
+    glCallList(list);
+
+    gluDeleteQuadric(qobj);
+
+
 	mGLCanvas->SwapBuffers();
 }
 

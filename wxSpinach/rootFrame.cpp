@@ -87,6 +87,11 @@ void rootFrame::enableGL() {
 void rootFrame::glTick() {
  	glClear(GL_COLOR_BUFFER_BIT);
 
+  //This should really be done with a onResize event
+    int w,h;
+    mGLCanvas->GetClientSize(&w,&h);
+    glViewport(0,0,w,h);
+
 	static float coord=5.0;
 	coord+=0.1;
 	if(coord>5.0){coord=-5.0;}

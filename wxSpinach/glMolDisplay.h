@@ -14,7 +14,8 @@ protected:
     DECLARE_EVENT_TABLE()
 
     GLuint list;
-
+    long mousex;
+    long mousey;
 };
 
 

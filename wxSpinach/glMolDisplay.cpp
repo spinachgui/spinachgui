@@ -14,7 +14,7 @@ void glMolDisplay::enableGL() {
 	glColor3f(0.0, 0.0, 1.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+	//glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     glMatrixMode(GL_MODELVIEW);
 
     GLUquadricObj* qobj= gluNewQuadric();
@@ -24,7 +24,7 @@ void glMolDisplay::enableGL() {
     list = glGenLists(1);
 
     glNewList(list,GL_COMPILE);
-      gluSphere(qobj,3,20,20);
+      gluSphere(qobj,0.2,20,20);
     glEndList();
     gluDeleteQuadric(qobj);
 }
@@ -37,16 +37,17 @@ void glMolDisplay::glTick() {
     this->GetClientSize(&w,&h);
     glViewport(0,0,w,h);
 
-	static float coord=5.0;
-	coord+=0.1;
-	if(coord>5.0){coord=-5.0;}
-
     glLoadIdentity();
-    glTranslatef(0.0,0.0,-5.0);
+    glTranslatef(0.0,0.0,-0.5);
     glCallList(list);
 
-    glTranslatef(coord,0.0,0.0);
+
+  //Get the mouse coordinates in normalized device coordinates
+    double xNDC=2*(double(mousex)/double(w))-1.0;
+    double yNDC=2*(double(mousey)/double(h))-1.0;
+    glTranslatef(xNDC,-yNDC,0.0);
     glCallList(list);
+  //
 
 	this->SwapBuffers();
 }
@@ -54,8 +55,8 @@ void glMolDisplay::glTick() {
 //=========================>> Event handlers <<====================//
 
 void glMolDisplay::OnMouseMove(wxMouseEvent& e) {
-    int x=e.GetX();
-    int y=e.GetY();
+    mousex=e.GetX();
+    mousey=e.GetY();
 }
 
 BEGIN_EVENT_TABLE(glMolDisplay, wxGLCanvas)

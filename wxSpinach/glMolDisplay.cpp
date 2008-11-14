@@ -12,10 +12,6 @@ void glMolDisplay::enableGL() {
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glColor3f(0.0, 0.0, 1.0);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	//glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    glMatrixMode(GL_MODELVIEW);
 
     GLUquadricObj* qobj= gluNewQuadric();
     gluQuadricDrawStyle(qobj,GLU_LINE);
@@ -24,30 +20,36 @@ void glMolDisplay::enableGL() {
     list = glGenLists(1);
 
     glNewList(list,GL_COMPILE);
-      gluSphere(qobj,0.2,20,20);
+      gluSphere(qobj,3,20,20);
     glEndList();
     gluDeleteQuadric(qobj);
 }
 
 void glMolDisplay::glTick() {
  	glClear(GL_COLOR_BUFFER_BIT);
-
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    glMatrixMode(GL_MODELVIEW);
   //This should really be done with a onResize event
     int w,h;
     this->GetClientSize(&w,&h);
     glViewport(0,0,w,h);
 
     glLoadIdentity();
-    glTranslatef(0.0,0.0,-0.5);
+    glTranslatef(0.0,0.0,-5);
     glCallList(list);
 
 
   //Get the mouse coordinates in normalized device coordinates
     double xNDC=2*(double(mousex)/double(w))-1.0;
     double yNDC=2*(double(mousey)/double(h))-1.0;
-    glTranslatef(xNDC,-yNDC,0.0);
+  //Now translate the coordinates into eye coordinates
+    double xEye=xNDC*10;  //This is not a good way to do the inversion
+    double yEye=yNDC*10;
+    glTranslatef(xEye,-yEye,0.0);
     glCallList(list);
-  //
+
 
 	this->SwapBuffers();
 }

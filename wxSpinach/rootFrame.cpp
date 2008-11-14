@@ -75,7 +75,7 @@ void rootFrame::enableGL() {
 
 void rootFrame::OnIdle(wxIdleEvent& e) {
     mMolDisplay->glTick();
-   // e.RequestMore();
+    e.RequestMore();
 }
 
 void rootFrame::OnMouseMove(wxMouseEvent& e) {

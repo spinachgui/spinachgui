@@ -12,17 +12,20 @@ void glMolDisplay::enableGL() {
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glColor3f(0.0, 0.0, 1.0);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    glMatrixMode(GL_MODELVIEW);
 
     GLUquadricObj* qobj= gluNewQuadric();
     gluQuadricDrawStyle(qobj,GLU_LINE);
     gluQuadricNormals(qobj,GLU_SMOOTH);
 
     list = glGenLists(1);
-    glNewList(list,GL_COMPILE);
-    gluSphere(qobj,3,20,20);
-    glEndList();
 
+    glNewList(list,GL_COMPILE);
+      gluSphere(qobj,3,20,20);
+    glEndList();
     gluDeleteQuadric(qobj);
 }
 
@@ -34,18 +37,16 @@ void glMolDisplay::glTick() {
     this->GetClientSize(&w,&h);
     glViewport(0,0,w,h);
 
-    glMatrixMode(GL_MODELVIEW);
-//	glLoadIdentity();
- //   gluLookAt(0,0,5.0,0,0,0,0,1,0);   //Move the camera to 0,0,5 and aim at 0,0,0
+	static float coord=5.0;
+	coord+=0.1;
+	if(coord>5.0){coord=-5.0;}
 
-	glLoadIdentity();
-    glTranslatef(0,0,5.0);
-    glCallList(list);  //Draw a sphere at 5,0,0 (global coordinates)
+    glLoadIdentity();
+    glTranslatef(0.0,0.0,-5.0);
+    glCallList(list);
 
-	glLoadIdentity();
-    glTranslatef(0,0,-5.0);
-    glCallList(list);  //Draw a sphere at 5,0,0 (global coordinates)
-
+    glTranslatef(coord,0.0,0.0);
+    glCallList(list);
 
 	this->SwapBuffers();
 }

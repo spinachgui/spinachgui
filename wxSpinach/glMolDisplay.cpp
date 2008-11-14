@@ -37,17 +37,27 @@ void glMolDisplay::glTick() {
     glViewport(0,0,w,h);
 
     glLoadIdentity();
+    gluLookAt(0,2,4,0,0,0,0,1,0);
+
     glTranslatef(0.0,0.0,-5);
     glCallList(list);
 
 
   //Get the mouse coordinates in normalized device coordinates
-    double xNDC=2*(double(mousex)/double(w))-1.0;
-    double yNDC=2*(double(mousey)/double(h))-1.0;
-  //Now translate the coordinates into eye coordinates
-    double xEye=xNDC*10;  //This is not a good way to do the inversion
-    double yEye=yNDC*10;
-    glTranslatef(xEye,-yEye,0.0);
+//    double xNDC=2*(double(mousex)/double(w))-1.0;
+//    double yNDC=2*(double(mousey)/double(h))-1.0;
+
+    GLdouble mvmatrix[16], projmatrix[16];
+    GLdouble worldx,worldy,worldz;
+    GLint viewport[4];
+
+    glGetIntegerv(GL_VIEWPORT,viewport);
+    glGetDoublev(GL_MODELVIEW_MATRIX,mvmatrix);
+    glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
+
+    gluUnProject(double(mousex),double(h-mousey-1),0.5,mvmatrix,projmatrix,viewport,&worldx,&worldy,&worldz);
+
+    glTranslatef(worldx,worldy,worldz);
     glCallList(list);
 
 

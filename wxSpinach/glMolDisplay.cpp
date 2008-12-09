@@ -26,15 +26,18 @@ void glMolDisplay::enableGL() {
 }
 
 void glMolDisplay::glTick() {
- 	glClear(GL_COLOR_BUFFER_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    glMatrixMode(GL_MODELVIEW);
   //This should really be done with a onResize event
     int w,h;
     this->GetClientSize(&w,&h);
     glViewport(0,0,w,h);
+
+
+ 	glClear(GL_COLOR_BUFFER_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-w/10, w/10, -h/10, h/10, -10.0, 10.0);
+
+    glMatrixMode(GL_MODELVIEW);
 
     glLoadIdentity();
     gluLookAt(0,2,4,0,0,0,0,1,0);
@@ -60,7 +63,6 @@ void glMolDisplay::glTick() {
     glTranslatef(worldx,worldy,worldz);
     glCallList(list);
 
-
 	this->SwapBuffers();
 }
 
@@ -71,7 +73,14 @@ void glMolDisplay::OnMouseMove(wxMouseEvent& e) {
     mousey=e.GetY();
 }
 
+void glMolDisplay::OnResize(wxSizeEvent& e) {
+    this->GetClientSize(&width,&height);
+    e.Skip();
+}
+
+
 BEGIN_EVENT_TABLE(glMolDisplay, wxGLCanvas)
   EVT_MOTION  (glMolDisplay::OnMouseMove)
+  EVT_SIZE    (glMolDisplay::OnResize)
 END_EVENT_TABLE()
 

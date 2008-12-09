@@ -3,7 +3,7 @@
 #include "glMolDisplay.h"
 
 glMolDisplay::glMolDisplay(wxWindow* parent)
-: wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize) {
+: wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05) {
 }
 
 
@@ -23,19 +23,12 @@ void glMolDisplay::enableGL() {
       gluSphere(qobj,3,20,20);
     glEndList();
     gluDeleteQuadric(qobj);
+
+    DoReize();
 }
 
 void glMolDisplay::glTick() {
-  //This should really be done with a onResize event
-    int w,h;
-    this->GetClientSize(&w,&h);
-    glViewport(0,0,w,h);
-
-
  	glClear(GL_COLOR_BUFFER_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-w/10, w/10, -h/10, h/10, -10.0, 10.0);
 
     glMatrixMode(GL_MODELVIEW);
 
@@ -58,7 +51,7 @@ void glMolDisplay::glTick() {
     glGetDoublev(GL_MODELVIEW_MATRIX,mvmatrix);
     glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
 
-    gluUnProject(double(mousex),double(h-mousey-1),0.5,mvmatrix,projmatrix,viewport,&worldx,&worldy,&worldz);
+    gluUnProject(double(mousex),double(height-mousey-1),0.5,mvmatrix,projmatrix,viewport,&worldx,&worldy,&worldz);
 
     glTranslatef(worldx,worldy,worldz);
     glCallList(list);
@@ -73,14 +66,34 @@ void glMolDisplay::OnMouseMove(wxMouseEvent& e) {
     mousey=e.GetY();
 }
 
+void glMolDisplay::DoReize() {
+    glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-width*mZoom, width*mZoom, -height*mZoom, height*mZoom, -10.0, 10.0);
+}
+
+void glMolDisplay::OnWheel(wxMouseEvent& e) {
+    mZoom-=0.001*e.GetWheelRotation()/e.GetWheelDelta();
+    if(mZoom<0.001) {
+        mZoom=0.001;
+    }
+    DoReize();
+}
+
 void glMolDisplay::OnResize(wxSizeEvent& e) {
+  //This should really be done with a onResize event
     this->GetClientSize(&width,&height);
+    glViewport(0,0,width,height);
+
+	DoReize();
+
     e.Skip();
 }
 
 
 BEGIN_EVENT_TABLE(glMolDisplay, wxGLCanvas)
-  EVT_MOTION  (glMolDisplay::OnMouseMove)
-  EVT_SIZE    (glMolDisplay::OnResize)
+  EVT_MOTION     (glMolDisplay::OnMouseMove)
+  EVT_MOUSEWHEEL (glMolDisplay::OnWheel)
+  EVT_SIZE       (glMolDisplay::OnResize)
 END_EVENT_TABLE()
 

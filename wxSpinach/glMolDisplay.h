@@ -12,6 +12,8 @@ public:
 protected:
     void OnMouseMove(wxMouseEvent& e);
     void OnResize(wxSizeEvent& e);
+    void DoReize();
+    void OnWheel(wxMouseEvent& e);
     DECLARE_EVENT_TABLE()
 
     GLuint list;
@@ -22,6 +24,9 @@ protected:
   //window being redrawn.
     int width;
     int height;
+
+  //The current zoom level, multiplys the screen width and screen height in glOrth
+    double mZoom;
 };
 
 

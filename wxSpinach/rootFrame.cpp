@@ -1,24 +1,43 @@
 
 #include "rootFrame.h"
 #include "rotationDialog.h"
-
+#include "res\cluster.xpm"
+#include "res\Jcoupling.xpm"
+#include "res\S.xpm"
 
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {
+    mSpinPanel->Show(true);
+    mJCoupPanel->Show(true);
+    mClusterPanel->Show(true);
+
+  //Add the 3D display
     mMolDisplay = new glMolDisplay(this);
-    mSpinPropGrid = new wxPropertyGrid(mLeftPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+    this->GetSizer()->Add(mMolDisplay,         1, wxALL|wxEXPAND, 5 );
+
+
+    mSpinPropGrid = new wxPropertyGrid(mSpinPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
 	mSpinPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
-	mCouplingPropGrid = new wxPropertyGrid(mRightPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+	mCouplingPropGrid = new wxPropertyGrid(mJCoupPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
 	mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
     this->popSpinPropGrid();
     this->popCouplingGrid();
 
-  //Add everything to the sizer
-	mLeftPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
-    this->GetSizer()->Insert(1, mMolDisplay,         1, wxALL|wxEXPAND, 5 );
-	mRightPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
+
+  //Add everything to the panel sizers
+	mSpinPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
+	mJCoupPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
+
+
+
+  //Sort out the toolbar
+    mRootToolbar->AddTool( EV_MODE_SHIELDING, wxT("Shielding"),           wxBitmap( S, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+    mRootToolbar->AddTool( EV_MODE_JCOUPLING, wxT("J Coupling"),          wxBitmap( Jcoupling, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+    mRootToolbar->AddTool( EV_MODE_CLUSTERS,  wxT("Cluster Definitions"), wxBitmap( cluster, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+    mRootToolbar->Realize(); // Called to draw the buttons
+
 
 	this->Layout();
 }
@@ -87,10 +106,36 @@ void rootFrame::OnMouseMove(wxMouseEvent& e) {
     e.Skip();
 }
 
+void rootFrame::setModeShielding(wxCommandEvent& e) {
+    mSpinPanel->Show(true);
+    mJCoupPanel->Show(false);
+    mClusterPanel->Show(false);
+    this->Layout();
+    e.Skip();
+};
+
+void rootFrame::setModeJCoupling(wxCommandEvent& e) {
+    mSpinPanel->Show(false);
+    mJCoupPanel->Show(true);
+    mClusterPanel->Show(false);
+    this->Layout();
+    e.Skip();
+};
+
+void rootFrame::setModeClusters(wxCommandEvent& e) {
+    mSpinPanel->Show(false);
+    mJCoupPanel->Show(false);
+    mClusterPanel->Show(true);
+    this->Layout();
+    e.Skip();
+};
 
 BEGIN_EVENT_TABLE(rootFrame, wxFrame)
   EVT_IDLE    (rootFrame::OnIdle)
   EVT_MOTION  (rootFrame::OnMouseMove)
+  EVT_MENU    (EV_MODE_SHIELDING, rootFrame::setModeShielding)
+  EVT_MENU    (EV_MODE_JCOUPLING, rootFrame::setModeJCoupling)
+  EVT_MENU    (EV_MODE_CLUSTERS,  rootFrame::setModeClusters)
 END_EVENT_TABLE()
 
 

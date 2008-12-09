@@ -8,8 +8,8 @@
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {
     mSpinPanel->Show(true);
-    mJCoupPanel->Show(true);
-    mClusterPanel->Show(true);
+    mJCoupPanel->Show(false);
+    mClusterPanel->Show(false);
 
   //Add the 3D display
     mMolDisplay = new glMolDisplay(this);
@@ -28,8 +28,8 @@ rootFrame::rootFrame( wxWindow* parent )
 
   //Add everything to the panel sizers
 	mSpinPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
-	mJCoupPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
 
+	mJCoupPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
 
 
   //Sort out the toolbar

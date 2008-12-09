@@ -44,10 +44,6 @@ void glMolDisplay::glTick() {
     glCallList(list);
 
 
-  //Get the mouse coordinates in normalized device coordinates
-//    double xNDC=2*(double(mousex)/double(w))-1.0;
-//    double yNDC=2*(double(mousey)/double(h))-1.0;
-
     GLdouble mvmatrix[16], projmatrix[16];
     GLdouble worldx,worldy,worldz;
     GLint viewport[4];

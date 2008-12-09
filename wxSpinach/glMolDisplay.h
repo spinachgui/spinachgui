@@ -1,7 +1,7 @@
 
 
 #include <wx/glcanvas.h>
-
+#include <wx/timer.h>
 
 class glMolDisplay : public wxGLCanvas {
 public:
@@ -14,6 +14,7 @@ protected:
     void OnResize(wxSizeEvent& e);
     void DoReize();
     void OnWheel(wxMouseEvent& e);
+    void OnTimer(wxTimerEvent& e);
     DECLARE_EVENT_TABLE()
 
     GLuint list;
@@ -27,6 +28,9 @@ protected:
 
   //The current zoom level, multiplys the screen width and screen height in glOrth
     double mZoom;
+
+    wxTimer mTimer;
+
 };
 
 

@@ -2,8 +2,13 @@
 #include <gl/glu.h>
 #include "glMolDisplay.h"
 
+enum {
+    TIMER_GLTICK=1
+};
+
 glMolDisplay::glMolDisplay(wxWindow* parent)
-: wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05) {
+: wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
+    this->mTimer.Start(1);
 }
 
 
@@ -90,10 +95,15 @@ void glMolDisplay::OnResize(wxSizeEvent& e) {
     e.Skip();
 }
 
+void glMolDisplay::OnTimer(wxTimerEvent& e) {
+    glTick();
+}
+
 
 BEGIN_EVENT_TABLE(glMolDisplay, wxGLCanvas)
   EVT_MOTION     (glMolDisplay::OnMouseMove)
   EVT_MOUSEWHEEL (glMolDisplay::OnWheel)
   EVT_SIZE       (glMolDisplay::OnResize)
+  EVT_TIMER      (TIMER_GLTICK, glMolDisplay::OnTimer)
 END_EVENT_TABLE()
 

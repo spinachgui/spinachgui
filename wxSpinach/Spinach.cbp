@@ -8,7 +8,7 @@
 		<Option virtualFolders="Automatically Generated Files\;" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin\Debug\Spinach" prefix_auto="1" extension_auto="1" />
+				<Option output="bin\Debug\winSpinach" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -37,7 +37,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin\Release\Spinach" prefix_auto="1" extension_auto="1" />
+				<Option output="bin\Release\winSpinach" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -58,6 +58,18 @@
 					<Add library="libwxzlib.a" />
 					<Add directory="..\wxWidgets-2.8.9\lib\gcc_lib" />
 				</Linker>
+			</Target>
+			<Target title="command">
+				<Option output="bin\cmd\Spinach" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\cmd\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+			<Target title="commandd">
+				<Option output="bin\cmdd\Spinach" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\cmdd\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
 			</Target>
 		</Build>
 		<Compiler>
@@ -91,26 +103,72 @@
 			<Add library="libglu32.a" />
 			<Add library="libglut32.a" />
 		</Linker>
-		<Unit filename="gui\SpinachApp.cpp" />
-		<Unit filename="gui\SpinachApp.h" />
-		<Unit filename="gui\calcFrame.cpp" />
-		<Unit filename="gui\calcFrame.h" />
-		<Unit filename="gui\glMolDisplay.cpp" />
-		<Unit filename="gui\glMolDisplay.h" />
-		<Unit filename="gui\optionFrame.cpp" />
-		<Unit filename="gui\optionFrame.h" />
+		<Unit filename="commandln\main.cpp">
+			<Option target="command" />
+			<Option target="commandd" />
+		</Unit>
+		<Unit filename="gui\SpinachApp.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\SpinachApp.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\calcFrame.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\calcFrame.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\glMolDisplay.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\glMolDisplay.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\optionFrame.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\optionFrame.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="gui\resource.rc">
 			<Option compilerVar="WINDRES" />
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
-		<Unit filename="gui\rootFrame.cpp" />
-		<Unit filename="gui\rootFrame.h" />
-		<Unit filename="gui\rotationDialog.cpp" />
-		<Unit filename="gui\rotationDialog.h" />
+		<Unit filename="gui\rootFrame.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\rootFrame.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\rotationDialog.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\rotationDialog.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="gui\spinachGUI.cpp">
 			<Option virtualFolder="Automatically Generated Files\" />
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="spinachGUI.h">
 			<Option virtualFolder="Automatically Generated Files\" />
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
 		<Extensions>
 			<code_completion />

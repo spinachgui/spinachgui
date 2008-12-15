@@ -9,6 +9,17 @@ enum {
 glMolDisplay::glMolDisplay(wxWindow* parent)
 : wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
     this->mTimer.Start(1);
+
+    camX=0;
+    camY=0;
+    camZ=5.0;
+
+    xRotate=0.0;
+    yRotate=0.0;
+
+    //Initalize rotationMatrix to the identity
+    for(long i=0;i<16;i++) {rotationMatrix[i]=(i%5==0 ? 1.0 : 0.0);}
+
 }
 
 
@@ -34,14 +45,32 @@ void glMolDisplay::enableGL() {
 
 void glMolDisplay::glTick() {
  	glClear(GL_COLOR_BUFFER_BIT);
-
     glMatrixMode(GL_MODELVIEW);
 
-    glLoadIdentity();
-    gluLookAt(0,2,4,0,0,0,0,1,0);
 
-    glTranslatef(0.0,0.0,-5);
-    glCallList(list);
+  //Take the opertunity to calculate the rotation matrix for the scene
+  //TODO: This would be better handled on the CPU, it's only one
+  //      matrix. Change when matrix classes have been written
+    float dotProduct=xRotate*xRotate+yRotate*yRotate;
+    float norm=sqrt(xRotate*xRotate+yRotate*yRotate);
+
+    glLoadIdentity();
+    glLoadMatrixf(rotationMatrix);
+    glRotatef(dotProduct,xRotate/norm,yRotate/norm,0);
+    glGetFloatv(GL_MODELVIEW_MATRIX,rotationMatrix);
+    xRotate=0.0;
+    yRotate=0.0;
+
+  //Load the Identity, actually start the trasfromations
+    glLoadIdentity();
+    gluLookAt(camX,camY,camZ,0,0,0,0,1,0);
+
+    glLoadMatrixf(rotationMatrix);
+
+    glPushMatrix();
+      glTranslatef(0.0,0.0,-5);
+      glCallList(list);
+    glPopMatrix();
 
 
     GLdouble mvmatrix[16], projmatrix[16];
@@ -63,8 +92,14 @@ void glMolDisplay::glTick() {
 //=========================>> Event handlers <<====================//
 
 void glMolDisplay::OnMouseMove(wxMouseEvent& e) {
+    if(e.Dragging()) {
+        xRotate+=(e.GetX()-mousex);
+        yRotate+=(e.GetY()-mousey);
+    }
+
     mousex=e.GetX();
     mousey=e.GetY();
+
 }
 
 void glMolDisplay::DoReize() {

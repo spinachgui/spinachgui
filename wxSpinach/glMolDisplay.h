@@ -29,6 +29,15 @@ protected:
   //The current zoom level, multiplys the screen width and screen height in glOrth
     double mZoom;
 
+    double camX;
+    double camY;
+    double camZ;
+
+    double xRotate;
+    double yRotate;
+
+    float rotationMatrix[16];
+
     wxTimer mTimer;
 
 };

@@ -91,22 +91,22 @@
 			<Add library="libglu32.a" />
 			<Add library="libglut32.a" />
 		</Linker>
-		<Unit filename="SpinachApp.cpp" />
-		<Unit filename="SpinachApp.h" />
-		<Unit filename="calcFrame.cpp" />
-		<Unit filename="calcFrame.h" />
-		<Unit filename="glMolDisplay.cpp" />
-		<Unit filename="glMolDisplay.h" />
-		<Unit filename="optionFrame.cpp" />
-		<Unit filename="optionFrame.h" />
-		<Unit filename="resource.rc">
+		<Unit filename="gui\SpinachApp.cpp" />
+		<Unit filename="gui\SpinachApp.h" />
+		<Unit filename="gui\calcFrame.cpp" />
+		<Unit filename="gui\calcFrame.h" />
+		<Unit filename="gui\glMolDisplay.cpp" />
+		<Unit filename="gui\glMolDisplay.h" />
+		<Unit filename="gui\optionFrame.cpp" />
+		<Unit filename="gui\optionFrame.h" />
+		<Unit filename="gui\resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="rootFrame.cpp" />
-		<Unit filename="rootFrame.h" />
-		<Unit filename="rotationDialog.cpp" />
-		<Unit filename="rotationDialog.h" />
-		<Unit filename="spinachGUI.cpp">
+		<Unit filename="gui\rootFrame.cpp" />
+		<Unit filename="gui\rootFrame.h" />
+		<Unit filename="gui\rotationDialog.cpp" />
+		<Unit filename="gui\rotationDialog.h" />
+		<Unit filename="gui\spinachGUI.cpp">
 			<Option virtualFolder="Automatically Generated Files\" />
 		</Unit>
 		<Unit filename="spinachGUI.h">

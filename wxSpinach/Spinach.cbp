@@ -165,6 +165,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="shared\struct.h" />
 		<Unit filename="spinachGUI.h">
 			<Option virtualFolder="Automatically Generated Files\" />
 			<Option target="Debug" />

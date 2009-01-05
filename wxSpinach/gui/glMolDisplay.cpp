@@ -51,21 +51,22 @@ void glMolDisplay::glTick() {
   //Take the opertunity to calculate the rotation matrix for the scene
   //TODO: This would be better handled on the CPU, it's only one
   //      matrix. Change when matrix classes have been written
-    float dotProduct=xRotate*xRotate+yRotate*yRotate;
-    float norm=sqrt(xRotate*xRotate+yRotate*yRotate);
+    float dotProduct=(xRotate*xRotate+yRotate*yRotate);
+    float norm=sqrt(dotProduct);
 
     glLoadIdentity();
-    glLoadMatrixf(rotationMatrix);
-    glRotatef(dotProduct,xRotate/norm,yRotate/norm,0);
+    glRotatef(dotProduct,yRotate/norm,xRotate/norm,0);
+    glMultMatrixf(rotationMatrix);
     glGetFloatv(GL_MODELVIEW_MATRIX,rotationMatrix);
-    xRotate=0.0;
-    yRotate=0.0;
 
   //Load the Identity, actually start the trasfromations
     glLoadIdentity();
     gluLookAt(camX,camY,camZ,0,0,0,0,1,0);
+    glMultMatrixf(rotationMatrix);
 
-    glLoadMatrixf(rotationMatrix);
+    xRotate=0.0;
+    yRotate=0.0;
+//    glLoadMatrixf(rotationMatrix);
 
     glPushMatrix();
       glTranslatef(0.0,0.0,-5);

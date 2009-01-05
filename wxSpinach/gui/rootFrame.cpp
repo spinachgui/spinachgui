@@ -1,9 +1,9 @@
 
 #include "rootFrame.h"
 #include "rotationDialog.h"
-#include "res\cluster.xpm"
-#include "res\Jcoupling.xpm"
-#include "res\S.xpm"
+#include "..\res\cluster.xpm"
+#include "..\res\Jcoupling.xpm"
+#include "..\res\S.xpm"
 
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ) {

@@ -162,15 +162,11 @@
 		</Unit>
 		<Unit filename="gui\spinachGUI.cpp">
 			<Option virtualFolder="Automatically Generated Files\" />
-			<Option target="Debug" />
-			<Option target="Release" />
+		</Unit>
+		<Unit filename="gui\spinachGUI.h">
+			<Option virtualFolder="Automatically Generated Files\" />
 		</Unit>
 		<Unit filename="shared\struct.h" />
-		<Unit filename="spinachGUI.h">
-			<Option virtualFolder="Automatically Generated Files\" />
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />

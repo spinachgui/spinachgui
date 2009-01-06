@@ -1,4 +1,5 @@
 
+
 #include "rootFrame.h"
 #include "rotationDialog.h"
 #include "..\res\cluster.xpm"
@@ -6,7 +7,7 @@
 #include "..\res\S.xpm"
 
 rootFrame::rootFrame( wxWindow* parent )
-:rootFrameBase( parent ) {
+:rootFrameBase( parent ),mSpinSys(new SpinSystem) {
     mSpinPanel->Show(true);
     mJCoupPanel->Show(false);
     mClusterPanel->Show(false);
@@ -40,7 +41,11 @@ rootFrame::rootFrame( wxWindow* parent )
 
 
 	this->Layout();
+
+  //Now for the numerical stuff
+  //Add some random test data
 }
+
 
 void rootFrame::popSpinPropGrid() {
     // Populate all the fields in mSpinPropGrid

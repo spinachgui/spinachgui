@@ -1,6 +1,7 @@
 #ifndef __rootFrame__
 #define __rootFrame__
 
+#include <boost/scoped_ptr.hpp>
 
 #include <wx/odcombo.h>
 #include <wx/propgrid/propgrid.h>
@@ -10,6 +11,10 @@
 #include "optionFrame.h"
 #include "calcFrame.h"
 #include "glMolDisplay.h"
+
+#include "../shared/struct.h"
+
+using namespace boost;
 
 enum {
     EV_MODE_SHIELDING=1,
@@ -26,12 +31,12 @@ In order for this to compile, wxUSE_GLCANVAS must
 be set to 1 in wxWidgets-2.8.9\lib\gcc_lib\mswd\wx\setup.h
 
 */
+
 class rootFrame : public rootFrameBase
 {
 public:
 
 	rootFrame(wxWindow* parent);
-
 
   //Event Handling functions
     void OnIdle(wxIdleEvent& e);
@@ -54,6 +59,10 @@ protected:
     wxPropertyGrid* mSpinPropGrid;
 	wxPropertyGrid* mCouplingPropGrid;
     glMolDisplay* mMolDisplay;
+
+  //Numerical Stuff
+    scoped_ptr<SpinSystem> mSpinSys;
+
     DECLARE_EVENT_TABLE()
 
 };

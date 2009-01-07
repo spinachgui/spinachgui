@@ -81,6 +81,7 @@
 			<Add option="-D__WXMSW__" />
 			<Add directory="..\lib\wxWidgets-2.8.9\include" />
 			<Add directory="..\lib\wxWidgets-2.8.9\contrib\include" />
+			<Add directory="..\lib\boost_1_37_0" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="..\lib\wxWidgets-2.8.9\include" />
@@ -166,6 +167,8 @@
 		<Unit filename="gui\spinachGUI.h">
 			<Option virtualFolder="Automatically Generated Files\" />
 		</Unit>
+		<Unit filename="shared\nuclear_data.cpp" />
+		<Unit filename="shared\nuclear_data.h" />
 		<Unit filename="shared\struct.h" />
 		<Extensions>
 			<code_completion />

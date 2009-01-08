@@ -11,7 +11,7 @@ class glMolDisplay : public wxGLCanvas {
 public:
     glMolDisplay(wxWindow* parent);
     void glTick();
-    void enableGL();
+    void enableGL();;  //Resolve the cyclic dependency by replying on the fact that all pointers are alike
 
 protected:
     rootFrame* mParentFrame;

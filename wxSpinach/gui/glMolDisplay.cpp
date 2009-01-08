@@ -1,6 +1,7 @@
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include "glMolDisplay.h"
+#include "rootFrame.h"
 
 #include <vector>
 

@@ -10,7 +10,6 @@
 #include "spinachGUI.h"
 #include "optionFrame.h"
 #include "calcFrame.h"
-#include "glMolDisplay.h"
 
 #include "../shared/spin_system.h"
 
@@ -32,6 +31,8 @@ In order for this to compile, wxUSE_GLCANVAS must
 be set to 1 in wxWidgets-2.8.9\lib\gcc_lib\mswd\wx\setup.h
 
 */
+
+class glMolDisplay;  //Resolve the cyclic dependency by replying on the fact that all pointers are alike
 
 class rootFrame : public rootFrameBase
 {

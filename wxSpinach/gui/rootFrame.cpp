@@ -1,6 +1,7 @@
 
 
 #include "rootFrame.h"
+#include "glMolDisplay.h"
 #include "rotationDialog.h"
 #include "..\res\cluster.xpm"
 #include "..\res\Jcoupling.xpm"

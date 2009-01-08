@@ -14,10 +14,9 @@ enum {
     TIMER_GLTICK=1
 };
 
-glMolDisplay::glMolDisplay(wxWindow* parent)
-: wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
-  //How to better impliment this line....
-    mParentFrame=reinterpret_cast<rootFrame*>(this->GetParent());
+glMolDisplay::glMolDisplay(rootFrame* parent)
+: wxGLCanvas(reinterpret_cast<rootFrame*>(parent),-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
+    mParentFrame=parent;
 
     this->mTimer.Start(1);
 

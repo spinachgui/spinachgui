@@ -2,12 +2,22 @@
 #include <gl/glu.h>
 #include "glMolDisplay.h"
 
+#include <vector>
+
+#include "../shared/spin.h"
+#include "rootFrame.h"
+
+using namespace std;
+
 enum {
     TIMER_GLTICK=1
 };
 
 glMolDisplay::glMolDisplay(wxWindow* parent)
 : wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
+  //How to better impliment this line....
+    mParentFrame=reinterpret_cast<rootFrame*>(this->GetParent());
+
     this->mTimer.Start(1);
 
     camX=0;
@@ -68,11 +78,21 @@ void glMolDisplay::glTick() {
     yRotate=0.0;
 //    glLoadMatrixf(rotationMatrix);
 
-    glPushMatrix();
-      glTranslatef(0.0,0.0,-5);
-      glCallList(list);
-    glPopMatrix();
 
+    vector<Spin>* spins=mParentFrame->mSpinSys->GetSpins();
+    for(unsigned long i=0; i<spins->size() ;i++) {
+        if(i==mParentFrame->GetFocusedSpin()) {
+            glColor3f(1.0, 1.0, 1.0);
+        } else {
+            glColor3f(0.0, 0.0, 1.0);
+        }
+        glPushMatrix();
+          glTranslatef((*spins)[i].x,(*spins)[i].y,(*spins)[i].z);
+          glCallList(list);
+        glPopMatrix();
+    }
+
+    glColor3f(0.0, 0.0, 1.0);
 
     GLdouble mvmatrix[16], projmatrix[16];
     GLdouble worldx,worldy,worldz;

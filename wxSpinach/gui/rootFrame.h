@@ -12,14 +12,15 @@
 #include "calcFrame.h"
 #include "glMolDisplay.h"
 
-#include "../shared/struct.h"
+#include "../shared/spin_system.h"
 
 using namespace boost;
 
 enum {
     EV_MODE_SHIELDING=1,
     EV_MODE_JCOUPLING,
-    EV_MODE_CLUSTERS
+    EV_MODE_CLUSTERS,
+    EV_FOCUSED_SPIN_CHANGE
 };
 
 /*
@@ -48,20 +49,31 @@ public:
     void setModeJCoupling(wxCommandEvent& e);
     void setModeClusters(wxCommandEvent& e);
 
+    void onFocusedSpinChange(wxCommandEvent& e);
+
   //Graphics functions
 	void enableGL();
 	void glTick();
+
+  //Functions for interacting with the spin system
+    void SetFocusedSpin(long index);   //Focus on a particular spin, updating the properties pannel.
+    unsigned long GetFocusedSpin();   //Focus on a particular spin, updating the properties pannel.
+
+  //Functions for updating the contained spin system
+    void addSpin(Spin& S);
+
+  //Numerical Stuff
+    scoped_ptr<SpinSystem> mSpinSys;
 
 protected:
     void popSpinPropGrid();
     void popCouplingGrid();
 
+    unsigned long mActiveSpin;  //The index of the currently selected spin
+
     wxPropertyGrid* mSpinPropGrid;
 	wxPropertyGrid* mCouplingPropGrid;
     glMolDisplay* mMolDisplay;
-
-  //Numerical Stuff
-    scoped_ptr<SpinSystem> mSpinSys;
 
     DECLARE_EVENT_TABLE()
 

@@ -44,6 +44,15 @@ rootFrame::rootFrame( wxWindow* parent )
 
   //Now for the numerical stuff
   //Add some random test data
+
+    Spin S1=Spin("Spin 1",0 ,0 , 0);
+    this->addSpin(S1);
+    Spin S2=Spin("Spin 2",0 ,11, 0);
+    this->addSpin(S2);
+    Spin S3=Spin("Spin 3",5,7  ,-10);
+    this->addSpin(S3);
+
+    SetFocusedSpin(0);
 }
 
 
@@ -95,6 +104,25 @@ void rootFrame::ShowCalc(wxCommandEvent& e) {
 void rootFrame::enableGL() {
      mMolDisplay->enableGL();
 }
+
+//////////////////////////////////>> Spin system Editors <<==============//
+
+void rootFrame::addSpin(Spin& S) {
+    mSpinChoice->Insert(S.mName,0);
+    mSpinSys->addSpin(S);
+}
+
+//==========================>> Logical Event Handlers <<==================//
+
+void rootFrame::SetFocusedSpin(long index) {
+    mActiveSpin=index;
+    mSpinChoice->SetSelection(index);
+}
+
+unsigned long rootFrame::GetFocusedSpin() {
+    return mActiveSpin;
+}
+
 ////////////////////////////////////>> Event Handlers <<==================//
 
 void rootFrame::OnIdle(wxIdleEvent& e) {
@@ -134,6 +162,10 @@ void rootFrame::setModeClusters(wxCommandEvent& e) {
     this->Layout();
     e.Skip();
 };
+
+void rootFrame::onFocusedSpinChange(wxCommandEvent& e) {
+    this->SetFocusedSpin(e.GetInt());
+}
 
 BEGIN_EVENT_TABLE(rootFrame, wxFrame)
   EVT_IDLE    (rootFrame::OnIdle)

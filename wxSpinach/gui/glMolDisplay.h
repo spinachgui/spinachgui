@@ -1,7 +1,11 @@
 
+#ifndef GL_MOL_DISPLAY
+#define GL_MOL_DISPLAY
 
 #include <wx/glcanvas.h>
 #include <wx/timer.h>
+
+class rootFrame;
 
 class glMolDisplay : public wxGLCanvas {
 public:
@@ -10,6 +14,8 @@ public:
     void enableGL();
 
 protected:
+    rootFrame* mParentFrame;
+
     void OnMouseMove(wxMouseEvent& e);
     void OnResize(wxSizeEvent& e);
     void DoReize();
@@ -42,4 +48,4 @@ protected:
 
 };
 
-
+#endif

@@ -556,7 +556,7 @@
                                             <property name="id">wxID_ANY</property>
                                             <property name="maximum_size"></property>
                                             <property name="minimum_size"></property>
-                                            <property name="name">mSpin</property>
+                                            <property name="name">mSpinChoice</property>
                                             <property name="permission">protected</property>
                                             <property name="pos"></property>
                                             <property name="selection">0</property>
@@ -571,7 +571,7 @@
                                             <property name="window_name"></property>
                                             <property name="window_style"></property>
                                             <event name="OnChar"></event>
-                                            <event name="OnChoice"></event>
+                                            <event name="OnChoice">onFocusedSpinChange</event>
                                             <event name="OnEnterWindow"></event>
                                             <event name="OnEraseBackground"></event>
                                             <event name="OnKeyDown"></event>

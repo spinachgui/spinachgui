@@ -20,7 +20,7 @@ rootFrame::rootFrame( wxWindow* parent )
     this->GetSizer()->Add(mMolDisplay,         1, wxALL|wxEXPAND, 5 );
 
 
-    mSpinPropGrid = new wxPropertyGrid(mSpinPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+    mSpinPropGrid = new wxPropertyGrid(mSpinPanel, EV_SPIN_PROP_GRID_CHANGE, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
 	mSpinPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
 	mCouplingPropGrid = new wxPropertyGrid(mJCoupPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
@@ -174,12 +174,33 @@ void rootFrame::onFocusedSpinChange(wxCommandEvent& e) {
     this->SetFocusedSpin(e.GetInt());
 }
 
+void rootFrame::onSpinPropGridChange(wxPropertyGridEvent& e) {
+  // TODO: This method of reading properties from the grid is
+  //       rather dangerous because we assume the user changed
+  //       the isotropic shielding.
+     wxPGProperty *property = e.GetProperty();
+
+  // It may be NULL
+     if ( !property )
+         return;
+
+  // Get name of changed property
+     const wxString& name = property->GetName();
+
+  // Get resulting value
+     wxVariant value = property->GetValue();
+     mSpinSys->GetSpin(mActiveSpin).mIsotropic=value.GetDouble();
+
+     return;
+}
+
 BEGIN_EVENT_TABLE(rootFrame, wxFrame)
-  EVT_IDLE    (rootFrame::OnIdle)
-  EVT_MOTION  (rootFrame::OnMouseMove)
-  EVT_MENU    (EV_MODE_SHIELDING, rootFrame::setModeShielding)
-  EVT_MENU    (EV_MODE_JCOUPLING, rootFrame::setModeJCoupling)
-  EVT_MENU    (EV_MODE_CLUSTERS,  rootFrame::setModeClusters)
+  EVT_IDLE      (rootFrame::OnIdle)
+  EVT_MOTION    (rootFrame::OnMouseMove)
+  EVT_MENU      (EV_MODE_SHIELDING,        rootFrame::setModeShielding)
+  EVT_MENU      (EV_MODE_JCOUPLING,        rootFrame::setModeJCoupling)
+  EVT_MENU      (EV_MODE_CLUSTERS,         rootFrame::setModeClusters)
+  EVT_PG_CHANGED(EV_SPIN_PROP_GRID_CHANGE, rootFrame::onSpinPropGridChange)
 END_EVENT_TABLE()
 
 

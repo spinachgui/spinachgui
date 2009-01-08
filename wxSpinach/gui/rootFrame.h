@@ -19,7 +19,8 @@ enum {
     EV_MODE_SHIELDING=1,
     EV_MODE_JCOUPLING,
     EV_MODE_CLUSTERS,
-    EV_FOCUSED_SPIN_CHANGE
+    EV_FOCUSED_SPIN_CHANGE,
+    EV_SPIN_PROP_GRID_CHANGE
 };
 
 /*
@@ -51,6 +52,7 @@ public:
     void setModeClusters(wxCommandEvent& e);
 
     void onFocusedSpinChange(wxCommandEvent& e);
+    void onSpinPropGridChange(wxPropertyGridEvent& e);
 
   //Graphics functions
 	void enableGL();

@@ -1,5 +1,7 @@
 
 
+#include <wx\log.h>
+
 #include "rootFrame.h"
 #include "glMolDisplay.h"
 #include "rotationDialog.h"
@@ -46,11 +48,11 @@ rootFrame::rootFrame( wxWindow* parent )
   //Now for the numerical stuff
   //Add some random test data
 
-    Spin S1=Spin("Spin 1",0 ,0 , 0);
+    Spin S1=Spin("Spin 1",0 ,0 , 0 ,10.0);
     this->addSpin(S1);
-    Spin S2=Spin("Spin 2",0 ,11, 0);
+    Spin S2=Spin("Spin 2",0 ,11, 0,0.55);
     this->addSpin(S2);
-    Spin S3=Spin("Spin 3",5,7  ,-10);
+    Spin S3=Spin("Spin 3",5,7  ,-10,-7);
     this->addSpin(S3);
 
     SetFocusedSpin(0);
@@ -61,7 +63,7 @@ void rootFrame::popSpinPropGrid() {
     // Populate all the fields in mSpinPropGrid
     // (isotropic shielding, anisotropic shilding... etc)
     mSpinPropGrid->Append( new wxPropertyCategory(wxT("Sheilding")) );
-    mSpinPropGrid->Append( new wxFloatProperty(wxT("Isotropic (ppm)"), wxPG_LABEL, 0) );
+    mIsotropicShieldPGId=mSpinPropGrid->Append( new wxFloatProperty(wxT("Isotropic (ppm)"), wxPG_LABEL, 0) );
     wxPGId pid=mSpinPropGrid->Append( new wxStringProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL,  wxT("<composed>")) );
       mSpinPropGrid->AppendIn(pid,new RotationProperty(wxT("Rotation"), wxPG_LABEL,  wxT("ax 0,0,0")) );
       mSpinPropGrid->AppendIn(pid,new wxFloatProperty(wxT("x"),wxPG_LABEL,1.0) );
@@ -118,6 +120,10 @@ void rootFrame::addSpin(Spin& S) {
 void rootFrame::SetFocusedSpin(long index) {
     mActiveSpin=index;
     mSpinChoice->SetSelection(index);
+
+  //Load the information about the spin into the property box
+    Spin S=mSpinSys->GetSpin(index);
+    mSpinPropGrid->SetPropertyValueDouble(mIsotropicShieldPGId,S.mIsotropic);
 }
 
 unsigned long rootFrame::GetFocusedSpin() {

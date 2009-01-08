@@ -9,3 +9,6 @@ vector<Spin>* SpinSystem::GetSpins() {
     return &mSpins;
 }
 
+Spin& SpinSystem::GetSpin(long index) {
+    return mSpins[index];
+}

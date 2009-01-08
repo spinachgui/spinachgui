@@ -15,6 +15,7 @@ public:
 
     void addSpin(Spin S);
     vector<Spin>* GetSpins();
+    Spin& GetSpin(long index);
 
 protected:
     vector<Spin> mSpins;

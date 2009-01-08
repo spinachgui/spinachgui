@@ -15,7 +15,7 @@ enum {
 };
 
 glMolDisplay::glMolDisplay(rootFrame* parent)
-: wxGLCanvas(reinterpret_cast<rootFrame*>(parent),-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
+: wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
     mParentFrame=parent;
 
     this->mTimer.Start(1);

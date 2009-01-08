@@ -76,6 +76,8 @@ protected:
 	wxPropertyGrid* mCouplingPropGrid;
     glMolDisplay* mMolDisplay;
 
+    wxPGId mIsotropicShieldPGId;
+
     DECLARE_EVENT_TABLE()
 
 };

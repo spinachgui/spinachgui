@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
+
 using namespace std;
 
 class Spin {
@@ -28,7 +31,10 @@ public:
     double mRelaxationRate;
 
 private:
+    Spin(Spin&);
 };
+
+typedef boost::shared_ptr<Spin> SpinPnt;
 
 #endif
 

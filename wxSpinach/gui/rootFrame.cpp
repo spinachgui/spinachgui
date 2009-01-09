@@ -4,6 +4,7 @@
 
 #include "rootFrame.h"
 #include "glMolDisplay.h"
+#include "spinpgbind.h"
 #include "rotationDialog.h"
 #include "..\res\cluster.xpm"
 #include "..\res\Jcoupling.xpm"
@@ -20,13 +21,11 @@ rootFrame::rootFrame( wxWindow* parent )
     this->GetSizer()->Add(mMolDisplay,         1, wxALL|wxEXPAND, 5 );
 
 
-    mSpinPropGrid = new wxPropertyGrid(mSpinPanel, EV_SPIN_PROP_GRID_CHANGE, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
-	mSpinPropGrid->SetMinSize( wxSize( 250,-1 ) );
+    mSpinPropGrid = new SpinPropertyGrid(mSpinPanel,this);
 
 	mCouplingPropGrid = new wxPropertyGrid(mJCoupPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
 	mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
-    this->popSpinPropGrid();
     this->popCouplingGrid();
 
 
@@ -48,38 +47,17 @@ rootFrame::rootFrame( wxWindow* parent )
   //Now for the numerical stuff
   //Add some random test data
 
-    Spin S1=Spin("Spin 1",0 ,0 , 0 ,10.0);
-    this->addSpin(S1);
-    Spin S2=Spin("Spin 2",0 ,11, 0,0.55);
-    this->addSpin(S2);
-    Spin S3=Spin("Spin 3",5,7  ,-10,-7);
-    this->addSpin(S3);
+   /* PinPnt is a Boost smart pointer, so yes, this is safe.*/
+    SpinPnt S(new Spin("Spin 1",0 ,0 , 0 ,10.0));
+    this->addSpin(S);
+    S.reset(new Spin("Spin 2",0 ,11, 0,0.55));
+    this->addSpin(S);
+    S.reset(new Spin("Spin 3",5,7  ,-10,-7));
+    this->addSpin(S);
 
     SetFocusedSpin(0);
 }
 
-
-void rootFrame::popSpinPropGrid() {
-    // Populate all the fields in mSpinPropGrid
-    // (isotropic shielding, anisotropic shilding... etc)
-    mSpinPropGrid->Append( new wxPropertyCategory(wxT("Sheilding")) );
-    mIsotropicShieldPGId=mSpinPropGrid->Append( new wxFloatProperty(wxT("Isotropic (ppm)"), wxPG_LABEL, 0) );
-    wxPGId pid=mSpinPropGrid->Append( new wxStringProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL,  wxT("<composed>")) );
-      mSpinPropGrid->AppendIn(pid,new RotationProperty(wxT("Rotation"), wxPG_LABEL,  wxT("ax 0,0,0")) );
-      mSpinPropGrid->AppendIn(pid,new wxFloatProperty(wxT("x"),wxPG_LABEL,1.0) );
-      mSpinPropGrid->AppendIn(pid,new wxFloatProperty(wxT("y"),wxPG_LABEL,1.0) );
-      mSpinPropGrid->AppendIn(pid,new wxFloatProperty(wxT("z"),wxPG_LABEL,1.0) );
-
-
-    mSpinPropGrid->Append( new wxPropertyCategory(wxT("Relaxation")) );
-    mSpinPropGrid->Append( new wxBoolProperty(wxT("Redfield"), wxPG_LABEL, false) );
-    mSpinPropGrid->Append( new wxFloatProperty(wxT("Rate"), wxPG_LABEL,0) );
-
-    mSpinPropGrid->Append( new wxPropertyCategory(wxT("Coordinates")) );
-    mSpinPropGrid->Append( new wxFloatProperty(wxT("x"), wxPG_LABEL, 0) );
-    mSpinPropGrid->Append( new wxFloatProperty(wxT("y"), wxPG_LABEL, 0) );
-    mSpinPropGrid->Append( new wxFloatProperty(wxT("z"), wxPG_LABEL, 0) );
-}
 
 
 void rootFrame::popCouplingGrid() {
@@ -110,8 +88,8 @@ void rootFrame::enableGL() {
 
 //////////////////////////////////>> Spin system Editors <<==============//
 
-void rootFrame::addSpin(Spin& S) {
-    mSpinChoice->Insert(S.mName,0);
+void rootFrame::addSpin(SpinPnt S) {
+    mSpinChoice->Insert(S->mName,0);
     mSpinSys->addSpin(S);
 }
 
@@ -122,15 +100,15 @@ void rootFrame::SetFocusedSpin(long index) {
     mSpinChoice->SetSelection(index);
 
   //Load the information about the spin into the property box
-    Spin S=mSpinSys->GetSpin(index);
-    mSpinPropGrid->SetPropertyValueDouble(mIsotropicShieldPGId,S.mIsotropic);
+    SpinPnt S=mSpinSys->GetSpin(index);
+    mSpinPropGrid->LinkToSpin(S);
 }
 
 unsigned long rootFrame::GetFocusedSpin() {
     return mActiveSpin;
 }
 
-////////////////////////////////////>> Event Handlers <<==================//
+//========================>> Event Handlers <<==================//
 
 void rootFrame::OnIdle(wxIdleEvent& e) {
    // mMolDisplay->glTick();
@@ -174,25 +152,7 @@ void rootFrame::onFocusedSpinChange(wxCommandEvent& e) {
     this->SetFocusedSpin(e.GetInt());
 }
 
-void rootFrame::onSpinPropGridChange(wxPropertyGridEvent& e) {
-  // TODO: This method of reading properties from the grid is
-  //       rather dangerous because we assume the user changed
-  //       the isotropic shielding.
-     wxPGProperty *property = e.GetProperty();
 
-  // It may be NULL
-     if ( !property )
-         return;
-
-  // Get name of changed property
-     const wxString& name = property->GetName();
-
-  // Get resulting value
-     wxVariant value = property->GetValue();
-     mSpinSys->GetSpin(mActiveSpin).mIsotropic=value.GetDouble();
-
-     return;
-}
 
 BEGIN_EVENT_TABLE(rootFrame, wxFrame)
   EVT_IDLE      (rootFrame::OnIdle)
@@ -200,7 +160,6 @@ BEGIN_EVENT_TABLE(rootFrame, wxFrame)
   EVT_MENU      (EV_MODE_SHIELDING,        rootFrame::setModeShielding)
   EVT_MENU      (EV_MODE_JCOUPLING,        rootFrame::setModeJCoupling)
   EVT_MENU      (EV_MODE_CLUSTERS,         rootFrame::setModeClusters)
-  EVT_PG_CHANGED(EV_SPIN_PROP_GRID_CHANGE, rootFrame::onSpinPropGridChange)
 END_EVENT_TABLE()
 
 

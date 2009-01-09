@@ -13,12 +13,12 @@ class SpinSystem {
 public:
     SpinSystem(){};
 
-    void addSpin(Spin S);
-    vector<Spin>* GetSpins();
-    Spin& GetSpin(long index);
+    void addSpin(SpinPnt S);
+    SpinPnt GetSpin(long index);
+    inline long GetSpinCount(){return mSpins.size();}
 
 protected:
-    vector<Spin> mSpins;
+    vector<SpinPnt> mSpins;
 };
 
 

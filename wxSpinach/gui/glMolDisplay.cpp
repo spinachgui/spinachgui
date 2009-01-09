@@ -79,15 +79,16 @@ void glMolDisplay::glTick() {
 //    glLoadMatrixf(rotationMatrix);
 
 
-    vector<Spin>* spins=mParentFrame->mSpinSys->GetSpins();
-    for(unsigned long i=0; i<spins->size() ;i++) {
+    long spinCount=mParentFrame->mSpinSys->GetSpinCount();
+    for(long i=0; i<spinCount ;i++) {
         if(i==mParentFrame->GetFocusedSpin()) {
             glColor3f(1.0, 1.0, 1.0);
         } else {
             glColor3f(0.0, 0.0, 1.0);
         }
+        SpinPnt thisSpin=mParentFrame->mSpinSys->GetSpin(i);
         glPushMatrix();
-          glTranslatef((*spins)[i].x,(*spins)[i].y,(*spins)[i].z);
+          glTranslatef(thisSpin->x,thisSpin->y,thisSpin->z);
           glCallList(list);
         glPopMatrix();
     }

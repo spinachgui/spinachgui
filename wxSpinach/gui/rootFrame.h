@@ -34,6 +34,7 @@ be set to 1 in wxWidgets-2.8.9\lib\gcc_lib\mswd\wx\setup.h
 */
 
 class glMolDisplay;  //Resolve the cyclic dependency by replying on the fact that all pointers are alike
+class SpinPropertyGrid;
 
 class rootFrame : public rootFrameBase
 {
@@ -63,22 +64,20 @@ public:
     unsigned long GetFocusedSpin();   //Focus on a particular spin, updating the properties pannel.
 
   //Functions for updating the contained spin system
-    void addSpin(Spin& S);
+    void addSpin(SpinPnt S);
 
   //Numerical Stuff
     scoped_ptr<SpinSystem> mSpinSys;
 
 protected:
-    void popSpinPropGrid();
     void popCouplingGrid();
 
     unsigned long mActiveSpin;  //The index of the currently selected spin
 
-    wxPropertyGrid* mSpinPropGrid;
+    SpinPropertyGrid* mSpinPropGrid;
 	wxPropertyGrid* mCouplingPropGrid;
     glMolDisplay* mMolDisplay;
 
-    wxPGId mIsotropicShieldPGId;
 
     DECLARE_EVENT_TABLE()
 

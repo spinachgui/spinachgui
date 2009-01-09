@@ -79,8 +79,8 @@ void glMolDisplay::glTick() {
 //    glLoadMatrixf(rotationMatrix);
 
 
-    long spinCount=mParentFrame->mSpinSys->GetSpinCount();
-    for(long i=0; i<spinCount ;i++) {
+    unsigned spinCount=mParentFrame->mSpinSys->GetSpinCount();
+    for(unsigned long i=0; i<spinCount ;i++) {
         if(i==mParentFrame->GetFocusedSpin()) {
             glColor3f(1.0, 1.0, 1.0);
         } else {

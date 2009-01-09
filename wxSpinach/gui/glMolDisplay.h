@@ -2,6 +2,8 @@
 #ifndef GL_MOL_DISPLAY
 #define GL_MOL_DISPLAY
 
+#include "../shared/spin.h"
+
 #include <wx/glcanvas.h>
 #include <wx/timer.h>
 

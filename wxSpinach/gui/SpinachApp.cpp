@@ -7,6 +7,8 @@
  * License:
  **************************************************************/
 
+#include "../shared/spin.h"
+
 #ifdef WX_PRECOMP
 #include "wx_pch.h"
 #endif

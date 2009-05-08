@@ -1,5 +1,13 @@
-#include <gl/gl.h>
-#include <gl/glu.h>
+
+#ifdef OS_WIN32
+	#include <GL/glext.h>
+#endif
+#ifdef OS_LINUX
+	#include <GL/glx.h>
+#endif
+
+
+#include <GL/glu.h>
 #include "glMolDisplay.h"
 #include "rootFrame.h"
 
@@ -18,7 +26,7 @@ glMolDisplay::glMolDisplay(rootFrame* parent)
 : wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
     mParentFrame=parent;
 
-    this->mTimer.Start(1);
+    this->mTimer.Start(30);
 
     camX=0;
     camY=0;

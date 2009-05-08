@@ -4,14 +4,14 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <wx/odcombo.h>
-#include <wx/propgrid/propgrid.h>
-#include <wx/propgrid/advprops.h>
+//#include <wx/propgrid/propgrid.h>
+//#include <wx/propgrid/advprops.h>
 
-#include "spinachGUI.h"
-#include "optionFrame.h"
-#include "calcFrame.h"
+#include <gui/spinachGUI.h>
+#include <gui/optionFrame.h>
+#include <gui/calcFrame.h>
 
-#include "../shared/spin_system.h"
+#include <shared/spin_system.h>
 
 using namespace boost;
 
@@ -53,7 +53,7 @@ public:
     void setModeClusters(wxCommandEvent& e);
 
     void onFocusedSpinChange(wxCommandEvent& e);
-    void onSpinPropGridChange(wxPropertyGridEvent& e);
+    //void onSpinPropGridChange(wxPropertyGridEvent& e);
 
   //Graphics functions
 	void enableGL();
@@ -74,8 +74,8 @@ protected:
 
     unsigned long mActiveSpin;  //The index of the currently selected spin
 
-    SpinPropertyGrid* mSpinPropGrid;
-	wxPropertyGrid* mCouplingPropGrid;
+//  SpinPropertyGrid* mSpinPropGrid;
+//	wxPropertyGrid* mCouplingPropGrid;
     glMolDisplay* mMolDisplay;
 
 

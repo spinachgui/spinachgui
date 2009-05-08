@@ -9,7 +9,7 @@ wxPGEditorDialogAdapter* RotationProperty::GetEditorDialog() const {
 }
 
 RotationProperty::RotationProperty() {
-    RotationProperty("ax 0,0,0");
+    RotationProperty(_T("ax 0,0,0"));
 }
 
 RotationProperty::RotationProperty(const wxString& label, const wxString& name, const wxString& value)
@@ -46,5 +46,5 @@ rotationDialog::rotationDialog( wxWindow* parent )
 
 
 wxString rotationDialog::getAsString() {
-    return "Got From Dialog";
+    return _T("Got From Dialog");
 }

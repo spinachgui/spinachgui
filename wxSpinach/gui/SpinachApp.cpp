@@ -7,7 +7,7 @@
  * License:
  **************************************************************/
 
-#include "../shared/spin.h"
+#include <shared/spin.h>
 
 #ifdef WX_PRECOMP
 #include "wx_pch.h"
@@ -26,7 +26,7 @@ IMPLEMENT_APP(SpinachApp);
 bool SpinachApp::OnInit()
 {
     rootFrame* frame = new rootFrame(NULL);
-    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
+//    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
     frame->Show();
     frame->enableGL();
 

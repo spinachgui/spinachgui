@@ -45,7 +45,6 @@ protected:
     double yRotate;
 
     float rotationMatrix[16];
-
     wxTimer mTimer;
 
 };

@@ -1,14 +1,14 @@
 
 
-#include <wx\log.h>
+#include <wx/log.h>
 
-#include "rootFrame.h"
-#include "glMolDisplay.h"
-#include "spinpgbind.h"
-#include "rotationDialog.h"
-#include "..\res\cluster.xpm"
-#include "..\res\Jcoupling.xpm"
-#include "..\res\S.xpm"
+#include <gui/rootFrame.h>
+#include <gui/glMolDisplay.h>
+#include <gui/spinpgbind.h>
+#include <gui/rotationDialog.h>
+#include <res/cluster.xpm>
+#include <res/Jcoupling.xpm>
+#include <res/S.xpm>
 
 rootFrame::rootFrame( wxWindow* parent )
 :rootFrameBase( parent ),mSpinSys(new SpinSystem) {
@@ -21,24 +21,24 @@ rootFrame::rootFrame( wxWindow* parent )
     this->GetSizer()->Add(mMolDisplay,         1, wxALL|wxEXPAND, 5 );
 
 
-    mSpinPropGrid = new SpinPropertyGrid(mSpinPanel,this);
+    //mSpinPropGrid = new SpinPropertyGrid(mSpinPanel,this);
 
-	mCouplingPropGrid = new wxPropertyGrid(mJCoupPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
-	mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
+	//mCouplingPropGrid = new wxPropertyGrid(mJCoupPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+	//mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
-    this->popCouplingGrid();
+    //this->popCouplingGrid();
 
 
   //Add everything to the panel sizers
-	mSpinPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
+	//mSpinPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
 
-	mJCoupPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
+	//mJCoupPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
 
 
   //Sort out the toolbar
-    mRootToolbar->AddTool( EV_MODE_SHIELDING, wxT("Shielding"),           wxBitmap( S, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
-    mRootToolbar->AddTool( EV_MODE_JCOUPLING, wxT("J Coupling"),          wxBitmap( Jcoupling, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
-    mRootToolbar->AddTool( EV_MODE_CLUSTERS,  wxT("Cluster Definitions"), wxBitmap( cluster, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+  //  mRootToolbar->AddTool( EV_MODE_SHIELDING, wxT("Shielding"),           wxBitmap( S, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+  //  mRootToolbar->AddTool( EV_MODE_JCOUPLING, wxT("J Coupling"),          wxBitmap( Jcoupling, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+  //  mRootToolbar->AddTool( EV_MODE_CLUSTERS,  wxT("Cluster Definitions"), wxBitmap( cluster, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
     mRootToolbar->Realize(); // Called to draw the buttons
 
 
@@ -63,22 +63,22 @@ rootFrame::rootFrame( wxWindow* parent )
 void rootFrame::popCouplingGrid() {
     // Populate all the fields in mSpinPairPropGrid
     // (isotropic shielding, anisotropic shilding... etc)
-    mCouplingPropGrid->Append( new wxPropertyCategory(wxT("Coupling")) );
-    mCouplingPropGrid->Append( new wxFloatProperty(wxT("J-coupling"), wxPG_LABEL, 0) );
-    mCouplingPropGrid->Append( new wxFloatProperty(wxT("Dipole coupling"), wxPG_LABEL, 0) );
+    //mCouplingPropGrid->Append( new wxPropertyCategory(wxT("Coupling")) );
+    //mCouplingPropGrid->Append( new wxFloatProperty(wxT("J-coupling"), wxPG_LABEL, 0) );
+    //mCouplingPropGrid->Append( new wxFloatProperty(wxT("Dipole coupling"), wxPG_LABEL, 0) );
 
 }
 
 
 void rootFrame::ShowOptions(wxCommandEvent& e) {
     optionFrame* frame = new optionFrame(this);
-    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
+//    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
     frame->Show();
 }
 
 void rootFrame::ShowCalc(wxCommandEvent& e) {
     calcFrame* frame = new calcFrame(this);
-    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
+//    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
     frame->Show();
 }
 
@@ -89,7 +89,7 @@ void rootFrame::enableGL() {
 //////////////////////////////////>> Spin system Editors <<==============//
 
 void rootFrame::addSpin(SpinPnt S) {
-    mSpinChoice->Insert(S->mName,0);
+    mSpinChoice->Insert(wxString(S->mName.c_str(),wxConvUTF8),0);
     mSpinSys->addSpin(S);
 }
 
@@ -101,7 +101,7 @@ void rootFrame::SetFocusedSpin(long index) {
 
   //Load the information about the spin into the property box
     SpinPnt S=mSpinSys->GetSpin(index);
-    mSpinPropGrid->LinkToSpin(S);
+    //mSpinPropGrid->LinkToSpin(S);
 }
 
 unsigned long rootFrame::GetFocusedSpin() {
@@ -118,8 +118,8 @@ void rootFrame::OnIdle(wxIdleEvent& e) {
 void rootFrame::OnMouseMove(wxMouseEvent& e) {
     long x=e.GetX();
     long y=e.GetY();
-    wxString msg="";
-    msg << "x=" << x << " y=" << y;
+    wxString msg=_T("");
+    msg << _T("x=") << x << _T(" y=") << y;
     mRootStatusBar->SetStatusText(msg);
     e.Skip();
 }

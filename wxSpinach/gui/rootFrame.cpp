@@ -36,9 +36,9 @@ rootFrame::rootFrame( wxWindow* parent )
 
 
   //Sort out the toolbar
-  //  mRootToolbar->AddTool( EV_MODE_SHIELDING, wxT("Shielding"),           wxBitmap( S, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
-  //  mRootToolbar->AddTool( EV_MODE_JCOUPLING, wxT("J Coupling"),          wxBitmap( Jcoupling, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
-  //  mRootToolbar->AddTool( EV_MODE_CLUSTERS,  wxT("Cluster Definitions"), wxBitmap( cluster, wxBITMAP_TYPE_XPM  ), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+    mRootToolbar->AddTool( EV_MODE_SHIELDING, wxT("Shielding"),           wxBitmap(S),         wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+    mRootToolbar->AddTool( EV_MODE_JCOUPLING, wxT("J Coupling"),          wxBitmap(Jcoupling), wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
+    mRootToolbar->AddTool( EV_MODE_CLUSTERS,  wxT("Cluster Definitions"), wxBitmap(cluster),   wxNullBitmap, wxITEM_RADIO, wxEmptyString, wxEmptyString );
     mRootToolbar->Realize(); // Called to draw the buttons
 
 

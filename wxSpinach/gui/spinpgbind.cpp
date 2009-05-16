@@ -34,8 +34,8 @@ SpinPropertyGrid::SpinPropertyGrid(wxWindow* parent,rootFrame* root)
     this->Append( new wxPropertyCategory(wxT("Sheilding")) );
     mIsotropicShieldPGId=this->Append( new wxFloatProperty(wxT("Isotropic (ppm)"), wxPG_LABEL, 0) );
 
-    wxPGId pid=this->Append( new wxStringProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL,  wxT("<composed>")) );
-        wxPGId r_id=this->AppendIn(pid,new RotationProperty(wxT("Rotation"), wxPG_LABEL,  wxT("ax 0,0,0")) );
+    wxPGProperty* pid=this->Append( new wxStringProperty(wxT("Anisotropic (ppm)"), wxPG_LABEL,  wxT("<composed>")) );
+        wxPGProperty* r_id=this->AppendIn(pid,new RotationProperty(wxT("Rotation"), wxPG_LABEL,  wxT("ax 0,0,0")) );
 
         this->SetPropertyValidator(r_id,wxTextValidator(wxFILTER_ALPHA));
 
@@ -56,8 +56,8 @@ SpinPropertyGrid::SpinPropertyGrid(wxWindow* parent,rootFrame* root)
 
 void SpinPropertyGrid::LinkToSpin(SpinPnt S) {
     mCurrentSpin=S;
-    this->SetPropertyValueDouble(mIsotropicShieldPGId,S->mIsotropic);
-    this->SetPropertyValueBool(mRedfieldPGId         ,S->mRedfield);
+    this->SetPropertyValue(mIsotropicShieldPGId,S->mIsotropic);
+    this->SetPropertyValue(mRedfieldPGId         ,S->mRedfield);
 }
 
 void SpinPropertyGrid::onChange(wxPropertyGridEvent& e) {

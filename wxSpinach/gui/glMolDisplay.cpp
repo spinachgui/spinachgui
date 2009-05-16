@@ -6,10 +6,11 @@
 	#include <GL/glx.h>
 #endif
 
+//#include <wx/log.h>
 
 #include <GL/glu.h>
-#include "glMolDisplay.h"
-#include "rootFrame.h"
+#include <gui/glMolDisplay.h>
+#include <gui/rootFrame.h>
 
 #include <vector>
 
@@ -23,9 +24,8 @@ enum {
 };
 
 glMolDisplay::glMolDisplay(rootFrame* parent)
-: wxGLCanvas(parent,-1,wxDefaultPosition,wxDefaultSize),mZoom(0.05),mTimer(this, TIMER_GLTICK) {
+: wxGLCanvas(parent,-1,NULL),mZoom(0.05),mTimer(this, TIMER_GLTICK),mpGLContext(NULL),mInitalised(false) {
     mParentFrame=parent;
-
     this->mTimer.Start(30);
 
     camX=0;
@@ -42,7 +42,12 @@ glMolDisplay::glMolDisplay(rootFrame* parent)
 
 
 void glMolDisplay::enableGL() {
-    this->SetCurrent();
+	if(mpGLContext==NULL) {
+		mpGLContext = new wxGLContext(this);
+	}
+    // This is required even though dc is not used otherwise.
+    wxPaintDC dc(this);
+    this->SetCurrent(*mpGLContext);
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glColor3f(0.0, 0.0, 1.0);
@@ -59,9 +64,15 @@ void glMolDisplay::enableGL() {
     gluDeleteQuadric(qobj);
 
     DoReize();
+    mInitalised=true;
 }
 
 void glMolDisplay::glTick() {
+	if(!mInitalised) {
+		return;
+	}
+    // This is required even though dc is not used otherwise.
+    wxPaintDC dc(this);
  	glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
 

@@ -17,8 +17,8 @@
 #pragma hdrstop
 #endif //__BORLANDC__
 
-#include "SpinachApp.h"
-#include "rootFrame.h"
+#include <gui/SpinachApp.h>
+#include <gui/rootFrame.h>
 
 
 IMPLEMENT_APP(SpinachApp);
@@ -28,7 +28,7 @@ bool SpinachApp::OnInit()
     rootFrame* frame = new rootFrame(NULL);
 //    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
     frame->Show();
-    frame->enableGL();
+//    frame->enableGL();
 
     return true;
 }

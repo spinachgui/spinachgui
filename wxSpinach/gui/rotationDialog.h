@@ -3,8 +3,8 @@
 
 #include "spinachGUI.h"
 #include <wx/propgrid/propgrid.h>
-#include <wx/propgrid/advprops.h>
-#include <wx/propgrid/propdev.h>
+//#include <wx/propgrid/advprops.h>
+
 
 class rotationDialog : public rotationDialogBase {
 public:

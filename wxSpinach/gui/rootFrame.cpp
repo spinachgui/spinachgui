@@ -21,18 +21,18 @@ rootFrame::rootFrame( wxWindow* parent )
     this->GetSizer()->Add(mMolDisplay,         1, wxALL|wxEXPAND, 5 );
 
 
-    //mSpinPropGrid = new SpinPropertyGrid(mSpinPanel,this);
+    mSpinPropGrid = new SpinPropertyGrid(mSpinPanel,this);
 
-	//mCouplingPropGrid = new wxPropertyGrid(mJCoupPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
-	//mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
+	mCouplingPropGrid = new wxPropertyGrid(mJCoupPanel, wxID_ANY, wxDefaultPosition, wxSize( 250,-1 ), wxPG_DEFAULT_STYLE);
+	mCouplingPropGrid->SetMinSize( wxSize( 250,-1 ) );
 
-    //this->popCouplingGrid();
+    this->popCouplingGrid();
 
 
   //Add everything to the panel sizers
-	//mSpinPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
+	mSpinPanel->GetSizer()->Add( mSpinPropGrid,     1, wxALL|wxEXPAND, 5 );
 
-	//mJCoupPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
+	mJCoupPanel->GetSizer()->Add( mCouplingPropGrid, 1, wxALL|wxEXPAND, 5 );
 
 
   //Sort out the toolbar
@@ -63,9 +63,9 @@ rootFrame::rootFrame( wxWindow* parent )
 void rootFrame::popCouplingGrid() {
     // Populate all the fields in mSpinPairPropGrid
     // (isotropic shielding, anisotropic shilding... etc)
-    //mCouplingPropGrid->Append( new wxPropertyCategory(wxT("Coupling")) );
-    //mCouplingPropGrid->Append( new wxFloatProperty(wxT("J-coupling"), wxPG_LABEL, 0) );
-    //mCouplingPropGrid->Append( new wxFloatProperty(wxT("Dipole coupling"), wxPG_LABEL, 0) );
+    mCouplingPropGrid->Append( new wxPropertyCategory(wxT("Coupling")) );
+    mCouplingPropGrid->Append( new wxFloatProperty(wxT("J-coupling"), wxPG_LABEL, 0) );
+    mCouplingPropGrid->Append( new wxFloatProperty(wxT("Dipole coupling"), wxPG_LABEL, 0) );
 
 }
 
@@ -86,7 +86,7 @@ void rootFrame::enableGL() {
      mMolDisplay->enableGL();
 }
 
-//////////////////////////////////>> Spin system Editors <<==============//
+//================================>> Spin system Editors <<==============//
 
 void rootFrame::addSpin(SpinPnt S) {
     mSpinChoice->Insert(wxString(S->mName.c_str(),wxConvUTF8),0);
@@ -101,7 +101,7 @@ void rootFrame::SetFocusedSpin(long index) {
 
   //Load the information about the spin into the property box
     SpinPnt S=mSpinSys->GetSpin(index);
-    //mSpinPropGrid->LinkToSpin(S);
+    mSpinPropGrid->LinkToSpin(S);
 }
 
 unsigned long rootFrame::GetFocusedSpin() {
@@ -111,6 +111,11 @@ unsigned long rootFrame::GetFocusedSpin() {
 //========================>> Event Handlers <<==================//
 
 void rootFrame::OnIdle(wxIdleEvent& e) {
+	static bool firstTime=true;
+	if(firstTime) {
+		this->enableGL();
+		firstTime=false;
+	}
    // mMolDisplay->glTick();
    // e.RequestMore();
 }

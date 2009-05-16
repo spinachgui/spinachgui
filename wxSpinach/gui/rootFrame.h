@@ -4,7 +4,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <wx/odcombo.h>
-//#include <wx/propgrid/propgrid.h>
+#include <wx/propgrid/propgrid.h>
 //#include <wx/propgrid/advprops.h>
 
 #include <gui/spinachGUI.h>
@@ -74,8 +74,8 @@ protected:
 
     unsigned long mActiveSpin;  //The index of the currently selected spin
 
-//  SpinPropertyGrid* mSpinPropGrid;
-//	wxPropertyGrid* mCouplingPropGrid;
+    SpinPropertyGrid* mSpinPropGrid;
+	wxPropertyGrid* mCouplingPropGrid;
     glMolDisplay* mMolDisplay;
 
 

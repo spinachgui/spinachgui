@@ -4,9 +4,9 @@
 
 #include <wx/odcombo.h>
 #include <wx/propgrid/propgrid.h>
-#include <wx/propgrid/advprops.h>
+//#include <wx/propgrid/advprops.h>
 
-#include "../shared/spin.h"
+#include <shared/spin.h>
 
 class rootFrame;
 
@@ -25,8 +25,8 @@ protected:
 
   //Fields to hold ids for all the fields in the Property Grid.
   //Carn't think of a better way to do this right now.
-    wxPGId mIsotropicShieldPGId;
-    wxPGId mRedfieldPGId;
+    wxPGProperty* mIsotropicShieldPGId;
+    wxPGProperty* mRedfieldPGId;
 
     DECLARE_EVENT_TABLE()
 

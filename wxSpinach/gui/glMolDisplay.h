@@ -46,7 +46,9 @@ protected:
 
     float rotationMatrix[16];
     wxTimer mTimer;
+	wxGLContext* mpGLContext;
 
+	bool mInitalised;
 };
 
 #endif

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--Created with Liquid XML Studio - FREE Community Edition 7.0.2.746 (http://www.liquid-technologies.com)-->
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="vector">
+    <xs:annotation>
+      <xs:documentation>This is a documentation line.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence minOccurs="1" maxOccurs="1">
+      <xs:element minOccurs="3" maxOccurs="3" name="element" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="orientation">
+    <xs:choice minOccurs="1" maxOccurs="1">
+      <xs:element name="euler_angles">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="alpha" type="xs:double" />
+            <xs:element minOccurs="1" maxOccurs="1" name="beta" type="xs:double" />
+            <xs:element minOccurs="1" maxOccurs="1" name="gamma" type="xs:double" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="angle_axis">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="angle" type="xs:double" />
+            <xs:element name="axis" type="vector" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="quaternion">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="re" type="xs:double" />
+            <xs:element name="i" type="xs:double" />
+            <xs:element name="j" type="xs:double" />
+            <xs:element name="k" type="xs:double" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="eigensystem">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="x_axis" type="vector" />
+            <xs:element minOccurs="1" maxOccurs="1" name="y_axis" type="vector" />
+            <xs:element minOccurs="1" maxOccurs="1" name="z_axis" type="vector" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="reference_frame" type="xs:integer" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="interaction">
+    <xs:choice minOccurs="1" maxOccurs="1">
+      <xs:element name="scalar">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:double">
+              <xs:attribute name="strong" type="xs:boolean" />
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="matrix">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="9" maxOccurs="9" name="element" type="xs:double" />
+          </xs:sequence>
+          <xs:attribute name="reference_frame" type="xs:double" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:sequence>
+        <xs:choice minOccurs="1" maxOccurs="1">
+          <xs:element name="eigenvalues">
+            <xs:complexType>
+              <xs:sequence minOccurs="1" maxOccurs="1">
+                <xs:element minOccurs="1" maxOccurs="1" name="XX" type="xs:double" />
+                <xs:element minOccurs="1" maxOccurs="1" name="YY" type="xs:double" />
+                <xs:element minOccurs="1" maxOccurs="1" name="ZZ" type="xs:double" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="axiality_rhombicity">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="iso" type="xs:double" />
+                <xs:element name="ax" type="xs:double" />
+                <xs:element name="rh" type="xs:double" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="span_skew">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="iso" type="xs:double" />
+                <xs:element name="span" type="xs:double" />
+                <xs:element name="skew" type="xs:double" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:element minOccurs="1" maxOccurs="1" name="orientation" type="orientation" />
+      </xs:sequence>
+    </xs:choice>
+    <xs:attribute name="type" type="xs:string" use="required" />
+    <xs:attribute name="units" type="xs:string" use="required" />
+    <xs:attribute name="spin_1" type="xs:integer" use="required" />
+    <xs:attribute name="spin_2" type="xs:integer" />
+  </xs:complexType>
+  <xs:element name="spin_system">
+    <xs:complexType>
+      <xs:sequence minOccurs="1" maxOccurs="1">
+        <xs:element minOccurs="1" maxOccurs="unbounded" name="spin">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" name="coordinates" type="vector" />
+            </xs:sequence>
+            <xs:attribute name="number" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:integer" />
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="isotope" type="xs:string" use="required" />
+            <xs:attribute name="label" type="xs:string" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="1" maxOccurs="unbounded" name="interaction" type="interaction" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="reference_frame">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="origin" type="vector" />
+              <xs:element name="orientation" type="orientation" />
+            </xs:sequence>
+            <xs:attribute name="number" type="xs:integer" use="required" />
+            <xs:attribute name="label" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

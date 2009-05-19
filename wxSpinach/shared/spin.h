@@ -10,11 +10,15 @@
 
 using namespace std;
 
+
 class Spin {
 public:
     Spin();
     Spin(const string& name,double _x,double _y,double _z,double isotropic): mName(name),x(_x),y(_y),z(_z),mIsotropic(isotropic) {
-        double dA[] = { 1, 3, 2, 1.5, 2.5, 3.5, 4.5, 9.5, 5.5 };
+      //Eigenvalues 1 2 3 rotated about x by pi/4
+        double dA[] = { 1.5, 0.5, 0,
+                       -0.5, 1.5, 0,
+                        0,   0,   3};
         //Matrix A(dA, 3, 3);
     };
 

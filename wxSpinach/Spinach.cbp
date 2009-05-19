@@ -82,6 +82,7 @@
 			<Add directory="..\lib\wxWidgets-2.8.9\include" />
 			<Add directory="..\lib\wxWidgets-2.8.9\contrib\include" />
 			<Add directory="..\lib\boost_1_37_0" />
+			<Add directory="..\lib\mtl\include" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="..\lib\wxWidgets-2.8.9\include" />
@@ -167,9 +168,14 @@
 		<Unit filename="gui\spinachGUI.h">
 			<Option virtualFolder="Automatically Generated Files\" />
 		</Unit>
+		<Unit filename="gui\spinpgbind.cpp" />
+		<Unit filename="gui\spinpgbind.h" />
 		<Unit filename="shared\nuclear_data.cpp" />
 		<Unit filename="shared\nuclear_data.h" />
-		<Unit filename="shared\struct.h" />
+		<Unit filename="shared\spin.cpp" />
+		<Unit filename="shared\spin.h" />
+		<Unit filename="shared\spin_system.cpp" />
+		<Unit filename="shared\spin_system.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

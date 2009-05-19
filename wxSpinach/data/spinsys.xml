@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid XML Studio - FREE Community Edition 7.0.2.746 (http://www.liquid-technologies.com) -->
+<spin_system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:///E:/Work%20in%20progress/Spinach/Spinach/XML%20markup/SpinXML/xml_schema_for_spin_system_specification.xsd">
+  <spin number="-6548" isotope="string" label="string">
+    <coordinates>
+      <element>-142.2250941961</element>
+      <element>9780.8749058039</element>
+      <element>-3974.6050941961</element>
+    </coordinates>
+  </spin>
+  <interaction type="string" units="string" spin_1="-671" spin_2="-3508">
+    <span_skew>
+      <span>-6037.5650941961</span>
+      <skew>1867.5149058039</skew>
+    </span_skew>
+    <orientation reference_frame="string">
+      <quaternion>
+        <re>4064.8749058039</re>
+        <i>-3705.9850941961</i>
+        <j>9928.6349058039</j>
+        <k>-1433.7650941961</k>
+      </quaternion>
+    </orientation>
+  </interaction>
+  <interaction type="string" units="string" spin_1="-8933" spin_2="-3969">
+    <scalar strong="false">3636.6549058039</scalar>
+  </interaction>
+  <reference_frame name="string">
+    <origin>
+      <element>6338.2949058039</element>
+      <element>-7305.8450941961</element>
+      <element>4740.2949058039</element>
+    </origin>
+    <orientation reference_frame="string">
+      <euler_angles>
+        <alpha>-8029.2450941961</alpha>
+        <beta>4947.3749058039</beta>
+        <gamma>1705.1149058039</gamma>
+      </euler_angles>
+    </orientation>
+  </reference_frame>
+  <reference_frame name="string">
+    <origin>
+      <element>-4783.4050941961</element>
+      <element>3783.6149058039</element>
+      <element>7243.3949058039</element>
+    </origin>
+    <orientation reference_frame="string">
+      <euler_angles>
+        <alpha>-6613.4650941961</alpha>
+        <beta>-2078.6650941961</beta>
+        <gamma>8618.8949058039</gamma>
+      </euler_angles>
+    </orientation>
+  </reference_frame>
+  <reference_frame name="string">
+    <origin>
+      <element>1885.6949058039</element>
+      <element>-8516.9050941961</element>
+      <element>2693.9949058039</element>
+    </origin>
+    <orientation reference_frame="string">
+      <eigensystem>
+        <x_axis>
+          <element>1391.2549058039</element>
+          <element>2535.1949058039</element>
+          <element>-1235.4250941961</element>
+        </x_axis>
+        <y_axis>
+          <element>4154.4349058039</element>
+          <element>6080.0549058039</element>
+          <element>7932.8949058039</element>
+        </y_axis>
+        <z_axis>
+          <element>895.2749058039</element>
+          <element>-4260.9650941961</element>
+          <element>7132.6749058039</element>
+        </z_axis>
+      </eigensystem>
+    </orientation>
+  </reference_frame>
+</spin_system>

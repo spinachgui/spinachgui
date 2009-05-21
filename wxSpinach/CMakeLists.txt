@@ -4,6 +4,9 @@ project(cspinach)
 #find_package(wxWidgets COMPONENTS net xml adv aui core gl html propgrid qa richtext stc xrc REQUIRED)
 find_package(wxWidgets COMPONENTS gl REQUIRED)
 
+#set the version of gcc to use. Currently g++-4.3 doesn't work.
+set(CMAKE_CXX_COMPILER "g++-4.2")
+
 
 #Enclose this in some sort of "if" if more than one 
 #compiler is ever supported
@@ -61,6 +64,6 @@ target_link_libraries (wxSpinach GLEW)
 
 set(spinachSources ${cmdSources} ${sharedSources})
 add_executable (spinach ${spinachSources})
-target_link_libraries (spinach atlas) 
+target_link_libraries (spinach atlas flens xerces-c) 
 
 

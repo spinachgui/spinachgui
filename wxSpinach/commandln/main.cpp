@@ -15,6 +15,28 @@ using namespace xercesc;
 typedef GeMatrix<FullStorage<double, ColMajor> > MyMatrix;
 
 
+class MyErrorHandler : public ErrorHandler {
+public:
+  void warning (const SAXParseException &exc) {
+	printError(exc,"Warning");
+  }
+  void error (const SAXParseException &exc) {
+	printError(exc,"Error");
+  }
+  void fatalError (const SAXParseException &exc) {
+	printError(exc, "Bad Error");
+  }
+  void resetErrors() {}
+protected:
+  void printError(const SAXParseException& e,const char* type) {
+    const XMLCh* msg=e.getMessage();
+	char* realMsg=XMLString::transcode(msg);
+	cerr << type << " (" << e.getLineNumber() << "): " << realMsg << endl;
+	XMLString::release(&realMsg);
+  }
+
+};
+
 int main(int argc,char** argv) {
     bool bFailed = false;
 
@@ -27,14 +49,15 @@ int main(int argc,char** argv) {
 	}	
 
 	XercesDOMParser* parser = new XercesDOMParser;
+    //parser->setExternalSchemaLocation("../data/spinsys_spec.xsd");
+    //parser->setValidationScheme(AbstractDOMParser::Val_Always);
 
-    parser->setValidationScheme(XercesDOMParser::Val_Auto);
     parser->setDoNamespaces(false);
     parser->setDoSchema(false);
 
 	// skip this if you haven't written your own error reporter class.
-	//DOMTreeErrorReporter *errReporter = new DOMTreeErrorReporter;
-	//parser->setErrorHandler(errReporter);
+	MyErrorHandler *errReporter = new MyErrorHandler;
+	parser->setErrorHandler(errReporter);
 
     //parser->setCreateEntityReferenceNodes(false);
     //parser->setToCreateXMLDeclTypeNode(true);
@@ -45,8 +68,8 @@ int main(int argc,char** argv) {
       parser->parse(source);
       bFailed = parser->getErrorCount() != 0;
       if (bFailed) {
-        cerr << "Parsing " << argv[1];
-        cerr << " error count: " << parser->getErrorCount() << endl;
+        cerr << "Error Parsing file. error count: " << parser->getErrorCount() << endl;
+		
       }
     } catch (const DOMException& e) {
       cerr << "DOM Exception parsing ";
@@ -79,8 +102,14 @@ int main(int argc,char** argv) {
     }
     // did the input document parse okay?
     if (!bFailed) {
-	  DOMNode *pDoc = parser->getDocument();
+	  DOMDocument *pDoc = parser->getDocument();
+	  DOMElement* pRootElement = pDoc->getDocumentElement();
 	  // insert code to do something with the DOM document here.
+	  const XMLCh* topNodeName = pRootElement->getNodeName();
+	  char* topNodeNameActual = XMLString::transcode(topNodeName);
+	  cout << "The name of the top node is " << topNodeNameActual << endl;
+	  XMLString::release(&topNodeNameActual); 
+	  
 	}
 	delete parser;
 

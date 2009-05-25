@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
 project(cspinach)
 
+#Tell me what commands are being executed.
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+
 #find_package(wxWidgets COMPONENTS net xml adv aui core gl html propgrid qa richtext stc xrc REQUIRED)
 find_package(wxWidgets COMPONENTS gl REQUIRED)
 
@@ -43,6 +46,18 @@ set(guiSources ${guiSources} "gui/spinachGUI.cpp")
 set(sharedSources "shared/nuclear_data.cpp")
 set(sharedSources ${sharedSources} "shared/spin.cpp")
 set(sharedSources ${sharedSources} "shared/spin_system.cpp")
+set(sharedSources ${sharedSources} "shared/spinsys_spec.cxx")
+
+
+#Use the Spin System XSD spec. to generate parsing classes
+#There's a bit of a hack here. We're assuming that we're building
+#in a subdirectory such as build/ so this build process would fail
+#if it were ever tried elsewhere. I'm not sure how to fix this yet.
+set(xsd_args cxx-tree --generate-doxygen --output-dir ../shared ../data/spinsys_spec.xsd )
+add_custom_command(OUTPUT ../shared/spinsys_spec.cxx
+				   MAIN_DEPENDENCY data/spinsys_spec.xsd
+                   COMMAND COMMAND xsdcxx ${xsd_args}
+				   COMMENT "Automatically generating XML parsing classes")
 
 set(cmdSources "commandln/main.cpp")
 
@@ -58,8 +73,9 @@ add_executable (wxSpinach ${wxSpinachSources})
 
 target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
 target_link_libraries (wxSpinach atlas) 
-target_link_libraries (wxSpinach GL) 
-target_link_libraries (wxSpinach GLEW)
+target_link_libraries (wxSpinach GL GLEW) 
+target_link_libraries (wxSpinach xerces-c)
+
 #target_link_libraries (wxSpinach wxcode_gtk2u_propgrid-2.8)
 
 set(spinachSources ${cmdSources} ${sharedSources})

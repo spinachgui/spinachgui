@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxFrame" name="rootFrameBase">
+		<style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
+		<size>1000,600</size>
+		<title>Spinach</title>
+		<object class="wxMenuBar" name="mRootMenu">
+			<label>MyMenuBar</label>
+			<object class="wxMenu" name="mMenuFile">
+				<label>_File</label>
+				<object class="wxMenuItem" name="mMenuItemNew">
+					<label>&amp;New</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemOpen">
+					<label>Open</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemSave">
+					<label>Save</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemSaveAs">
+					<label>Save &amp;As</label>
+					<help></help>
+				</object>
+				<object class="separator" />
+				<object class="wxMenuItem" name="mMenuItemImport">
+					<label>Import...</label>
+					<help></help>
+				</object>
+				<object class="separator" />
+				<object class="wxMenuItem" name="mMenuItemOptions">
+					<label>&amp;Options...</label>
+					<help></help>
+				</object>
+				<object class="separator" />
+				<object class="wxMenuItem" name="mMenuItemExit">
+					<label>E&amp;xit</label>
+					<help></help>
+				</object>
+			</object>
+			<object class="wxMenu" name="mMenuCalculate">
+				<label>C_alculate</label>
+				<object class="wxMenuItem" name="mMenuItemSetupCalc">
+					<label>Setup Calculation</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemExportCalc">
+					<label>Export Calculation</label>
+					<help></help>
+				</object>
+			</object>
+			<object class="wxMenu" name="mMenuMode">
+				<label>Mode</label>
+				<object class="wxMenuItem" name="mMenuItemShielding">
+					<label>Shielding</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemJCoupling">
+					<label>J Coupling</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemClusters">
+					<label>Clusters</label>
+					<help></help>
+				</object>
+				<object class="separator" />
+				<object class="wxMenuItem" name="mMenuItemBondLength">
+					<label>Bond Length</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemBondAngle">
+					<label>Bond Angle</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemDiAngle">
+					<label>Dihedral Angle</label>
+					<help></help>
+				</object>
+			</object>
+			<object class="wxMenu" name="mMenuHelp">
+				<label>_Help</label>
+				<object class="wxMenuItem" name="mMenuItemHelp">
+					<label>Help...</label>
+					<help></help>
+				</object>
+				<object class="wxMenuItem" name="mMenuItemAbout">
+					<label>About</label>
+					<help></help>
+				</object>
+			</object>
+		</object>
+		<object class="wxBoxSizer">
+			<orient>wxHORIZONTAL</orient>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxEXPAND | wxALL</flag>
+				<border>0</border>
+				<object class="wxPanel" name="mSpinPanel">
+					<style>wxTAB_TRAVERSAL</style>
+					<object class="wxBoxSizer">
+						<orient>wxVERTICAL</orient>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxFlexGridSizer">
+								<rows>2</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText16">
+										<label>Spin:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxChoice" name="mSpinChoice">
+										<selection>0</selection>
+										<content />
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxTreeCtrl" name="mSpinTree">
+								<style>wxTR_DEFAULT_STYLE</style>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxEXPAND | wxALL</flag>
+				<border>0</border>
+				<object class="wxPanel" name="mJCoupPanel">
+					<style>wxTAB_TRAVERSAL</style>
+					<object class="wxBoxSizer">
+						<orient>wxVERTICAL</orient>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxFlexGridSizer">
+								<rows>2</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText20">
+										<label>Spin 1</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxChoice" name="m_choice2">
+										<selection>0</selection>
+										<content />
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText19">
+										<label>Spin 2</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxChoice" name="m_choice3">
+										<selection>0</selection>
+										<content />
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxTreeCtrl" name="m_treeCtrl3">
+								<style>wxTR_DEFAULT_STYLE</style>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+			<object class="sizeritem">
+				<option>0</option>
+				<flag>wxEXPAND | wxALL</flag>
+				<border>0</border>
+				<object class="wxPanel" name="mClusterPanel">
+					<style>wxTAB_TRAVERSAL</style>
+					<object class="wxBoxSizer">
+						<orient>wxVERTICAL</orient>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxFlexGridSizer">
+								<rows>1</rows>
+								<cols>1</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText162">
+										<label>Something goes here</label>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+		</object>
+		<object class="wxStatusBar" name="mRootStatusBar">
+			<style>wxST_SIZEGRIP</style>
+			<fields>1</fields>
+		</object>
+		<object class="wxToolBar" name="mRootToolbar">
+			<style>wxTB_HORIZONTAL</style>
+			<bitmapsize></bitmapsize>
+			<margins></margins>
+			<packing>1</packing>
+			<separation>5</separation>
+			<object class="tool" name="mSpinTool">
+				<label>Spin</label>
+				<tooltip></tooltip>
+				<longhelp></longhelp>
+				<bitmap>../res/S.xpm</bitmap>
+				<radio>1</radio>
+			</object>
+			<object class="tool" name="mJTool">
+				<label>J Coupling</label>
+				<tooltip></tooltip>
+				<longhelp></longhelp>
+				<bitmap>../res/Jcoupling.ico</bitmap>
+				<radio>1</radio>
+			</object>
+			<object class="tool" name="mClusterTool">
+				<label>Cluster</label>
+				<tooltip></tooltip>
+				<longhelp></longhelp>
+				<bitmap>../res/cluster.ico</bitmap>
+				<radio>1</radio>
+			</object>
+		</object>
+	</object>
+</resource>

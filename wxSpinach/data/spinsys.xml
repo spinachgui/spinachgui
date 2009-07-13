@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Created with Liquid XML Studio - FREE Community Edition 7.0.2.746 (http://www.liquid-technologies.com) -->
-<spin_system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<spin_system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="spinsys_spec.xsd">
   <spin number="-418" isotope="string" label="string">
     <coordinates>
       <element>-108.3650941961</element>

@@ -46,15 +46,15 @@ set(guiSources ${guiSources} "gui/spinachGUI.cpp")
 set(sharedSources "shared/nuclear_data.cpp")
 set(sharedSources ${sharedSources} "shared/spin.cpp")
 set(sharedSources ${sharedSources} "shared/spin_system.cpp")
-set(sharedSources ${sharedSources} "shared/spinsys_spec.cxx")
+set(sharedSources ${sharedSources} "../shared/spinsys_spec.cpp")
 
 
 #Use the Spin System XSD spec. to generate parsing classes
 #There's a bit of a hack here. We're assuming that we're building
 #in a subdirectory such as build/ so this build process would fail
 #if it were ever tried elsewhere. I'm not sure how to fix this yet.
-set(xsd_args cxx-tree --generate-doxygen --output-dir ../shared ../data/spinsys_spec.xsd )
-add_custom_command(OUTPUT ../shared/spinsys_spec.cxx
+set(xsd_args cxx-tree --generate-serialization --type-naming java --function-naming java  --generate-doxygen --cxx-suffix .cpp --hxx-suffix .hpp --output-dir ../shared ../data/spinsys_spec.xsd )
+add_custom_command(OUTPUT shared/spinsys_spec.cpp
 				   MAIN_DEPENDENCY data/spinsys_spec.xsd
                    COMMAND COMMAND xsdcxx ${xsd_args}
 				   COMMENT "Automatically generating XML parsing classes")
@@ -80,6 +80,6 @@ target_link_libraries (wxSpinach xerces-c)
 
 set(spinachSources ${cmdSources} ${sharedSources})
 add_executable (spinach ${spinachSources})
-target_link_libraries (spinach atlas flens xerces-c) 
+target_link_libraries (spinach atlas  xerces-c) 
 
 

@@ -4,8 +4,12 @@ project(cspinach)
 #Tell me what commands are being executed.
 #set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
+
 #find_package(wxWidgets COMPONENTS net xml adv aui core gl html propgrid qa richtext stc xrc REQUIRED)
 find_package(wxWidgets COMPONENTS gl REQUIRED)
+
+#Work out where python is installed.
+find_package(PythonLibs)
 
 #set the version of gcc to use. Currently g++-4.3 doesn't work.
 set(CMAKE_CXX_COMPILER "g++-4.2")
@@ -26,6 +30,9 @@ set(CMAKE_BUILD_TYPE Debug)
 #Compile a release build
 #set(CMAKE_BUILD_TYPE Release)
 
+#Work out where all the built files are going
+set(buildDir ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
+
 #GDB can debug an optermised executable. It's one of a very small number of debuggers that can.
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb")
 
@@ -34,6 +41,8 @@ set(wxWidgets_USE_UNICODE,ON)
 set(wxWidgets_USE_UNIVERSAL,OFF)
 set(wxWidgets_USE_STATIC,ON)
 
+
+#List of source files for all the targets
 set(guiSources "gui/SpinachApp.cpp")
 set(guiSources ${guiSources} "gui/calcFrame.cpp")
 set(guiSources ${guiSources} "gui/glMolDisplay.cpp")
@@ -46,38 +55,75 @@ set(guiSources ${guiSources} "gui/spinachGUI.cpp")
 set(sharedSources "shared/nuclear_data.cpp")
 set(sharedSources ${sharedSources} "shared/spin.cpp")
 set(sharedSources ${sharedSources} "shared/spin_system.cpp")
-set(sharedSources ${sharedSources} "../shared/spinsys_spec.cpp")
+set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
 
+set(pySources "shared/spinsys.cpp")
+set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
+set(pySources ${pySources} "shared/spinsys_spec.cpp")
+
+set(cmdSources "commandln/main.cpp")
 
 #Use the Spin System XSD spec. to generate parsing classes
 #There's a bit of a hack here. We're assuming that we're building
 #in a subdirectory such as build/ so this build process would fail
 #if it were ever tried elsewhere. I'm not sure how to fix this yet.
-set(xsd_args cxx-tree --generate-serialization --type-naming java --function-naming java  --generate-doxygen --cxx-suffix .cpp --hxx-suffix .hpp --output-dir ../shared ../data/spinsys_spec.xsd )
-add_custom_command(OUTPUT shared/spinsys_spec.cpp
-				   MAIN_DEPENDENCY data/spinsys_spec.xsd
-                   COMMAND COMMAND xsdcxx ${xsd_args}
-				   COMMENT "Automatically generating XML parsing classes")
+set(xsd_args cxx-tree )
+set(xsd_args ${xsd_args} --generate-default-ctor)
+set(xsd_args ${xsd_args} --generate-serialization)
+set(xsd_args ${xsd_args} --type-naming java)
+set(xsd_args ${xsd_args} --function-naming java)
+set(xsd_args ${xsd_args} --generate-doxygen)
+set(xsd_args ${xsd_args} --cxx-suffix .cpp --hxx-suffix .hpp)
+set(xsd_args ${xsd_args} --output-dir ${CMAKE_CURRENT_BINARY_DIR}/shared)
+set(xsd_args ${xsd_args} --generate-doxygen)
 
-set(cmdSources "commandln/main.cpp")
+add_custom_command(OUTPUT shared/spinsys_spec.cpp
+                   MAIN_DEPENDENCY data/spinsys_spec.xsd
+                   COMMAND COMMAND xsdcxx ${xsd_args}
+                   ${CMAKE_CURRENT_SOURCE_DIR}/data/spinsys_spec.xsd
+                   COMMENT "Automatically generating XML parsing classes")
+
+#Use swig to generate the python bindings for the XSD C++ code.
+set(swig_args -c++ -python 
+              -I${CMAKE_CURRENT_SOURCE_DIR}
+              -outdir ${CMAKE_CURRENT_BINARY_DIR})
+
+set(swig_file -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.cpp
+              -oh ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/shared/swig/spinsys.i) 
+add_custom_command(OUTPUT shared/swig/spinsys_wrap.cpp
+                   MAIN_DEPENDENCY shared/swig/spinsys.i
+		   DEPENDS shared/spinsys_spec.cpp shared/spinsys.cpp
+                   COMMAND COMMAND swig ${swig_args} ${swig_file}
+                   COMMENT "Automatically generating python bindings")
+
+
 
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}) #If you include via absolute paths, you can move source files about more easily.
 include_directories(SYSTEM ${wxWidgets_INCLUDE_DIRS})
+include_directories(SYSTEM ${buildDir})
+include_directories(SYSTEM ${buildDir}/_spinsys.dir)
+include_directories(SYSTEM ${PYTHON_INCLUDE_PATH})
+
 
 add_definitions(${wxWidgets_DEFINITIONS})
 
 link_directories("/usr/lib/sse2")
 
-set(wxSpinachSources ${guiSources} ${sharedSources})
-add_executable (wxSpinach ${wxSpinachSources})
+#python bindings
+add_library(_spinsys SHARED  ${pySources})
+target_link_libraries (_spinsys xerces-c ${PYTHON_LIBRARIES})
 
-target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
-target_link_libraries (wxSpinach atlas) 
-target_link_libraries (wxSpinach GL GLEW) 
-target_link_libraries (wxSpinach xerces-c)
+#C++ GUI
+#set(wxSpinachSources ${guiSources} ${sharedSources})
+#add_executable (wxSpinach ${wxSpinachSources})
+#target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
+#target_link_libraries (wxSpinach atlas) 
+#target_link_libraries (wxSpinach GL GLEW) 
+#target_link_libraries (wxSpinach xerces-c)
 
-#target_link_libraries (wxSpinach wxcode_gtk2u_propgrid-2.8)
 
+#command line exe
 set(spinachSources ${cmdSources} ${sharedSources})
 add_executable (spinach ${spinachSources})
 target_link_libraries (spinach atlas  xerces-c) 

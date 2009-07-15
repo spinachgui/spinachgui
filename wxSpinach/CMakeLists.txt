@@ -91,9 +91,9 @@ set(swig_args -c++ -python
 set(swig_file -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.cpp
               -oh ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/shared/swig/spinsys.i) 
-add_custom_command(OUTPUT shared/swig/spinsys_wrap.cpp
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.cpp
                    MAIN_DEPENDENCY shared/swig/spinsys.i
-		   DEPENDS shared/spinsys_spec.cpp shared/spinsys.cpp
+		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinsys_spec.cpp shared/spinsys.cpp
                    COMMAND COMMAND swig ${swig_args} ${swig_file}
                    COMMENT "Automatically generating python bindings")
 
@@ -101,8 +101,7 @@ add_custom_command(OUTPUT shared/swig/spinsys_wrap.cpp
 
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}) #If you include via absolute paths, you can move source files about more easily.
 include_directories(SYSTEM ${wxWidgets_INCLUDE_DIRS})
-include_directories(SYSTEM ${buildDir})
-include_directories(SYSTEM ${buildDir}/_spinsys.dir)
+include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(SYSTEM ${PYTHON_INCLUDE_PATH})
 
 
@@ -128,4 +127,27 @@ set(spinachSources ${cmdSources} ${sharedSources})
 add_executable (spinach ${spinachSources})
 target_link_libraries (spinach atlas  xerces-c) 
 
+#Create an "install" target (copy everything to a test directory)
+#This is probaly not how to do it in a production build, but it works and will
+#do for now
+add_custom_target(install-res ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/res/* ${CMAKE_CURRENT_BINARY_DIR}/install/res
+                          DEPENDS _spinsys spinach 
+                          COMMENT "Copying files to /install")
+
+
+add_custom_target(install-py ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/py/* ${CMAKE_CURRENT_BINARY_DIR}/install
+                          DEPENDS _spinsys spinach 
+                          COMMENT "Copying files to /install")
+
+
+
+add_custom_target(install ALL cp ${CMAKE_CURRENT_BINARY_DIR}/spinsys.py  ${CMAKE_CURRENT_BINARY_DIR}/install/
+                          DEPENDS _spinsys spinach 
+                          COMMENT "Copying files to /install")
+
+
+
+add_custom_target(install-so ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_spinsys.so ${CMAKE_CURRENT_BINARY_DIR}/install/_spinsys.so
+                          DEPENDS _spinsys spinach 
+                          COMMENT "Copying files to /install")
 

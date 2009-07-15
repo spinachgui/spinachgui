@@ -9,6 +9,8 @@ class MyApp(wx.App):
         self.res = xrc.XmlResource('res/gui.xrc')
         self.ss=spinsys.Spinsys()
         self.init_frame()
+        self.filename=""
+        self.filepath=""
         return True
 
     def init_frame(self):
@@ -33,8 +35,11 @@ class MyApp(wx.App):
         self.frame.Bind(wx.EVT_MENU, self.onJButton, id=xrc.XRCID('mJTool'))
         self.frame.Bind(wx.EVT_MENU, self.onClusterButton, id=xrc.XRCID('mClusterTool'))
 
-        self.frame.Bind(wx.EVT_MENU, self.onLoadFromFile, id=xrc.XRCID('mMenuItemOpen'))
-        self.frame.Bind(wx.EVT_MENU, self.onSaveToFile, id=xrc.XRCID('mMenuItemSaveAs'))
+        self.frame.Bind(wx.EVT_MENU, self.onOpen, id=xrc.XRCID('mMenuItemOpen'))
+        self.frame.Bind(wx.EVT_MENU, self.onSave, id=xrc.XRCID('mMenuItemSave'))
+        self.frame.Bind(wx.EVT_MENU, self.onSaveAs, id=xrc.XRCID('mMenuItemSaveAs'))
+
+        self.frame.Bind(wx.EVT_MENU, self.onExit, id=xrc.XRCID('mMenuItemExit'))
 
         self.frame.Show()
 
@@ -56,13 +61,21 @@ class MyApp(wx.App):
         self.ClusterPanel.Show(True)
         self.frame.Layout();
 
-    def onLoadFromFile(self,e):
-        print "hello"
-        self.ss.loadFromFile("install/data/spinsys.xml")
+    def onOpen(self,e):
+        fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
+        if(fd.ShowModal()):
+            self.ss.loadFromFile(fd.GetPath().encode('latin-1'))
 
-    def onSaveToFile(self,e):
-        print "world"
-        self.ss.saveToFile("install/data/spinsys2.xml")
+    def onSaveAs(self,e):
+        fd=wx.FileDialog(self.frame,style=wx.FD_SAVE, message="Save your Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
+        if(fd.ShowModal()):
+            self.ss.saveToFile(fd.GetPath().encode('latin-1'))
+
+    def onSave(self,e):
+        print "Impliment me"
+
+    def onExit(self,e):
+        exit(0)
 
 if __name__ == '__main__':
     app = MyApp(False)

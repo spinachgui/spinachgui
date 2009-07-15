@@ -13,7 +13,7 @@ void Spinsys::createNew() {
   mXMLSpinSys.reset(new Spin_system());
 }
 
-void Spinsys::dump() {
+void Spinsys::dump() const{
   cout << "Printing out a spin system" << endl;
   cout << "Spins:" << endl;
   for (Spin_system::SpinConstIterator i (mXMLSpinSys->getSpin().begin());

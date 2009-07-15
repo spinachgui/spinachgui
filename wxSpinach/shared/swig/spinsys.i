@@ -16,7 +16,7 @@ public:
   void saveToFile(const char* filename);
   ///Output the spin system in a human readable format to the standard
   ///output for debugging purposes.
-  void dump();
+  void dump() const;
   ///Get a reference to a spin
   void addSpin();
 };

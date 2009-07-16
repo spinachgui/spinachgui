@@ -2,6 +2,62 @@ import wx
 import spinsys
 from wx import xrc
 
+def getARotation(parent):
+    class rotDialog():
+        def __init__(self):
+            self.orientRes = xrc.XmlResource("res/gui.xrc")
+            self.dlg = self.orientRes.LoadDialog(parent, "rotationDialog")
+
+            self.eulerAPanel = xrc.XRCCTRL(self.dlg,'eulerAPanel')
+            self.eulerBPanel = xrc.XRCCTRL(self.dlg,'eulerBPanel')
+            self.angleAxisPanel = xrc.XRCCTRL(self.dlg,'angleAxisPanel')
+
+            self.radioBox = xrc.XRCCTRL(self.dlg,'mRConRadioBox')
+
+            self.eulerBPanel.Enable(False)
+            self.angleAxisPanel.Enable(False)
+
+            self.dlg.Bind(wx.EVT_RADIOBOX,self.onRadioBox,id=xrc.XRCID('mRConRadioBox'))
+            
+        def onRadioBox(self,e):
+            self.eulerAPanel.Enable(False)
+            self.eulerBPanel.Enable(False)
+            self.angleAxisPanel.Enable(False)
+            if e.Selection==0:
+                self.eulerAPanel.Enable(True)
+            elif e.Selection==1:
+                self.eulerBPanel.Enable(True)
+            elif e.Selection==2:
+                self.angleAxisPanel.Enable(True)
+            else:
+                raise "A highly usual selection number was returned by a radioBox"
+        def getRotation(self):
+            convention=thisDialog.radioBox.GetSelection()
+            if convention==0:
+                v1=xrc.XRCCTRL(self.dlg,'alphaA')
+                v2=xrc.XRCCTRL(self.dlg,'alphaA')
+                v3=xrc.XRCCTRL(self.dlg,'gammaA')
+            elif convention==1:
+                v1=xrc.XRCCTRL(self.dlg,'alphaB')
+                v2=xrc.XRCCTRL(self.dlg,'alphaB')
+                v3=xrc.XRCCTRL(self.dlg,'gammaB')
+            elif convention==2:
+                v1=xrc.XRCCTRL(self.dlg,'omega')
+                v2=xrc.XRCCTRL(self.dlg,'theta')
+                v3=xrc.XRCCTRL(self.dlg,'phi')
+            else:
+                raise "A highly usual selection number was returned by a radioBox"
+            return (convention,(float(v1.GetValue()),float(v2.GetValue()),float(v3.GetValue())))
+
+    thisDialog=rotDialog()
+    if(thisDialog.dlg.ShowModal() == wx.ID_OK):
+        print "Dialog Okay"
+        return thisDialog.getRotation()
+    else:
+        print "Dialog canceled"
+        return None
+
+
 
 class MyApp(wx.App):
 
@@ -44,6 +100,9 @@ class MyApp(wx.App):
         self.updateSpinTree()
 
         self.frame.Show()
+   
+        print getARotation(self.frame)
+
 
     def updateSpinTree(self):
         spins=self.ss.getSpins()
@@ -72,6 +131,7 @@ class MyApp(wx.App):
         fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
         if(fd.ShowModal()):
             self.ss.loadFromFile(fd.GetPath().encode('latin-1'))
+            self.updateSpinTree()
 
     def onSaveAs(self,e):
         fd=wx.FileDialog(self.frame,style=wx.FD_SAVE, message="Save your Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 

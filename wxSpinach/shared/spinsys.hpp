@@ -18,6 +18,8 @@ public:
   void dump() const;
   ///Get a reference to a spin
   void getSpin();
+  ///Get a list of references to spins
+  Spin_system::SpinSequence& getSpins() {return mXMLSpinSys->getSpin();}
 
   ///Attach a spin
   void addSpin();

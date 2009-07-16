@@ -41,7 +41,14 @@ class MyApp(wx.App):
 
         self.frame.Bind(wx.EVT_MENU, self.onExit, id=xrc.XRCID('mMenuItemExit'))
 
+        self.updateSpinTree()
+
         self.frame.Show()
+
+    def updateSpinTree(self):
+        spins=self.ss.getSpins()
+        for spin in spin:
+            self.spinTree.AppendItem(self.spinTree.GetRootItem(),spin[2])
 
     def onSpinButton(self,e):
         self.spinPanel.Show(True)

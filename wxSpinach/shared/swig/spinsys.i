@@ -4,6 +4,24 @@
 #include <shared/spinsys.hpp>
  %}
 
+%typemap(out) Spin_system::SpinSequence&
+{
+  int j=0;
+  $result = PyList_New($1->size());
+  for (Spin_system::SpinConstIterator i=$1->begin();i != $1->end(); ++i) {
+    PyObject* label;
+    if(i->getLabel().present()) {
+      label = PyString_FromString(i->getLabel().get().c_str());
+    } else {
+      label = PyString_FromString("");
+    }
+    PyObject* isotope=PyString_FromString(i->getIsotope().c_str());
+    PyObject* number =PyLong_FromLong(i->getNumber());
+    PyObject* spin=PyTuple_Pack(3,number,isotope,label);
+    PyList_SetItem($result,j,spin);
+    j++;
+  }
+}
 
 class Spinsys {
 public:
@@ -19,4 +37,6 @@ public:
   void dump() const;
   ///Get a reference to a spin
   void addSpin();
+  ///Get a list of references to spins
+  Spin_system::SpinSequence& getSpins();
 };

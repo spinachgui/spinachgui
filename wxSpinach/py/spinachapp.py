@@ -47,7 +47,7 @@ class MyApp(wx.App):
 
     def updateSpinTree(self):
         spins=self.ss.getSpins()
-        for spin in spin:
+        for spin in spins:
             self.spinTree.AppendItem(self.spinTree.GetRootItem(),spin[2])
 
     def onSpinButton(self,e):

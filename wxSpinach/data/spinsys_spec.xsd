@@ -182,7 +182,7 @@
             <xs:attribute name="number" use="required">
               <xs:simpleType>
                 <xs:restriction base="xs:integer">
-                  <xs:minInclusive value="0" />
+                  <xs:minInclusive value="1" />
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>

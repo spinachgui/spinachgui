@@ -2,11 +2,20 @@ import wx
 import spinsys
 from wx import xrc
 
+import wx.glcanvas
+
+from OpenGL.GLUT import *
+from OpenGL.GLU import *
+from OpenGL.GL import *
+
+from numpy import *
+
 def getARotation(parent):
     class rotDialog():
         def __init__(self):
             self.orientRes = xrc.XmlResource("res/gui.xrc")
             self.dlg = self.orientRes.LoadDialog(parent, "rotationDialog")
+
 
             self.eulerAPanel = xrc.XRCCTRL(self.dlg,'eulerAPanel')
             self.eulerBPanel = xrc.XRCCTRL(self.dlg,'eulerBPanel')
@@ -18,6 +27,7 @@ def getARotation(parent):
             self.angleAxisPanel.Enable(False)
 
             self.dlg.Bind(wx.EVT_RADIOBOX,self.onRadioBox,id=xrc.XRCID('mRConRadioBox'))
+
             
         def onRadioBox(self,e):
             self.eulerAPanel.Enable(False)
@@ -58,6 +68,94 @@ def getARotation(parent):
         return None
 
 
+class glDisplay(wx.glcanvas.GLCanvas):
+    def __init__(self,parent,id=-1):
+        super(glDisplay,self).__init__(parent,id)
+        self.ss=None
+        self.xRotate=0
+        self.yRotate=0
+        self.rotationMatrix=array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, 0, 0, 1]], float64)
+        self.zoom=0.05
+        self.camX=0.0
+        self.camY=0.0
+        self.camZ=5.0
+
+    def setSpinSystem(self,ss):
+        """Set the spin system that this gl display is displaying"""
+        self.ss=ss
+
+
+    def enableGL(self):
+        """This has to be called after the frame has been shown"""
+        print "enableGL()"
+        self.SetCurrent()
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+        glClear(GL_COLOR_BUFFER_BIT)
+
+        qobj = gluNewQuadric();
+        gluQuadricDrawStyle(qobj,GLU_LINE);
+        gluQuadricNormals(qobj,GLU_SMOOTH);
+
+        self.list = glGenLists(1);
+
+        glNewList(self.list,GL_COMPILE);
+        gluSphere(qobj,3,20,20);
+        glEndList();
+        gluDeleteQuadric(qobj);
+
+        self.Bind(wx.EVT_PAINT,self.onPaint)
+
+    def onPaint(self,e):
+        print "painting"
+	glColor3f(0.0, 0.0, 1.0);
+	self.SwapBuffers();
+
+        glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+        width,height = self.GetClientSizeTuple()
+        glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -10.0, 10.0);
+        glMatrixMode(GL_MODELVIEW);
+
+
+        #Take the opertunity to calculate the rotation matrix for the scene
+        #TODO: This would be better handled on the CPU, it's only one
+        #      matrix. Change when matrix classes have been written
+        dotProduct=(self.xRotate*self.xRotate+self.yRotate*self.yRotate);
+        norm=sqrt(dotProduct);
+
+        glLoadIdentity();
+        glRotatef(dotProduct,self.yRotate/norm,self.xRotate/norm,0);
+        glMultMatrixf(self.rotationMatrix);
+        self.rotationMatrix=glGetFloatv(GL_MODELVIEW_MATRIX);
+
+        glLoadIdentity();
+        camX=0
+        camY=0
+        camZ=5.0
+        gluLookAt(camX,camY,camZ,0,0,0,0,1,0);
+        glMultMatrixf(self.rotationMatrix);
+
+        #glLoadMatrixf(rotationMatrix);
+
+        if self.ss==None:
+            return
+
+        for i in range(2):
+            if(i==0):
+                glColor3f(1.0, 1.0, 1.0);
+            else:
+                glColor3f(0.0, 0.0, 1.0);
+        
+            glPushMatrix();
+            glTranslatef(0.2,0.4,0.8);
+
+            glCallList(self.list);
+            glPopMatrix();
+        
+            glColor3f(0.0, 0.0, 1.0);
+
+        self.SwapBuffers()
+
 
 class MyApp(wx.App):
 
@@ -67,6 +165,7 @@ class MyApp(wx.App):
         self.init_frame()
         self.filename=""
         self.filepath=""
+
         return True
 
     def init_frame(self):
@@ -85,6 +184,12 @@ class MyApp(wx.App):
         #Populate the spin tree
         self.spinTree = xrc.XRCCTRL(self.frame,'mSpinTree')
         self.spinTree.AddRoot("Spin System")
+
+        #Set up a openGL canvas
+        self.glc = glDisplay(self.frame,-1)
+        self.frame.GetSizer().Add(self.glc, 1, wx.EXPAND | wx.ALL)
+        self.dc=wx.PaintDC(self.glc);
+
         
         #Setup event handling
         self.frame.Bind(wx.EVT_MENU, self.onSpinButton, id=xrc.XRCID('mSpinTool'))
@@ -100,8 +205,11 @@ class MyApp(wx.App):
         self.updateSpinTree()
 
         self.frame.Show()
-   
-        print getARotation(self.frame)
+
+        self.glc.enableGL()   
+
+
+
 
 
     def updateSpinTree(self):

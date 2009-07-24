@@ -75,12 +75,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.xRotate=0
         self.yRotate=0
         self.rotationMatrix=array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, 0, 0, 1]], float64)
-        self.zoom=0.05
+        self.zoom=0.01
         self.camX=0.0
         self.camY=0.0
         self.camZ=5.0
 
-    def setSpinSystem(self,ss):
+    def setSpinSys(self,ss):
         """Set the spin system that this gl display is displaying"""
         self.ss=ss
 
@@ -99,7 +99,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.list = glGenLists(1);
 
         glNewList(self.list,GL_COMPILE);
-        gluSphere(qobj,3,20,20);
+        gluSphere(qobj,0.8,20,20);
         glEndList();
         gluDeleteQuadric(qobj);
 
@@ -138,22 +138,19 @@ class glDisplay(wx.glcanvas.GLCanvas):
         #glLoadMatrixf(rotationMatrix);
 
         if self.ss==None:
+            self.SwapBuffers()
             return
 
-        for i in range(2):
-            if(i==0):
-                glColor3f(1.0, 1.0, 1.0);
-            else:
-                glColor3f(0.0, 0.0, 1.0);
-        
+        spins=self.ss.getSpins()
+        for spin in spins:
+            glColor3f(1.0, 1.0, 1.0);
             glPushMatrix();
-            glTranslatef(0.2,0.4,0.8);
-
+            glTranslatef(spin[3][0],spin[3][1],spin[3][2]);
+        
             glCallList(self.list);
             glPopMatrix();
         
             glColor3f(0.0, 0.0, 1.0);
-
         self.SwapBuffers()
 
 
@@ -206,7 +203,10 @@ class MyApp(wx.App):
 
         self.frame.Show()
 
+        self.glc.setSpinSys(self.ss)
         self.glc.enableGL()   
+        
+        self.loadFromFile('data/hccch.xml')
 
 
 
@@ -238,8 +238,11 @@ class MyApp(wx.App):
     def onOpen(self,e):
         fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
         if(fd.ShowModal()):
-            self.ss.loadFromFile(fd.GetPath().encode('latin-1'))
-            self.updateSpinTree()
+            loadFromFile(fd.GetPath().encode('latin-1'))
+            
+    def loadFromFile(self,filename):
+        self.ss.loadFromFile(filename)
+        self.updateSpinTree()
 
     def onSaveAs(self,e):
         fd=wx.FileDialog(self.frame,style=wx.FD_SAVE, message="Save your Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 

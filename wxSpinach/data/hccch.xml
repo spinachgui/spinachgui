@@ -1,25 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<spin_system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\Users\Administrator\Documents\cspinach\wxSpinach\data\spinsys_spec.xsd">
+<spin_system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="spinsys_spec.xsd">
 
   <spin number="1" isotope="C" label="C1" reference_frame="0">
     <coordinates x="-1.24904900" y="0.00000000" z="0.00000000" />
   </spin>
-  <spin number="1" isotope="H" label="H1" reference_frame="0">
+  <spin number="2" isotope="H" label="H1" reference_frame="0">
     <coordinates x="-1.80332400" y="0.92819600 " z="0.00000000" />
   </spin>
-  <spin number="1" isotope="H" label="H2" reference_frame="0">
+  <spin number="3" isotope="H" label="H2" reference_frame="0">
     <coordinates x="-0.92818700" y="0.00000000" z="0.00000000" />
   </spin>
 
-  <spin number="1" isotope="C" label="C2" reference_frame="0">
+  <spin number="4" isotope="C" label="C2" reference_frame="0">
     <coordinates x="0.11538100" y="0.00000000" z="0.00000000" />
   </spin>
-  <spin number="1" isotope="H" label="H3" reference_frame="0">
+  <spin number="5" isotope="H" label="H3" reference_frame="0">
     <coordinates x="1.33533100" y="0.00000000" z="0.00000000" />
   </spin>
-  <spin number="1" isotope="H" label="H4" reference_frame="0">
+  <spin number="6" isotope="H" label="H4" reference_frame="0">
     <coordinates x="2.39668900" y="0.00000000" z="0.00000000" />
   </spin>
+
+  <interaction reference_frame="0" type="string" units="string" spin_1="1" spin_2="2">
+    <scalar strong="1">-433.9050941961</scalar>
+  </interaction>
 
  
   </spin_system>

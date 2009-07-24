@@ -18,7 +18,12 @@
     }
     PyObject* isotope=PyString_FromString(i->getIsotope().c_str());
     PyObject* number =PyLong_FromLong(i->getNumber());
-    PyObject* spin=PyTuple_Pack(3,number,isotope,label);
+    const Spin::CoordinatesType c = i->getCoordinates();
+    PyObject* x=PyFloat_FromDouble(c.getX());
+    PyObject* y=PyFloat_FromDouble(c.getY());
+    PyObject* z=PyFloat_FromDouble(c.getZ());
+    PyObject* coords = PyTuple_Pack(3,x,y,x);
+    PyObject* spin=PyTuple_Pack(4,number,isotope,label,coords);
     PyList_SetItem($result,j,spin);
     j++;
   }

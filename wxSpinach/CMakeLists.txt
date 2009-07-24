@@ -151,3 +151,8 @@ add_custom_target(install-so ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_spinsys.so $
                           DEPENDS _spinsys spinach 
                           COMMENT "Copying files to /install")
 
+
+add_custom_target(install-data ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/data/* ${CMAKE_CURRENT_BINARY_DIR}/install/data
+                          DEPENDS _spinsys spinach 
+                          COMMENT "Copying files to /install")
+

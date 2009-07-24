@@ -1,89 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Created with Liquid XML Studio - FREE Community Edition 7.0.2.746 (http://www.liquid-technologies.com) -->
 <spin_system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="spinsys_spec.xsd">
-  <spin number="-418" isotope="string" label="string">
-    <coordinates>
-      <element>-108.3650941961</element>
-      <element>4242.6149058039</element>
-      <element>1079.2949058039</element>
-    </coordinates>
+  <spin number="1840975454" isotope="string" label="string" reference_frame="1835909540">
+    <coordinates x="6439.3949058039" y="-6744.4250941961" z="8477.3949058039" />
   </spin>
-  <spin number="2025" isotope="string" label="string">
-    <coordinates>
-      <element>-5533.0650941961</element>
-      <element>-1211.8850941961</element>
-      <element>-7318.0650941961</element>
-    </coordinates>
+  <spin number="2064144102" isotope="string" label="string" reference_frame="1004298645">
+    <coordinates x="3459.6949058039" y="-6495.4050941961" z="-751.3450941961" />
   </spin>
-  <spin number="-8931" isotope="string" label="string" />
-  <spin number="1820" isotope="string" label="string" />
-  <interaction type="string" units="string" spin_1="-4483" spin_2="-4654">
-    <matrix reference_frame="-7729.6650941961">
-      <element>-7945.6850941961</element>
-      <element>9767.2949058039</element>
-      <element>-907.2450941961</element>
-      <element>9421.4549058039</element>
-      <element>9560.7349058039</element>
-      <element>-9681.4450941961</element>
-      <element>-8288.5650941961</element>
-      <element>-6555.5850941961</element>
-      <element>6501.0749058039</element>
-    </matrix>
+  <spin number="816797553" isotope="string" label="string" reference_frame="2060890664">
+    <coordinates x="8490.2349058039" y="1404.7149058039" z="9211.7149058039" />
+  </spin>
+  <spin number="629090302" isotope="string" label="string" reference_frame="1103018468">
+    <coordinates x="3191.4949058039" y="3248.5549058039" z="6223.5749058039" />
+  </spin>
+  <interaction reference_frame="552785913" type="string" units="string" spin_1="1627352370" spin_2="968341179">
+    <scalar strong="1">-433.9050941961</scalar>
   </interaction>
-  <interaction type="string" units="string" spin_1="-2206" spin_2="-7577">
-    <matrix reference_frame="8233.7149058039">
-      <element>9284.7749058039</element>
-      <element>-7803.1850941961</element>
-      <element>4039.0149058039</element>
-      <element>-9372.1650941961</element>
-      <element>-8697.9250941961</element>
-      <element>1201.5349058039</element>
-      <element>2398.7149058039</element>
-      <element>-8282.0650941961</element>
-      <element>-675.8850941961</element>
-    </matrix>
+  <interaction reference_frame="110286170" type="string" units="string" spin_1="2027851628" spin_2="1667694998">
+    <scalar strong="0">-8306.1650941961</scalar>
   </interaction>
-  <reference_frame number="-8619" label="string">
-    <origin>
-      <element>8910.1349058039</element>
-      <element>8199.7349058039</element>
-      <element>3526.5349058039</element>
-    </origin>
-    <orientation reference_frame="-1344">
-      <euler_angles>
-        <alpha>1529.0949058039</alpha>
-        <beta>8396.4549058039</beta>
-        <gamma>6367.7149058039</gamma>
-      </euler_angles>
+  <interaction reference_frame="918210320" type="string" units="string" spin_1="513757545" spin_2="663267504">
+    <axiality_rhombicity iso="2105.5149058039" ax="-7664.6050941961" rh="-8119.6050941961" />
+    <orientation>
+      <eigensystem>
+        <x_axis x="-8161.1650941961" y="-7965.2650941961" z="1777.5549058039" />
+        <y_axis x="-9968.8450941961" y="-5164.6850941961" z="-6891.0050941961" />
+        <z_axis x="4529.9749058039" y="-2437.6850941961" z="6104.1549058039" />
+      </eigensystem>
     </orientation>
-  </reference_frame>
-  <reference_frame number="1119" label="string">
-    <origin>
-      <element>9062.5749058039</element>
-      <element>-1847.3250941961</element>
-      <element>-4222.3650941961</element>
-    </origin>
-    <orientation reference_frame="-6082">
-      <quaternion>
-        <re>-6183.1450941961</re>
-        <i>4163.0349058039</i>
-        <j>-2547.0850941961</j>
-        <k>-7697.5250941961</k>
-      </quaternion>
-    </orientation>
-  </reference_frame>
-  <reference_frame number="-5830" label="string">
-    <origin>
-      <element>-8984.2850941961</element>
-      <element>1810.9149058039</element>
-      <element>9003.3949058039</element>
-    </origin>
-    <orientation reference_frame="7813">
-      <euler_angles>
-        <alpha>1532.3149058039</alpha>
-        <beta>8431.8949058039</beta>
-        <gamma>2789.5549058039</gamma>
-      </euler_angles>
+  </interaction>
+  <reference_frame number="578070386" label="string" reference_frame="920297674">
+    <origin x="7847.3149058039" y="9341.3349058039" z="-4928.0650941961" />
+    <orientation>
+      <angle_axis>
+        <angle>3.0987251183</angle>
+        <axis x="-5857.1050941961" y="1857.5949058039" z="423.6949058039" />
+      </angle_axis>
     </orientation>
   </reference_frame>
 </spin_system>

@@ -10,3 +10,10 @@ ss.addSpin()
 ss.dump()
 print ss.getSpins()
 
+s=spinsys.SpinachSpin()
+print s
+s=spinsys.SpinachSpin()
+print s
+print s.sayHello()
+print s.dump()
+

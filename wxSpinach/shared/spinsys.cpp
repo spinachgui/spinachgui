@@ -35,11 +35,17 @@ void Spinsys::loadFromFile(const char* filename) {
     cerr << e << endl;
     exit(1);
   }
+
+  for(Spin_system::SpinConstIterator i(mXMLSpinSys->getSpin().begin()); 
+      i != mXMLSpinSys->getSpin().end();
+      ++i) {
+    cout << "Loading a spin" << endl;
+  }
 }
 
 void Spinsys::addSpin() {
-  Spin s(3,"He");
-  mXMLSpinSys->getSpin().push_back(s);
+  //  Spin s();
+  //  mXMLSpinSys->getSpin().push_back(s);
 }
 
 void Spinsys::saveToFile(const char* filename) {
@@ -55,3 +61,12 @@ void Spinsys::saveToFile(const char* filename) {
   serializeSpin_system(fout, *mXMLSpinSys, map);
 }
 
+
+
+void SpinachSpin::dump() {
+  cout << "Spin name=" << getLabel() << endl;
+  /*  cout << getCoordinates().getX() << endl;
+  cout << getCoordinates().getY() << endl;
+  cout << getCoordinates().getZ() << endl;*/
+  cout << "IsotopeE = " << getIsotope() << endl;
+}

@@ -62,11 +62,21 @@ void Spinsys::saveToFile(const char* filename) {
 }
 
 
+SpinachSpin Spinsys::getSpin() {
+  SpinachSpin s;
+  return s;
+}
+
+Vector SpinachSpin::getCoords() {
+  cout << "About to return a vector " << endl;
+  return getCoordinates();
+}
 
 void SpinachSpin::dump() {
   cout << "Spin name=" << getLabel() << endl;
-  /*  cout << getCoordinates().getX() << endl;
-  cout << getCoordinates().getY() << endl;
-  cout << getCoordinates().getZ() << endl;*/
-  cout << "IsotopeE = " << getIsotope() << endl;
+  //const Spin::CoordinatesType c = getCoordinates();
+  //cout << c.getX() << endl;
+  //cout << c.getY() << endl;
+  //cout << c.getZ() << endl;
+  //cout << "IsotopeE = " << getIsotope() << endl;
 }

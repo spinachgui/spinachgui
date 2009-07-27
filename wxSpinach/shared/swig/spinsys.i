@@ -29,6 +29,15 @@
   }
 }
 
+%typemap(out) Vector
+{
+  // PyObject* x=PyFloat_FromDouble(42.0);//$1.getX());
+  //PyObject* y=PyFloat_FromDouble(42.0);//$1.getY());
+  //PyObject* z=PyFloat_FromDouble(42.0);//$1.getZ());
+  //PyObject* t=PyTuple_Pack(3,x,y,z);
+  $result = PyInt_FromLong(4);
+}
+
 class Spin {
   Spin();
 };
@@ -42,6 +51,7 @@ public:
   SpinachSpin();
   void sayHello();
   void dump();
+  Vector getCoords();
 };
 
 class SpinachOrientation : public Orientation {
@@ -65,6 +75,7 @@ public:
   void addSpin();
   ///Get a list of references to spins
   Spin_system::SpinSequence& getSpins();
+  SpinachSpin getSpin();
 };
 
 

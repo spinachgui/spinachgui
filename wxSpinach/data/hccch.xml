@@ -5,10 +5,10 @@
     <coordinates x="-1.24904900" y="0.00000000" z="0.00000000" />
   </spin>
   <spin number="2" isotope="H" label="H1" reference_frame="0">
-    <coordinates x="-1.80332400" y="0.92819600 " z="0.00000000" />
+    <coordinates x="-1.80332400" y="0.92819600" z="0.00000000" />
   </spin>
   <spin number="3" isotope="H" label="H2" reference_frame="0">
-    <coordinates x="-0.92818700" y="0.00000000" z="0.00000000" />
+    <coordinates x="-1.80332400" y="-0.92819600" z="0.00000000" />
   </spin>
 
   <spin number="4" isotope="C" label="C2" reference_frame="0">

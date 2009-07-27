@@ -3,17 +3,15 @@ import spinsys
 
 ss=spinsys.Spinsys()
 ss.loadFromFile("data/spinsys.xml")
-ss.dump()
 ss.saveToFile("data/spinsys_saved.xml")
-ss.dump()
 ss.addSpin()
-ss.dump()
 print ss.getSpins()
 
 s=spinsys.SpinachSpin()
+print "printing s"
 print s
-s=spinsys.SpinachSpin()
-print s
+print "printing hello"
 print s.sayHello()
-print s.dump()
+print "printing coords"
+print s.getCoords()
 

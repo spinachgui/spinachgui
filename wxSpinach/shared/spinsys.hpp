@@ -6,6 +6,7 @@ using namespace std;
 
 //Forward declare the classes in this file
 class Spinsys;
+class SpinachSpin;
 class OrientationWrap;
 
 class Spinsys  {
@@ -21,10 +22,10 @@ public:
   ///Output the spin system in a human readable format to the standard
   ///output for debugging purposes.
   void dump() const;
-  ///Get a reference to a spin
-  void getSpin();
   ///Get a list of references to spins
   Spin_system::SpinSequence& getSpins() {return mXMLSpinSys->getSpin();}
+  ///Get a reference to a spin
+  SpinachSpin getSpin();
 
   ///Attach a spin
   void addSpin();
@@ -36,6 +37,7 @@ class SpinachSpin : public Spin {
 public:
   void sayHello(){cout << "Hello world from C++" << endl;}
   void dump();
+  Vector getCoords();
 };
 
 

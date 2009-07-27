@@ -90,7 +90,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         print "enableGL()"
         self.SetCurrent()
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-        glClear(GL_COLOR_BUFFER_BIT)
+
 
         qobj = gluNewQuadric();
         gluQuadricDrawStyle(qobj,GLU_LINE);
@@ -104,11 +104,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         gluDeleteQuadric(qobj);
 
         self.Bind(wx.EVT_PAINT,self.onPaint)
+        self.Bind(wx.EVT_MOTION,self.onMouseMove)
 
     def onPaint(self,e):
-        print "painting"
 	glColor3f(0.0, 0.0, 1.0);
-	self.SwapBuffers();
+        glClear(GL_COLOR_BUFFER_BIT)
 
         glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -125,14 +125,13 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         glLoadIdentity();
         glRotatef(dotProduct,self.yRotate/norm,self.xRotate/norm,0);
+        self.xRotate=0
+        self.yRotate=0
         glMultMatrixf(self.rotationMatrix);
         self.rotationMatrix=glGetFloatv(GL_MODELVIEW_MATRIX);
 
         glLoadIdentity();
-        camX=0
-        camY=0
-        camZ=5.0
-        gluLookAt(camX,camY,camZ,0,0,0,0,1,0);
+        gluLookAt(self.camX,self.camY,self.camZ,0,0,0,0,1,0);
         glMultMatrixf(self.rotationMatrix);
 
         #glLoadMatrixf(rotationMatrix);
@@ -152,6 +151,16 @@ class glDisplay(wx.glcanvas.GLCanvas):
         
             glColor3f(0.0, 0.0, 1.0);
         self.SwapBuffers()
+
+    def onMouseMove(self,e):
+        if(e.Dragging()):
+            self.xRotate=self.xRotate+(e.GetX()-self.mousex);
+            self.yRotate=self.yRotate+(e.GetY()-self.mousey);
+
+        self.mousex=e.GetX();
+        self.mousey=e.GetY();
+        self.Refresh()
+
 
 
 class MyApp(wx.App):

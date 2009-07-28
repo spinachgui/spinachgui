@@ -140,11 +140,13 @@ class glDisplay(wx.glcanvas.GLCanvas):
             self.SwapBuffers()
             return
 
-        spins=self.ss.getSpins()
-        for spin in spins:
+        spinCount=self.ss.getSpinCount()
+        for i in range(spinCount):
+            thisSpin=self.ss.getSpin(i)
+            coords=thisSpin.getCoords()
             glColor3f(1.0, 1.0, 1.0);
             glPushMatrix();
-            glTranslatef(spin[3][0],spin[3][1],spin[3][2]);
+            glTranslatef(coords[0],coords[1],coords[2]);
         
             glCallList(self.list);
             glPopMatrix();
@@ -222,9 +224,11 @@ class MyApp(wx.App):
 
 
     def updateSpinTree(self):
-        spins=self.ss.getSpins()
-        for spin in spins:
-            self.spinTree.AppendItem(self.spinTree.GetRootItem(),spin[2])
+        count=self.ss.getSpinCount()
+        for i in range(count):
+            spin=self.ss.getSpin(i)
+            string=spin.getLabel() + " (" + spin.getIsotope()  + ")"
+            self.spinTree.AppendItem(self.spinTree.GetRootItem(),string)
 
     def onSpinButton(self,e):
         self.spinPanel.Show(True)

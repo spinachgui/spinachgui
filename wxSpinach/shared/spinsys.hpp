@@ -68,7 +68,17 @@ class SpinachSpin : public Spin {
 public:
   SpinachSpin() : Spin() {}
   SpinachSpin(const Spin& _Spin) : Spin(_Spin) {}
-  void sayHello(){cout << "Hello world from C++" << endl;}
+  long getIndex() {return Spin::getNumber();}
+  const char* getIsotope() {return Spin::getIsotope().c_str();}
+  const char* getLabel() {
+    LabelOptional la = Spin::getLabel();
+    if(la.present()) {
+      return la.get().c_str();
+    } else {
+      return "";
+    }
+  }
+
   void dump();
   Vector getCoords();
 };

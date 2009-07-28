@@ -52,9 +52,10 @@ public:
 class SpinachSpin : public Spin {
 public:
   SpinachSpin();
-  void sayHello();
-  void dump();
   Vector getCoords();
+  long getIndex();
+  const char* getIsotope();
+  const char* getLabel();
 };
 
 //============================================================>>

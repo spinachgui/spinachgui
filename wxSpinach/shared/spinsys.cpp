@@ -109,7 +109,6 @@ long Spinsys::getInteractionCount() const {
 // SpinachSpin
 
 Vector SpinachSpin::getCoords() {
-  cout << "About to return a vector " << endl;
   return getCoordinates();
 }
 

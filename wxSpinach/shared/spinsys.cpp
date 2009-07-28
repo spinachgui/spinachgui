@@ -81,6 +81,9 @@ void Spinsys::saveToFile(const char* filename) {
   serializeSpin_system(fout, *mXMLSpinSys, map);
 }
 
+long Spinsys::getSpinCount() const {
+  return mSpins.size();
+}
 
 SpinachSpin Spinsys::getSpin(long n) {
   if(n>=0 && n<mSpins.size()) {
@@ -89,6 +92,21 @@ SpinachSpin Spinsys::getSpin(long n) {
   SpinachSpin s;
   return s;
 }
+
+SpinachInteraction Spinsys::getInteraction(long n) {
+  if(n>=0 && n<mInteractions.size()) {
+    return mInteractions[n];
+  }
+  SpinachInteraction inter;
+  return inter;
+}
+
+long Spinsys::getInteractionCount() const {
+  return mInteractions.size();
+}
+
+//============================================================//
+// SpinachSpin
 
 Vector SpinachSpin::getCoords() {
   cout << "About to return a vector " << endl;
@@ -102,4 +120,50 @@ void SpinachSpin::dump() {
   //cout << c.getY() << endl;
   //cout << c.getZ() << endl;
   //cout << "IsotopeE = " << getIsotope() << endl;
+}
+
+//============================================================//
+// SpinachOrientation
+
+
+//============================================================//
+// SpinachInteraction
+
+
+
+SpinachOrientation SpinachInteraction::getOrientation() {
+  OrientationOptional orentOpt=Interaction1::getOrientation();
+  if(orentOpt.present()) {
+    SpinachOrientation orient(orentOpt.get());
+    return orient;
+  } else {
+    //TODO Return some sort of exception to the calling code at this point
+    cerr << "Trying to get the orientation when this type of interaction doesn't need it" << endl;
+    SpinachOrientation so;
+    return so;
+  }
+};
+
+
+const char* SpinachInteraction::getFormAsString() const {
+  if(getScalar().present()) {
+    return "scalar";
+  } else if(getMatrix().present()) {
+    return "matrix";
+  } else if(getEigenvalues().present()) {
+    return "eigenvalues";
+  } else if(getAxiality_rhombicity().present()) {
+    return "axiality_rhombicity";
+  } else if(getSpan_skew().present()) {
+    return "span_skew";
+  } else {
+    //TODO Throw some sort of error here
+  }
+}
+
+//============================================================//
+// SpinachFrame
+
+SpinachFrame::SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {
+  
 }

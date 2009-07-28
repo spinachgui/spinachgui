@@ -3,8 +3,6 @@
 #include <iostream>
 #include <vector>
 
-///Having "Vector" mean a 3D vector and "vector" mean a type of array
-///would be just too confusing and error prone. Typedef the problem away
 
 using namespace std;
 
@@ -28,11 +26,15 @@ public:
   ///Output the spin system in a human readable format to the standard
   ///output for debugging purposes.
   void dump() const;
-  ///Get a list of references to spins
-  Spin_system::SpinSequence& getSpins() {return mXMLSpinSys->getSpin();}
-  ///Get a reference to a spin
+  ///Get a particular spin number
   SpinachSpin getSpin(long n);
-  long getSpinCount() {return 10;}
+  ///Get the total number of spins in the spin system
+  long getSpinCount() const;
+  ///Get a particular interaction
+  SpinachInteraction getInteraction(long n);
+  ///Get the total number of interactions
+  long getInteractionCount() const;  
+
 
   ///Attach a spin
   void addSpin();
@@ -46,10 +48,20 @@ protected:
   framearray mFrames;
 };
 
+
+class SpinachOrientation : public Orientation{
+public:
+  SpinachOrientation() : Orientation() {}
+  SpinachOrientation(const Orientation& _O) : Orientation(_O) {}
+};
+
+
 class SpinachInteraction : public Interaction1 {
 public:
   SpinachInteraction() : Interaction1() {}
   SpinachInteraction(const Interaction1& _Int) : Interaction1(_Int) {}
+  SpinachOrientation getOrientation();
+  const char* getFormAsString() const;
 };
 
 class SpinachSpin : public Spin {
@@ -62,17 +74,11 @@ public:
 };
 
 
-class SpinachOrientation : public Orientation{
-public:
-  SpinachOrientation() : Orientation() {}
-  SpinachOrientation(const Orientation& _O) : Orientation(_O) {}
-};
-
 
 class SpinachFrame : public Reference_frame {
 public:
   SpinachFrame() : Reference_frame() {}
-  SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {}
-protected:
+  SpinachFrame(const Reference_frame& _rf);
+  SpinachOrientation getOrientation() {SpinachOrientation orient(Reference_frame::getOrientation()); return orient;};
 };
 

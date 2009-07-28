@@ -36,11 +36,28 @@ void Spinsys::loadFromFile(const char* filename) {
     exit(1);
   }
 
+  //Load the spins
   for(Spin_system::SpinConstIterator i(mXMLSpinSys->getSpin().begin()); 
       i != mXMLSpinSys->getSpin().end();
       ++i) {
     cout << "Loading a spin" << endl;
+    mSpins.push_back(*i);
   }
+  //Load the interactions
+  for(Spin_system::InteractionConstIterator i(mXMLSpinSys->getInteraction().begin()); 
+      i != mXMLSpinSys->getInteraction().end();
+      ++i) {
+    cout << "Loading an interaction" << endl;
+    mInteractions.push_back(*i);
+  }
+  //Load the frames
+  for(Spin_system::Reference_frameConstIterator i(mXMLSpinSys->getReference_frame().begin()); 
+      i != mXMLSpinSys->getReference_frame().end();
+      ++i) {
+    cout << "Loading a frame" << endl;
+    mFrames.push_back(*i);
+  }
+  
 }
 
 void Spinsys::addSpin() {
@@ -62,7 +79,10 @@ void Spinsys::saveToFile(const char* filename) {
 }
 
 
-SpinachSpin Spinsys::getSpin() {
+SpinachSpin Spinsys::getSpin(long n) {
+  if(n>=0 && n<mSpins.size()) {
+    return mSpins[n];
+  }
   SpinachSpin s;
   return s;
 }

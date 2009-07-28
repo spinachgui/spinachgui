@@ -7,11 +7,10 @@ ss.saveToFile("data/spinsys_saved.xml")
 ss.addSpin()
 print ss.getSpins()
 
-s=spinsys.SpinachSpin()
-print "printing s"
-print s
-print "printing hello"
-print s.sayHello()
-print "printing coords"
-print s.getCoords()
+s1=ss.getSpin(0)
+s2=ss.getSpin(0)
+print s1
+print s2
+s1.dump()
+s2.dump()
 

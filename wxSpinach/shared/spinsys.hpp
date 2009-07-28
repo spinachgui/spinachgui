@@ -1,13 +1,19 @@
 
 #include <shared/spinsys_spec.hpp>
 #include <iostream>
+#include <vector>
+
+///Having "Vector" mean a 3D vector and "vector" mean a type of array
+///would be just too confusing and error prone. Typedef the problem away
 
 using namespace std;
 
 //Forward declare the classes in this file
 class Spinsys;
 class SpinachSpin;
-class OrientationWrap;
+class SpinachInteraction;
+class SpinachFrame;
+class SpinachOrientation;
 
 class Spinsys  {
 public:
@@ -25,74 +31,48 @@ public:
   ///Get a list of references to spins
   Spin_system::SpinSequence& getSpins() {return mXMLSpinSys->getSpin();}
   ///Get a reference to a spin
-  SpinachSpin getSpin();
+  SpinachSpin getSpin(long n);
+  long getSpinCount() {return 10;}
 
   ///Attach a spin
   void addSpin();
 protected:
   auto_ptr<Spin_system> mXMLSpinSys;
+  typedef std::vector<SpinachSpin> spinarray;
+  typedef std::vector<SpinachInteraction> interactionarray;
+  typedef std::vector<SpinachFrame> framearray;
+  spinarray mSpins;
+  interactionarray mInteractions;
+  framearray mFrames;
+};
+
+class SpinachInteraction : public Interaction1 {
+public:
+  SpinachInteraction() : Interaction1() {}
+  SpinachInteraction(const Interaction1& _Int) : Interaction1(_Int) {}
 };
 
 class SpinachSpin : public Spin {
 public:
+  SpinachSpin() : Spin() {}
+  SpinachSpin(const Spin& _Spin) : Spin(_Spin) {}
   void sayHello(){cout << "Hello world from C++" << endl;}
   void dump();
   Vector getCoords();
 };
 
 
-class SpinachOrientation : public Orientation {
+class SpinachOrientation : public Orientation{
 public:
+  SpinachOrientation() : Orientation() {}
+  SpinachOrientation(const Orientation& _O) : Orientation(_O) {}
 };
 
 
-class SpinachVector {
+class SpinachFrame : public Reference_frame {
 public:
-
-};
-
-class OrientationWrap {
- public:
-  OrientationWrap();
-  //I'm not sure what type function needs to return yet
-  virtual void getAsMatrix() const = 0;
-
-};
-
-class EulerA : public OrientationWrap {
- public:
-  EulerA(double alpha, double beta, double gamma);
-  double getAlpha() const {return alpha;}
-  double getBeta() const {return beta;}
-  double getGamma() const {return gamma;}
- private:
-  double alpha;
-  double beta;
-  double gamma;
-};
-
-class EulerB : public OrientationWrap {
- public:
-  EulerB(double alpha, double beta, double gamma);
-  double getAlpha() const {return alpha;}
-  double getBeta() const {return beta;}
-  double getGamma() const {return gamma;}
- private:
-  double alpha;
-  double beta;
-  double gamma;
-};
-
-class QuaternionWrap : public OrientationWrap {
-  QuaternionWrap(double Re, double i, double j, double k);
-  double getRe() const {return mRe;}
-  double getI()  const {return mI;}
-  double getJ()  const {return mJ;}
-  double getK()  const {return mK;}
- private:
-  double mRe;
-  double mI;
-  double mJ;
-  double mK;
+  SpinachFrame() : Reference_frame() {}
+  SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {}
+protected:
 };
 

@@ -38,26 +38,7 @@
   $result = PyInt_FromLong(4);
 }
 
-class Spin {
-  Spin();
-};
-
-class Orientation {
-  Orientation();
-};
-
-class SpinachSpin : public Spin {
-public:
-  SpinachSpin();
-  void sayHello();
-  void dump();
-  Vector getCoords();
-};
-
-class SpinachOrientation : public Orientation {
-public:
-  SpinachOrientation();
-};
+//=========>> Spinsys class <<=========//
 
 class Spinsys {
 public:
@@ -75,52 +56,53 @@ public:
   void addSpin();
   ///Get a list of references to spins
   Spin_system::SpinSequence& getSpins();
-  SpinachSpin getSpin();
+  SpinachSpin getSpin(long n);
+  long getSpinCount();
+};
+
+//=========>> Spin Class =========//
+
+//Swig just needs to know that there is a spin class and it has
+//a default constructior
+class Spin {
+public:
+  Spin();
 };
 
 
-class OrientationWrap {
- public:
-  OrientationWrap();
-  //I'm not sure what type function needs to return yet
-  virtual void getAsMatrix() const = 0;
-
+class SpinachSpin : public Spin {
+public:
+  SpinachSpin();
+  void sayHello();
+  void dump();
+  Vector getCoords();
 };
 
-class EulerA : public OrientationWrap {
- public:
-  EulerA(double alpha, double beta, double gamma);
-  double getAlpha() const {return alpha;}
-  double getBeta() const {return beta;}
-  double getGamma() const {return gamma;}
- private:
-  double alpha;
-  double beta;
-  double gamma;
+
+//=========>> Orientation Class <<=====//
+
+class Orientation {
+public:
+  Orientation();
 };
 
-class EulerB : public OrientationWrap {
- public:
-  EulerB(double alpha, double beta, double gamma);
-  double getAlpha() const {return alpha;}
-  double getBeta() const {return beta;}
-  double getGamma() const {return gamma;}
- private:
-  double alpha;
-  double beta;
-  double gamma;
+class SpinachOrientation : public Orientation{
+public:
+  SpinachOrientation() : Orientation() {}
+  SpinachOrientation(const Orientation& _O) : Orientation(_O) {}
 };
 
-class QuaternionWrap : public OrientationWrap {
-  QuaternionWrap(double Re, double i, double j, double k);
-  double getRe() const {return mRe;}
-  double getI()  const {return mI;}
-  double getJ()  const {return mJ;}
-  double getK()  const {return mK;}
- private:
-  double mRe;
-  double mI;
-  double mJ;
-  double mK;
+
+//=========>> Reference Frame Class <<=========//
+
+class Reference_frame {
+public:
+  Reference_frame();
 };
 
+class SpinachFrame : public Reference_frame {
+public:
+  SpinachFrame() : Reference_frame() {}
+  SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {}
+protected:
+};

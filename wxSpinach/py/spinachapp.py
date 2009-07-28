@@ -140,6 +140,10 @@ class glDisplay(wx.glcanvas.GLCanvas):
             self.SwapBuffers()
             return
 
+        ints=[]
+        for i in range(self.ss.getInteractionCount()):
+            ints.append(self.ss.getInteraction(i))
+            
         spinCount=self.ss.getSpinCount()
         for i in range(spinCount):
             thisSpin=self.ss.getSpin(i)
@@ -147,7 +151,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glColor3f(1.0, 1.0, 1.0);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
-        
+            #see if any interactions involve this spin
+            for inter in ints:
+                if inter.getSpin1Number()==thisSpin.getNumber() and inter.getFormAsString() == "matrix":
+                    #Apply the transformation matrix to warp the sphere
+                    mat=array([[inter.get(0,0),inter.get(0,1),inter.get(0,2),0],[inter.get(1,0),inter.get(1,1),inter.get(1,2),0],[inter.get(2,0),inter.get(2,1),inter.get(2,2),0],[0,0,0,1]],float32)
+                    glMultMatrixf(mat)
             glCallList(self.list);
             glPopMatrix();
         

@@ -62,13 +62,19 @@ public:
   SpinachInteraction(const Interaction1& _Int) : Interaction1(_Int) {}
   SpinachOrientation getOrientation();
   const char* getFormAsString() const;
+  long getSpin1Number() const {return Interaction1::getSpin_1();}
+  double get(long x,long y) const {
+    //Danger!
+    Matrix m=getMatrix().get();
+    return m.getElement()[3*y+x];
+  }
 };
 
 class SpinachSpin : public Spin {
 public:
   SpinachSpin() : Spin() {}
   SpinachSpin(const Spin& _Spin) : Spin(_Spin) {}
-  long getIndex() {return Spin::getNumber();}
+  long getNumber() {return Spin::getNumber();}
   const char* getIsotope() {return Spin::getIsotope().c_str();}
   const char* getLabel() {
     LabelOptional la = Spin::getLabel();

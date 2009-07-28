@@ -25,5 +25,22 @@
     <scalar strong="1">-433.9050941961</scalar>
   </interaction>
 
+
+  <interaction reference_frame="0" type="string" units="string" spin_1="3" spin_2="2">
+    <matrix>
+      <element>0.1579</element>
+      <element>-0.1633</element>
+      <element>0.5173</element>
+
+      <element>0.2961</element>
+      <element>-0.1257</element>
+      <element>-0.1301</element>
+
+      <element>-0.4018</element>
+      <element>-0.1257</element>
+      <element>-0.1227</element>
+    </matrix>
+  </interaction>
+
  
   </spin_system>

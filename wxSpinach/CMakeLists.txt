@@ -67,6 +67,7 @@ set(cmdSources "commandln/main.cpp")
 #There's a bit of a hack here. We're assuming that we're building
 #in a subdirectory such as build/ so this build process would fail
 #if it were ever tried elsewhere. I'm not sure how to fix this yet.
+
 set(xsd_args cxx-tree )
 set(xsd_args ${xsd_args} --generate-default-ctor)
 set(xsd_args ${xsd_args} --generate-serialization)
@@ -88,6 +89,20 @@ set(swig_args -c++ -python
               -I${CMAKE_CURRENT_SOURCE_DIR}
               -outdir ${CMAKE_CURRENT_BINARY_DIR})
 
+
+#Regenerate the documentation as part of the build
+#There's a bit of a hack here. We're assuming that we're building
+#in a subdirectory such as build/ so this build process would fail
+#if it were ever tried elsewhere. I'm not sure how to fix this yet.
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/doc/html/index.html
+				   COMMAND doxygen ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile
+				   MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile
+				   IMPLICIT_DEPENDS CXX ${sharedSources} ${guiSources} ${cmdSources}
+				   COMMENT "Regenerating the documentation")
+
+
+
+
 set(swig_file -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.cpp
               -oh ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/shared/swig/spinsys.i) 
@@ -96,6 +111,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.c
 		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinsys_spec.cpp shared/spinsys.cpp
                    COMMAND COMMAND swig ${swig_args} ${swig_file}
                    COMMENT "Automatically generating python bindings")
+
 
 
 

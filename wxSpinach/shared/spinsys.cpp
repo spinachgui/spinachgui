@@ -2,6 +2,8 @@
 #include "spinsys.hpp"
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <boost/algorithm/string/trim.hpp>
 
 using namespace std;
 
@@ -61,6 +63,58 @@ void Spinsys::loadFromFile(const char* filename) {
     mFrames.push_back(thisFrame);
   }
   
+}
+
+void Spinsys::loadFromG03File(const char* filename) {
+  ifstream fin(filename);
+  cout << "Opening a g03 file:" << filename << endl;
+  if(!fin.is_open()) {
+    //Throw some sort of error here
+    cerr << "Couldn't open file" << endl;
+    return;
+  }
+  long nAtoms=0;
+  while(!fin.eof()) {
+    string line;
+    char buff[500];  //TODO buletproof this
+    fin.getline(buff,500); line=buff; //Read a line
+    boost::algorithm::trim(line); //Remove whitespace
+    cout << "line=" << line << endl;
+    if (line=="Standard orientation:") {
+      cout << "Standard orientation found." << endl;
+      //Skip 4 lines
+      fin.ignore(999999,'\n');
+      while (line != "---------------------------------------------------------------------") {
+	fin.getline(buff,500); line=buff; //Read a line
+	cout << "I reckon this line should have coordinates on it:" << line << endl;
+	nAtoms++;
+      }
+    }
+    if (line=="Isotropic Fermi Contact Couplings") {
+      //Skip a line
+      fin.ignore(999999,'\n');
+      for (long i=0;i<nAtoms;i++) {
+	fin.getline(buff,500); line=buff; //Read a line
+	cout << "This should be a fermi-contact line" << line << endl;
+	//S=char(A(n+1+k)); S=eval(['[' S(20:end) ']']); iso_hfc(k)=S(3);
+      }          
+    }
+    if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
+      cout << "Anisotropic spin dipole couplings found." << endl; 
+    
+      for (long i=0;i>nAtoms;i++) {
+	fin.getline(buff,500); line=buff; //Read a line
+	cout << line << endl;
+	fin.getline(buff,500); line=buff; //Read a line
+	cout << line << endl;
+	fin.getline(buff,500); line=buff; //Read a line
+	cout << line << endl;
+        //nbaa=A(n+4*k+1); baa=char(baa); baa=eval(['[' baa(4:end) ']']); Baa(k)=baa(3); aa_axis(k,:)=baa(5:7);
+        //bbb=A(n+4*k+2); bbb=char(bbb); bbb=eval(['[' bbb(14:end) ']']); Bbb(k)=bbb(3); bb_axis(k,:)=bbb(5:7);
+	//bcc=A(n+4*k+3); bcc=char(bcc); bcc=eval(['[' bcc(4:end) ']']); Bcc(k)=bcc(3); cc_axis(k,:)=bcc(5:7);
+      }
+    }
+  }
 }
 
 void Spinsys::addSpin() {

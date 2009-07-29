@@ -3,6 +3,7 @@ import spinsys
 
 ss=spinsys.Spinsys()
 ss.loadFromFile("data/spinsys.xml")
+ss.loadFromG03File("data/tryosine.log")
 ss.saveToFile("data/spinsys_saved.xml")
 
 for i in range(ss.getSpinCount()):
@@ -18,6 +19,6 @@ for i in range(ss.getInteractionCount()):
         m=inter.getAsMatrix();
         m.dump()
     if form != "scalar" and form != "matrix":
-        orient=inter.getOrientation()
+        orient=inter.getSpinachOrientation()
         print orient
 

@@ -155,7 +155,9 @@ class glDisplay(wx.glcanvas.GLCanvas):
             for inter in ints:
                 if inter.getSpin1Number()==thisSpin.getNumber() and inter.getFormAsString() == "matrix":
                     #Apply the transformation matrix to warp the sphere
-                    mat=array([[inter.get(0,0),inter.get(0,1),inter.get(0,2),0],[inter.get(1,0),inter.get(1,1),inter.get(1,2),0],[inter.get(2,0),inter.get(2,1),inter.get(2,2),0],[0,0,0,1]],float32)
+                    mat3=inter.getAsMatrix()
+                    #Convert to a openGL 4x4 matrix
+                    mat=array([[mat3.get(0,0),mat3.get(0,1),mat3.get(0,2),0],[mat3.get(1,0),mat3.get(1,1),mat3.get(1,2),0],[mat3.get(2,0),mat3.get(2,1),mat3.get(2,2),0],[0,0,0,1]],float32)
                     glMultMatrixf(mat)
             glCallList(self.list);
             glPopMatrix();

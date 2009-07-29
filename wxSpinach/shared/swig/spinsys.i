@@ -74,6 +74,7 @@ public:
   long getSpin1Number() const;
   const char* getFormAsString() const;
   double get(long x, long y) const; //get matrix elements. This really needs replacing
+  Matrix3 getAsMatrix() const;
 };
 
 
@@ -103,4 +104,24 @@ public:
   SpinachFrame() : Reference_frame() {}
   SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {}
   SpinachOrientation getOrientation();
+};
+
+class Matrix {
+public:
+  Matrix();
+  Matrix(const Matrix& _m);
+};
+
+class Matrix3 {
+public:
+  Matrix3();
+  Matrix3(const Matrix& _m);
+  Matrix3(const Matrix3& _m);
+  Matrix3(double a00,double a01,double a02,
+	  double a10,double a11,double a12,
+	  double a20,double a21,double a22);
+  double get(long i1,long i2) const;
+  void set(long i1,long i2, double a);
+  void dump() const;  
+
 };

@@ -143,6 +143,41 @@ SpinachOrientation SpinachInteraction::getOrientation() {
   }
 };
 
+Matrix3 SpinachInteraction::getAsMatrix() const {
+  if(getForm()==INTER_SCALER) {
+    //Return the identity multipled by the scalar
+    double s=getScalar().get();
+    Matrix3 m(s,0,0,0,s,0,0,0,s);
+    return m;
+  } else if(getForm()==INTER_MATRIX) {
+    //Just return the matrix
+    Matrix3 m(getMatrix().get());
+    return m;
+  } else if(getForm()==INTER_EIGENVALUES) {
+    //Convert to a matrix
+  } else {
+    cerr << "Interaction type not suported in getAsMatrix()" << endl;
+  }
+  //Return the identity
+  Matrix3 identity(1,0,0,0,1,0,0,0,1);
+  return identity;
+}
+
+long SpinachInteraction::getForm() const {
+  if(getScalar().present()) {
+    return INTER_SCALER;
+  } else if(getMatrix().present()) {
+    return INTER_MATRIX;
+  } else if(getEigenvalues().present()) {
+    return INTER_EIGENVALUES;
+  } else if(getAxiality_rhombicity().present()) {
+    return INTER_AXIALITY_RHOMBICITY;
+  } else if(getSpan_skew().present()) {
+    return INTER_SPAN_SKEW;
+  } else {
+    //TODO Throw some sort of error here
+  }
+}
 
 const char* SpinachInteraction::getFormAsString() const {
   if(getScalar().present()) {
@@ -165,4 +200,46 @@ const char* SpinachInteraction::getFormAsString() const {
 
 SpinachFrame::SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {
   
+}
+
+
+//============================================================//
+
+Matrix3::Matrix3(double a00,double a01,double a02,
+		 double a10,double a11,double a12,
+		 double a20,double a21,double a22) {
+  ElementSequence elements;
+  elements.resize(9);
+  elements[0]=a00;
+  elements[1]=a01;
+  elements[2]=a02;
+
+  elements[3]=a10;
+  elements[4]=a11;
+  elements[5]=a12;
+
+  elements[6]=a20;
+  elements[7]=a21;
+  elements[8]=a22;
+  setElement(elements);
+}
+
+void Matrix3::dump() const {
+  const ElementSequence elements=getElement();
+  double a00=elements[0];
+  double a01=elements[1];
+  double a02=elements[2];
+
+  double a10=elements[3];
+  double a11=elements[4];
+  double a12=elements[5];
+
+  double a20=elements[6];
+  double a21=elements[7];
+  double a22=elements[8];
+
+  cout << "Matrix3:" << endl;
+  cout << " (" << a00 << " " << a01 << " " << a02 << endl;
+  cout << " (" << a10 << " " << a11 << " " << a12 << endl;
+  cout << " (" << a20 << " " << a21 << " " << a22 << ")" << endl;
 }

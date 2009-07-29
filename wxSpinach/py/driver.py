@@ -13,6 +13,10 @@ for i in range(ss.getInteractionCount()):
     inter=ss.getInteraction(i)
     form=inter.getFormAsString()
     print "The form of the interaction "+str(i)+" is "+form
+    if form == "scalar" or form == "matrix":
+        print "The interaction matrix is:"
+        m=inter.getAsMatrix();
+        m.dump()
     if form != "scalar" and form != "matrix":
         orient=inter.getOrientation()
         print orient

@@ -12,6 +12,16 @@ class SpinachSpin;
 class SpinachInteraction;
 class SpinachFrame;
 class SpinachOrientation;
+class Matrix3;
+
+///Enumeration of the various types of interaction
+enum INTERACTION {
+  INTER_SCALER,
+  INTER_MATRIX,
+  INTER_EIGENVALUES,
+  INTER_AXIALITY_RHOMBICITY,
+  INTER_SPAN_SKEW
+};
 
 class Spinsys  {
 public:
@@ -62,12 +72,14 @@ public:
   SpinachInteraction(const Interaction1& _Int) : Interaction1(_Int) {}
   SpinachOrientation getOrientation();
   const char* getFormAsString() const;
+  long getForm() const;
   long getSpin1Number() const {return Interaction1::getSpin_1();}
   double get(long x,long y) const {
     //Danger!
     Matrix m=getMatrix().get();
     return m.getElement()[3*y+x];
   }
+  Matrix3 getAsMatrix() const;
 };
 
 class SpinachSpin : public Spin {
@@ -98,3 +110,14 @@ public:
   SpinachOrientation getOrientation() {SpinachOrientation orient(Reference_frame::getOrientation()); return orient;};
 };
 
+class Matrix3 : public Matrix {
+public:
+  Matrix3() : Matrix() {}
+  Matrix3(const Matrix& _m) : Matrix(_m) {}
+  Matrix3(double a00,double a01,double a02,
+	  double a10,double a11,double a12,
+	  double a20,double a21,double a22);
+  double get(long i1,long i2) const {return getElement()[3*i1+i2];}
+  void set(long i1,long i2, double a) {getElement()[3*i1+i2]=a;}
+  void dump() const;  
+};

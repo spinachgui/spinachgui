@@ -70,7 +70,7 @@ class SpinachInteraction : public Interaction1 {
 public:
   SpinachInteraction() : Interaction1() {}
   SpinachInteraction(const Interaction1& _Int) : Interaction1(_Int) {}
-  SpinachOrientation getOrientation();
+  SpinachOrientation getSpinachOrientation();
   long getSpin1Number() const;
   const char* getFormAsString() const;
   double get(long x, long y) const; //get matrix elements. This really needs replacing

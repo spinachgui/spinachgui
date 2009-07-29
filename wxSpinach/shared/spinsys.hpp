@@ -31,6 +31,8 @@ public:
   void createNew();
   ///Load a spin system from an XML file located at filename
   void loadFromFile(const char* filename);
+  ///Load a spin system from a g03 output file
+  void loadFromG03File(const char* filename);
   ///Save the spin system to an XML file at filename
   void saveToFile(const char* filename);
   ///Output the spin system in a human readable format to the standard
@@ -63,6 +65,7 @@ class SpinachOrientation : public Orientation{
 public:
   SpinachOrientation() : Orientation() {}
   SpinachOrientation(const Orientation& _O) : Orientation(_O) {}
+  Matrix3 getAsMatrix() const;
 };
 
 
@@ -70,7 +73,7 @@ class SpinachInteraction : public Interaction1 {
 public:
   SpinachInteraction() : Interaction1() {}
   SpinachInteraction(const Interaction1& _Int) : Interaction1(_Int) {}
-  SpinachOrientation getOrientation();
+  SpinachOrientation getSpinachOrientation();
   const char* getFormAsString() const;
   long getForm() const;
   long getSpin1Number() const {return Interaction1::getSpin_1();}

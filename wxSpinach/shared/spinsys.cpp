@@ -124,13 +124,17 @@ void SpinachSpin::dump() {
 //============================================================//
 // SpinachOrientation
 
+Matrix3 SpinachOrientation::getAsMatrix() const {
+  return Matrix3(1,0,0,0,1,0,0,0,1);
+}
+
 
 //============================================================//
 // SpinachInteraction
 
 
 
-SpinachOrientation SpinachInteraction::getOrientation() {
+SpinachOrientation SpinachInteraction::getSpinachOrientation() {
   OrientationOptional orentOpt=Interaction1::getOrientation();
   if(orentOpt.present()) {
     SpinachOrientation orient(orentOpt.get());
@@ -138,7 +142,7 @@ SpinachOrientation SpinachInteraction::getOrientation() {
   } else {
     //TODO Return some sort of exception to the calling code at this point
     cerr << "Trying to get the orientation when this type of interaction doesn't need it" << endl;
-    SpinachOrientation so;
+    const SpinachOrientation so;
     return so;
   }
 };
@@ -155,6 +159,28 @@ Matrix3 SpinachInteraction::getAsMatrix() const {
     return m;
   } else if(getForm()==INTER_EIGENVALUES) {
     //Convert to a matrix
+
+    const Eigenvalues ev=getEigenvalues().get();
+
+    double xx=ev.getXX();
+    double yy=ev.getYY();
+    double zz=ev.getZZ();
+
+    const SpinachOrientation o=getOrientation().get();
+    Matrix3 intMatrix=o.getAsMatrix();
+
+    intMatrix.set(0,0,intMatrix.get(0,0)*xx);
+    intMatrix.set(0,1,intMatrix.get(0,1)*xx);
+    intMatrix.set(0,2,intMatrix.get(0,2)*xx);
+
+    intMatrix.set(1,0,intMatrix.get(1,0)*yy);
+    intMatrix.set(1,1,intMatrix.get(1,1)*yy);
+    intMatrix.set(1,2,intMatrix.get(1,2)*yy);
+
+    intMatrix.set(2,0,intMatrix.get(2,0)*zz);
+    intMatrix.set(2,1,intMatrix.get(2,1)*zz);
+    intMatrix.set(2,2,intMatrix.get(2,2)*zz);
+    return intMatrix;
   } else {
     cerr << "Interaction type not suported in getAsMatrix()" << endl;
   }

@@ -13,6 +13,15 @@
   $result=PyTuple_Pack(3,x,y,z);
 }
 
+%typemap(out) std::vector<long> 
+{
+  $result=PyList_New($1.size());
+  for(long i=0;i < $1.size(); i++) {
+    PyObject* n=PyInt_FromLong($1[i]);
+    PyList_SetItem($result,i,n);
+  }
+}
+
 //=========>> Spinsys class <<=========//
 
 class Spinsys {
@@ -38,6 +47,7 @@ public:
   SpinachInteraction getInteraction(long n);
   ///Get the total number of interactions
   long getInteractionCount() const;  
+  std::vector<long> getNearbySpins(long spinNumber,double distance);
 };
 
 //=========>> Spin Class =========//

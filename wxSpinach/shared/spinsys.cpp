@@ -114,12 +114,12 @@ void Spinsys::loadFromG03File(const char* filename) {
 	int dummy1,dummy2,dummy3;
 	double x,y,z;
 	stream >> dummy1 >> dummy2 >> dummy3 >> x >> y >> z;
-	nAtoms++;
 	stream.clear();
 	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
 	Spin s(Vector(x,y,z),nAtoms,"H1",0);
 	s.setLabel("A Spin");
 	mSpins.push_back(s);
+	nAtoms++;
       }
     }
     if (line=="Isotropic Fermi Contact Couplings") {
@@ -151,13 +151,16 @@ void Spinsys::loadFromG03File(const char* filename) {
 
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
 	stream                     >> dummy1 >> dummy2 >> eigenvalue3 >> dummy3 >> dummy4 >> x3 >> y3 >> z3;
-	
+	cout << x1 << " " << y1 << " " << z1 << endl; 
+	cout << x2 << " " << y2 << " " << z2 << endl; 
+	cout << x3 << " " << y3 << " " << z3 << endl; 
 	//Skip a line
 	fin.getline(buff,500); line=buff; //Read a line
 
 	SpinachInteraction inter;
 	inter.setEigenvalues(Eigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05));
 	SpinachOrientation o;
+	o.setEigensystem(Eigensystem(Vector(x1,y1,z1),Vector(x2,y2,z2),Vector(x3,y3,z3)));
 	inter.setOrientation(o);
 	inter.setSpin_1(i);
 	mInteractions.push_back(inter);
@@ -209,6 +212,29 @@ long Spinsys::getInteractionCount() const {
   return mInteractions.size();
 }
 
+std::vector<long> Spinsys::getNearbySpins(long spinNumber,double distance) {
+  std::vector<long> result;
+  double dist2=distance*distance;
+  Vector coords1=mSpins[spinNumber].getCoordinates();
+  double x1=coords1.getX();
+  double y1=coords1.getY();
+  double z1=coords1.getZ();
+
+  for(long i=spinNumber+1;i<mSpins.size();i++) {
+    Vector coords2=mSpins[i].getCoordinates();
+    double x2=coords2.getX();
+    double y2=coords2.getY();
+    double z2=coords2.getZ();
+    double deltaX=(x1-x2);
+    double deltaY=(y1-y2);
+    double deltaZ=(z1-z2);
+    if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ < dist2) {
+      result.push_back(i);
+    }
+  }
+  return result;
+}
+
 //============================================================//
 // SpinachSpin
 
@@ -228,7 +254,32 @@ void SpinachSpin::dump() {
 //============================================================//
 // SpinachOrientation
 
+long SpinachOrientation::getForm() const {
+  if(getEuler_angles().present()) {
+    return ORIENT_EULER;
+  } else if(getAngle_axis().present()) {
+    return ORIENT_ANGLE_AXIS;
+  } else if(getQuaternion().present()) {
+    return ORIENT_QUATERNION;
+  } else if(getEigensystem().present()) {
+    return ORIENT_EIGENSYSTEM;
+  } else {
+    //TODO Throw some sort of error here
+  }
+}
+
+
 Matrix3 SpinachOrientation::getAsMatrix() const {
+  if(getForm()==ORIENT_EIGENSYSTEM) {
+    Eigensystem sys=getEigensystem().get();
+    Vector xa=sys.getX_axis();
+    Vector ya=sys.getY_axis();
+    Vector za=sys.getZ_axis();
+
+    return Matrix3(xa.getX(),ya.getX(),za.getX(),
+		   xa.getY(),ya.getY(),za.getY(),
+		   xa.getZ(),ya.getZ(),za.getZ());
+  }
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }
 
@@ -274,15 +325,15 @@ Matrix3 SpinachInteraction::getAsMatrix() const {
     Matrix3 intMatrix=o.getAsMatrix();
 
     intMatrix.set(0,0,intMatrix.get(0,0)*xx);
-    intMatrix.set(0,1,intMatrix.get(0,1)*xx);
-    intMatrix.set(0,2,intMatrix.get(0,2)*xx);
+    intMatrix.set(0,1,intMatrix.get(0,1)*yy);
+    intMatrix.set(0,2,intMatrix.get(0,2)*zz);
 
-    intMatrix.set(1,0,intMatrix.get(1,0)*yy);
+    intMatrix.set(1,0,intMatrix.get(1,0)*xx);
     intMatrix.set(1,1,intMatrix.get(1,1)*yy);
-    intMatrix.set(1,2,intMatrix.get(1,2)*yy);
+    intMatrix.set(1,2,intMatrix.get(1,2)*zz);
 
-    intMatrix.set(2,0,intMatrix.get(2,0)*zz);
-    intMatrix.set(2,1,intMatrix.get(2,1)*zz);
+    intMatrix.set(2,0,intMatrix.get(2,0)*xx);
+    intMatrix.set(2,1,intMatrix.get(2,1)*yy);
     intMatrix.set(2,2,intMatrix.get(2,2)*zz);
     return intMatrix;
   } else {

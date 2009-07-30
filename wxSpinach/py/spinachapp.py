@@ -4,6 +4,7 @@ from wx import xrc
 
 import wx.glcanvas
 
+from math import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
@@ -145,6 +146,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
             ints.append(self.ss.getInteraction(i))
             
         spinCount=self.ss.getSpinCount()
+
+        qobj = gluNewQuadric();
+        gluQuadricDrawStyle(qobj,GLU_LINE);
+        gluQuadricNormals(qobj,GLU_SMOOTH);
+
         for i in range(spinCount):
             thisSpin=self.ss.getSpin(i)
             coords=thisSpin.getCoords()
@@ -165,7 +171,31 @@ class glDisplay(wx.glcanvas.GLCanvas):
                     break;
             glCallList(self.list);
             glPopMatrix();
+
+            glPushMatrix();
+            glTranslatef(coords[0],coords[1],coords[2]);
+            glScale(0.2,0.2,0.2);
+            glColor3f(0.0, 0.0, 1.0);
+            glCallList(self.list);
+            glPopMatrix();
         
+            #Now draw in bonds to nearby atoms
+            nearby=self.ss.getNearbySpins(i,1.8)
+            glColor3f(1.0, 0.0, 0.0);
+            for index in nearby:
+                otherCoords=self.ss.getSpin(index).getCoords()
+                height=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
+                        (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
+                        (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
+
+                #Now we need to find the rotation between the z axis
+                angle=acos((otherCoords[2]-coords[2])/height)
+                glPushMatrix();
+                glTranslatef(coords[0],coords[1],coords[2]);
+                glRotate(angle/2/pi*360,coords[1]-otherCoords[1],otherCoords[0]-coords[0],0)
+                gluCylinder(qobj,0.1,0.1,height,10,10)
+                glPopMatrix();
+
             glColor3f(0.0, 0.0, 1.0);
         self.SwapBuffers()
 

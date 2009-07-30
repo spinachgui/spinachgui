@@ -13,6 +13,7 @@ class SpinachInteraction;
 class SpinachFrame;
 class SpinachOrientation;
 class Matrix3;
+class intList;
 
 ///Enumeration of the various types of interaction
 enum INTERACTION {
@@ -22,6 +23,14 @@ enum INTERACTION {
   INTER_AXIALITY_RHOMBICITY,
   INTER_SPAN_SKEW
 };
+
+enum ORIENTATION {
+  ORIENT_EULER,
+  ORIENT_ANGLE_AXIS,
+  ORIENT_QUATERNION,
+  ORIENT_EIGENSYSTEM
+};
+
 
 class Spinsys  {
 public:
@@ -46,6 +55,10 @@ public:
   SpinachInteraction getInteraction(long n);
   ///Get the total number of interactions
   long getInteractionCount() const;  
+  ///Get all spins within distance of spin spinNumber with a higher number
+  ///than spinNumber (useful for drawing bonds. If you loop though the structure,
+  ///you only need to draw a bond once)
+  std::vector<long> getNearbySpins(long spinNumber,double distance);
 
 
   ///Attach a spin
@@ -66,6 +79,7 @@ public:
   SpinachOrientation() : Orientation() {}
   SpinachOrientation(const Orientation& _O) : Orientation(_O) {}
   Matrix3 getAsMatrix() const;
+  long getForm() const;
 };
 
 

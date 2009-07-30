@@ -294,9 +294,13 @@ class MyApp(wx.App):
         self.frame.Layout();
 
     def onOpen(self,e):
-        fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
+        fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard="Spin XML files (*.xml)|*.xml|G03 Log Files (*.log)|*.log|All Files (*.*)|*.*") 
         if(fd.ShowModal()):
-            loadFromFile(fd.GetPath().encode('latin-1'))
+            fileExt=fd.GetPath()[-3:]
+            if(fileExt=="log"):
+                self.loadFromFile(fd.GetPath().encode('latin-1'),'g03')
+            else:
+                self.loadFromFile(fd.GetPath().encode('latin-1'))
             
     def loadFromFile(self,filename,type="xml"):
         if type=="xml":

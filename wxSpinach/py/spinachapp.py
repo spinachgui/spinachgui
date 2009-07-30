@@ -228,8 +228,8 @@ class MyApp(wx.App):
         self.glc.setSpinSys(self.ss)
         self.glc.enableGL()   
         
-        self.loadFromFile('data/hccch.xml')
-
+        #self.loadFromFile('data/hccch.xml')
+        self.loadFromFile('data/tyrosine.log','g03')
 
 
 
@@ -264,8 +264,11 @@ class MyApp(wx.App):
         if(fd.ShowModal()):
             loadFromFile(fd.GetPath().encode('latin-1'))
             
-    def loadFromFile(self,filename):
-        self.ss.loadFromFile(filename)
+    def loadFromFile(self,filename,type="xml"):
+        if type=="xml":
+            self.ss.loadFromFile(filename)
+        elif type=="g03":
+            self.ss.loadFromG03File(filename)
         self.updateSpinTree()
 
     def onSaveAs(self,e):

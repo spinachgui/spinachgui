@@ -2,6 +2,7 @@
 #include "spinsys.hpp"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <boost/algorithm/string/trim.hpp>
 
@@ -13,6 +14,7 @@ Spinsys::Spinsys() : mXMLSpinSys(new Spin_system()) {
 
 void Spinsys::createNew() {
   mXMLSpinSys.reset(new Spin_system());
+  mSpins.resize(0);
 }
 
 void Spinsys::dump() const{
@@ -25,12 +27,16 @@ void Spinsys::dump() const{
       cout << " Spin name=" << i->getLabel() << endl;
       cout << "      number=" << i->getNumber() << endl;
       cout << "      isotope=" << i->getIsotope() << endl;
+      cout << "      coords=(" << i->getCoordinates().getX() << ",";
+      cout << "              " << i->getCoordinates().getY() << ",";
+      cout << "              " << i->getCoordinates().getZ() << ")" << endl;
     }
 
 
 }
 
 void Spinsys::loadFromFile(const char* filename) {
+  createNew();
   try {
     mXMLSpinSys = parseSpin_system(filename);
   } catch(const xml_schema::Exception& e) {
@@ -66,6 +72,12 @@ void Spinsys::loadFromFile(const char* filename) {
 }
 
 void Spinsys::loadFromG03File(const char* filename) {
+  /*
+    This function really needs some work done on in, as it's not using C++
+    streams properly. This is due to it being adapted from matlab code (which uses
+    c style I/O
+   */
+  createNew();
   ifstream fin(filename);
   cout << "Opening a g03 file:" << filename << endl;
   if(!fin.is_open()) {
@@ -79,20 +91,32 @@ void Spinsys::loadFromG03File(const char* filename) {
     char buff[500];  //TODO buletproof this
     fin.getline(buff,500); line=buff; //Read a line
     boost::algorithm::trim(line); //Remove whitespace
-    cout << "line=" << line << endl;
+
     if (line=="Standard orientation:") {
       cout << "Standard orientation found." << endl;
       //Skip 4 lines
-      fin.ignore(999999,'\n');
-      while (line != "---------------------------------------------------------------------") {
-	fin.getline(buff,500); line=buff; //Read a line
-	cout << "I reckon this line should have coordinates on it:" << line << endl;
+      fin.getline(buff,500); line=buff; //Read a line
+      fin.getline(buff,500); line=buff; //Read a line
+      fin.getline(buff,500); line=buff; //Read a line
+      fin.getline(buff,500); line=buff; //Read a line
+      istringstream stream;
+
+      fin.getline(buff,500); line=buff; stream.str(line); //Read a line
+      while(line.find("--------") == string::npos && !fin.eof()) {
+	int dummy1,dummy2,dummy3;
+	double x,y,z;
+	stream >> dummy1 >> dummy2 >> dummy3 >> x >> y >> z;
 	nAtoms++;
+	stream.clear();
+	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
+	Spin s(Vector(x,y,z),nAtoms,"H1",0);
+	s.setLabel("A Spin");
+	mSpins.push_back(s);
       }
     }
     if (line=="Isotropic Fermi Contact Couplings") {
       //Skip a line
-      fin.ignore(999999,'\n');
+      fin.getline(buff,500); line=buff; //Read a line
       for (long i=0;i<nAtoms;i++) {
 	fin.getline(buff,500); line=buff; //Read a line
 	cout << "This should be a fermi-contact line" << line << endl;
@@ -115,6 +139,7 @@ void Spinsys::loadFromG03File(const char* filename) {
       }
     }
   }
+  dump();
 }
 
 void Spinsys::addSpin() {

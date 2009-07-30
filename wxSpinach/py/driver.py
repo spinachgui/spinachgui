@@ -3,7 +3,7 @@ import spinsys
 
 ss=spinsys.Spinsys()
 ss.loadFromFile("data/spinsys.xml")
-ss.loadFromG03File("data/tryosine.log")
+ss.loadFromG03File("data/tyrosine.log")
 ss.saveToFile("data/spinsys_saved.xml")
 
 for i in range(ss.getSpinCount()):

@@ -2,9 +2,10 @@
 import spinsys
 
 ss=spinsys.Spinsys()
-ss.loadFromFile("data/spinsys.xml")
+#ss.loadFromFile("data/spinsys.xml")
 ss.loadFromG03File("data/tyrosine.log")
-ss.saveToFile("data/spinsys_saved.xml")
+ss.dump()
+#ss.saveToFile("data/spinsys_saved.xml")
 
 for i in range(ss.getSpinCount()):
     spin=ss.getSpin(i)
@@ -13,8 +14,8 @@ for i in range(ss.getSpinCount()):
 for i in range(ss.getInteractionCount()):
     inter=ss.getInteraction(i)
     form=inter.getFormAsString()
-    print "The form of the interaction "+str(i)+" is "+form
-    if form == "scalar" or form == "matrix":
+    print "The form of the interaction "+str(i)+" is "+form + " and the spin number is " + str(inter.getSpin1Number())
+    if form == "scalar" or form == "matrix" or form == "eigenvalues":
         print "The interaction matrix is:"
         m=inter.getAsMatrix();
         m.dump()

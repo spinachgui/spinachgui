@@ -15,6 +15,8 @@ Spinsys::Spinsys() : mXMLSpinSys(new Spin_system()) {
 void Spinsys::createNew() {
   mXMLSpinSys.reset(new Spin_system());
   mSpins.resize(0);
+  mInteractions.resize(0);
+  mFrames.resize(0);
 }
 
 void Spinsys::dump() const{
@@ -31,8 +33,14 @@ void Spinsys::dump() const{
       cout << "              " << i->getCoordinates().getY() << ",";
       cout << "              " << i->getCoordinates().getZ() << ")" << endl;
     }
-
-
+  for (Spin_system::InteractionConstIterator i (mXMLSpinSys->getInteraction().begin());
+       i != mXMLSpinSys->getInteraction().end();
+       ++i)
+    {
+      SpinachInteraction so(*i);
+      cout << " Interaction type=" << so.getFormAsString() << endl;
+      cout << "      Spin_1=" << so.getSpin_1() << endl;
+    }
 }
 
 void Spinsys::loadFromFile(const char* filename) {
@@ -124,18 +132,35 @@ void Spinsys::loadFromG03File(const char* filename) {
       }          
     }
     if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
-      cout << "Anisotropic spin dipole couplings found." << endl; 
-    
-      for (long i=0;i>nAtoms;i++) {
+      cout << "Anisotropic couplings found" << endl;
+      //Skip 4 lines
+      fin.getline(buff,500); line=buff; //Read a line
+      fin.getline(buff,500); line=buff; //Read a line
+      fin.getline(buff,500); line=buff; //Read a line
+      fin.getline(buff,500); line=buff; //Read a line
+      istringstream stream;
+      for (long i=0;i<nAtoms;i++) {
+	string dummy1,dummy2,dummy3,dummy4,dummy5,dummy6;
+	double eigenvalue1,eigenvalue2,eigenvalue3;
+	double x1,y1,z1,x2,y2,z2,x3,y3,z3;
+	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
+	stream                     >> dummy1 >> dummy2 >> eigenvalue1 >> dummy3 >> dummy4 >> x1 >> y1 >> z1;
+
+	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
+	stream >> dummy6 >> dummy5 >> dummy1 >> dummy2 >> eigenvalue2 >> dummy3 >> dummy4 >> x2 >> y2 >> z2;
+
+	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
+	stream                     >> dummy1 >> dummy2 >> eigenvalue3 >> dummy3 >> dummy4 >> x3 >> y3 >> z3;
+	
+	//Skip a line
 	fin.getline(buff,500); line=buff; //Read a line
-	cout << line << endl;
-	fin.getline(buff,500); line=buff; //Read a line
-	cout << line << endl;
-	fin.getline(buff,500); line=buff; //Read a line
-	cout << line << endl;
-        //nbaa=A(n+4*k+1); baa=char(baa); baa=eval(['[' baa(4:end) ']']); Baa(k)=baa(3); aa_axis(k,:)=baa(5:7);
-        //bbb=A(n+4*k+2); bbb=char(bbb); bbb=eval(['[' bbb(14:end) ']']); Bbb(k)=bbb(3); bb_axis(k,:)=bbb(5:7);
-	//bcc=A(n+4*k+3); bcc=char(bcc); bcc=eval(['[' bcc(4:end) ']']); Bcc(k)=bcc(3); cc_axis(k,:)=bcc(5:7);
+
+	SpinachInteraction inter;
+	inter.setEigenvalues(Eigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05));
+	SpinachOrientation o;
+	inter.setOrientation(o);
+	inter.setSpin_1(i);
+	mInteractions.push_back(inter);
       }
     }
   }

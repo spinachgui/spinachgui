@@ -99,7 +99,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.list = glGenLists(1);
 
         glNewList(self.list,GL_COMPILE);
-        gluSphere(qobj,0.8,20,20);
+        gluSphere(qobj,0.8,14,14);
         glEndList();
         gluDeleteQuadric(qobj);
 
@@ -153,12 +153,16 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glTranslatef(coords[0],coords[1],coords[2]);
             #see if any interactions involve this spin
             for inter in ints:
-                if inter.getSpin1Number()==thisSpin.getNumber() and inter.getFormAsString() == "matrix":
+                if inter.getSpin1Number()==thisSpin.getNumber() and (inter.getFormAsString() == "matrix" or inter.getFormAsString() == "eigenvalues"):
                     #Apply the transformation matrix to warp the sphere
                     mat3=inter.getAsMatrix()
                     #Convert to a openGL 4x4 matrix
-                    mat=array([[mat3.get(0,0),mat3.get(0,1),mat3.get(0,2),0],[mat3.get(1,0),mat3.get(1,1),mat3.get(1,2),0],[mat3.get(2,0),mat3.get(2,1),mat3.get(2,2),0],[0,0,0,1]],float32)
+                    mat=array([[abs(mat3.get(0,0)),abs(mat3.get(0,1)),abs(mat3.get(0,2)),0],
+                               [abs(mat3.get(1,0)),abs(mat3.get(1,1)),abs(mat3.get(1,2)),0],
+                               [abs(mat3.get(2,0)),abs(mat3.get(2,1)),abs(mat3.get(2,2)),0],
+                               [0,0,0,1]],float32)
                     glMultMatrixf(mat)
+                    break;
             glCallList(self.list);
             glPopMatrix();
         

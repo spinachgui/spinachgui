@@ -92,17 +92,73 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.SetCurrent()
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 
-
+        self.sphereWire = glGenLists(1);
+       
         qobj = gluNewQuadric();
         gluQuadricDrawStyle(qobj,GLU_LINE);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
-        self.list = glGenLists(1);
-
-        glNewList(self.list,GL_COMPILE);
+        glNewList(self.sphereWire,GL_COMPILE);
         gluSphere(qobj,0.8,14,14);
         glEndList();
         gluDeleteQuadric(qobj);
+
+        self.sphereSolid = glGenLists(1);
+
+        qobj = gluNewQuadric();
+        gluQuadricDrawStyle(qobj,GLU_FILL);
+        gluQuadricNormals(qobj,GLU_SMOOTH);
+
+        glNewList(self.sphereSolid,GL_COMPILE);
+        gluSphere(qobj,0.8,32,32);
+        glEndList();
+        gluDeleteQuadric(qobj);
+
+	#glClearColor(0.0, 0.0, 0.0, 0.0);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	#glShadeModel(GL_SMOOTH);
+        #Adpated from a detailed tutorail on opengl lighting located at
+        #http://www.falloutsoftware.com/tutorials/gl/gl8.htm
+
+	# Enable light and set up 2 light sources (GL_LIGHT0 and GL_LIGHT1)
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	#glEnable(GL_LIGHT1);
+
+	# We're setting up two light sources. One of them is located
+	# on the left side of the model (x = -1.5f) and emits white light. The
+	# second light source is located on the right side of the model (x = 1.5f)
+	# emitting red light.
+
+	# GL_LIGHT0: the white light emitting light source
+	# Create light components for GL_LIGHT0
+	ambientLight0 =  array([0.3, 0.3, 0.3, 1.0],float32);
+	diffuseLight0 =  array([0.5, 0.5, 0.5, 1.0],float32);
+	specularLight0 = array([0.9, 0.9, 0.9, 1.0],float32);
+	position0 =      array([-1.5, 1.0,-4.0, 1.0],float32);	
+	# Assign created components to GL_LIGHT0
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
+	glLightfv(GL_LIGHT0, GL_POSITION, position0);
+
+	# GL_LIGHT1: the red light emitting light source
+	# Create light components for GL_LIGHT1
+	ambientLight1 =  array([1.0, 0.5, 0.5, 1.0 ],float32);
+	diffuseLight1 =  array([1.0, 0.5, 0.5, 1.0 ],float32);
+	specularLight1 = array([1.0, 0.5, 0.5, 1.0 ],float32);
+	position1 =      array([1.5, 1.0, -4.0,1.0],float32);	
+	# Assign created components to GL_LIGHT1
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
+	glLightfv(GL_LIGHT1, GL_POSITION, position1);
+
+        #glEnable(GL_COLOR_MATERIAL);
+        #glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
         self.Bind(wx.EVT_PAINT,self.onPaint)
         self.Bind(wx.EVT_MOTION,self.onMouseMove)
@@ -110,6 +166,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
     def onPaint(self,e):
 	glColor3f(0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_DEPTH_BUFFER_BIT)
+	glClearDepth(1.0);
 
         width,height = self.GetClientSizeTuple()
         glViewport(0,0,width,height);
@@ -150,7 +208,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         spinCount=self.ss.getSpinCount()
 
         qobj = gluNewQuadric();
-        gluQuadricDrawStyle(qobj,GLU_LINE);
+        gluQuadricDrawStyle(qobj,GLU_FILL);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
         for i in range(spinCount):
@@ -171,14 +229,16 @@ class glDisplay(wx.glcanvas.GLCanvas):
                                [0,0,0,1]],float32)
                     glMultMatrixf(mat)
                     break;
-            glCallList(self.list);
+            
+            glCallList(self.sphereWire);
             glPopMatrix();
 
+            whiteSpecularMaterial = array([1.0, 1.0, 1.0],float32); 
+            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, whiteSpecularMaterial);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
-            glScale(0.2,0.2,0.2);
-            glColor3f(0.0, 0.0, 1.0);
-            glCallList(self.list);
+            glScale(0.4,0.4,0.4);
+            glCallList(self.sphereSolid);
             glPopMatrix();
         
             #Now draw in bonds to nearby atoms

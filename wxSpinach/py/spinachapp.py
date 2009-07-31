@@ -111,10 +111,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
 	glColor3f(0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT)
 
+        width,height = self.GetClientSizeTuple()
+        glViewport(0,0,width,height);
+
         glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-        width,height = self.GetClientSizeTuple()
-        glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -10.0, 10.0);
+        glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -70.0, 70.0);
         glMatrixMode(GL_MODELVIEW);
 
 

@@ -205,10 +205,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
             self.SwapBuffers()
             return
 
-        ints=[]
-        for i in range(self.ss.getInteractionCount()):
-            ints.append(self.ss.getInteraction(i))
-            
         spinCount=self.ss.getSpinCount()
 
         qobj = gluNewQuadric();
@@ -221,18 +217,16 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glColor3f(1.0, 1.0, 1.0);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
-            #see if any interactions involve this spin
-            for inter in ints:
-                if inter.getSpin1Number()==thisSpin.getNumber() and (inter.getFormAsString() == "matrix" or inter.getFormAsString() == "eigenvalues"):
-                    #Apply the transformation matrix to warp the sphere
-                    mat3=inter.getAsMatrix()
-                    #Convert to a openGL 4x4 matrix
-                    mat=array([[abs(mat3.get(0,0)),abs(mat3.get(0,1)),abs(mat3.get(0,2)),0],
-                               [abs(mat3.get(1,0)),abs(mat3.get(1,1)),abs(mat3.get(1,2)),0],
-                               [abs(mat3.get(2,0)),abs(mat3.get(2,1)),abs(mat3.get(2,2)),0],
-                               [0,0,0,1]],float32)
-                    glMultMatrixf(mat)
-                    break;
+            #Draw in the single spin interaction tensor
+            mat3=self.ss.GetTotalInteractionOnSpinAsMatrix(i)
+            #Convert to a openGL 4x4 matrix
+            mat=array([[abs(mat3.get(0,0)),abs(mat3.get(0,1)),abs(mat3.get(0,2)),0],
+                       [abs(mat3.get(1,0)),abs(mat3.get(1,1)),abs(mat3.get(1,2)),0],
+                       [abs(mat3.get(2,0)),abs(mat3.get(2,1)),abs(mat3.get(2,2)),0],
+                       [0,0,0,1]],float32)
+            #Apply the transformation matrix to warp the sphere
+            glMultMatrixf(mat)
+            glScale(0.05,0.05,0.05)
             
             glCallList(self.sphereWire);
             glPopMatrix();

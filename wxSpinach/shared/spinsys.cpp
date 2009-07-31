@@ -125,10 +125,18 @@ void Spinsys::loadFromG03File(const char* filename) {
     if (line=="Isotropic Fermi Contact Couplings") {
       //Skip a line
       fin.getline(buff,500); line=buff; //Read a line
+      istringstream stream;
       for (long i=0;i<nAtoms;i++) {
+	string dummy1,dummy2,dummy3;
+	double isoCoupling;
 	fin.getline(buff,500); line=buff; //Read a line
-	cout << "This should be a fermi-contact line" << line << endl;
-	//S=char(A(n+1+k)); S=eval(['[' S(20:end) ']']); iso_hfc(k)=S(3);
+	stream.clear(); stream.str(line);
+	//Read the coupling strength (in megaherz)
+	stream >> dummy1 >> dummy2 >> dummy3 >> isoCoupling;
+	SpinachInteraction inter;
+	inter.setScalar(isoCoupling);
+	inter.setSpin_1(i);
+	mInteractions.push_back(inter);
       }          
     }
     if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
@@ -143,6 +151,7 @@ void Spinsys::loadFromG03File(const char* filename) {
 	string dummy1,dummy2,dummy3,dummy4,dummy5,dummy6;
 	double eigenvalue1,eigenvalue2,eigenvalue3;
 	double x1,y1,z1,x2,y2,z2,x3,y3,z3;
+	//Read the rotation matrix and eigenvalues (in megaherz)
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
 	stream                     >> dummy1 >> dummy2 >> eigenvalue1 >> dummy3 >> dummy4 >> x1 >> y1 >> z1;
 
@@ -235,192 +244,226 @@ std::vector<long> Spinsys::getNearbySpins(long spinNumber,double distance) {
   return result;
 }
 
-//============================================================//
-// SpinachSpin
+Matrix3 Spinsys::GetTotalInteractionOnSpinAsMatrix(long n) {
+  bool foundInter=false;
+  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
+  for(long i;i < mInteractions.size();++i) {
+      if(mInteractions[i].getSpin_1()==n) {
+	foundInter=true;
+	totalMatrix=totalMatrix+mInteractions[i].getAsMatrix();
+      }
+    }
+	if(foundInter) {
+	  return totalMatrix;
+	} else {
+	  return Matrix3(0,0,0,
+			 0,0,0,
+			 0,0,0);
+	}
+	}
 
-Vector SpinachSpin::getCoords() {
-  return getCoordinates();
-}
 
-void SpinachSpin::dump() {
-  cout << "Spin name=" << getLabel() << endl;
-  //const Spin::CoordinatesType c = getCoordinates();
-  //cout << c.getX() << endl;
-  //cout << c.getY() << endl;
-  //cout << c.getZ() << endl;
-  //cout << "IsotopeE = " << getIsotope() << endl;
-}
+  //============================================================//
+  // SpinachSpin
 
-//============================================================//
-// SpinachOrientation
-
-long SpinachOrientation::getForm() const {
-  if(getEuler_angles().present()) {
-    return ORIENT_EULER;
-  } else if(getAngle_axis().present()) {
-    return ORIENT_ANGLE_AXIS;
-  } else if(getQuaternion().present()) {
-    return ORIENT_QUATERNION;
-  } else if(getEigensystem().present()) {
-    return ORIENT_EIGENSYSTEM;
-  } else {
-    //TODO Throw some sort of error here
+  Vector SpinachSpin::getCoords() {
+    return getCoordinates();
   }
-}
 
-
-Matrix3 SpinachOrientation::getAsMatrix() const {
-  if(getForm()==ORIENT_EIGENSYSTEM) {
-    Eigensystem sys=getEigensystem().get();
-    Vector xa=sys.getX_axis();
-    Vector ya=sys.getY_axis();
-    Vector za=sys.getZ_axis();
-
-    return Matrix3(xa.getX(),ya.getX(),za.getX(),
-		   xa.getY(),ya.getY(),za.getY(),
-		   xa.getZ(),ya.getZ(),za.getZ());
+  void SpinachSpin::dump() {
+    cout << "Spin name=" << getLabel() << endl;
+    //const Spin::CoordinatesType c = getCoordinates();
+    //cout << c.getX() << endl;
+    //cout << c.getY() << endl;
+    //cout << c.getZ() << endl;
+    //cout << "IsotopeE = " << getIsotope() << endl;
   }
-  return Matrix3(1,0,0,0,1,0,0,0,1);
-}
 
 
-//============================================================//
-// SpinachInteraction
+  //============================================================//
+  // SpinachOrientation
 
-
-
-SpinachOrientation SpinachInteraction::getSpinachOrientation() {
-  OrientationOptional orentOpt=Interaction1::getOrientation();
-  if(orentOpt.present()) {
-    SpinachOrientation orient(orentOpt.get());
-    return orient;
-  } else {
-    //TODO Return some sort of exception to the calling code at this point
-    cerr << "Trying to get the orientation when this type of interaction doesn't need it" << endl;
-    const SpinachOrientation so;
-    return so;
+  long SpinachOrientation::getForm() const {
+    if(getEuler_angles().present()) {
+      return ORIENT_EULER;
+    } else if(getAngle_axis().present()) {
+      return ORIENT_ANGLE_AXIS;
+    } else if(getQuaternion().present()) {
+      return ORIENT_QUATERNION;
+    } else if(getEigensystem().present()) {
+      return ORIENT_EIGENSYSTEM;
+    } else {
+      //TODO Throw some sort of error here
+    }
   }
-};
 
-Matrix3 SpinachInteraction::getAsMatrix() const {
-  if(getForm()==INTER_SCALER) {
-    //Return the identity multipled by the scalar
-    double s=getScalar().get();
-    Matrix3 m(s,0,0,0,s,0,0,0,s);
-    return m;
-  } else if(getForm()==INTER_MATRIX) {
-    //Just return the matrix
-    Matrix3 m(getMatrix().get());
-    return m;
-  } else if(getForm()==INTER_EIGENVALUES) {
-    //Convert to a matrix
 
-    const Eigenvalues ev=getEigenvalues().get();
+  Matrix3 SpinachOrientation::getAsMatrix() const {
+    if(getForm()==ORIENT_EIGENSYSTEM) {
+      Eigensystem sys=getEigensystem().get();
+      Vector xa=sys.getX_axis();
+      Vector ya=sys.getY_axis();
+      Vector za=sys.getZ_axis();
 
-    double xx=ev.getXX();
-    double yy=ev.getYY();
-    double zz=ev.getZZ();
-
-    const SpinachOrientation o=getOrientation().get();
-    Matrix3 intMatrix=o.getAsMatrix();
-
-    intMatrix.set(0,0,intMatrix.get(0,0)*xx);
-    intMatrix.set(0,1,intMatrix.get(0,1)*yy);
-    intMatrix.set(0,2,intMatrix.get(0,2)*zz);
-
-    intMatrix.set(1,0,intMatrix.get(1,0)*xx);
-    intMatrix.set(1,1,intMatrix.get(1,1)*yy);
-    intMatrix.set(1,2,intMatrix.get(1,2)*zz);
-
-    intMatrix.set(2,0,intMatrix.get(2,0)*xx);
-    intMatrix.set(2,1,intMatrix.get(2,1)*yy);
-    intMatrix.set(2,2,intMatrix.get(2,2)*zz);
-    return intMatrix;
-  } else {
-    cerr << "Interaction type not suported in getAsMatrix()" << endl;
+      return Matrix3(xa.getX(),ya.getX(),za.getX(),
+		     xa.getY(),ya.getY(),za.getY(),
+		     xa.getZ(),ya.getZ(),za.getZ());
+    }
+    return Matrix3(1,0,0,0,1,0,0,0,1);
   }
-  //Return the identity
-  Matrix3 identity(1,0,0,0,1,0,0,0,1);
-  return identity;
-}
 
-long SpinachInteraction::getForm() const {
-  if(getScalar().present()) {
-    return INTER_SCALER;
-  } else if(getMatrix().present()) {
-    return INTER_MATRIX;
-  } else if(getEigenvalues().present()) {
-    return INTER_EIGENVALUES;
-  } else if(getAxiality_rhombicity().present()) {
-    return INTER_AXIALITY_RHOMBICITY;
-  } else if(getSpan_skew().present()) {
-    return INTER_SPAN_SKEW;
-  } else {
-    //TODO Throw some sort of error here
+
+  //============================================================//
+  // SpinachInteraction
+
+
+
+  SpinachOrientation SpinachInteraction::getSpinachOrientation() {
+    OrientationOptional orentOpt=Interaction1::getOrientation();
+    if(orentOpt.present()) {
+      SpinachOrientation orient(orentOpt.get());
+      return orient;
+    } else {
+      //TODO Return some sort of exception to the calling code at this point
+      cerr << "Trying to get the orientation when this type of interaction doesn't need it" << endl;
+      const SpinachOrientation so;
+      return so;
+    }
+  };
+
+  Matrix3 SpinachInteraction::getAsMatrix() const {
+    if(getForm()==INTER_SCALER) {
+      //Return the identity multipled by the scalar
+      double s=getScalar().get();
+      Matrix3 m(s,0,0,0,s,0,0,0,s);
+      return m;
+    } else if(getForm()==INTER_MATRIX) {
+      //Just return the matrix
+      Matrix3 m(getMatrix().get());
+      return m;
+    } else if(getForm()==INTER_EIGENVALUES) {
+      //Convert to a matrix
+
+      const Eigenvalues ev=getEigenvalues().get();
+
+      double xx=ev.getXX();
+      double yy=ev.getYY();
+      double zz=ev.getZZ();
+
+      const SpinachOrientation o=getOrientation().get();
+      Matrix3 intMatrix=o.getAsMatrix();
+
+      intMatrix.set(0,0,intMatrix.get(0,0)*xx);
+      intMatrix.set(0,1,intMatrix.get(0,1)*yy);
+      intMatrix.set(0,2,intMatrix.get(0,2)*zz);
+
+      intMatrix.set(1,0,intMatrix.get(1,0)*xx);
+      intMatrix.set(1,1,intMatrix.get(1,1)*yy);
+      intMatrix.set(1,2,intMatrix.get(1,2)*zz);
+
+      intMatrix.set(2,0,intMatrix.get(2,0)*xx);
+      intMatrix.set(2,1,intMatrix.get(2,1)*yy);
+      intMatrix.set(2,2,intMatrix.get(2,2)*zz);
+      return intMatrix;
+    } else {
+      cerr << "Interaction type not suported in getAsMatrix()" << endl;
+    }
+    //Return the identity
+    Matrix3 identity(0,0,0,0,0,0,0,0,0);
+    return identity;
   }
-}
 
-const char* SpinachInteraction::getFormAsString() const {
-  if(getScalar().present()) {
-    return "scalar";
-  } else if(getMatrix().present()) {
-    return "matrix";
-  } else if(getEigenvalues().present()) {
-    return "eigenvalues";
-  } else if(getAxiality_rhombicity().present()) {
-    return "axiality_rhombicity";
-  } else if(getSpan_skew().present()) {
-    return "span_skew";
-  } else {
-    //TODO Throw some sort of error here
+  long SpinachInteraction::getForm() const {
+    if(getScalar().present()) {
+      return INTER_SCALER;
+    } else if(getMatrix().present()) {
+      return INTER_MATRIX;
+    } else if(getEigenvalues().present()) {
+      return INTER_EIGENVALUES;
+    } else if(getAxiality_rhombicity().present()) {
+      return INTER_AXIALITY_RHOMBICITY;
+    } else if(getSpan_skew().present()) {
+      return INTER_SPAN_SKEW;
+    } else {
+      //TODO Throw some sort of error here
+    }
   }
-}
 
-//============================================================//
-// SpinachFrame
+  const char* SpinachInteraction::getFormAsString() const {
+    if(getScalar().present()) {
+      return "scalar";
+    } else if(getMatrix().present()) {
+      return "matrix";
+    } else if(getEigenvalues().present()) {
+      return "eigenvalues";
+    } else if(getAxiality_rhombicity().present()) {
+      return "axiality_rhombicity";
+    } else if(getSpan_skew().present()) {
+      return "span_skew";
+    } else {
+      //TODO Throw some sort of error here
+    }
+  }
 
-SpinachFrame::SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {
+  //============================================================//
+  // SpinachFrame
+
+  SpinachFrame::SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {
   
-}
+  }
 
 
-//============================================================//
+  //============================================================//
 
-Matrix3::Matrix3(double a00,double a01,double a02,
-		 double a10,double a11,double a12,
-		 double a20,double a21,double a22) {
-  ElementSequence elements;
-  elements.resize(9);
-  elements[0]=a00;
-  elements[1]=a01;
-  elements[2]=a02;
+  Matrix3::Matrix3(double a00,double a01,double a02,
+		   double a10,double a11,double a12,
+		   double a20,double a21,double a22) {
+    ElementSequence elements;
+    elements.resize(9);
+    elements[0]=a00;
+    elements[1]=a01;
+    elements[2]=a02;
 
-  elements[3]=a10;
-  elements[4]=a11;
-  elements[5]=a12;
+    elements[3]=a10;
+    elements[4]=a11;
+    elements[5]=a12;
 
-  elements[6]=a20;
-  elements[7]=a21;
-  elements[8]=a22;
-  setElement(elements);
-}
+    elements[6]=a20;
+    elements[7]=a21;
+    elements[8]=a22;
+    setElement(elements);
+  }
 
-void Matrix3::dump() const {
-  const ElementSequence elements=getElement();
-  double a00=elements[0];
-  double a01=elements[1];
-  double a02=elements[2];
+  void Matrix3::dump() const {
+    const ElementSequence elements=getElement();
+    double a00=elements[0];
+    double a01=elements[1];
+    double a02=elements[2];
 
-  double a10=elements[3];
-  double a11=elements[4];
-  double a12=elements[5];
+    double a10=elements[3];
+    double a11=elements[4];
+    double a12=elements[5];
 
-  double a20=elements[6];
-  double a21=elements[7];
-  double a22=elements[8];
+    double a20=elements[6];
+    double a21=elements[7];
+    double a22=elements[8];
 
-  cout << "Matrix3:" << endl;
-  cout << " (" << a00 << " " << a01 << " " << a02 << endl;
-  cout << " (" << a10 << " " << a11 << " " << a12 << endl;
-  cout << " (" << a20 << " " << a21 << " " << a22 << ")" << endl;
-}
+    cout << "Matrix3:" << endl;
+    cout << " (" << a00 << " " << a01 << " " << a02 << endl;
+    cout << " (" << a10 << " " << a11 << " " << a12 << endl;
+    cout << " (" << a20 << " " << a21 << " " << a22 << ")" << endl;
+  }
+
+  Matrix3 Matrix3::operator+(const Matrix3& m) const {
+    //Well unlike with a serious matrix class, this doesn't have to be efficent
+    Matrix3 retVal(get(0,0)+m.get(0,0),
+		   get(0,1)+m.get(0,1),
+		   get(0,2)+m.get(0,2),
+		   get(1,0)+m.get(1,0),
+		   get(1,1)+m.get(1,1),
+		   get(1,2)+m.get(1,2),
+		   get(2,0)+m.get(2,0),
+		   get(2,1)+m.get(2,1),
+		   get(2,2)+m.get(2,2));
+    return retVal;
+  }

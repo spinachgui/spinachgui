@@ -48,6 +48,7 @@ public:
   ///Get the total number of interactions
   long getInteractionCount() const;  
   std::vector<long> getNearbySpins(long spinNumber,double distance);
+  Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
 };
 
 //=========>> Spin Class =========//

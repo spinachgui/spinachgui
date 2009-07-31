@@ -59,6 +59,9 @@ public:
   ///than spinNumber (useful for drawing bonds. If you loop though the structure,
   ///you only need to draw a bond once)
   std::vector<long> getNearbySpins(long spinNumber,double distance);
+  ///Sum all the interaction matricese involving a given spin and return as a single
+  ///matrix
+  Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
 
 
   ///Attach a spin
@@ -114,6 +117,7 @@ public:
     }
   }
 
+  Matrix3 GetTotalInteractionAsMatrix();
   void dump();
   Vector getCoords();
 };
@@ -137,4 +141,6 @@ public:
   double get(long i1,long i2) const {return getElement()[3*i1+i2];}
   void set(long i1,long i2, double a) {getElement()[3*i1+i2]=a;}
   void dump() const;  
+  ///Add two matricese together in the expected way.
+  Matrix3 operator+(const Matrix3& m) const;
 };

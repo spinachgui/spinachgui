@@ -11,6 +11,10 @@ from OpenGL.GL import *
 
 from numpy import *
 
+
+
+
+
 def getARotation(parent):
     class rotDialog():
         def __init__(self):
@@ -126,7 +130,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
 	# Enable light and set up 2 light sources (GL_LIGHT0 and GL_LIGHT1)
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	#glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT1);
 
 	# We're setting up two light sources. One of them is located
 	# on the left side of the model (x = -1.5f) and emits white light. The
@@ -137,7 +141,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
 	# Create light components for GL_LIGHT0
 	ambientLight0 =  array([0.3, 0.3, 0.3, 1.0],float32);
 	diffuseLight0 =  array([0.5, 0.5, 0.5, 1.0],float32);
-	specularLight0 = array([0.9, 0.9, 0.9, 1.0],float32);
+	specularLight0 = array([0.6, 0.6, 0.6, 1.0],float32);
 	position0 =      array([-1.5, 1.0,-4.0, 1.0],float32);	
 	# Assign created components to GL_LIGHT0
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
@@ -147,10 +151,10 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
 	# GL_LIGHT1: the red light emitting light source
 	# Create light components for GL_LIGHT1
-	ambientLight1 =  array([1.0, 0.5, 0.5, 1.0 ],float32);
-	diffuseLight1 =  array([1.0, 0.5, 0.5, 1.0 ],float32);
-	specularLight1 = array([1.0, 0.5, 0.5, 1.0 ],float32);
-	position1 =      array([1.5, 1.0, -4.0,1.0],float32);	
+	ambientLight1 =  array([0.1, 0.1, 0.2, 1.0 ],float32);
+	diffuseLight1 =  array([0.1, 0.1, 0.2, 1.0 ],float32);
+	specularLight1 = array([0.1, 0.1, 0.2, 1.0 ],float32);
+	position1 =      array([1.5, 1.0, 4.0,1.0],float32);	
 	# Assign created components to GL_LIGHT1
 	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
@@ -233,8 +237,9 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glCallList(self.sphereWire);
             glPopMatrix();
 
-            whiteSpecularMaterial = array([1.0, 1.0, 1.0],float32); 
-            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, whiteSpecularMaterial);
+            whiteSpecularMaterial = array([0.5, 0.5, 0.5],float32); 
+            blueSpecularMaterial = array([0.06, 0.06, 0.4],float32); 
+            glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
             glScale(0.4,0.4,0.4);
@@ -242,6 +247,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glPopMatrix();
         
             #Now draw in bonds to nearby atoms
+            glMaterialfv(GL_FRONT, GL_SPECULAR, blueSpecularMaterial);
             nearby=self.ss.getNearbySpins(i,1.8)
             glColor3f(1.0, 0.0, 0.0);
             for index in nearby:

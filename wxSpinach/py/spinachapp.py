@@ -83,7 +83,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.zoom=0.01
         self.camX=0.0
         self.camY=0.0
-        self.camZ=5.0
+        self.camZ=20.0
+        self.mousex=0;
+        self.mousey=0;
+
+
 
     def setSpinSys(self,ss):
         """Set the spin system that this gl display is displaying"""
@@ -178,7 +182,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-        glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -70.0, 70.0);
+        #glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -40.0, 40.0);
+        gluPerspective(45.0,float(width)/float(height),0.1, 200.0);
         glMatrixMode(GL_MODELVIEW);
 
 
@@ -196,8 +201,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.rotationMatrix=glGetFloatv(GL_MODELVIEW_MATRIX);
 
         glLoadIdentity();
-        gluLookAt(self.camX,self.camY,self.camZ,0,0,0,0,1,0);
-        glMultMatrixf(self.rotationMatrix);
+        gluLookAt(self.camX,self.camY,self.camZ,0,0,-1,0,1,0);
+        #glMultMatrixf(self.rotationMatrix);
 
         #glLoadMatrixf(rotationMatrix);
 
@@ -210,6 +215,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
         qobj = gluNewQuadric();
         gluQuadricDrawStyle(qobj,GLU_FILL);
         gluQuadricNormals(qobj,GLU_SMOOTH);
+
+        #Define some openGL materials
+        whiteSpecularMaterial = array([0.5, 0.5, 0.5],float32); 
+        blueSpecularMaterial = array([0.06, 0.06, 0.4],float32); 
+        redSpecularMaterial = array([0.9, 0.00, 0.00],float32); 
+
 
         for i in range(spinCount):
             thisSpin=self.ss.getSpin(i)
@@ -230,35 +241,79 @@ class glDisplay(wx.glcanvas.GLCanvas):
             
             glCallList(self.sphereWire);
             glPopMatrix();
+            
+            #Move these to some sort of config file
+            radius=0.4
+            radius2=radius*radius
 
-            whiteSpecularMaterial = array([0.5, 0.5, 0.5],float32); 
-            blueSpecularMaterial = array([0.06, 0.06, 0.4],float32); 
-            glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
+            #Cast a ray from the eye to worldx,worldy,worldz and see if it collides with anything.
+            #There four equations which combine into quadratic equation. If the descrimiate indicates a real
+            #solution then the ray hits the sphere.
+            viewport   = glGetIntegerv(GL_VIEWPORT);
+            mvmatrix   = glGetDoublev(GL_MODELVIEW_MATRIX);
+            projmatrix = glGetDoublev(GL_PROJECTION_MATRIX);
+            worldx,worldy,worldz=gluUnProject(self.mousex,height-self.mousey-1,0,mvmatrix,projmatrix,viewport);
+
+
+            Rx=worldx-self.camX
+            Ry=worldy-self.camY
+            Rz=worldz-self.camZ
+
+            A =    Rx**2+                        Ry**2                    + Rz**2
+            B = 2*(Rx*(self.camX-coords[0]) +    Ry*(self.camY-coords[1]) + Rz*(self.camZ-coords[2]))
+            C =    (self.camX-coords[0])**2 +    (self.camY-coords[1])**2 + (self.camZ-coords[2])**2 - radius2
+
+            #angle=acos((self.camZ-worldz)/A)
+            #glPushMatrix();
+            #glTranslatef(worldx,worldy,worldz);
+            #glRotate(angle/2/pi*360,worldy-self.camX,self.camY-worldx,0)
+            #gluCylinder(qobj,0.1,0.1,A,10,10)
+            #glPopMatrix();
+
+
+            desc=B**2-4*A*C
+            if(desc>0):
+                glMaterialfv(GL_FRONT, GL_SPECULAR, redSpecularMaterial);
+                #glMaterialfv(GL_FRONT, GL_DIFFUSE, redSpecularMaterial);
+            else:
+                glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
+                #glMaterialfv(GL_FRONT, GL_DIFFUSE,  whiteSpecularMaterial);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
-            glScale(0.4,0.4,0.4);
+            glScale(radius,radius,radius);
             glCallList(self.sphereSolid);
             glPopMatrix();
         
             #Now draw in bonds to nearby atoms
+            #glMaterialfv(GL_FRONT, GL_DIFFUSE, blueSpecularMaterial);
             glMaterialfv(GL_FRONT, GL_SPECULAR, blueSpecularMaterial);
             nearby=self.ss.getNearbySpins(i,1.8)
             glColor3f(1.0, 0.0, 0.0);
             for index in nearby:
                 otherCoords=self.ss.getSpin(index).getCoords()
-                height=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
-                        (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
-                        (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
+                bondLength=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
+                            (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
+                            (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
 
                 #Now we need to find the rotation between the z axis
-                angle=acos((otherCoords[2]-coords[2])/height)
+                angle=acos((otherCoords[2]-coords[2])/bondLength)
                 glPushMatrix();
                 glTranslatef(coords[0],coords[1],coords[2]);
                 glRotate(angle/2/pi*360,coords[1]-otherCoords[1],otherCoords[0]-coords[0],0)
-                gluCylinder(qobj,0.1,0.1,height,10,10)
+                gluCylinder(qobj,0.1,0.1,bondLength,10,10)
                 glPopMatrix();
 
             glColor3f(0.0, 0.0, 1.0);
+
+        
+
+
+
+        glTranslatef(worldx,worldy,worldz);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
+        glCallList(self.sphereWire);
+
+
         self.SwapBuffers()
 
     def onMouseMove(self,e):

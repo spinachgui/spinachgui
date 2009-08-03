@@ -88,17 +88,29 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.mousey=0;
 
 
-
     def setSpinSys(self,ss):
         """Set the spin system that this gl display is displaying"""
         self.ss=ss
 
+    def setDrawMode(self,mode):
+        if mode=="wireframe":
+            glDisable(GL_DEPTH_TEST)  
+            glDisable(GL_LIGHTING);   
+            glDisable(GL_LIGHT0);     
+            glDisable(GL_LIGHT1);     
+        else:
+            glEnable(GL_DEPTH_TEST)  
+            glEnable(GL_LIGHTING);   
+            glEnable(GL_LIGHT0);     
+            glEnable(GL_LIGHT1);     
+        self.mode=mode
+        print self.mode
 
     def enableGL(self):
         """This has to be called after the frame has been shown"""
-        print "enableGL()"
         self.SetCurrent()
 	glClearColor(0.0, 0.0, 0.0, 0.0);
+        self.setDrawMode('wireframe')
 
         self.sphereWire = glGenLists(1);
        
@@ -122,19 +134,14 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glEndList();
         gluDeleteQuadric(qobj);
 
-	#glClearColor(0.0, 0.0, 0.0, 0.0);
 
-	glEnable(GL_DEPTH_TEST);
+
 	glDepthFunc(GL_LEQUAL);
 
 	#glShadeModel(GL_SMOOTH);
         #Adpated from a detailed tutorail on opengl lighting located at
         #http://www.falloutsoftware.com/tutorials/gl/gl8.htm
 
-	# Enable light and set up 2 light sources (GL_LIGHT0 and GL_LIGHT1)
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
 
 	# We're setting up two light sources. One of them is located
 	# on the left side of the model (x = -1.5f) and emits white light. The
@@ -213,7 +220,10 @@ class glDisplay(wx.glcanvas.GLCanvas):
         spinCount=self.ss.getSpinCount()
 
         qobj = gluNewQuadric();
-        gluQuadricDrawStyle(qobj,GLU_FILL);
+        if self.mode=="wireframe":
+            gluQuadricDrawStyle(qobj,GLU_LINE);
+        else:
+            gluQuadricDrawStyle(qobj,GLU_FILL);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
         #Define some openGL materials
@@ -281,11 +291,17 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
             glScale(radius,radius,radius);
-            glCallList(self.sphereSolid);
+            if(self.mode=="wireframe"):
+                glCallList(self.sphereWire);
+            else:
+                glCallList(self.sphereSolid);
             glPopMatrix();
         
             #Now draw in bonds to nearby atoms
             #glMaterialfv(GL_FRONT, GL_DIFFUSE, blueSpecularMaterial);
+
+
+
             glMaterialfv(GL_FRONT, GL_SPECULAR, blueSpecularMaterial);
             nearby=self.ss.getNearbySpins(i,1.8)
             glColor3f(1.0, 0.0, 0.0);
@@ -372,6 +388,9 @@ class MyApp(wx.App):
 
         self.frame.Bind(wx.EVT_MENU, self.onExit, id=xrc.XRCID('mMenuItemExit'))
 
+        self.frame.Bind(wx.EVT_MENU, self.onWireframe, id=xrc.XRCID('mMenuItemWireframe'))
+        self.frame.Bind(wx.EVT_MENU, self.onFilled, id=xrc.XRCID('mMenuItemFilled'))
+
         self.updateSpinTree()
 
         self.frame.Show()
@@ -433,6 +452,14 @@ class MyApp(wx.App):
 
     def onSave(self,e):
         print "Impliment me"
+
+    def onFilled(self,e):
+        self.glc.setDrawMode('filled')
+
+    def onWireframe(self,e):
+        self.glc.setDrawMode('wireframe')
+
+
 
     def onExit(self,e):
         exit(0)

@@ -181,8 +181,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
     def onPaint(self,e):
 	glColor3f(0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT)
-        #glClear(GL_DEPTH_BUFFER_BIT)
-	#glClearDepth(1.0);
+        glClear(GL_DEPTH_BUFFER_BIT)
+	glClearDepth(1.0);
 
         width,height = self.GetClientSizeTuple()
         glViewport(0,0,width,height);
@@ -246,6 +246,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
                        [abs(mat3.get(2,0)),abs(mat3.get(2,1)),abs(mat3.get(2,2)),0],
                        [0,0,0,1]],float32)
             #Apply the transformation matrix to warp the sphere
+            #print mat
             glMultMatrixf(mat)
             glScale(0.05,0.05,0.05)
             
@@ -273,12 +274,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
             B = 2*(Rx*(self.camX-coords[0]) +    Ry*(self.camY-coords[1]) + Rz*(self.camZ-coords[2]))
             C =    (self.camX-coords[0])**2 +    (self.camY-coords[1])**2 + (self.camZ-coords[2])**2 - radius2
 
-            #angle=acos((self.camZ-worldz)/A)
-            #glPushMatrix();
-            #glTranslatef(worldx,worldy,worldz);
-            #glRotate(angle/2/pi*360,worldy-self.camX,self.camY-worldx,0)
-            #gluCylinder(qobj,0.1,0.1,A,10,10)
-            #glPopMatrix();
 
 
             desc=B**2-4*A*C
@@ -298,9 +293,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glPopMatrix();
         
             #Now draw in bonds to nearby atoms
-            #glMaterialfv(GL_FRONT, GL_DIFFUSE, blueSpecularMaterial);
-
-
 
             glMaterialfv(GL_FRONT, GL_SPECULAR, blueSpecularMaterial);
             nearby=self.ss.getNearbySpins(i,1.8)

@@ -123,6 +123,7 @@ void Spinsys::loadFromG03File(const char* filename) {
       }
     }
     if (line=="Isotropic Fermi Contact Couplings") {
+      cout << "Isotropic couplings found" << endl;
       //Skip a line
       fin.getline(buff,500); line=buff; //Read a line
       istringstream stream;
@@ -160,9 +161,6 @@ void Spinsys::loadFromG03File(const char* filename) {
 
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
 	stream                     >> dummy1 >> dummy2 >> eigenvalue3 >> dummy3 >> dummy4 >> x3 >> y3 >> z3;
-	cout << x1 << " " << y1 << " " << z1 << endl; 
-	cout << x2 << " " << y2 << " " << z2 << endl; 
-	cout << x3 << " " << y3 << " " << z3 << endl; 
 	//Skip a line
 	fin.getline(buff,500); line=buff; //Read a line
 
@@ -176,7 +174,6 @@ void Spinsys::loadFromG03File(const char* filename) {
       }
     }
   }
-  dump();
 }
 
 void Spinsys::addSpin() {
@@ -245,22 +242,14 @@ std::vector<long> Spinsys::getNearbySpins(long spinNumber,double distance) {
 }
 
 Matrix3 Spinsys::GetTotalInteractionOnSpinAsMatrix(long n) {
-  bool foundInter=false;
   Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
-  for(long i;i < mInteractions.size();++i) {
-      if(mInteractions[i].getSpin_1()==n) {
-	foundInter=true;
-	totalMatrix=totalMatrix+mInteractions[i].getAsMatrix();
-      }
+  for(long i=0;i < mInteractions.size();++i) {
+    if(mInteractions[i].getSpin_1()==n) {
+      totalMatrix=totalMatrix+mInteractions[i].getAsMatrix();
     }
-	if(foundInter) {
-	  return totalMatrix;
-	} else {
-	  return Matrix3(0,0,0,
-			 0,0,0,
-			 0,0,0);
-	}
-	}
+  }
+  return totalMatrix;
+}
 
 
   //============================================================//

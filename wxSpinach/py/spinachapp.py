@@ -83,7 +83,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.zoom=0.01
         self.camX=0.0
         self.camY=0.0
-        self.camZ=20.0
+        self.camZ=15.0
         self.mousex=0;
         self.mousey=0;
 
@@ -104,7 +104,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glEnable(GL_LIGHT0);     
             glEnable(GL_LIGHT1);     
         self.mode=mode
-        print self.mode
 
     def enableGL(self):
         """This has to be called after the frame has been shown"""
@@ -119,7 +118,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
         glNewList(self.sphereWire,GL_COMPILE);
-        gluSphere(qobj,0.8,14,14);
+        gluSphere(qobj,1.0,14,14);
         glEndList();
         gluDeleteQuadric(qobj);
 
@@ -130,7 +129,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
         glNewList(self.sphereSolid,GL_COMPILE);
-        gluSphere(qobj,0.8,32,32);
+        gluSphere(qobj,1.0,32,32);
         glEndList();
         gluDeleteQuadric(qobj);
 
@@ -189,8 +188,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-        #glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -40.0, 40.0);
-        gluPerspective(45.0,float(width)/float(height),0.1, 200.0);
+        glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -40.0, 40.0);
+        #gluPerspective(45.0,float(width)/float(height),0.1, 200.0);
         glMatrixMode(GL_MODELVIEW);
 
 
@@ -209,9 +208,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         glLoadIdentity();
         gluLookAt(self.camX,self.camY,self.camZ,0,0,-1,0,1,0);
-        #glMultMatrixf(self.rotationMatrix);
-
-        #glLoadMatrixf(rotationMatrix);
+        glMultMatrixf(self.rotationMatrix);
 
         if self.ss==None:
             self.SwapBuffers()
@@ -231,13 +228,28 @@ class glDisplay(wx.glcanvas.GLCanvas):
         blueSpecularMaterial = array([0.06, 0.06, 0.4],float32); 
         redSpecularMaterial = array([0.9, 0.00, 0.00],float32); 
 
+        viewport   = glGetIntegerv(GL_VIEWPORT);
+        mvmatrix   = glGetDoublev(GL_MODELVIEW_MATRIX);
+        projmatrix = glGetDoublev(GL_PROJECTION_MATRIX);
+        worldFarX, worldFarY ,worldFarZ  = gluUnProject(self.mousex,height-self.mousey-1,1.0,mvmatrix,projmatrix,viewport);
+        worldNearX,worldNearY,worldNearZ = gluUnProject(self.mousex,height-self.mousey-1,0.0,mvmatrix,projmatrix,viewport);
+
+        #glPushMatrix();
+        #glTranslatef(coords[0],coords[1],coords[2]);
+        #glMultMatrixf(mat)
+        #glScale(0.04,0.04,0.04)
+        #glCallList(self.sphereWire);
+        #glPopMatrix();
+
+
+        #Move these to some sort of config file
+        radius=0.3
+        radius2=radius*radius
 
         for i in range(spinCount):
             thisSpin=self.ss.getSpin(i)
             coords=thisSpin.getCoords()
             glColor3f(1.0, 1.0, 1.0);
-            glPushMatrix();
-            glTranslatef(coords[0],coords[1],coords[2]);
             #Draw in the single spin interaction tensor
             mat3=self.ss.GetTotalInteractionOnSpinAsMatrix(i)
             #Convert to a openGL 4x4 matrix
@@ -247,32 +259,25 @@ class glDisplay(wx.glcanvas.GLCanvas):
                        [0,0,0,1]],float32)
             #Apply the transformation matrix to warp the sphere
             #print mat
+            glPushMatrix();
+            glTranslatef(coords[0],coords[1],coords[2]);
             glMultMatrixf(mat)
-            glScale(0.05,0.05,0.05)
-            
+            glScale(0.04,0.04,0.04)
             glCallList(self.sphereWire);
             glPopMatrix();
             
-            #Move these to some sort of config file
-            radius=0.4
-            radius2=radius*radius
-
             #Cast a ray from the eye to worldx,worldy,worldz and see if it collides with anything.
             #There four equations which combine into quadratic equation. If the descrimiate indicates a real
             #solution then the ray hits the sphere.
-            viewport   = glGetIntegerv(GL_VIEWPORT);
-            mvmatrix   = glGetDoublev(GL_MODELVIEW_MATRIX);
-            projmatrix = glGetDoublev(GL_PROJECTION_MATRIX);
-            worldx,worldy,worldz=gluUnProject(self.mousex,height-self.mousey-1,0,mvmatrix,projmatrix,viewport);
 
 
-            Rx=worldx-self.camX
-            Ry=worldy-self.camY
-            Rz=worldz-self.camZ
+            Rx=worldNearX-worldFarX
+            Ry=worldNearY-worldFarY
+            Rz=worldNearZ-worldFarZ
 
             A =    Rx**2+                        Ry**2                    + Rz**2
-            B = 2*(Rx*(self.camX-coords[0]) +    Ry*(self.camY-coords[1]) + Rz*(self.camZ-coords[2]))
-            C =    (self.camX-coords[0])**2 +    (self.camY-coords[1])**2 + (self.camZ-coords[2])**2 - radius2
+            B = 2*(Rx*(worldNearX-coords[0]) +    Ry*(worldNearY-coords[1]) + Rz*(worldNearZ-coords[2]))
+            C =    (worldNearX-coords[0])**2 +    (worldNearY-coords[1])**2 + (worldNearZ-coords[2])**2 - radius2
 
 
 
@@ -311,15 +316,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
                 gluCylinder(qobj,0.1,0.1,bondLength,10,10)
                 glPopMatrix();
 
-            glColor3f(0.0, 0.0, 1.0);
-
-        
-
-
-
-        glTranslatef(worldx,worldy,worldz);
-        glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
-        glCallList(self.sphereWire);
+        glColor3f(0.0, 0.0, 1.0);
 
 
         self.SwapBuffers()

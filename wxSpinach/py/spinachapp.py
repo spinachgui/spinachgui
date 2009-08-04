@@ -432,7 +432,7 @@ class MyApp(wx.App):
             self.ssroot.loadFromFile(filename)
         elif type=="g03":
             self.ssroot.loadFromG03File(filename)
-        #self.ss=self.ssroot.getRoot();
+        self.ss=self.ssroot.getRoot();
         self.glc.setSpinSys(self.ss)
         self.updateSpinTree()
 

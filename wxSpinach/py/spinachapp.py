@@ -1,9 +1,7 @@
 import wx
 import spinsys
-from wx import xrc
-
-import wx.glcanvas
-
+from wx import xrc 
+from wx import glcanvas 
 from math import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -109,7 +107,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         """This has to be called after the frame has been shown"""
         self.SetCurrent()
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-        self.setDrawMode('wireframe')
+        self.setDrawMode('self')
 
         self.sphereWire = glGenLists(1);
        
@@ -247,7 +245,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         radius2=radius*radius
 
         for i in range(spinCount):
-            thisSpin=self.ss.getSpin(i)
+            thisSpin=self.ss.getSpinByIndex(i)
             coords=thisSpin.getCoords()
             glColor3f(1.0, 1.0, 1.0);
             #Draw in the single spin interaction tensor
@@ -303,7 +301,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
             nearby=self.ss.getNearbySpins(i,1.8)
             glColor3f(1.0, 0.0, 0.0);
             for index in nearby:
-                otherCoords=self.ss.getSpin(index).getCoords()
+                otherCoords=self.ss.getSpinByIndex(index).getCoords()
                 bondLength=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
                             (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
                             (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
@@ -336,10 +334,11 @@ class MyApp(wx.App):
 
     def OnInit(self):
         self.res = xrc.XmlResource('res/gui.xrc')
-        self.ss=spinsys.Spinsys()
-        self.init_frame()
+        self.ssroot=spinsys.SpinsysXMLRoot()
+        self.ss=self.ssroot.getRoot()
         self.filename=""
         self.filepath=""
+        self.init_frame()
 
         return True
 
@@ -389,14 +388,15 @@ class MyApp(wx.App):
         
         #self.loadFromFile('data/hccch.xml')
         self.loadFromFile('data/tyrosine.log','g03')
+        self.saveToFile('data/tyrosine.xml')
 
 
-
-
+ 
     def updateSpinTree(self):
         count=self.ss.getSpinCount()
+        print "Count=",count
         for i in range(count):
-            spin=self.ss.getSpin(i)
+            spin=self.ss.getSpinByIndex(i)
             string=spin.getLabel() + " (" + spin.getIsotope()  + ")"
             self.spinTree.AppendItem(self.spinTree.GetRootItem(),string)
 
@@ -429,15 +429,21 @@ class MyApp(wx.App):
             
     def loadFromFile(self,filename,type="xml"):
         if type=="xml":
-            self.ss.loadFromFile(filename)
+            self.ssroot.loadFromFile(filename)
         elif type=="g03":
-            self.ss.loadFromG03File(filename)
+            self.ssroot.loadFromG03File(filename)
+        #self.ss=self.ssroot.getRoot();
+        self.glc.setSpinSys(self.ss)
         self.updateSpinTree()
+
+    def saveToFile(self,filename):
+        #self.ssroot.setRoot(self.ss);
+        self.ssroot.saveToFile(filename)   
 
     def onSaveAs(self,e):
         fd=wx.FileDialog(self.frame,style=wx.FD_SAVE, message="Save your Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
         if(fd.ShowModal()):
-            self.ss.saveToFile(fd.GetPath().encode('latin-1'))
+            saveToFile(fd.GetPath().encode('latin-1'))
 
     def onSave(self,e):
         print "Impliment me"

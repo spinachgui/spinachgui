@@ -22,34 +22,40 @@
   }
 }
 
-//=========>> Spinsys class <<=========//
 
-class Spinsys {
+class SpinsysXMLRoot {
 public:
-  Spinsys();
-  ///Create an empty spin system
-  void createNew();
-  ///Load a spin system from an XML file located at filename
+  SpinsysXMLRoot();
+  void clear();
   void loadFromFile(const char* filename);
   void loadFromG03File(const char* filename);
-  ///Save the spin system to an XML file at filename
-  void saveToFile(const char* filename);
-  ///Output the spin system in a human readable format to the standard
-  ///output for debugging purposes.
+  void saveToFile(const char* filename) const;
+  SpinachSpinsys getRoot() const;
+  void setRoot(SpinachSpinsys ss);
+};
+
+class Spin_system {
+public:
+  Spin_system();
+};
+
+class SpinachSpinsys : public Spin_system {
+  friend class SpinsysXMLRoot;
+public:
+  SpinachSpinsys();
+  SpinachSpinsys(Spin_system& s);
   void dump() const;
-  ///Get a reference to a spin
-  void addSpin();
-  ///Get a particular spin number
-  SpinachSpin getSpin(long n);
-  ///Get the total number of spins in the spin system
   long getSpinCount() const;
-  ///Get a particular interaction
-  SpinachInteraction getInteraction(long n);
-  ///Get the total number of interactions
+  SpinachSpin getSpinByIndex(long n);
+  SpinachInteraction getInteractionByIndex(long n);
   long getInteractionCount() const;  
   std::vector<long> getNearbySpins(long spinNumber,double distance);
   Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
+  void addSpin();
+protected:
+  void loadFromG03File(const char* filename);
 };
+
 
 //=========>> Spin Class =========//
 

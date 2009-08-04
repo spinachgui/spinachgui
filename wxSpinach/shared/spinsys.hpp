@@ -7,6 +7,8 @@
 using namespace std;
 
 //Forward declare the classes in this file
+class SpinsysXMLRoot;
+class SpinachSpinsys;
 class Spinsys;
 class SpinachSpin;
 class SpinachInteraction;
@@ -32,27 +34,18 @@ enum ORIENTATION {
 };
 
 
-class Spinsys  {
+class SpinachSpinsys : public Spin_system {
+  friend class SpinsysXMLRoot;
 public:
-  ///Default contructor. Creates an empty object
-  Spinsys();
-  ///Create an empty spin system
-  void createNew();
-  ///Load a spin system from an XML file located at filename
-  void loadFromFile(const char* filename);
-  ///Load a spin system from a g03 output file
-  void loadFromG03File(const char* filename);
-  ///Save the spin system to an XML file at filename
-  void saveToFile(const char* filename);
-  ///Output the spin system in a human readable format to the standard
-  ///output for debugging purposes.
+  SpinachSpinsys() : Spin_system() {}
+  SpinachSpinsys(Spin_system& s) : Spin_system(s) {}
   void dump() const;
   ///Get a particular spin number
-  SpinachSpin getSpin(long n);
+  SpinachSpin getSpinByIndex(long n);
   ///Get the total number of spins in the spin system
   long getSpinCount() const;
   ///Get a particular interaction
-  SpinachInteraction getInteraction(long n);
+  SpinachInteraction getInteractionByIndex(long n);
   ///Get the total number of interactions
   long getInteractionCount() const;  
   ///Get all spins within distance of spin spinNumber with a higher number
@@ -62,18 +55,29 @@ public:
   ///Sum all the interaction matricese involving a given spin and return as a single
   ///matrix
   Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
-
-
   ///Attach a spin
   void addSpin();
 protected:
-  auto_ptr<Spin_system> mXMLSpinSys;
-  typedef std::vector<SpinachSpin> spinarray;
-  typedef std::vector<SpinachInteraction> interactionarray;
-  typedef std::vector<SpinachFrame> framearray;
-  spinarray mSpins;
-  interactionarray mInteractions;
-  framearray mFrames;
+  void loadFromG03File(const char* filename);
+};
+
+class SpinsysXMLRoot {
+public:
+  SpinsysXMLRoot();
+  void clear();
+  ///Load a spin system from an XML file located at filename
+  void loadFromFile(const char* filename);
+  ///Load a spin system from a g03 output file
+  ///Save the spin system to an XML file at filename
+  void loadFromG03File(const char* filename);
+  ///Save the spin system to an XML file at filename
+  void saveToFile(const char* filename) const;
+  ///Output the spin system in a human readable format to the standard
+  ///output for debugging purposes.
+  SpinachSpinsys getRoot() const {return *mXMLSpinSys;}
+  void setRoot(SpinachSpinsys ss) {mXMLSpinSys.reset(new SpinachSpinsys(ss));}
+protected:
+  auto_ptr<SpinachSpinsys> mXMLSpinSys;
 };
 
 

@@ -57,9 +57,12 @@ set(sharedSources ${sharedSources} "shared/spin.cpp")
 set(sharedSources ${sharedSources} "shared/spin_system.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
 
-set(pySources "shared/spinsys.cpp")
+set(pySources              "shared/spinsys.cpp")
 set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
 set(pySources ${pySources} "shared/spinsys_spec.cpp")
+
+set(nuclearSources  "shared/nuclear_data.cpp")
+set(nuclearSources ${nuclearSources} "shared/swig/nuclear_data_wrap.cpp")
 
 set(cmdSources "commandln/main.cpp")
 
@@ -112,6 +115,15 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.c
                    COMMAND COMMAND swig ${swig_args} ${swig_file}
                    COMMENT "Automatically generating python bindings")
 
+set(swig_file_nuclear -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/nuclear_data_wrap.cpp
+                      -oh ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/nuclear_data_wrap.hpp
+                      ${CMAKE_CURRENT_SOURCE_DIR}/shared/swig/nuclear_data.i) 
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/nuclear_data_wrap.cpp
+                   MAIN_DEPENDENCY shared/swig/nuclear_data.i
+		   DEPENDS shared/nuclear_data.cpp 
+                   COMMAND COMMAND swig ${swig_args} ${swig_file_nuclear}
+                   COMMENT "Automatically exporting the nuclear data tables to python")
+
 
 
 
@@ -128,6 +140,11 @@ link_directories("/usr/lib/sse2")
 #python bindings
 add_library(_spinsys SHARED  ${pySources})
 target_link_libraries (_spinsys xerces-c ${PYTHON_LIBRARIES})
+
+add_library(_nuclear_data SHARED  ${nuclearSources})
+target_link_libraries (_nuclear_data  ${PYTHON_LIBRARIES})
+
+
 
 #C++ GUI
 #set(wxSpinachSources ${guiSources} ${sharedSources})
@@ -157,13 +174,17 @@ add_custom_target(install-py ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/py/* ${CMAKE_CUR
 
 
 
-add_custom_target(install ALL cp ${CMAKE_CURRENT_BINARY_DIR}/spinsys.py  ${CMAKE_CURRENT_BINARY_DIR}/install/
+add_custom_target(install ALL cp ${CMAKE_CURRENT_BINARY_DIR}/*.py  ${CMAKE_CURRENT_BINARY_DIR}/install/
                           DEPENDS _spinsys spinach 
                           COMMENT "Copying files to /install")
 
 
 
 add_custom_target(install-so ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_spinsys.so ${CMAKE_CURRENT_BINARY_DIR}/install/_spinsys.so
+                          DEPENDS _spinsys spinach 
+                          COMMENT "Copying files to /install")
+
+add_custom_target(install-so2 ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_nuclear_data.so ${CMAKE_CURRENT_BINARY_DIR}/install/_nuclear_data.so
                           DEPENDS _spinsys spinach 
                           COMMENT "Copying files to /install")
 

@@ -1,23 +1,60 @@
 
-#include "nuclear_data.h"
+#include "nuclear_data.hpp"
+#include <cstring>
+
+using namespace std;
+
+//A very simple struct like datatype for storing data about nuclei
+struct Isotope {
+  const char* symbol;
+  const char* name;
+  long protonN; //Number of protons
+  long massN;    //Number or protons+neutrons
+  long multiplicity;
+  double gamma;
+  double red;
+  double green;
+  double blue;
+};
 
 
-Isotope::Isotope(string _name,string _shortName,long _multiplicity,double _gamma)
-: name(_name),shortName(_shortName),multiplicity(_multiplicity),gamma(_gamma) {
+long getIsotopeCount(){
+  return gKnownIsotopeCount;
+}
+
+long getIsotopeBySymbol(const char* str) {
+  for(long i=0;i<gKnownIsotopeCount;i++) {
+    if(strcmp(str,gIsotopes[i].symbol)==0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+long getIsotope(long protonN,long massN){
+  for(long i=0;i<gKnownIsotopeCount;i++) {
+    if(gIsotopes[i].protonN==protonN && gIsotopes[i].massN==massN) {
+      return i;
+    }
+  }
+  return -1;
+}
+double getIsotopeColorR(long index) {
+  return gIsotopes[index].red;
+}
+double getIsotopeColorG(long index) {
+  return gIsotopes[index].green;
+}
+double getIsotopeColorB(long index) {
+  return gIsotopes[index].blue;
 }
 
 
-void LoadIsotopes() {
-/*
-This function should probably graduate to loading the data from a file
-*/
-    KnownIsotopes.resize(6);
-    KnownIsotopes[0]=Isotope("Electron","E"   ,2,  1.760859770e11);
-    KnownIsotopes[1]=Isotope("Hydrogen","1H"  ,2,  26.7522205e7);
-    KnownIsotopes[2]=Isotope("Hydrogen","2H"  ,3,  4.10662914e7);
-    KnownIsotopes[3]=Isotope("Hydrogen","13C" ,2,  6.728286e7);
-    KnownIsotopes[4]=Isotope("Hydrogen","14N" ,3,  1.9337798e7);
-    KnownIsotopes[5]=Isotope("Hydrogen","15N" ,2,  -2.7126188e7);
-}
-
+const long gKnownIsotopeCount=3;
+const Isotope gIsotopes[]={
+  {"E","Electron",-1,0,2,1.760859770e11,0.0,0.0,1.0},
+  {"H","Hydrogen",1 ,0,2,1.760859770e11,1.0,0.0,0.0},
+  {"C","Carbon"  ,6 ,6,2,1.760859770e11,0.6,0.6,0.6},
+  {"N","Nitrogen",7 ,7,3,1.9337798e7   ,0.7,0.0,0.0}
+};
 

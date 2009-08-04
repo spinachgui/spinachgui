@@ -1,5 +1,6 @@
 import wx
 import spinsys
+from nuclear_data import *
 from wx import xrc 
 from wx import glcanvas 
 from math import *
@@ -10,7 +11,16 @@ from OpenGL.GL import *
 from numpy import *
 
 
-
+def splitSymbol(symbol):
+    """Split and isotope symbol such as H1 into a letter and a number such as (H,1)"""
+    str="";
+    num="";
+    for c in symbol:
+        if c.isalpha():
+            str=str+c
+        else:
+            num=num+c
+    return (str,num)
 
 
 def getARotation(parent):
@@ -177,6 +187,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOTION,self.onMouseMove)
         self.Bind(wx.EVT_MOUSEWHEEL,self.onWheel)
 
+        #Create a dictionary of colours
+        self.colourDict={}
+        for i in range(getIsotopeCount()):
+            self.colourDict[getIsotopeSymbol(i)]=array([getIsotopeColorR(i), getIsotopeColorG(i), getIsotopeColorB(i)],float32);
+
     def onWheel(self,e):
         self.zoom=self.zoom-0.001*e.GetWheelRotation()/e.GetWheelDelta();
         if(self.zoom<0.001):
@@ -296,7 +311,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
                 glMaterialfv(GL_FRONT, GL_SPECULAR, redSpecularMaterial);
                 #glMaterialfv(GL_FRONT, GL_DIFFUSE, redSpecularMaterial);
             else:
-                glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
+                letter,num=splitSymbol(thisSpin.getIsotope())
+                if(letter in self.colourDict):
+                    glMaterialfv(GL_FRONT, GL_SPECULAR, self.colourDict[letter]);
+                else:
+                    glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
                 #glMaterialfv(GL_FRONT, GL_DIFFUSE,  whiteSpecularMaterial);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);

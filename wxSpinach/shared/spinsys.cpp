@@ -140,7 +140,8 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	stream >> dummy1 >> dummy2 >> dummy3 >> x >> y >> z;
 	stream.clear();
 	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
-	Spin s(Vector(x,y,z),nAtoms,"H1",0);
+	Spin s(Vector(x,y,z),nAtoms,"H1",0); //Assume everything is a hydrogen, overwrite later
+	
 	s.setLabel("A Spin");
 	Spins.push_back(s);
 	nAtoms++;
@@ -172,18 +173,18 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
       fin.getline(buff,500); line=buff; //Read a line
       istringstream stream;
       for (long i=0;i<nAtoms;i++) {
-	string dummy1,dummy2,dummy3,dummy4,dummy5,dummy6;
+	string dummy1,dummy2,dummy3,dummy4,dummy5,isotope;
 	double eigenvalue1,eigenvalue2,eigenvalue3;
 	double x1,y1,z1,x2,y2,z2,x3,y3,z3;
 	//Read the rotation matrix and eigenvalues (in megaherz)
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
-	stream                     >> dummy1 >> dummy2 >> eigenvalue1 >> dummy3 >> dummy4 >> x1 >> y1 >> z1;
+	stream                      >> dummy1 >> dummy2 >> eigenvalue1 >> dummy3 >> dummy4 >> x1 >> y1 >> z1;
 
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
-	stream >> dummy6 >> dummy5 >> dummy1 >> dummy2 >> eigenvalue2 >> dummy3 >> dummy4 >> x2 >> y2 >> z2;
+	stream >> dummy5 >> isotope >> dummy1 >> dummy2 >> eigenvalue2 >> dummy3 >> dummy4 >> x2 >> y2 >> z2;
 
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
-	stream                     >> dummy1 >> dummy2 >> eigenvalue3 >> dummy3 >> dummy4 >> x3 >> y3 >> z3;
+	stream                      >> dummy1 >> dummy2 >> eigenvalue3 >> dummy3 >> dummy4 >> x3 >> y3 >> z3;
 	//Skip a line
 	fin.getline(buff,500); line=buff; //Read a line
 
@@ -193,6 +194,14 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	o.setEigensystem(Eigensystem(Vector(x1,y1,z1),Vector(x2,y2,z2),Vector(x3,y3,z3)));
 	inter.setOrientation(o);
 	Interactions.push_back(inter);
+
+	//Now process the isotope
+	long leftBracket=isotope.find("(");
+	long rightBracket=isotope.find(")");
+	string element=isotope.substr(0,leftBracket);
+	string massnum=isotope.substr(leftBracket+1,rightBracket-leftBracket-1);
+	isotope=element+massnum;
+	Spins[i].setIsotope(isotope);
       }
     }
   }

@@ -49,6 +49,9 @@ double getIsotopeColorB(long index) {
   return gIsotopes[index].blue;
 }
 
+const char* getIsotopeSymbol(long index) {
+  return gIsotopes[index].symbol;
+}
 
 const long gKnownIsotopeCount=3;
 const Isotope gIsotopes[]={

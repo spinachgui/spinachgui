@@ -17,6 +17,7 @@ long getIsotopeBySymbol(const char* str);
 double getIsotopeColorR(long index);
 double getIsotopeColorG(long index);
 double getIsotopeColorB(long index);
+const char* getIsotopeSymbol(long index);
 
 
 #endif // __spinachcalcFrameBase__

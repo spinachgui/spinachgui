@@ -59,6 +59,7 @@ public:
   void addSpin();
 protected:
   void loadFromG03File(const char* filename);
+  void loadFromXYZFile(const char* filename);
 };
 
 class SpinsysXMLRoot {
@@ -71,6 +72,7 @@ public:
   ///Save the spin system to an XML file at filename
   void loadFromG03File(const char* filename);
   ///Save the spin system to an XML file at filename
+  void loadFromXYZFile(const char* filename);
   void saveToFile(const char* filename) const;
   ///Output the spin system in a human readable format to the standard
   ///output for debugging purposes.

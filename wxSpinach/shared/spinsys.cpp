@@ -48,6 +48,11 @@ void SpinsysXMLRoot::loadFromG03File(const char* filename) {
   mXMLSpinSys->loadFromG03File(filename);
 }
 
+void SpinsysXMLRoot::loadFromXYZFile(const char* filename) {
+  clear();
+  mXMLSpinSys->loadFromXYZFile(filename);
+}
+
 void SpinsysXMLRoot::clear() {
   mXMLSpinSys.reset(new SpinachSpinsys());
 }
@@ -74,6 +79,27 @@ void SpinachSpinsys::dump() const {
   }
 }
 
+void SpinachSpinsys::loadFromXYZFile(const char* filename) {
+  ifstream fin(filename);
+  cout << "Opening an xyz file " << filename << endl;
+  if(!fin.is_open()) {
+    //Throw some sort of error here
+    cerr << "Couhn't open the file" << endl;
+  }
+  SpinSequence Spins;
+  string element;
+  double x,y,z;
+  long nAtoms;
+  while(!fin.eof()) {
+    fin >> element >> x >> y >> z >> ws;
+    cout << element << " " << x << "  " << y << " " << z << endl;
+    Spin s(Vector(x,y,z),nAtoms,element,0);  //Last paramiter is the reference frame
+    s.setLabel("Spin");
+    Spins.push_back(s);
+    nAtoms++;
+  } 
+  setSpin(Spins);
+}
 
 void SpinachSpinsys::loadFromG03File(const char* filename) {
   /*

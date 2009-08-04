@@ -27,9 +27,12 @@ class SpinsysXMLRoot {
 public:
   SpinsysXMLRoot();
   void clear();
+
   void loadFromFile(const char* filename);
   void loadFromG03File(const char* filename);
+  void loadFromXYZFile(const char* filename);
   void saveToFile(const char* filename) const;
+
   SpinachSpinsys getRoot() const;
   void setRoot(SpinachSpinsys ss);
 };
@@ -44,16 +47,17 @@ class SpinachSpinsys : public Spin_system {
 public:
   SpinachSpinsys();
   SpinachSpinsys(Spin_system& s);
+
   void dump() const;
   long getSpinCount() const;
   SpinachSpin getSpinByIndex(long n);
-  SpinachInteraction getInteractionByIndex(long n);
+
   long getInteractionCount() const;  
+  SpinachInteraction getInteractionByIndex(long n);
+
   std::vector<long> getNearbySpins(long spinNumber,double distance);
   Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
   void addSpin();
-protected:
-  void loadFromG03File(const char* filename);
 };
 
 

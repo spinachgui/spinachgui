@@ -434,11 +434,14 @@ class MyApp(wx.App):
         self.frame.Layout();
 
     def onOpen(self,e):
-        fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard="Spin XML files (*.xml)|*.xml|G03 Log Files (*.log)|*.log|All Files (*.*)|*.*") 
+        wildcard="Spin XML files (*.xml)|*.xml|G03 Log Files (*.log)|*.log|Plain XYZ Files (*.xyz)|*.xyz|All Files (*.*)|*.*"
+        fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard=wildcard) 
         if(fd.ShowModal()):
             fileExt=fd.GetPath()[-3:]
             if(fileExt=="log"):
                 self.loadFromFile(fd.GetPath().encode('latin-1'),'g03')
+            if(fileExt=="xyz"):
+                self.loadFromFile(fd.GetPath().encode('latin-1'),'xyz')
             else:
                 self.loadFromFile(fd.GetPath().encode('latin-1'))
             
@@ -447,6 +450,8 @@ class MyApp(wx.App):
             self.ssroot.loadFromFile(filename)
         elif type=="g03":
             self.ssroot.loadFromG03File(filename)
+        elif type=="xyz":
+            self.ssroot.loadFromXYZFile(filename)
         self.ss=self.ssroot.getRoot();
         self.glc.setSpinSys(self.ss)
         self.updateSpinTree()

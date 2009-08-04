@@ -174,6 +174,14 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         self.Bind(wx.EVT_PAINT,self.onPaint)
         self.Bind(wx.EVT_MOTION,self.onMouseMove)
+        self.Bind(wx.EVT_MOUSEWHEEL,self.onWheel)
+
+    def onWheel(self,e):
+        self.zoom=self.zoom-0.001*e.GetWheelRotation()/e.GetWheelDelta();
+        if(self.zoom<0.001):
+            self.zoom=0.001;
+        self.Refresh()
+
 
     def onPaint(self,e):
 	glColor3f(0.0, 0.0, 1.0);
@@ -273,7 +281,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
             Ry=worldNearY-worldFarY
             Rz=worldNearZ-worldFarZ
 
-            A =    Rx**2+                        Ry**2                    + Rz**2
+            A =    Rx**2+                         Ry**2                    + Rz**2
             B = 2*(Rx*(worldNearX-coords[0]) +    Ry*(worldNearY-coords[1]) + Rz*(worldNearZ-coords[2]))
             C =    (worldNearX-coords[0])**2 +    (worldNearY-coords[1])**2 + (worldNearZ-coords[2])**2 - radius2
 

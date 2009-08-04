@@ -84,7 +84,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.camZ=15.0
         self.mousex=0;
         self.mousey=0;
-
+        self.xTranslate=0;
+        self.yTranslate=0;
 
     def setSpinSys(self,ss):
         """Set the spin system that this gl display is displaying"""
@@ -207,8 +208,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         glLoadIdentity();
         glRotatef(dotProduct,self.yRotate/norm,self.xRotate/norm,0);
+        glTranslatef(self.xTranslate*self.zoom,self.yTranslate*self.zoom,0);
         self.xRotate=0
         self.yRotate=0
+        self.xTranslate=0
+        self.yTranslate=0
         glMultMatrixf(self.rotationMatrix);
         self.rotationMatrix=glGetFloatv(GL_MODELVIEW_MATRIX);
 
@@ -328,7 +332,10 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.SwapBuffers()
 
     def onMouseMove(self,e):
-        if(e.Dragging()):
+        if(e.Dragging() and e.RightIsDown()):
+            self.xTranslate=self.xTranslate+(e.GetX()-self.mousex)
+            self.yTranslate=self.yTranslate-(e.GetY()-self.mousey)
+        elif(e.Dragging() and e.LeftIsDown()):
             self.xRotate=self.xRotate+(e.GetX()-self.mousex);
             self.yRotate=self.yRotate+(e.GetY()-self.mousey);
 

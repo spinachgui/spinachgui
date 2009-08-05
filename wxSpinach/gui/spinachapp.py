@@ -26,7 +26,7 @@ class MyApp(wx.App):
         
         #Populate the spin tree
         self.spinTree = xrc.XRCCTRL(self.frame,'mSpinTree')
-        self.spinTree.AddRoot("Spin System")
+        self.root=self.spinTree.AddRoot("Spin System")
         
         #Setup event handling
         self.frame.Bind(wx.EVT_MENU, self.onSpinButton, id=xrc.XRCID('mSpinTool'))
@@ -55,6 +55,13 @@ class MyApp(wx.App):
         self.JCoupPanel.Show(False)
         self.ClusterPanel.Show(True)
         self.frame.Layout();
+        
+    def onNewSpinTool(self,e):
+        spinElement=self.spinTree.AppendItem(self.root, "Spin 4")
+        
+        self.spinTree.AppendItem(spinElement,"x",wnd=wx.TextCtrl(self.spinTree, -1,"0.0"))
+        self.spinTree.AppendItem(spinElement,"y",wnd=wx.TextCtrl(self.spinTree, -1,"0.0"))
+        self.spinTree.AppendItem(spinElement,"z",wnd=wx.TextCtrl(self.spinTree, -1,"0.0"))
 
     def onLoadFromFile(self,e):
         print "hello"

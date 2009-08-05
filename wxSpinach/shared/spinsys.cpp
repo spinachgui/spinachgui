@@ -89,7 +89,7 @@ void SpinachSpinsys::loadFromXYZFile(const char* filename) {
   SpinSequence Spins;
   string element;
   double x,y,z;
-  long nAtoms;
+  long nAtoms=0;
   while(!fin.eof()) {
     fin >> element >> x >> y >> z >> ws;
     cout << element << " " << x << "  " << y << " " << z << endl;

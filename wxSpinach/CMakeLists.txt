@@ -32,7 +32,10 @@ set(wxWidgets_USE_UNICODE,ON)
 set(wxWidgets_USE_UNIVERSAL,OFF)
 set(wxWidgets_USE_STATIC,ON)
 
+set(xsd xsdcxx)
+
 if(WIN32)
+  set(xsd xsd)
   include("windows-config.cmake")
 else()
   #find_package(wxWidgets COMPONENTS net xml adv aui core gl html propgrid qa richtext stc xrc REQUIRED)
@@ -90,7 +93,7 @@ set(xsd_args ${xsd_args} --generate-doxygen)
 
 add_custom_command(OUTPUT shared/spinsys_spec.cpp
                    MAIN_DEPENDENCY data/spinsys_spec.xsd
-                   COMMAND COMMAND xsd ${xsd_args}
+                   COMMAND COMMAND ${xsd} ${xsd_args}
                    ${CMAKE_CURRENT_SOURCE_DIR}/data/spinsys_spec.xsd
                    COMMENT "Automatically generating XML parsing classes")
 

@@ -2,17 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 project(cspinach)
 
 #Tell me what commands are being executed.
-#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-
-#find_package(wxWidgets COMPONENTS net xml adv aui core gl html propgrid qa richtext stc xrc REQUIRED)
-find_package(wxWidgets COMPONENTS gl REQUIRED)
-
-#Work out where python is installed.
-find_package(PythonLibs)
-
-#set the version of gcc to use. Currently g++-4.3 doesn't work.
-set(CMAKE_CXX_COMPILER "g++-4.2")
 
 
 #Enclose this in some sort of "if" if more than one 
@@ -41,6 +32,22 @@ set(wxWidgets_USE_UNICODE,ON)
 set(wxWidgets_USE_UNIVERSAL,OFF)
 set(wxWidgets_USE_STATIC,ON)
 
+if(WIN32)
+  include("windows-config.cmake")
+else()
+  #find_package(wxWidgets COMPONENTS net xml adv aui core gl html propgrid qa richtext stc xrc REQUIRED)
+  #Don't need this, using wxPython now
+  #find_package(wxWidgets COMPONENTS gl REQUIRED)
+
+  #Work out where python is installed.
+  find_package(PythonLibs)
+
+  #Work out where boost is installed
+  find_package(Boost REQUIRED)
+
+  #set the version of gcc to use. Currently g++-4.3 doesn't work.
+  #set(CMAKE_CXX_COMPILER "g++-4.2")
+endif()
 
 #List of source files for all the targets
 set(guiSources "gui/SpinachApp.cpp")
@@ -83,7 +90,7 @@ set(xsd_args ${xsd_args} --generate-doxygen)
 
 add_custom_command(OUTPUT shared/spinsys_spec.cpp
                    MAIN_DEPENDENCY data/spinsys_spec.xsd
-                   COMMAND COMMAND xsdcxx ${xsd_args}
+                   COMMAND COMMAND xsd ${xsd_args}
                    ${CMAKE_CURRENT_SOURCE_DIR}/data/spinsys_spec.xsd
                    COMMENT "Automatically generating XML parsing classes")
 
@@ -132,10 +139,10 @@ include_directories(SYSTEM ${wxWidgets_INCLUDE_DIRS})
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(SYSTEM ${PYTHON_INCLUDE_PATH})
 
+include_directories(SYSTEM ${CodeSynthesisXSD_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
-add_definitions(${wxWidgets_DEFINITIONS})
-
-link_directories("/usr/lib/sse2")
+link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
 
 #python bindings
 add_library(_spinsys SHARED  ${pySources})
@@ -159,6 +166,7 @@ target_link_libraries (_nuclear_data  ${PYTHON_LIBRARIES})
 set(spinachSources ${cmdSources} ${sharedSources})
 add_executable (spinach ${spinachSources})
 target_link_libraries (spinach atlas  xerces-c) 
+
 
 #Create an "install" target (copy everything to a test directory)
 #This is probaly not how to do it in a production build, but it works and will

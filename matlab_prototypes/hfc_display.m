@@ -56,7 +56,8 @@ colormap hot; shading interp; lighting phong;
 k=4; n=2^k-1; theta=pi*(-n:2:n)/n; phi=(pi/2)*(-n:2:n)'/n;
 X=cos(phi)*cos(theta); Y=cos(phi)*sin(theta); Z=sin(phi)*ones(size(theta));
 for n=1:natoms
-    coords=[reshape(X*(Baa(n)+iso_hfc(n))/10,1,length(phi)*length(theta));reshape(Y*(Bbb(n)+iso_hfc(n))/10,1,length(phi)*length(theta));...
+    coords=[reshape(X*(Baa(n)+iso_hfc(n))/10,1,length(phi)*length(theta));
+            reshape(Y*(Bbb(n)+iso_hfc(n))/10,1,length(phi)*length(theta));
             reshape(Z*(Bcc(n)+iso_hfc(n))/10,1,length(phi)*length(theta))];
     new_coords=[aa_axis(n,:)' bb_axis(n,:)' cc_axis(n,:)']*coords;
     Xd=reshape(new_coords(1,:),length(phi),length(theta))+atoms(n,1);

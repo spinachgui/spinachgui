@@ -186,6 +186,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT,self.onPaint)
         self.Bind(wx.EVT_MOTION,self.onMouseMove)
         self.Bind(wx.EVT_MOUSEWHEEL,self.onWheel)
+        self.Bind(wx.EVT_RIGHT_UP,self.onRightClick)
 
         #Create a dictionary of colours
         self.colourDict={}
@@ -197,7 +198,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
         if(self.zoom<0.001):
             self.zoom=0.001;
         self.Refresh()
-
 
     def onPaint(self,e):
 	glColor3f(0.0, 0.0, 1.0);
@@ -388,6 +388,16 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.mousey=e.GetY();
         self.Refresh()
 
+    def onRightClick(self,e):
+        if(not e.Dragging()):
+            menu = wx.Menu()
+            for i in range(5):
+                menu.Append(-1, "Test Menu Item")
+   
+            self.PopupMenuXY( menu, e.GetX(), e.GetY() )
+            menu.Destroy()
+
+
 
 
 class MyApp(wx.App):
@@ -447,8 +457,8 @@ class MyApp(wx.App):
         self.glc.enableGL()   
         
         #self.loadFromFile('data/hccch.xml')
-        #self.loadFromFile('data/tyrosine.log','g03')
-        self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_5.log','g03');
+        self.loadFromFile('data/tyrosine.log','g03')
+        #self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_9.log','g03');
         #self.saveToFile('data/tyrosine.xml')
 
 

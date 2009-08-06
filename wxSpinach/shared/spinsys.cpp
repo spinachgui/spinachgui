@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <boost/algorithm/string/trim.hpp>
+#include <shared/nuclear_data.hpp>
 
 using namespace std;
 
@@ -137,9 +138,9 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 
       fin.getline(buff,500); line=buff; stream.str(line); //Read a line
       while(line.find("--------") == string::npos && !fin.eof()) {
-	int dummy1,dummy2,dummy3;
+	int dummy1,atomicNumber,dummy3;
 	double x,y,z;
-	stream >> dummy1 >> dummy2 >> dummy3 >> x >> y >> z;
+	stream >> dummy1 >> atomicNumber >> dummy3 >> x >> y >> z;
 	stream.clear();
 	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
 	if(standardOrientFound) {
@@ -151,7 +152,9 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	  }
 	} else {
 	  //Create a new spin
-	  Spin s(Vector(x,y,z),nAtoms,"H1",0); //Assume everything is a hydrogen, overwrite later
+	  string isotopeSymbol(getElementSymbol(atomicNumber));
+	  isotopeSymbol=isotopeSymbol+"1"; //We have no clue what the mass number is yet
+	  Spin s(Vector(x,y,z),nAtoms,isotopeSymbol,0);
 	  s.setLabel("A Spin");
 	  Spins.push_back(s);
 	}
@@ -160,6 +163,7 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
       standardOrientFound=true;
 
     } else if(line=="g tensor (ppm):") {
+      
     } else if(line=="g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:") {
     } else if(line=="SCF GIAO Magnetic shielding tensor (ppm):") {
       for(long i=0;i<nAtoms;i++) {

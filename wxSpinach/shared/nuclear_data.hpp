@@ -8,8 +8,16 @@ using namespace std;
 
 struct Isotope;
 
-extern  const long gKnownIsotopeCount;
-extern  const Isotope gIsotopes[];
+//Elemental functions
+long getElementCount();
+const char* getElementSymbol(long p);
+const char* getElementName(long p);
+double getElementR(long p);
+double getElementG(long p);
+double getElementB(long p);
+
+
+//Isotope functions
 
 long getIsotopeCount();
 long getIsotope(long protonN,long massN);

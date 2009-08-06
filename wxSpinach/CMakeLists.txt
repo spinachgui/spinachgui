@@ -148,11 +148,12 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
 
 #python bindings
-add_library(_spinsys SHARED  ${pySources})
-target_link_libraries (_spinsys xerces-c ${PYTHON_LIBRARIES})
 
 add_library(_nuclear_data SHARED  ${nuclearSources})
 target_link_libraries (_nuclear_data  ${PYTHON_LIBRARIES})
+
+add_library(_spinsys SHARED  ${pySources})
+target_link_libraries (_spinsys _nuclear_data xerces-c ${PYTHON_LIBRARIES})
 
 
 

@@ -158,7 +158,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
 	# GL_LIGHT0: the white light emitting light source
 	# Create light components for GL_LIGHT0
-	ambientLight0 =  array([0.3, 0.3, 0.3, 1.0],float32);
+	ambientLight0 =  array([0.0, 0.0, 0.0, 1.0],float32);
 	diffuseLight0 =  array([0.5, 0.5, 0.5, 1.0],float32);
 	specularLight0 = array([0.6, 0.6, 0.6, 1.0],float32);
 	position0 =      array([-1.5, 1.0,-4.0, 1.0],float32);	
@@ -170,9 +170,9 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
 	# GL_LIGHT1: the red light emitting light source
 	# Create light components for GL_LIGHT1
-	ambientLight1 =  array([0.1, 0.1, 0.2, 1.0 ],float32);
-	diffuseLight1 =  array([0.1, 0.1, 0.2, 1.0 ],float32);
-	specularLight1 = array([0.1, 0.1, 0.2, 1.0 ],float32);
+	ambientLight1 =  array([0.1, 0.1, 0.1, 1.0 ],float32);
+	diffuseLight1 =  array([0.1, 0.1, 0.1, 1.0 ],float32);
+	specularLight1 = array([0.3, 0.3, 0.3, 1.0 ],float32);
 	position1 =      array([1.5, 1.0, 4.0,1.0],float32);	
 	# Assign created components to GL_LIGHT1
 	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
@@ -189,8 +189,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         #Create a dictionary of colours
         self.colourDict={}
-        for i in range(getIsotopeCount()):
-            self.colourDict[getIsotopeSymbol(i)]=array([getIsotopeColorR(i), getIsotopeColorG(i), getIsotopeColorB(i)],float32);
+        for i in range(getElementCount()):
+            self.colourDict[getElementSymbol(i)]=array([getElementR(i), getElementG(i), getElementB(i)],float32);
 
     def onWheel(self,e):
         self.zoom=self.zoom-0.001*e.GetWheelRotation()/e.GetWheelDelta();
@@ -307,16 +307,16 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
 
             desc=B**2-4*A*C
+
+
             if(desc>0):
                 glMaterialfv(GL_FRONT, GL_SPECULAR, redSpecularMaterial);
-                #glMaterialfv(GL_FRONT, GL_DIFFUSE, redSpecularMaterial);
+                glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteSpecularMaterial);
             else:
                 letter,num=splitSymbol(thisSpin.getIsotope())
-                if(letter in self.colourDict):
+                if (letter in self.colourDict):
                     glMaterialfv(GL_FRONT, GL_SPECULAR, self.colourDict[letter]);
-                else:
-                    glMaterialfv(GL_FRONT, GL_SPECULAR, whiteSpecularMaterial);
-                #glMaterialfv(GL_FRONT, GL_DIFFUSE,  whiteSpecularMaterial);
+                    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, self.colourDict[letter]);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
             glScale(radius,radius,radius);
@@ -329,6 +329,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
             #Now draw in bonds to nearby atoms
 
             glMaterialfv(GL_FRONT, GL_SPECULAR, blueSpecularMaterial);
+            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteSpecularMaterial);
             nearby=self.ss.getNearbySpins(i,1.8)
             glColor3f(1.0, 0.0, 0.0);
             for index in nearby:

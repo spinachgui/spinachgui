@@ -422,7 +422,7 @@ class MyApp(wx.App):
         
         #self.loadFromFile('data/hccch.xml')
         #self.loadFromFile('data/tyrosine.log','g03')
-        self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_1.log','g03');
+        self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_5.log','g03');
         #self.saveToFile('data/tyrosine.xml')
 
 

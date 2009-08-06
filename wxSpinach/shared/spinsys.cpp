@@ -107,7 +107,7 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
     This function really needs some work done on in, as it's not using C++
     streams properly. This is due to it being adapted from matlab code (which uses
     c style I/O
-   */
+  */
   ifstream fin(filename);
   cout << "Opening a g03 file:" << filename << endl;
   if(!fin.is_open()) {
@@ -125,8 +125,12 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
     fin.getline(buff,500); line=buff; //Read a line
     boost::algorithm::trim(line); //Remove whitespace
 
-    if (line=="Standard orientation:" && !standardOrientFound) {
+    if (line=="Standard orientation:") {
       cout << "Standard orientation found." << endl;
+      if(standardOrientFound) {
+	//Throw away the old standard orientation data.
+	Spins.resize(0);
+      }
       standardOrientFound=true;
       //Skip 4 lines
       fin.getline(buff,500); line=buff; //Read a line
@@ -147,8 +151,96 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	Spins.push_back(s);
 	nAtoms++;
       }
-    }
-    if (line=="Isotropic Fermi Contact Couplings") {
+    } else if(line=="g tensor (ppm):") {
+    } else if(line=="g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:") {
+    } else if(line=="SCF GIAO Magnetic shielding tensor (ppm):") {
+      for(long i=0;i<nAtoms;i++) {
+	long centerNumber; 
+	string element;
+	string Isotropic,Anisotropy,Eigenvalues; //Should always end up with the value "Isotropic" or "Anisotropy" etc. or file is corrupt
+	string equils,equils2;
+        double isotropicValue,anisotropicValue;
+	string sXX,sYX,sZX, //Should end up "<variable name>="
+	  sXY,sYY,sZY,
+	  sXZ,sYZ,sZZ;
+	double XX,YX,ZX, //Should end up "<variable name>="
+	  XY,YY,ZY,
+	  XZ,YZ,ZZ;
+	double ev1,ev2,ev3;
+
+	fin >> centerNumber >> element >> Isotropic >> equils >> isotropicValue >> Anisotropy >> equils2 >> anisotropicValue;
+	fin >> sXX >> XX >> sYX >> YX >> sZX >> ZX;
+	fin >> sXY >> XY >> sYY >> YY >> sZY >> ZY;
+	fin >> sXZ >> XZ >> sYZ >> YZ >> sZZ >> ZZ;
+	fin >> Eigenvalues >> ev1 >> ev2 >> ev3;
+
+	//Check we got the input we expected
+	if(Isotropic!="Isotropic" || Anisotropy!="Anisotropy" || Eigenvalues!="Eigenvalues:"
+	   ||sXX!="XX="||sYX!="YX="||sZX!="ZX=" 
+	   ||sXY!="XY="||sYY!="YY="||sZY!="ZY="
+	   ||sXZ!="XZ="||sYZ!="YZ="||sZZ!="ZZ=") {
+	  cerr << "Error reading GIAO Magnetic shielding tensor" << endl;
+	  cerr << "Expected 'Isotropic' got " << Isotropic << endl;
+	  cerr << "Expected 'Anisotropy' got " << Anisotropy << endl;
+	  cerr << "Expected 'Eigenvalues:' got " << Eigenvalues << endl;
+
+	  cerr << "XX=" << sXX;
+	  cerr << " XY=" << sXY;
+	  cerr << " XZ=" << sXZ << endl;
+
+	  cerr << "YX=" << sYX;
+	  cerr << " YY=" << sYY;
+	  cerr << " YZ=" << sYZ << endl;
+
+	  cerr << "ZX=" << sZX;
+	  cerr << " ZY=" << sZY;
+	  cerr << " ZZ=" << sZZ << endl;
+
+	} else {
+	  //Store the interaction
+	}
+      }
+    } else if(line=="Total nuclear spin-spin coupling J (Hz):") {
+      long rows = nAtoms/5; //The number of rows the matrix is split over with the full 5 colums.
+                            //I'm relying on the fact that division is rounded down
+      long columsOnLastRow = nAtoms % 5;
+      for(long i=0;i<rows;i++) {  //For each big row
+	//Skip the center number labels on the top row
+	for(long k=0;k<5;k++) {
+	  long topCenterNumber;
+	  fin >> topCenterNumber;
+	  if(i*5+k+1 != topCenterNumber) {
+	    cerr << "Error reading J couplings, found topCenterNumber=" << topCenterNumber << " expected " << i*5+k+1 << endl; 
+	  }
+	}
+
+	for(long j=i*5;j<nAtoms;j++) {  //For each little row in the big row
+	  long centerNumber;
+	  fin >> centerNumber;
+	  if(centerNumber != j+1) {
+	    cerr << "Error reading J Couplings, found centerNumber=" << centerNumber << " expected " << j+1 << endl;
+	  }
+	  for(long k=0;k<5 && k < j+1-i*5;k++) {
+	    string JCouplingStr;
+	    double JCoupling;
+	    fin >> JCouplingStr;
+	    //Fotran double precision output isn't compatable with C++ iostreams, so we have to tweek it
+	    //Replace the D with an E
+	    long Dpos=JCouplingStr.find('D');
+	    if(Dpos >= 0) {
+	      JCouplingStr.replace(Dpos,1,"e");
+	    } else {
+	      cerr << "Was expecting a J coupling value in the form +-0.00000D00 but there was no D. Got" << JCouplingStr << endl;
+	    }
+	    //Pack it back into a istream and parse
+	    istringstream stream;
+	    stream.str(JCouplingStr);
+	    stream >> JCoupling;
+	    //cout << "J(" << j+1 << "," << i*5+k+1 << ")=" << JCoupling << endl;
+	  }
+	}
+      }
+    } else if(line=="Isotropic Fermi Contact Couplings") {
       cout << "Isotropic couplings found" << endl;
       //Skip a line
       fin.getline(buff,500); line=buff; //Read a line

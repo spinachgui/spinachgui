@@ -101,6 +101,7 @@ void SpinachSpinsys::loadFromXYZFile(const char* filename) {
   setSpin(Spins);
 }
 
+
 void SpinachSpinsys::loadFromG03File(const char* filename) {
   /*
     This function really needs some work done on in, as it's not using C++
@@ -115,17 +116,18 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
     return;
   }
   SpinSequence Spins;
-  cout << "Spins.size() = " <<  Spins.size() << endl;
   InteractionSequence Interactions;
   long nAtoms=0;
+  bool standardOrientFound=false; //Some files seem to have many standard orientation sections.
   while(!fin.eof()) {
     string line;
     char buff[500];  //TODO buletproof this
     fin.getline(buff,500); line=buff; //Read a line
     boost::algorithm::trim(line); //Remove whitespace
 
-    if (line=="Standard orientation:") {
+    if (line=="Standard orientation:" && !standardOrientFound) {
       cout << "Standard orientation found." << endl;
+      standardOrientFound=true;
       //Skip 4 lines
       fin.getline(buff,500); line=buff; //Read a line
       fin.getline(buff,500); line=buff; //Read a line
@@ -141,7 +143,6 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	stream.clear();
 	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
 	Spin s(Vector(x,y,z),nAtoms,"H1",0); //Assume everything is a hydrogen, overwrite later
-	
 	s.setLabel("A Spin");
 	Spins.push_back(s);
 	nAtoms++;

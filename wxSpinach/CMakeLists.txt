@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project(cspinach)
 
 #Tell me what commands are being executed.
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 
 
@@ -168,7 +168,8 @@ target_link_libraries (_nuclear_data  ${PYTHON_LIBRARIES})
 #command line exe
 set(spinachSources ${cmdSources} ${sharedSources})
 add_executable (spinach ${spinachSources})
-target_link_libraries (spinach atlas  xerces-c) 
+#target_link_libraries (spinach atlas  xerces-c) 
+target_link_libraries (spinach  xerces-c) 
 
 
 #Create an "install" target (copy everything to a test directory)

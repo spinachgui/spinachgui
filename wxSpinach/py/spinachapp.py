@@ -421,8 +421,9 @@ class MyApp(wx.App):
         self.glc.enableGL()   
         
         #self.loadFromFile('data/hccch.xml')
-        self.loadFromFile('data/tyrosine.log','g03')
-        self.saveToFile('data/tyrosine.xml')
+        #self.loadFromFile('data/tyrosine.log','g03')
+        self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_1.log','g03');
+        #self.saveToFile('data/tyrosine.xml')
 
 
  
@@ -457,7 +458,9 @@ class MyApp(wx.App):
         fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard=wildcard) 
         if(fd.ShowModal()):
             fileExt=fd.GetPath()[-3:]
+            print fileExt
             if(fileExt=="log"):
+                print "Gaussian"
                 self.loadFromFile(fd.GetPath().encode('latin-1'),'g03')
             if(fileExt=="xyz"):
                 self.loadFromFile(fd.GetPath().encode('latin-1'),'xyz')

@@ -55,6 +55,9 @@ public:
   ///Sum all the interaction matricese involving a given spin and return as a single
   ///matrix
   Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
+  ///Get the total coupling between a pair of spins (for example, scalar J coupling
+  ///Counts here
+  double GetTotalIsotropicInteractionOnSpinPair(long n,long m);
   ///Attach a spin
   void addSpin();
 protected:
@@ -106,6 +109,7 @@ public:
     return m.getElement()[3*y+x];
   }
   Matrix3 getAsMatrix() const;
+  double getAsScalar() const;
 };
 
 class SpinachSpin : public Spin {

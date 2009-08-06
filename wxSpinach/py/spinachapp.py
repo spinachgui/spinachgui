@@ -345,6 +345,31 @@ class glDisplay(wx.glcanvas.GLCanvas):
                 gluCylinder(qobj,0.1,0.1,bondLength,10,10)
                 glPopMatrix();
 
+        glDisable(GL_LIGHTING);   
+        glDisable(GL_LIGHT0);     
+        glDisable(GL_LIGHT1);     
+        glEnable(GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for i in range(spinCount):
+            #Do the two spin couplings
+            thisSpin=self.ss.getSpinByIndex(i)
+            coords=thisSpin.getCoords()            
+            for j in range(i+1,spinCount):
+                coordsJ=self.ss.getSpinByIndex(j).getCoords()
+                scalar=abs(self.ss.GetTotalIsotropicInteractionOnSpinPair(i,j))/300;
+                glColor4f(scalar,0,0,scalar);
+                glBegin(GL_LINES);
+                glVertex3f(coords[0],coords[1],coords[2]);
+                glVertex3f(coordsJ[0],coordsJ[1],coordsJ[2]);
+                glEnd();
+        glDisable(GL_BLEND);
+        glEnable(GL_LIGHTING);   
+        glEnable(GL_LIGHT0);     
+        glEnable(GL_LIGHT1);     
+                
+                
+
         glColor3f(0.0, 0.0, 1.0);
 
 

@@ -127,11 +127,7 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 
     if (line=="Standard orientation:") {
       cout << "Standard orientation found." << endl;
-      if(standardOrientFound) {
-	//Throw away the old standard orientation data.
-	Spins.resize(0);
-      }
-      standardOrientFound=true;
+      nAtoms=0;
       //Skip 4 lines
       fin.getline(buff,500); line=buff; //Read a line
       fin.getline(buff,500); line=buff; //Read a line
@@ -146,11 +142,23 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	stream >> dummy1 >> dummy2 >> dummy3 >> x >> y >> z;
 	stream.clear();
 	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
-	Spin s(Vector(x,y,z),nAtoms,"H1",0); //Assume everything is a hydrogen, overwrite later
-	s.setLabel("A Spin");
-	Spins.push_back(s);
+	if(standardOrientFound) {
+	  //Update an existing spin
+	  if(Spins.size() > nAtoms) {
+	    Spins[nAtoms].setCoordinates(Vector(x,y,z));
+	  } else {
+	    cerr << "Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables" << endl;
+	  }
+	} else {
+	  //Create a new spin
+	  Spin s(Vector(x,y,z),nAtoms,"H1",0); //Assume everything is a hydrogen, overwrite later
+	  s.setLabel("A Spin");
+	  Spins.push_back(s);
+	}
 	nAtoms++;
       }
+      standardOrientFound=true;
+
     } else if(line=="g tensor (ppm):") {
     } else if(line=="g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:") {
     } else if(line=="SCF GIAO Magnetic shielding tensor (ppm):") {
@@ -237,6 +245,10 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	    stream.str(JCouplingStr);
 	    stream >> JCoupling;
 	    //cout << "J(" << j+1 << "," << i*5+k+1 << ")=" << JCoupling << endl;
+	    Interaction1 inter("J","MHz",j+1,0);
+	    inter.setScalar(JCoupling);
+	    inter.setSpin_2(i*5+k+1);
+	    Interactions.push_back(inter);
 	  }
 	}
       }
@@ -362,13 +374,22 @@ std::vector<long> SpinachSpinsys::getNearbySpins(long spinNumber,double distance
 Matrix3 SpinachSpinsys::GetTotalInteractionOnSpinAsMatrix(long n) {
   Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
   for(long i=0;i < getInteraction().size();++i) {
-    if(getInteraction()[i].getSpin_1()==n) {
+    if(getInteraction()[i].getSpin_1()==n && !getInteraction()[i].getSpin_2().present()) {
       totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
     }
   }
   return totalMatrix;
 }
 
+double SpinachSpinsys::GetTotalIsotropicInteractionOnSpinPair(long n,long m) {
+  double totalScalar=0.0;
+  for(long i=0;i < getInteraction().size();++i) {
+    if(getInteraction()[i].getSpin_1()==n && getInteraction()[i].getSpin_2().present()) {
+      totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
+    }
+  }
+  return totalScalar;
+}
 
 
 //============================================================//
@@ -419,6 +440,7 @@ Matrix3 SpinachOrientation::getAsMatrix() const {
   }
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }
+
 
 
 //============================================================//
@@ -479,6 +501,21 @@ Matrix3 SpinachInteraction::getAsMatrix() const {
   //Return the identity
   Matrix3 identity(0,0,0,0,0,0,0,0,0);
   return identity;
+}
+
+double SpinachInteraction::getAsScalar() const {
+  if(getForm()==INTER_SCALER) {
+    //Return the identity multipled by the scalar
+    double s=getScalar().get();
+    return s;
+  } else if(getForm()==INTER_MATRIX) {
+    return 0;
+  } else if(getForm()==INTER_EIGENVALUES) {
+    return 0;
+  } else {
+    cerr << "Interaction type not suported in getAsScalar()" << endl;
+  }
+  return 0;
 }
 
 long SpinachInteraction::getForm() const {

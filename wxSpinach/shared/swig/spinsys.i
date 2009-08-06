@@ -57,6 +57,7 @@ public:
 
   std::vector<long> getNearbySpins(long spinNumber,double distance);
   Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
+  double GetTotalIsotropicInteractionOnSpinPair(long n,long m);
   void addSpin();
 };
 

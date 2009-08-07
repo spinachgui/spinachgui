@@ -475,15 +475,33 @@ Matrix3 SpinachInteraction::getAsMatrix() const {
     //Just return the matrix
     Matrix3 m(getMatrix().get());
     return m;
-  } else if(getForm()==INTER_EIGENVALUES) {
+  } else if(getForm()==INTER_EIGENVALUES || getForm() == INTER_AXIALITY_RHOMBICITY) {
     //Convert to a matrix
+    double xx,yy,zz;
 
-    const Eigenvalues ev=getEigenvalues().get();
-
-    double xx=ev.getXX();
-    double yy=ev.getYY();
-    double zz=ev.getZZ();
-
+    if(getForm()==INTER_EIGENVALUES) {
+      const Eigenvalues ev=getEigenvalues().get();
+    
+      xx=ev.getXX();
+      yy=ev.getYY();
+      zz=ev.getZZ();
+    } else if(getForm()==INTER_AXIALITY_RHOMBICITY) {
+      const Axiality_rhombicity ar=getAxiality_rhombicity().get();
+      double a=ar.getAx();
+      double r=ar.getRh();
+      double iso=ar.getIso();
+      xx=a/3+iso/3;
+      yy=-r/2-a/6+iso/3;
+      zz= r/2-a/6+iso/3;
+    } else if(getForm()==INTER_SPAN_SKEW) {
+      const Span_skew ss=getSpan_skew().get();
+      double span=ss.getSpan();
+      double skew=ss.getSkew();
+      double iso=ss.getIso();
+      xx=span*skew/6-span/2;
+      yy=iso-span*skew/3;
+      zz=span*skew/6+span/2;
+    }
     const SpinachOrientation o=getOrientation().get();
     Matrix3 intMatrix=o.getAsMatrix();
 
@@ -500,11 +518,11 @@ Matrix3 SpinachInteraction::getAsMatrix() const {
     intMatrix.set(2,2,intMatrix.get(2,2)*zz);
     return intMatrix;
   } else {
-    cerr << "Interaction type not suported in getAsMatrix()" << endl;
+    cerr << "Unknown interaction type returned by SpinachInteraction::getForm(). This is a serious error" << endl;
   }
-  //Return the identity
-  Matrix3 identity(0,0,0,0,0,0,0,0,0);
-  return identity;
+  //Return the zero matrix identity
+  Matrix3 zero(0,0,0,0,0,0,0,0,0);
+  return zero;
 }
 
 double SpinachInteraction::getAsScalar() const {

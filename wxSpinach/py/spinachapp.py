@@ -10,6 +10,13 @@ from OpenGL.GL import *
 
 from numpy import *
 
+#Define some openGL materials
+whiteMaterial = array([0.5, 0.5, 0.5],float32); 
+blueMaterial = array([0.06, 0.06, 0.4],float32); 
+redMaterial = array([0.9, 0.00, 0.00],float32); 
+
+hoverMaterial=redMaterial
+selectedMaterial=blueMaterial
 
 def splitSymbol(symbol):
     """Split and isotope symbol such as H1 into a letter and a number such as (H,1)"""
@@ -96,6 +103,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.mousey=0;
         self.xTranslate=0;
         self.yTranslate=0;
+        self.selected=[]  #List containing all spins which are currently selected
+        self.hover=-1   #The closest spin currently sitting under the mouse
 
     def setSpinSys(self,ss):
         """Set the spin system that this gl display is displaying"""
@@ -248,28 +257,45 @@ class glDisplay(wx.glcanvas.GLCanvas):
             gluQuadricDrawStyle(qobj,GLU_FILL);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
-        #Define some openGL materials
-        whiteSpecularMaterial = array([0.5, 0.5, 0.5],float32); 
-        blueSpecularMaterial = array([0.06, 0.06, 0.4],float32); 
-        redSpecularMaterial = array([0.9, 0.00, 0.00],float32); 
+        #Move these to some sort of config file
+        radius=0.3
+        radius2=radius*radius
+
+
+        #Find out if any of the spins are under the mouse and record the closest
+        self.hover=-1     #The index of the spin the user is hovering over
+        self.hoverDist=0  #This distance to that spin
 
         viewport   = glGetIntegerv(GL_VIEWPORT);
         mvmatrix   = glGetDoublev(GL_MODELVIEW_MATRIX);
         projmatrix = glGetDoublev(GL_PROJECTION_MATRIX);
         worldFarX, worldFarY ,worldFarZ  = gluUnProject(self.mousex,height-self.mousey-1,1.0,mvmatrix,projmatrix,viewport);
         worldNearX,worldNearY,worldNearZ = gluUnProject(self.mousex,height-self.mousey-1,0.0,mvmatrix,projmatrix,viewport);
+        for i in range(spinCount):
+            thisSpin=self.ss.getSpinByIndex(i);
+            coords=thisSpin.getCoords()
+            #The distance from the near clipping plane is reused in the colision detection
+            clipDist2=(worldNearX-coords[0])**2 +    (worldNearY-coords[1])**2 + (worldNearZ-coords[2])**2
+            if clipDist2 > self.hoverDist and self.hover!=-1:
+                continue; #We already found a closer spin, so there isn't any point in checking this one
 
-        #glPushMatrix();
-        #glTranslatef(coords[0],coords[1],coords[2]);
-        #glMultMatrixf(mat)
-        #glScale(0.04,0.04,0.04)
-        #glCallList(self.sphereWire);
-        #glPopMatrix();
+            #Cast a ray from the eye to worldx,worldy,worldz and see if it collides with anything.
+            #There four equations which combine into quadratic equation. If the descrimiate indicates a real
+            #solution then the ray hits the sphere.
+            Rx=worldNearX-worldFarX
+            Ry=worldNearY-worldFarY
+            Rz=worldNearZ-worldFarZ
 
+            A =    Rx**2+                         Ry**2                    + Rz**2
+            B = 2*(Rx*(worldNearX-coords[0]) +    Ry*(worldNearY-coords[1]) + Rz*(worldNearZ-coords[2]))
+            C =    clipDist2 - radius2
 
-        #Move these to some sort of config file
-        radius=0.3
-        radius2=radius*radius
+            desc=B**2-4*A*C
+            if desc > 0:
+                self.hover=i
+                self.hoverDist=clipDist2
+            
+
 
         for i in range(spinCount):
             thisSpin=self.ss.getSpinByIndex(i)
@@ -291,27 +317,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glCallList(self.sphereWire);
             glPopMatrix();
             
-            #Cast a ray from the eye to worldx,worldy,worldz and see if it collides with anything.
-            #There four equations which combine into quadratic equation. If the descrimiate indicates a real
-            #solution then the ray hits the sphere.
 
 
-            Rx=worldNearX-worldFarX
-            Ry=worldNearY-worldFarY
-            Rz=worldNearZ-worldFarZ
-
-            A =    Rx**2+                         Ry**2                    + Rz**2
-            B = 2*(Rx*(worldNearX-coords[0]) +    Ry*(worldNearY-coords[1]) + Rz*(worldNearZ-coords[2]))
-            C =    (worldNearX-coords[0])**2 +    (worldNearY-coords[1])**2 + (worldNearZ-coords[2])**2 - radius2
-
-
-
-            desc=B**2-4*A*C
-
-
-            if(desc>0):
-                glMaterialfv(GL_FRONT, GL_SPECULAR, redSpecularMaterial);
-                glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteSpecularMaterial);
+            if(self.hover==i):
+                glMaterialfv(GL_FRONT, GL_SPECULAR, redMaterial);
+                glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
             else:
                 letter,num=splitSymbol(thisSpin.getIsotope())
                 if (letter in self.colourDict):
@@ -328,8 +338,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
         
             #Now draw in bonds to nearby atoms
 
-            glMaterialfv(GL_FRONT, GL_SPECULAR, blueSpecularMaterial);
-            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteSpecularMaterial);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
+            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
             nearby=self.ss.getNearbySpins(i,1.8)
             glColor3f(1.0, 0.0, 0.0);
             for index in nearby:

@@ -530,14 +530,9 @@ double SpinachInteraction::getAsScalar() const {
     //Return the identity multipled by the scalar
     double s=getScalar().get();
     return s;
-  } else if(getForm()==INTER_MATRIX) {
-    return 0;
-  } else if(getForm()==INTER_EIGENVALUES) {
-    return 0;
   } else {
-    cerr << "Interaction type not suported in getAsScalar()" << endl;
+    return getAsMatrix().trace();
   }
-  return 0;
 }
 
 long SpinachInteraction::getForm() const {

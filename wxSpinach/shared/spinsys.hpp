@@ -150,6 +150,7 @@ public:
 	  double a20,double a21,double a22);
   double get(long i1,long i2) const {return getElement()[3*i1+i2];}
   void set(long i1,long i2, double a) {getElement()[3*i1+i2]=a;}
+  double trace(){return getElement()[0]+getElement()[4]+getElement()[8];}
   void dump() const;  
   ///Add two matricese together in the expected way.
   Matrix3 operator+(const Matrix3& m) const;

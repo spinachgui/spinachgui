@@ -107,8 +107,8 @@
           <xs:element name="span_skew">
             <xs:complexType>
               <xs:attribute name="iso" type="xs:double" />
-              <xs:attribute name="ax" type="xs:double" />
-              <xs:attribute name="rh" type="xs:double" />
+              <xs:attribute name="span" type="xs:double" />
+              <xs:attribute name="skew" type="xs:double" />
             </xs:complexType>
           </xs:element>
         </xs:choice>

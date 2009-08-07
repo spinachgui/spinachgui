@@ -196,6 +196,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOTION,self.onMouseMove)
         self.Bind(wx.EVT_MOUSEWHEEL,self.onWheel)
         self.Bind(wx.EVT_RIGHT_UP,self.onRightClick)
+        self.Bind(wx.EVT_LEFT_UP,self.onLeftClick)
 
         #Create a dictionary of colours
         self.colourDict={}
@@ -322,6 +323,9 @@ class glDisplay(wx.glcanvas.GLCanvas):
             if(self.hover==i):
                 glMaterialfv(GL_FRONT, GL_SPECULAR, redMaterial);
                 glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
+            elif(i in self.selected):
+                glMaterialfv(GL_FRONT, GL_SPECULAR, selectedMaterial);
+                glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);                
             else:
                 letter,num=splitSymbol(thisSpin.getIsotope())
                 if (letter in self.colourDict):
@@ -397,6 +401,14 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.mousex=e.GetX();
         self.mousey=e.GetY();
         self.Refresh()
+
+    def onLeftClick(self,e):
+        if(not e.ShiftDown()):
+            self.selected=[]
+        if self.hover != -1:
+            self.selected.append(self.hover);
+        self.Refresh()
+
 
     def onRightClick(self,e):
         if(not e.Dragging()):

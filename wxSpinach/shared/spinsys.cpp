@@ -6,6 +6,7 @@
 #include <string>
 #include <boost/algorithm/string/trim.hpp>
 #include <shared/nuclear_data.hpp>
+#include <cmath>
 
 using namespace std;
 
@@ -579,7 +580,7 @@ SpinachFrame::SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {
 
 Matrix3::Matrix3(double a00,double a01,double a02,
 		 double a10,double a11,double a12,
-		 double a20,double a21,double a22) {
+		 double a20,double a21,double a22) : foundEigenVals(false) {
   ElementSequence elements;
   elements.resize(9);
   elements[0]=a00;
@@ -594,6 +595,41 @@ Matrix3::Matrix3(double a00,double a01,double a02,
   elements[7]=a21;
   elements[8]=a22;
   setElement(elements);
+}
+
+double Matrix3::det() const {
+  return
+    get(0,0)  *  (get(1,1)*get(2,2)-get(1,2)*get(2,1))+
+    get(1,0)  *  (get(0,1)*get(2,2)-get(0,2)*get(2,1))-
+    get(2,0)  *  (get(0,1)*get(1,2)-get(1,1)*get(0,2));
+}
+
+void Matrix3::calcEigenvalues() const {
+  //Find the 3 coefficents of the characteristic polynomial
+  //This formulate was taken from the wikipedia page, the correctness should
+  //be evident when it is used for arrow drawing
+
+
+  //Fun fact, b,c,d are coefficents of the characteristic polynomial. They are also the three
+  //invarients of the matrix. Coincidence? I think not.
+  double b=get(0,0)+get(1,1)+get(2,2);
+  double c=get(1,0)*get(0,1) + get(2,0)*get(0,2) + get(1,2)*get(2,1) - get(0,0)*get(1,1) - get(0,0)*get(2,2) - get(1,1)*get(2,2);
+  double d=det();
+
+  double x = 3*c - b*b/3;
+  double y = 2*b*b*b - 9*b*c + 27*d/27;
+  double z = y*y/4 + x*x*x/27;
+
+  double i = sqrt(y*y/4 - z);
+  double j = -pow(i,1.0/3.0);
+  double k = acos(-(y/2/i));
+  double m = cos(k/3);
+  double n = sqrt(3)*sin(k/3);
+  double p = -(b/3);
+
+  eigx = -2*j*m + p;
+  eigy = j*(m + n) + p;
+  eigz = j*(m - n) + p;
 }
 
 void Matrix3::dump() const {

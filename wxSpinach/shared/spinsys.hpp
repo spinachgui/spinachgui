@@ -2,7 +2,7 @@
 #include <shared/spinsys_spec.hpp>
 #include <iostream>
 #include <vector>
-
+#include <complex>
 
 using namespace std;
 
@@ -160,16 +160,23 @@ private:
   ///in eigx, eigy, eigz, which act as a mutable cache.
   void calcEigenvalues() const;
 public:
-  ///Eigenvalues
-  double getEigenValX() const {if(!foundEigenVals){calcEigenvalues();} return eigx;}
-  double getEigenValY() const {if(!foundEigenVals){calcEigenvalues();} return eigy;}
-  double getEigenValZ() const {if(!foundEigenVals){calcEigenvalues();} return eigz;}
+  ///Eigenvalues and eigenvectors
+  complex<double> getEigenValX() const {if(!foundEigenVals){calcEigenvalues();} return eigx;}
+  complex<double> getEigenValY() const {if(!foundEigenVals){calcEigenvalues();} return eigy;}
+  complex<double> getEigenValZ() const {if(!foundEigenVals){calcEigenvalues();} return eigz;}
+
+  Vector getEigenvectorX() const;
+  Vector getEigenvectorY() const;
+  Vector getEigenvectorZ() const;
+
+  ///Use the matrix as a set of simultaious equations
+  Vector solveSimEq(double y1,double y2,double y3) const;
   
   ///Get the determinate of the matrix
   double det() const;
 private:
   mutable bool foundEigenVals;
-  mutable double eigx;
-  mutable double eigy;
-  mutable double eigz;
+  mutable complex<double> eigx;
+  mutable complex<double> eigy;
+  mutable complex<double> eigz;
 };

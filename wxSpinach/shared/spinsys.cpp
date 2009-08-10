@@ -7,6 +7,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <shared/nuclear_data.hpp>
 #include <cmath>
+#include <complex>
 
 using namespace std;
 
@@ -610,26 +611,38 @@ void Matrix3::calcEigenvalues() const {
   //be evident when it is used for arrow drawing
 
 
-  //Fun fact, b,c,d are coefficents of the characteristic polynomial. They are also the three
+  //Fun fact, a,b,c are coefficents of the characteristic polynomial. They are also the three
   //invarients of the matrix. Coincidence? I think not.
-  double b=get(0,0)+get(1,1)+get(2,2);
-  double c=get(1,0)*get(0,1) + get(2,0)*get(0,2) + get(1,2)*get(2,1) - get(0,0)*get(1,1) - get(0,0)*get(2,2) - get(1,1)*get(2,2);
-  double d=det();
+  double a=-(get(0,0)+get(1,1)+get(2,2));
+  double b=-(get(1,0)*get(0,1) + get(2,0)*get(0,2) + get(1,2)*get(2,1) - get(0,0)*get(1,1) - get(0,0)*get(2,2) - get(1,1)*get(2,2));
+  double c=-det();
 
-  double x = 3*c - b*b/3;
-  double y = 2*b*b*b - 9*b*c + 27*d/27;
-  double z = y*y/4 + x*x*x/27;
+  cout << "a=" << a << " b=" << b << " c=" << c << endl;
 
-  double i = sqrt(y*y/4 - z);
-  double j = -pow(i,1.0/3.0);
-  double k = acos(-(y/2/i));
-  double m = cos(k/3);
-  double n = sqrt(3)*sin(k/3);
-  double p = -(b/3);
+  double m=2*a*a*a-9*a*b+27*c;
+  double k=a*a-3*b;
+  complex<double> n=complex<double>(m*m - 4*k*k*k,0);
+  complex<double> omega1=complex<double>(-1/2.0,sqrt(3)/2);
+  complex<double> omega2=complex<double>(-1/2.0,-sqrt(3)/2);
 
-  eigx = -2*j*m + p;
-  eigy = j*(m + n) + p;
-  eigz = j*(m - n) + p;
+  complex<double> beta1=m+sqrt(n);
+  complex<double> beta2=m-sqrt(n);
+
+  complex<double> alpha1=pow(beta1/2.0,1/3.0);
+  complex<double> alpha2=pow(beta2/2.0,1/3.0);
+
+
+  complex<double> x1 = -(a+       alpha1 +        alpha2)/3.0;
+  complex<double> x2 = -(a+omega2*alpha1 + omega1*alpha2)/3.0;
+  complex<double> x3 = -(a+omega1*alpha1 + omega2*alpha2)/3.0;
+
+  cout << "x1=" << x1 << " x2=" << x2 << " x3=" << x3 << endl;
+
+  eigx = real(x1);
+  eigy = real(x2);
+  eigz = real(x3);
+  
+  cout << "eigx=" << eigx << " eigy=" << eigy << " eigz=" << eigz << endl;
 }
 
 void Matrix3::dump() const {
@@ -665,3 +678,139 @@ Matrix3 Matrix3::operator+(const Matrix3& m) const {
 		 get(2,2)+m.get(2,2));
   return retVal;
 }
+
+Vector Matrix3::getEigenvectorX() const {
+  if(!foundEigenVals) {
+    calcEigenvalues();
+  }
+  //Chose a value for x1, in this case, let x1=1
+  //Then solve the two remaining simultanious equations
+  complex<double> y1=-get(0,1);
+  complex<double> y2=-get(0,2);
+
+  //Diagonalise the 2 by 2 submatrix, watching out for any division by zero
+  complex<double> j,k,w1,w2;
+  if(get(1,2)!=0) {
+    j=get(2,1)/(get(1,1)-eigx);
+    w1=y1/(get(1,1)-eigx);
+
+    k=(get(2,2)-eigx)/get(1,2) - j;
+    w2=y2/get(1,2)-w1;
+  } else {
+    cout << "zero found " << endl;
+    j=get(2,1)/(get(1,1)-eigx);
+    w1=y1/(get(1,1)-eigx);
+
+    k=(get(2,2)-eigx);
+    w2=y2;
+    cout << " j=" << j << " w1=" << w1 << endl;
+  }
+
+
+  complex<double> v2=w2/k;
+  complex<double> v1=w1-j*v2;
+
+  cout << " unnormaized=(1.0," << v1 << ","  << v2 << ")" << endl;
+
+  //Normalise
+  cout << " w1=" << w1 << " v2=" << v2 << endl;
+  complex<double> norm=sqrt(1.0+w1*w1+v2*v2);
+
+  Vector eig((1.0/norm).real(),(w1/norm).real(),(v2/norm).real());
+
+  return eig;
+}
+
+Vector Matrix3::getEigenvectorY() const {
+  if(!foundEigenVals) {
+    calcEigenvalues();
+  }
+  /*n  //Chose a value for x1, in this case, let x1=1
+  //Then solve the two remaining simultanious equations
+  double y1=eigx-get(0,0);
+  double y2=eigx-get(0,2);
+
+  double j=get(2,0)/get(0,0);
+  double k=get(2,2)/get(0,2) - j;
+
+  double w1=y1/get(0,0);
+  double w2=y2/get(0,2)-y2/get(0,0);
+
+  double v3=w2/k;
+
+  //Normalise
+  double norm=sqrt(1+w1*w1+v3*v3);
+
+  Vector eig(1.0/norm,w1/norm,v3/norm);
+  */
+  return Vector(1.0,1.0,1.0);
+}
+
+Vector Matrix3::getEigenvectorZ() const {
+  if(!foundEigenVals) {
+    calcEigenvalues();
+  }
+  //Chose a value for x1, in this case, let x1=1
+  //Then solve the two remaining simultanious equations
+  /*double y1=eigx-get(0,0);
+  double y2=eigx-get(0,1);
+
+  double j=get(1,0)/get(0,0);
+  double k=get(1,1)/get(0,1) - j;
+
+  double w1=y1/get(0,0);
+  double w2=y2/get(0,1)-y2/get(0,0);
+
+  double v3=w2/k;
+
+  //Normalise
+  double norm=sqrt(1+w1*w1+v3*v3);
+
+  Vector eig(1/norm,w1/norm,v3/norm);
+  */
+  return Vector(1.0,1.0,1.0);
+}
+
+Vector Matrix3::solveSimEq(double y1,double y2,double y3) const {
+  //This function may not actually be needed
+  //First iteration, make every value on the top first collum zero except the first
+  //Which will be one.
+
+  //Start with the following matrix:
+  // (a,b,c,
+  //  d,e,f
+  //  g,h,i) where b=get(1,0) for example
+
+  double j = get(1,0)/get(0,0);
+  double k = get(2,0)/get(0,0);
+  double l = get(1,1)/get(0,1)-j;
+  double m = get(2,1)/get(0,1)-k;
+  double n = get(1,2)/get(0,2)-j;
+  double p = get(2,2)/get(0,2)-k;;
+
+  //Now we have
+  // (1,j,k,
+  //  0,l,m,
+  //  0,n,p)
+  //Repeate the process with the lower 2x2 matrix
+
+  double q=m/l;
+  double r=p/n-q;
+
+  //Matrix is in the form
+  // (1,j,k,
+  //  0,1,q,
+  //  0,0,r)
+
+  double w1=y1/get(0,0);
+  double w2=y2/get(0,1)-w1;
+  double w3=y2/get(0,2)-w1;
+
+  //z1=w1
+  double z2=w2/l;
+  double z3=(w3/n-w2/l)/r;
+
+  return Vector(w1,z2,z3);
+}
+
+

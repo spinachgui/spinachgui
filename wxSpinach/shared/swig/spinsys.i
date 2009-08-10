@@ -22,6 +22,12 @@
   }
 }
 
+%typemap(out) std::complex<double>
+{
+  $result=PyComplex_FromDoubles($1.real(),$1.imag());
+}
+
+
 
 class SpinsysXMLRoot {
 public:
@@ -147,4 +153,13 @@ public:
   void set(long i1,long i2, double a);
   void dump() const;  
 
+  std::complex<double> getEigenValX() const {if(!foundEigenVals){calcEigenvalues();} return eigx;}
+  std::complex<double> getEigenValY() const {if(!foundEigenVals){calcEigenvalues();} return eigy;}
+  std::complex<double> getEigenValZ() const {if(!foundEigenVals){calcEigenvalues();} return eigz;}
+
+  Vector getEigenvectorX() const;
+  Vector getEigenvectorY() const;
+  Vector getEigenvectorZ() const;
+
+  double det() const;
 };

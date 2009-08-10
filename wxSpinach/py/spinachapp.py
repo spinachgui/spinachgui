@@ -10,6 +10,9 @@ from OpenGL.GL import *
 
 from numpy import *
 
+import time
+
+
 #Define some openGL materials
 whiteMaterial = array([0.5, 0.5, 0.5],float32); 
 blueMaterial = array([0.06, 0.06, 0.4],float32); 
@@ -147,7 +150,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
         glNewList(self.sphereSolid,GL_COMPILE);
-        gluSphere(qobj,1.0,32,32);
+        gluSphere(qobj,1.0,12,12);
         glEndList();
         gluDeleteQuadric(qobj);
 
@@ -210,6 +213,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.Refresh()
 
     def onPaint(self,e):
+        t1=time.time()
 	glColor3f(0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT)
         glClear(GL_DEPTH_BUFFER_BIT)
@@ -272,9 +276,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         projmatrix = glGetDoublev(GL_PROJECTION_MATRIX);
         worldFarX, worldFarY ,worldFarZ  = gluUnProject(self.mousex,height-self.mousey-1,1.0,mvmatrix,projmatrix,viewport);
         worldNearX,worldNearY,worldNearZ = gluUnProject(self.mousex,height-self.mousey-1,0.0,mvmatrix,projmatrix,viewport);
+        tsetup=time.time()
         for i in range(spinCount):
             thisSpin=self.ss.getSpinByIndex(i);
             coords=thisSpin.getCoords()
+
             #The distance from the near clipping plane is reused in the colision detection
             clipDist2=(worldNearX-coords[0])**2 +    (worldNearY-coords[1])**2 + (worldNearZ-coords[2])**2
             if clipDist2 > self.hoverDist and self.hover!=-1:
@@ -297,10 +303,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
                 self.hoverDist=clipDist2
             
 
+        tspins=time.time()
 
         for i in range(spinCount):
             thisSpin=self.ss.getSpinByIndex(i)
             coords=thisSpin.getCoords()
+
             glColor3f(1.0, 1.0, 1.0);
             #Draw in the single spin interaction tensor
             mat3=self.ss.GetTotalInteractionOnSpinAsMatrix(i)
@@ -317,7 +325,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glScale(0.04,0.04,0.04)
             glCallList(self.sphereWire);
             glPopMatrix();
-            
 
 
             if(self.hover==i):
@@ -329,8 +336,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
             else:
                 letter,num=splitSymbol(thisSpin.getIsotope())
                 if (letter in self.colourDict):
-                    glMaterialfv(GL_FRONT, GL_SPECULAR, self.colourDict[letter]);
-                    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, self.colourDict[letter]);
+                     glMaterialfv(GL_FRONT, GL_SPECULAR, self.colourDict[letter]);
+                     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, self.colourDict[letter]);
             glPushMatrix();
             glTranslatef(coords[0],coords[1],coords[2]);
             glScale(radius,radius,radius);
@@ -352,13 +359,15 @@ class glDisplay(wx.glcanvas.GLCanvas):
                             (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
                             (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
 
-                #Now we need to find the rotation between the z axis
+               #Now we need to find the rotation between the z axis
                 angle=acos((otherCoords[2]-coords[2])/bondLength)
                 glPushMatrix();
                 glTranslatef(coords[0],coords[1],coords[2]);
                 glRotate(angle/2/pi*360,coords[1]-otherCoords[1],otherCoords[0]-coords[0],0)
-                gluCylinder(qobj,0.1,0.1,bondLength,10,10)
+                gluCylinder(qobj,0.1,0.1,bondLength,7,7)
                 glPopMatrix();
+
+        tbonds=time.time()
 
         glDisable(GL_LIGHTING);   
         glDisable(GL_LIGHT0);     
@@ -387,9 +396,14 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         glColor3f(0.0, 0.0, 1.0);
 
+        tj=time.time()
 
         self.SwapBuffers()
-
+        t2=time.time()
+        print ("Render time=" +str(t2-t1) + "ms , approx fps=" +str(1/(t2-t1)) + 
+               "s^-1 (setup=" + str(tsetup-t1) + ", spins=" + str(tspins-tsetup) + ", bonds="+
+               str(tbonds-tspins)+", j="+str(tj-tbonds)+", tswap="+str(t2-tj)+")")
+        
     def onMouseMove(self,e):
         if(e.Dragging() and e.RightIsDown()):
             self.xTranslate=self.xTranslate+(e.GetX()-self.mousex)

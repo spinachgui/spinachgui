@@ -11,6 +11,59 @@
 
 using namespace std;
 
+//============================================================//
+// Utility Functions
+
+typedef complex<double> cdouble;
+
+void solveCubic(cdouble a,cdouble b,cdouble c,cdouble& z1, cdouble& z2, cdouble& z3) {
+  //Define some numerical constants
+
+  static const cdouble i=cdouble(0.0,1.0);
+  static const double root3(sqrt(3.0));
+  static const double croot2(pow(2.0,1.0/3.0));
+  static const double croot3(pow(3.0,1.0/3.0));
+
+  //Equation is in the form z^3 + az^2 + bz + c = 0
+  const cdouble n=-a*a/3.0 + b;
+  const cdouble m=2.0*a*a*a/27.0 - a*b/3.0 + c;
+
+  //Equation is no in the form x^3 + nx + m == 0 where x = z - a/3
+  //And has a simpler solution (see the mathmatica notebook
+
+  const cdouble p=-9.0*m + sqrt(81.0*m*m+12.0*n*n*n);
+  
+  //The solutions for x are now pretty much as simple as their going to be (see notebook)
+  const cdouble crootp  = pow(p,1.0/3.0);
+  const cdouble crootp2 = crootp*crootp;
+  const cdouble x1num = -2.0*croot3*             n +   croot2*            crootp2;
+  const cdouble x2num =  2.0*cdouble(root3, 3.0)*n + i*croot2*sqrt(root3)*crootp2*cdouble(root3,1.0);
+  const cdouble x3num =  2.0*cdouble(root3,-3.0)*n +   croot2*sqrt(root3)*crootp2*cdouble(-1.0,-root3);
+
+  const cdouble x1denom =                  pow(6.0,2.0/3.0)*crootp;
+  const cdouble x2denom = pow(2.0,5.0/3.0)*pow(3.0,5.0/6.0)*crootp;
+  const cdouble x3denom = pow(2.0,5.0/3.0)*pow(3.0,5.0/6.0)*crootp;
+
+  const cdouble x1=x1num/x1denom;
+  const cdouble x2=x2num/x2denom;
+  const cdouble x3=x3num/x3denom;
+
+
+  cout << "x1=" << x1 << " x2=" << x2 << " x3=" << x3 << endl;
+  cout << "g(x1)=" << x1*x1*x1 + n*x1 + m << endl;
+  cout << "g(x2)=" << x2*x2*x2 + n*x2 + m << endl;
+  cout << "g(x3)=" << x3*x3*x3 + n*x3 + m << endl;
+
+
+  z1=x1num/x1denom - a/3.0;
+  z2=x2num/x2denom - a/3.0;
+  z3=x3num/x3denom - a/3.0;
+  return;
+}
+
+//============================================================//
+//
+
 SpinsysXMLRoot::SpinsysXMLRoot() : mXMLSpinSys(new SpinachSpinsys()) {
   cout << "The size of a newly created set of spins is " << mXMLSpinSys->getSpin().size() << endl;
 }
@@ -620,32 +673,15 @@ void Matrix3::calcEigenvalues() const {
 
   cout << "a=" << a << " b=" << b << " c=" << c << endl;
 
-  double m=2*a*a*a-9*a*b+27*c;
-  double k=a*a-3*b;
-  complex<double> n=complex<double>(m*m - 4*k*k*k,0);
-  complex<double> omega1=complex<double>(-1/2.0,sqrt(3)/2);
-  complex<double> omega2=complex<double>(-1/2.0,-sqrt(3)/2);
+  solveCubic(a,b,c,eigx,eigy,eigz);
 
-  complex<double> beta1=m+sqrt(n);
-  complex<double> beta2=m-sqrt(n);
-
-  complex<double> alpha1=pow(beta1/2.0,1/3.0);
-  complex<double> alpha2=pow(beta2/2.0,1/3.0);
-
-
-  complex<double> x1 = -(a+       alpha1 +        alpha2)/3.0;
-  complex<double> x2 = -(a+omega2*alpha1 + omega1*alpha2)/3.0;
-  complex<double> x3 = -(a+omega1*alpha1 + omega2*alpha2)/3.0;
-
+  cdouble x1=eigx,x2=eigy,x3=eigz;
   cout << "x1=" << x1 << " x2=" << x2 << " x3=" << x3 << endl;
   cout << "f(x1)=" << x1*x1*x1 + a*x1*x1 + b*x1 + c << endl;
   cout << "f(x2)=" << x2*x2*x2 + a*x2*x2 + b*x2 + c << endl;
   cout << "f(x3)=" << x3*x3*x3 + a*x3*x3 + b*x3 + c << endl;
 
-  eigx = x1;
-  eigy = x2;
-  eigz = x3;
-  
+
   cout << "eigx=" << eigx << " eigy=" << eigy << " eigz=" << eigz << endl;
 }
 
@@ -689,11 +725,11 @@ Vector Matrix3::getEigenvectorX() const {
   }
   //Chose a value for x1, in this case, let x1=1
   //Then solve the two remaining simultanious equations
-  complex<double> y1=-get(0,1);
-  complex<double> y2=-get(0,2);
+  cdouble y1=-get(0,1);
+  cdouble y2=-get(0,2);
 
   //Diagonalise the 2 by 2 submatrix, watching out for any division by zero
-  complex<double> j,k,w1,w2;
+  cdouble j,k,w1,w2;
   if(get(1,2)!=0) {
     j=get(2,1)/(get(1,1)-eigx);
     w1=y1/(get(1,1)-eigx);
@@ -711,14 +747,14 @@ Vector Matrix3::getEigenvectorX() const {
   }
 
 
-  complex<double> v2=w2/k;
-  complex<double> v1=w1-j*v2;
+  cdouble v2=w2/k;
+  cdouble v1=w1-j*v2;
 
   cout << " unnormaized=(1.0," << v1 << ","  << v2 << ")" << endl;
 
   //Normalise
   cout << " w1=" << w1 << " v2=" << v2 << endl;
-  complex<double> norm=sqrt(1.0+w1*w1+v2*v2);
+  cdouble norm=sqrt(1.0+w1*w1+v2*v2);
 
   Vector eig((1.0/norm).real(),(w1/norm).real(),(v2/norm).real());
 

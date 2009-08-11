@@ -16,7 +16,7 @@ using namespace std;
 
 typedef complex<double> cdouble;
 
-void solveCubic(cdouble a,cdouble b,cdouble c,cdouble& z1, cdouble& z2, cdouble& z3) {
+void solveCubic(const cdouble a,const cdouble b,const cdouble c,cdouble& z1, cdouble& z2, cdouble& z3) {
   //Define some numerical constants
 
   static const cdouble i=cdouble(0.0,1.0);
@@ -24,30 +24,35 @@ void solveCubic(cdouble a,cdouble b,cdouble c,cdouble& z1, cdouble& z2, cdouble&
   static const double croot2(pow(2.0,1.0/3.0));
   static const double croot3(pow(3.0,1.0/3.0));
 
+  static const double twoToTheFiveThirds=pow(2.0,5.0/3.0);
+  static const double threeToTheFiveSixths=pow(3.0,5.0/6.0);
+  
+  static const double pi=3.141592654;
+
   //Equation is in the form z^3 + az^2 + bz + c = 0
   const cdouble n=-a*a/3.0 + b;
   const cdouble m=2.0*a*a*a/27.0 - a*b/3.0 + c;
 
-  //Equation is no in the form x^3 + nx + m == 0 where x = z - a/3
+  //Equation is now in the form x^3 + nx + m == 0 where x = z - a/3
+
   //And has a simpler solution (see the mathmatica notebook
 
-  const cdouble p=-9.0*m + sqrt(81.0*m*m+12.0*n*n*n);
+  //Use vieta's substitution x=w-n/(3w) to get the the cubic equation into the form
+  // w^6 - m w^3 + n^3/27, a quadratic, solve for w^3. Only the positive roots
+  // are required as the negative roots give identical results.
+  const cdouble w3= (-m + sqrt(m*m + 4.0*n*n*n/27.0))/2.0;
+
+  cout << "Should be 0 = " << w3*w3 + m*w3 - n*n*n/27.0 << endl;
   
-  //The solutions for x are now pretty much as simple as their going to be (see notebook)
-  const cdouble crootp  = pow(p,1.0/3.0);
-  const cdouble crootp2 = crootp*crootp;
-  const cdouble x1num = -2.0*croot3*             n +   croot2*            crootp2;
-  const cdouble x2num =  2.0*cdouble(root3, 3.0)*n + i*croot2*sqrt(root3)*crootp2*cdouble(root3,1.0);
-  const cdouble x3num =  2.0*cdouble(root3,-3.0)*n +   croot2*sqrt(root3)*crootp2*cdouble(-1.0,-root3);
+  //There are three roots of w3
+  const cdouble r1 = polar(abs(w3),arg(w3)/3.0);
+  const cdouble r2 = polar(abs(w3),arg(w3)/3.0+2.0*pi/3.0);
+  const cdouble r3 = polar(abs(w3),arg(w3)/3.0+4.0*pi/3.0);
 
-  const cdouble x1denom =                  pow(6.0,2.0/3.0)*crootp;
-  const cdouble x2denom = pow(2.0,5.0/3.0)*pow(3.0,5.0/6.0)*crootp;
-  const cdouble x3denom = pow(2.0,5.0/3.0)*pow(3.0,5.0/6.0)*crootp;
 
-  const cdouble x1=x1num/x1denom;
-  const cdouble x2=x2num/x2denom;
-  const cdouble x3=x3num/x3denom;
-
+  const cdouble x1=r1-n/(3.0*r1);
+  const cdouble x2=r2-n/(3.0*r2);
+  const cdouble x3=r3-n/(3.0*r3);
 
   cout << "x1=" << x1 << " x2=" << x2 << " x3=" << x3 << endl;
   cout << "g(x1)=" << x1*x1*x1 + n*x1 + m << endl;
@@ -55,9 +60,9 @@ void solveCubic(cdouble a,cdouble b,cdouble c,cdouble& z1, cdouble& z2, cdouble&
   cout << "g(x3)=" << x3*x3*x3 + n*x3 + m << endl;
 
 
-  z1=x1num/x1denom - a/3.0;
-  z2=x2num/x2denom - a/3.0;
-  z3=x3num/x3denom - a/3.0;
+  //z1=x1num/x1denom - a/3.0;
+  //z2=x2num/x2denom - a/3.0;
+  //z3=x3num/x3denom - a/3.0;
   return;
 }
 

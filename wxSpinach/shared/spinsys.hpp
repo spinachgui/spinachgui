@@ -149,6 +149,7 @@ public:
 	  double a10,double a11,double a12,
 	  double a20,double a21,double a22);
   double get(long i1,long i2) const {return getElement()[3*i1+i2];}
+  double get(long i) const {return getElement()[i];}
   void set(long i1,long i2, double a) {foundEigenVals=false;getElement()[3*i1+i2]=a;}
   double trace(){return getElement()[0]+getElement()[4]+getElement()[8];}
   void dump() const;  

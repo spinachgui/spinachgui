@@ -602,7 +602,7 @@ double Matrix3::det() const {
   return
     get(0,0)  *  (get(1,1)*get(2,2)-get(1,2)*get(2,1))+
     get(1,0)  *  (get(0,1)*get(2,2)-get(0,2)*get(2,1))-
-    get(2,0)  *  (get(0,1)*get(1,2)-get(1,1)*get(0,2));
+    get(2,0)  *  (get(0,1)*get(1,2)-get(1,1)*get(0,1));
 }
 
 void Matrix3::calcEigenvalues() const {
@@ -614,7 +614,8 @@ void Matrix3::calcEigenvalues() const {
   //Fun fact, a,b,c are coefficents of the characteristic polynomial. They are also the three
   //invarients of the matrix. Coincidence? I think not.
   double a=-(get(0,0)+get(1,1)+get(2,2));
-  double b=-(get(1,0)*get(0,1) + get(2,0)*get(0,2) + get(1,2)*get(2,1) - get(0,0)*get(1,1) - get(0,0)*get(2,2) - get(1,1)*get(2,2));
+  double b=-(get(1,0)*get(0,1) + get(2,0)*get(0,2) + get(1,2)*get(2,1) -
+	     get(0,0)*get(1,1) - get(0,0)*get(2,2) - get(1,1)*get(2,2))/2.0;
   double c=-det();
 
   cout << "a=" << a << " b=" << b << " c=" << c << endl;
@@ -637,10 +638,13 @@ void Matrix3::calcEigenvalues() const {
   complex<double> x3 = -(a+omega1*alpha1 + omega2*alpha2)/3.0;
 
   cout << "x1=" << x1 << " x2=" << x2 << " x3=" << x3 << endl;
+  cout << "f(x1)=" << x1*x1*x1 + a*x1*x1 + b*x1 + c << endl;
+  cout << "f(x2)=" << x2*x2*x2 + a*x2*x2 + b*x2 + c << endl;
+  cout << "f(x3)=" << x3*x3*x3 + a*x3*x3 + b*x3 + c << endl;
 
-  eigx = real(x1);
-  eigy = real(x2);
-  eigz = real(x3);
+  eigx = x1;
+  eigy = x2;
+  eigz = x3;
   
   cout << "eigx=" << eigx << " eigy=" << eigy << " eigz=" << eigz << endl;
 }

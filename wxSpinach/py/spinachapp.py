@@ -1,8 +1,11 @@
 import wx
-import spinsys
-from nuclear_data import *
+import wx.aui
 from wx import xrc 
 from wx import glcanvas 
+import wx.grid
+
+import spinsys
+from nuclear_data import *
 from math import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
@@ -31,7 +34,6 @@ def splitSymbol(symbol):
         else:
             num=num+c
     return (str,num)
-
 
 
 
@@ -93,6 +95,52 @@ def getARotation(parent):
         return None
 
 
+class SpinGridEditPanel(wx.Panel):
+    def __init__(self,parent,ss,res,id=-1):
+        wx.Panel.__init__(self,parent,id)
+        self.res=res
+        self.ss=ss
+
+	self.Sizer=wx.BoxSizer( wx.VERTICAL );
+
+        self.grid=wx.grid.Grid(self,-1)
+
+        self.grid.CreateGrid( self.ss.getSpinCount(), 7 );
+
+        self.grid.EnableEditing( False );
+        self.grid.EnableGridLines( True );
+        self.grid.EnableDragGridSize( True );
+
+        self.grid.SetMargins( 0, 0 ); 
+
+        self.grid.SetColSize( 0, 73 );
+        self.grid.SetColSize( 1, 105 );
+        self.grid.SetColSize( 2, 70 );
+        self.grid.SetColSize( 3, 75 );
+        self.grid.SetColSize( 4, 50 );
+        self.grid.SetColSize( 5, 50 );
+        self.grid.SetColSize( 6, 50 );
+
+        self.grid.EnableDragColMove(False);
+        self.grid.EnableDragColSize(True);
+        self.grid.SetColLabelSize( 30 );
+
+        self.grid.SetColLabelValue( 0, "Selected" );
+        self.grid.SetColLabelValue( 1, "Spin Number" );
+        self.grid.SetColLabelValue( 2, "Element" );
+        self.grid.SetColLabelValue( 3, "Isotopes" );
+        self.grid.SetColLabelValue( 4, "x" );
+        self.grid.SetColLabelValue( 5, "y" );
+        self.grid.SetColLabelValue( 6, "z" );
+        self.grid.SetColLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE );
+	
+        self.grid.SetRowLabelSize( 80 );
+        self.grid.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE );
+	
+        self.SetSizer(self.Sizer);
+        self.Sizer.Add(self.grid,0,wx.ALL | wx.EXPAND,0)
+
+
 class glDisplay(wx.glcanvas.GLCanvas):
     def __init__(self,parent,id=-1):
         super(glDisplay,self).__init__(parent,id)
@@ -138,6 +186,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.sphereWire = glGenLists(1);
        
         qobj = gluNewQuadric();
+
         gluQuadricDrawStyle(qobj,GLU_LINE);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
@@ -512,12 +561,20 @@ class RootFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onFilled, id=xrc.XRCID('mMenuItemFilled'))
 
         #Set up a openGL canvas
-        self.glc = glDisplay(self,-1)
-        self.GetSizer().Add(self.glc, 1, wx.EXPAND | wx.ALL)
+        glNotebookPage=xrc.XRCCTRL(self, 'openglPanel')
+        self.glc = glDisplay(glNotebookPage);#glNotebookPage,-1);
+        glNotebookPage.GetSizer().Add(self.glc, 1, wx.EXPAND | wx.ALL);
         self.dc=wx.PaintDC(self.glc);
 
-        self.glc.setSpinSys(self.ss)
+        self.glc.setSpinSys(self.ss);
         
+
+        #Set up the grid
+        self.notebook=xrc.XRCCTRL(self,'rootNotebook')
+        self.spinGrid=SpinGridEditPanel(self.notebook,self.ss,self.res)
+        self.notebook.AddPage(self.spinGrid,"Grid View");
+
+
         #self.loadFromFile('data/hccch.xml')
         self.loadFromFile('data/tyrosine.log','g03')
         #self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_9.log','g03');

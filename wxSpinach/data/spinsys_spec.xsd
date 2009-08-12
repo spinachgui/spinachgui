@@ -115,7 +115,21 @@
         <xs:element minOccurs="1" maxOccurs="1" name="orientation" type="orientation" />
       </xs:sequence>
     </xs:choice>
-    <xs:attribute name="type" type="xs:string" use="required" />
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="hfc" />
+          <xs:enumeration value="shielding" />
+          <xs:enumeration value="quadrupolar" />
+          <xs:enumeration value="scalar" />
+          <xs:enumeration value="dipolar" />
+          <xs:enumeration value="g-tenser" />
+          <xs:enumeration value="zfs" />
+          <xs:enumeration value="exchange" />
+          <xs:enumeration value="custem" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
     <xs:attribute name="units" type="xs:string" use="required" />
     <xs:attribute name="spin_1" use="required">
       <xs:simpleType>

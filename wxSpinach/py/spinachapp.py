@@ -210,6 +210,9 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
 	glDepthFunc(GL_LEQUAL);
 
+        #Reserve Space for the display lists
+        self.bondDispList=glGenLists(1);
+
 	#glShadeModel(GL_SMOOTH);
         #Adpated from a detailed tutorail on opengl lighting located at
         #http://www.falloutsoftware.com/tutorials/gl/gl8.htm
@@ -258,11 +261,51 @@ class glDisplay(wx.glcanvas.GLCanvas):
         for i in range(getElementCount()):
             self.colourDict[getElementSymbol(i)]=array([getElementR(i), getElementG(i), getElementB(i)],float32);
 
+        self.genBondList()
+
     def onWheel(self,e):
         self.zoom=self.zoom-0.001*e.GetWheelRotation()/e.GetWheelDelta();
         if(self.zoom<0.001):
             self.zoom=0.001;
         self.Refresh()
+
+    def genBondList(self):
+        self.bondDispList
+        glNewList(self.bondDispList,GL_COMPILE);
+
+        qobj = gluNewQuadric();
+        if self.mode=="wireframe":
+            gluQuadricDrawStyle(qobj,GLU_LINE);
+        else:
+            gluQuadricDrawStyle(qobj,GLU_FILL);
+        gluQuadricNormals(qobj,GLU_SMOOTH);
+
+        for i in range(self.ss.getSpinCount()):   #Draw the spins and the bonds
+            thisSpin=self.ss.getSpinByIndex(i)
+            coords=thisSpin.getCoords()
+        
+            #draw in bonds to nearby atoms
+
+            glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
+            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
+            nearby=self.ss.getNearbySpins(i,1.8)
+            glColor3f(1.0, 0.0, 0.0);
+            for index in nearby:
+                otherCoords=self.ss.getSpinByIndex(index).getCoords()
+                bondLength=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
+                            (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
+                            (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
+
+               #Now we need to find the rotation between the z axis
+                angle=acos((otherCoords[2]-coords[2])/bondLength)
+                glPushMatrix();
+                glTranslatef(coords[0],coords[1],coords[2]);
+                glRotate(angle/2/pi*360,coords[1]-otherCoords[1],otherCoords[0]-coords[0],0)
+                gluCylinder(qobj,0.1,0.1,bondLength,7,7)
+                glPopMatrix();
+
+        glEndList();
+
 
     def onPaint(self,e):
         t1=time.time()
@@ -428,25 +471,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
                 glCallList(self.sphereSolid);
             glPopMatrix();
         
-            #Now draw in bonds to nearby atoms
-
-            glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
-            glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
-            nearby=self.ss.getNearbySpins(i,1.8)
-            glColor3f(1.0, 0.0, 0.0);
-            for index in nearby:
-                otherCoords=self.ss.getSpinByIndex(index).getCoords()
-                bondLength=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
-                            (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
-                            (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
-
-               #Now we need to find the rotation between the z axis
-                angle=acos((otherCoords[2]-coords[2])/bondLength)
-                glPushMatrix();
-                glTranslatef(coords[0],coords[1],coords[2]);
-                glRotate(angle/2/pi*360,coords[1]-otherCoords[1],otherCoords[0]-coords[0],0)
-                gluCylinder(qobj,0.1,0.1,bondLength,7,7)
-                glPopMatrix();
+        glCallList(self.bondDispList);
 
         tbonds=time.time()
 
@@ -562,7 +587,7 @@ class RootFrame(wx.Frame):
 
         #Set up a openGL canvas
         glNotebookPage=xrc.XRCCTRL(self, 'openglPanel')
-        self.glc = glDisplay(glNotebookPage);#glNotebookPage,-1);
+        self.glc = glDisplay(glNotebookPage);
         glNotebookPage.GetSizer().Add(self.glc, 1, wx.EXPAND | wx.ALL);
         self.dc=wx.PaintDC(self.glc);
 

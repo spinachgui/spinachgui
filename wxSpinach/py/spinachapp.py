@@ -33,6 +33,8 @@ def splitSymbol(symbol):
     return (str,num)
 
 
+
+
 def getARotation(parent):
     class rotDialog():
         def __init__(self):
@@ -94,6 +96,7 @@ def getARotation(parent):
 class glDisplay(wx.glcanvas.GLCanvas):
     def __init__(self,parent,id=-1):
         super(glDisplay,self).__init__(parent,id)
+        self.parent=parent
         self.ss=None
         self.xRotate=0
         self.yRotate=0
@@ -456,76 +459,76 @@ class glDisplay(wx.glcanvas.GLCanvas):
     def onRightClick(self,e):
         if(not e.Dragging()):
             menu = wx.Menu()
-            for i in range(5):
-                menu.Append(-1, "Test Menu Item")
+            menu.Append(-1, "Test Menu Item")
+            if(self.hover>=0):
+                menu.Append(-1, "Spin Properties...")
+                menu.Bind(wx.EVT_MENU,self.parent.onDisplaySpinPropDialog);
+            if(len(self.selected)==2):
+                menu.Append(-1, "Coupling Properties")                    
    
             self.PopupMenuXY( menu, e.GetX(), e.GetY() )
             menu.Destroy()
 
 
-
-
-class MyApp(wx.App):
-
-    def OnInit(self):
-        self.res = xrc.XmlResource('res/gui.xrc')
-        self.ssroot=spinsys.SpinsysXMLRoot()
+class RootFrame(wx.Frame):
+    def __init__(self,res,ssroot):
+        self.res=res;
+        self.ssroot=ssroot
         self.ss=self.ssroot.getRoot()
-        self.filename=""
-        self.filepath=""
-        self.init_frame()
 
-        return True
+        pre = wx.PreFrame();
+        self.res.LoadOnFrame(pre,None,"rootFrameBase");
+        self.PostCreate(pre);
+        self.SetSize(wx.Size(1024,768));
+        self.init_frame();
 
     def init_frame(self):
-        self.frame = self.res.LoadFrame(None, 'rootFrameBase')
-        self.frame.SetSizeWH(800,600)
-
-        self.toolbar = xrc.XRCCTRL(self.frame,'mRootToolbar')
+        self.toolbar = xrc.XRCCTRL(self,'mRootToolbar')
 
         #Hide the uneeded panels
-        self.spinPanel = xrc.XRCCTRL(self.frame, 'mSpinPanel')
-        self.JCoupPanel = xrc.XRCCTRL(self.frame, 'mJCoupPanel')
+        self.spinPanel = xrc.XRCCTRL(self, 'mSpinPanel')
+        self.JCoupPanel = xrc.XRCCTRL(self, 'mJCoupPanel')
         self.JCoupPanel.Show(False)
-        self.ClusterPanel = xrc.XRCCTRL(self.frame, 'mClusterPanel')
+        self.ClusterPanel = xrc.XRCCTRL(self, 'mClusterPanel')
         self.ClusterPanel.Show(False)
         
         #Populate the spin tree
-        self.spinTree = xrc.XRCCTRL(self.frame,'mSpinTree')
+        self.spinTree = xrc.XRCCTRL(self,'mSpinTree')
         self.spinTree.AddRoot("Spin System")
-
-        #Set up a openGL canvas
-        self.glc = glDisplay(self.frame,-1)
-        self.frame.GetSizer().Add(self.glc, 1, wx.EXPAND | wx.ALL)
-        self.dc=wx.PaintDC(self.glc);
-
+        self.updateSpinTree()
         
         #Setup event handling
-        self.frame.Bind(wx.EVT_MENU, self.onSpinButton, id=xrc.XRCID('mSpinTool'))
-        self.frame.Bind(wx.EVT_MENU, self.onJButton, id=xrc.XRCID('mJTool'))
-        self.frame.Bind(wx.EVT_MENU, self.onClusterButton, id=xrc.XRCID('mClusterTool'))
+        self.Bind(wx.EVT_MENU, self.onSpinButton, id=xrc.XRCID('mSpinTool'))
+        self.Bind(wx.EVT_MENU, self.onJButton, id=xrc.XRCID('mJTool'))
+        self.Bind(wx.EVT_MENU, self.onClusterButton, id=xrc.XRCID('mClusterTool'))
 
-        self.frame.Bind(wx.EVT_MENU, self.onOpen, id=xrc.XRCID('mMenuItemOpen'))
-        self.frame.Bind(wx.EVT_MENU, self.onSave, id=xrc.XRCID('mMenuItemSave'))
-        self.frame.Bind(wx.EVT_MENU, self.onSaveAs, id=xrc.XRCID('mMenuItemSaveAs'))
+        self.Bind(wx.EVT_MENU, self.onOpen, id=xrc.XRCID('mMenuItemOpen'))
+        self.Bind(wx.EVT_MENU, self.onSave, id=xrc.XRCID('mMenuItemSave'))
+        self.Bind(wx.EVT_MENU, self.onSaveAs, id=xrc.XRCID('mMenuItemSaveAs'))
 
-        self.frame.Bind(wx.EVT_MENU, self.onExit, id=xrc.XRCID('mMenuItemExit'))
+        self.Bind(wx.EVT_MENU, self.onExit, id=xrc.XRCID('mMenuItemExit'))
 
-        self.frame.Bind(wx.EVT_MENU, self.onWireframe, id=xrc.XRCID('mMenuItemWireframe'))
-        self.frame.Bind(wx.EVT_MENU, self.onFilled, id=xrc.XRCID('mMenuItemFilled'))
+        self.Bind(wx.EVT_MENU, self.onWireframe, id=xrc.XRCID('mMenuItemWireframe'))
+        self.Bind(wx.EVT_MENU, self.onFilled, id=xrc.XRCID('mMenuItemFilled'))
 
-        self.updateSpinTree()
-
-        self.frame.Show()
+        #Set up a openGL canvas
+        self.glc = glDisplay(self,-1)
+        self.GetSizer().Add(self.glc, 1, wx.EXPAND | wx.ALL)
+        self.dc=wx.PaintDC(self.glc);
 
         self.glc.setSpinSys(self.ss)
-        self.glc.enableGL()   
         
         #self.loadFromFile('data/hccch.xml')
         self.loadFromFile('data/tyrosine.log','g03')
         #self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_9.log','g03');
         #self.saveToFile('data/tyrosine.xml')
 
+        self.testDia=SpinPropDialog(self,self.ss,self.res,0);
+        self.testDia.Show();
+
+    def Show(self):
+        wx.Frame.Show(self);
+        self.glc.enableGL()   
 
  
     def updateSpinTree(self):
@@ -540,23 +543,23 @@ class MyApp(wx.App):
         self.spinPanel.Show(True)
         self.JCoupPanel.Show(False)
         self.ClusterPanel.Show(False)
-        self.frame.Layout();
+        self.Layout();
 
     def onJButton(self,e):
         self.spinPanel.Show(False)
         self.JCoupPanel.Show(True)
         self.ClusterPanel.Show(False)
-        self.frame.Layout();
+        self.Layout();
 
     def onClusterButton(self,e):
         self.spinPanel.Show(False)
         self.JCoupPanel.Show(False)
         self.ClusterPanel.Show(True)
-        self.frame.Layout();
+        self.Layout();
 
     def onOpen(self,e):
         wildcard="Spin XML files (*.xml)|*.xml|G03 Log Files (*.log)|*.log|Plain XYZ Files (*.xyz)|*.xyz|All Files (*.*)|*.*"
-        fd=wx.FileDialog(self.frame,style=wx.FD_OPEN, message="Open a Spin System",wildcard=wildcard) 
+        fd=wx.FileDialog(self,style=wx.FD_OPEN, message="Open a Spin System",wildcard=wildcard) 
         if(fd.ShowModal()):
             fileExt=fd.GetPath()[-3:]
             print fileExt
@@ -584,7 +587,7 @@ class MyApp(wx.App):
         self.ssroot.saveToFile(filename)   
 
     def onSaveAs(self,e):
-        fd=wx.FileDialog(self.frame,style=wx.FD_SAVE, message="Save your Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
+        fd=wx.FileDialog(self,style=wx.FD_SAVE, message="Save your Spin System",wildcard="Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*") 
         if(fd.ShowModal()):
             saveToFile(fd.GetPath().encode('latin-1'))
 
@@ -597,10 +600,47 @@ class MyApp(wx.App):
     def onWireframe(self,e):
         self.glc.setDrawMode('wireframe')
 
-
+    def onDisplaySpinPropDialog(self,e):
+        """Display the spin property dialog for the selected spin"""
+        if (self.glc.hover>=0):
+            dialog=SpinPropDialog(self,self.ss,self.res,self.glc.hover)
+            dialog.Show()
 
     def onExit(self,e):
         exit(0)
+
+        
+        
+
+class SpinPropDialog(wx.Frame):
+    def __init__(self,parent,ss,res,index):
+        self.ss=ss;
+        self.index=index;
+        self.parent=parent;
+        self.res=res;
+        pre = wx.PreFrame();
+        self.res.LoadOnFrame(pre,parent,"SpinDialog")
+        self.PostCreate(pre)
+
+    def Show(self):
+        wx.Frame.Show(self);
+
+
+
+
+class MyApp(wx.App):
+
+    def OnInit(self):
+        self.res = xrc.XmlResource('res/gui.xrc')
+        self.ssroot=spinsys.SpinsysXMLRoot()
+        self.filename=""
+        self.filepath=""
+
+        self.rootFrame=RootFrame(self.res,self.ssroot);
+        self.rootFrame.Show()
+
+        return True
+
 
 if __name__ == '__main__':
     app = MyApp(False)

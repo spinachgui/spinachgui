@@ -65,6 +65,16 @@ public:
   Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
   double GetTotalIsotropicInteractionOnSpinPair(long n,long m);
   void addSpin();
+
+
+  std::complex<double> getEigenValX(long n) const;
+  std::complex<double> getEigenValY(long n) const;
+  std::complex<double> getEigenValZ(long n) const;
+
+  Vector getEigenVecX(long n) const;
+  Vector getEigenVecY(long n) const;
+  Vector getEigenVecZ(long n) const;
+
 };
 
 
@@ -104,6 +114,7 @@ public:
   const char* getFormAsString() const;
   double get(long x, long y) const; //get matrix elements. This really needs replacing
   Matrix3 getAsMatrix() const;
+
 };
 
 

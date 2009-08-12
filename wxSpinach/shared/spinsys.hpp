@@ -60,6 +60,16 @@ public:
   double GetTotalIsotropicInteractionOnSpinPair(long n,long m);
   ///Attach a spin
   void addSpin();
+
+  complex<double> getEigenValX(long n) const {return complex<double>(1,0);}
+  complex<double> getEigenValY(long n) const {return complex<double>(1,0);}
+  complex<double> getEigenValZ(long n) const {return complex<double>(1,0);}
+
+  Vector getEigenVecX(long n) const {return Vector(1,0,0);}
+  Vector getEigenVecY(long n) const {return Vector(0,1,0);}
+  Vector getEigenVecZ(long n) const {return Vector(0,0,1);}
+
+
 protected:
   void loadFromG03File(const char* filename);
   void loadFromXYZFile(const char* filename);

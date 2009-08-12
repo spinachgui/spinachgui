@@ -277,7 +277,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         worldFarX, worldFarY ,worldFarZ  = gluUnProject(self.mousex,height-self.mousey-1,1.0,mvmatrix,projmatrix,viewport);
         worldNearX,worldNearY,worldNearZ = gluUnProject(self.mousex,height-self.mousey-1,0.0,mvmatrix,projmatrix,viewport);
         tsetup=time.time()
-        for i in range(spinCount):
+        for i in range(spinCount):  #Decide which spin is selected
             thisSpin=self.ss.getSpinByIndex(i);
             coords=thisSpin.getCoords()
 
@@ -305,7 +305,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         tspins=time.time()
 
-        for i in range(spinCount):
+        for i in range(spinCount):   #Draw the spins and the bonds
             thisSpin=self.ss.getSpinByIndex(i)
             coords=thisSpin.getCoords()
 
@@ -320,10 +320,39 @@ class glDisplay(wx.glcanvas.GLCanvas):
             #Apply the transformation matrix to warp the sphere
             #print mat
             glPushMatrix();
+
             glTranslatef(coords[0],coords[1],coords[2]);
+
+            glPushMatrix();
             glMultMatrixf(mat)
             glScale(0.04,0.04,0.04)
             glCallList(self.sphereWire);
+            glPopMatrix();
+
+            eValX=self.ss.getEigenValX(i).real;
+            eValY=self.ss.getEigenValY(i).real;
+            eValZ=self.ss.getEigenValZ(i).real;
+
+            eVecX=self.ss.getEigenVecX(i);
+            eVecY=self.ss.getEigenVecY(i);
+            eVecZ=self.ss.getEigenVecZ(i);
+
+            #Draw the three eigenvectors of the interactionx
+            glBegin(GL_LINES);
+            glVertex3f(0,0,0);
+            glVertex3f(eVecX[0]*eValX,eVecX[1]*eValX,eVecX[2]*eValX);
+            glEnd();
+
+            glBegin(GL_LINES);
+            glVertex3f(0,0,0);
+            glVertex3f(eVecY[0]*eValY,eVecY[1]*eValY,eVecY[2]*eValY);
+            glEnd();
+
+            glBegin(GL_LINES);
+            glVertex3f(0,0,0);
+            glVertex3f(eVecZ[0]*eValZ,eVecZ[1]*eValZ,eVecZ[2]*eValZ);
+            glEnd();
+
             glPopMatrix();
 
 
@@ -375,7 +404,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glEnable(GL_BLEND);
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        for i in range(spinCount):
+        for i in range(spinCount):  #Draw the J couplings
             #Do the two spin couplings
             thisSpin=self.ss.getSpinByIndex(i)
             coords=thisSpin.getCoords()            

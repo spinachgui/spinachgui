@@ -585,20 +585,28 @@ class RootFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onWireframe, id=xrc.XRCID('mMenuItemWireframe'))
         self.Bind(wx.EVT_MENU, self.onFilled, id=xrc.XRCID('mMenuItemFilled'))
 
-        #Set up a openGL canvas
-        glNotebookPage=xrc.XRCCTRL(self, 'openglPanel')
-        self.glc = glDisplay(glNotebookPage);
-        glNotebookPage.GetSizer().Add(self.glc, 1, wx.EXPAND | wx.ALL);
-        self.dc=wx.PaintDC(self.glc);
+        #Setup the aui elements (this cannot be done from wxFormBuilder currently)
 
+        self.auiPanel=xrc.XRCCTRL(self,'auiPanel');
+        self.notebook=wx.aui.AuiNotebook(self.auiPanel,-1);
+
+        self.spinGrid=SpinGridEditPanel(self.notebook,self.ss,self.res)
+
+        self.glc = glDisplay(self.notebook);
+        self.dc=wx.PaintDC(self.glc);
         self.glc.setSpinSys(self.ss);
+
+
+        # add the panes to the manager
+        self.notebook.AddPage(self.glc, '3D View')
+        self.notebook.AddPage(self.spinGrid, 'Grid View')
+
+        self.auiPanel.GetSizer().Add(self.notebook,1,wx.EXPAND);
+
+        #Set up a openGL canvas
         
 
         #Set up the grid
-        self.notebook=xrc.XRCCTRL(self,'rootNotebook')
-        self.spinGrid=SpinGridEditPanel(self.notebook,self.ss,self.res)
-        self.notebook.AddPage(self.spinGrid,"Grid View");
-
 
         #self.loadFromFile('data/hccch.xml')
         self.loadFromFile('data/tyrosine.log','g03')

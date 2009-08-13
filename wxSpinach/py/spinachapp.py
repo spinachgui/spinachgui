@@ -95,50 +95,53 @@ def getARotation(parent):
         return None
 
 
-class SpinGridEditPanel(wx.Panel):
+class SpinGridEditPanel(wx.grid.Grid):
     def __init__(self,parent,ss,res,id=-1):
-        wx.Panel.__init__(self,parent,id)
+        wx.grid.Grid.__init__(self,parent,id)
         self.res=res
         self.ss=ss
 
-	self.Sizer=wx.BoxSizer( wx.VERTICAL );
 
-        self.grid=wx.grid.Grid(self,-1)
 
-        self.grid.CreateGrid( self.ss.getSpinCount(), 7 );
+        self.CreateGrid( self.ss.getSpinCount()+1, 10 );
 
-        self.grid.EnableEditing( False );
-        self.grid.EnableGridLines( True );
-        self.grid.EnableDragGridSize( True );
+        self.EnableEditing( False );
+        self.EnableGridLines( True );
+        self.EnableDragGridSize( True );
 
-        self.grid.SetMargins( 0, 0 ); 
+        self.SetMargins( 0, 0 ); 
 
-        self.grid.SetColSize( 0, 73 );
-        self.grid.SetColSize( 1, 105 );
-        self.grid.SetColSize( 2, 70 );
-        self.grid.SetColSize( 3, 75 );
-        self.grid.SetColSize( 4, 50 );
-        self.grid.SetColSize( 5, 50 );
-        self.grid.SetColSize( 6, 50 );
+        self.SetColSize( 0, 73 );
+        self.SetColSize( 1, 105 );
+        self.SetColSize( 2, 70 );
+        self.SetColSize( 3, 75 );
+        self.SetColSize( 4, 50 );
+        self.SetColSize( 5, 50 );
+        self.SetColSize( 6, 50 );
+        self.SetColSize( 7, 50 );
+        self.SetColSize( 8, 50 );
+        self.SetColSize( 9, 50 );
 
-        self.grid.EnableDragColMove(False);
-        self.grid.EnableDragColSize(True);
-        self.grid.SetColLabelSize( 30 );
+        self.EnableDragColMove(False);
+        self.EnableDragColSize(True);
+        self.SetColLabelSize( 30 );
 
-        self.grid.SetColLabelValue( 0, "Selected" );
-        self.grid.SetColLabelValue( 1, "Spin Number" );
-        self.grid.SetColLabelValue( 2, "Element" );
-        self.grid.SetColLabelValue( 3, "Isotopes" );
-        self.grid.SetColLabelValue( 4, "x" );
-        self.grid.SetColLabelValue( 5, "y" );
-        self.grid.SetColLabelValue( 6, "z" );
-        self.grid.SetColLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE );
+        self.SetColLabelValue( 0, "Selected" );
+        self.SetColLabelValue( 1, "Spin Name" );
+        self.SetColLabelValue( 2, "Element" );
+        self.SetColLabelValue( 3, "Isotopes" );
+        self.SetColLabelValue( 4, "x" );
+        self.SetColLabelValue( 5, "y" );
+        self.SetColLabelValue( 6, "z" );
+        self.SetColLabelValue( 7, "Linear Interactions" );
+        self.SetColLabelValue( 8, "Bilinear Interactions" );
+        self.SetColLabelValue( 9, "Quadrapolar Interactions" );
+
+        self.SetColLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE );
 	
-        self.grid.SetRowLabelSize( 80 );
-        self.grid.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE );
+        self.SetRowLabelSize( 80 );
+        self.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE );
 	
-        self.SetSizer(self.Sizer);
-        self.Sizer.Add(self.grid,0,wx.ALL | wx.EXPAND,0)
 
 
 class glDisplay(wx.glcanvas.GLCanvas):

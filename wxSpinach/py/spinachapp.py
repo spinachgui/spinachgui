@@ -12,7 +12,7 @@ from nuclear_data import *
 #Local python imports
 from glDisplay import glDisplay
 from spinGrid import SpinGrid
-
+from spinDialog import SpinDialog
 
 
 
@@ -123,14 +123,13 @@ class RootFrame(wx.Frame):
 
         self.spinGrid=SpinGrid(self.notebook,self)
 
-        self.glc = glDisplay(self.notebook);
+        self.glc = glDisplay(self.notebook,self);
         self.dc=wx.PaintDC(self.glc);
-        self.glc.setSpinSys(self.ss);
 
 
         # add the panes to the manager
-        self.notebook.AddPage(self.spinGrid, 'Grid View')
         self.notebook.AddPage(self.glc, '3D View')
+        self.notebook.AddPage(self.spinGrid, 'Grid View')
 
         self.auiPanel.GetSizer().Add(self.notebook,1,wx.EXPAND);
 
@@ -144,7 +143,7 @@ class RootFrame(wx.Frame):
         #self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_9.log','g03');
         #self.saveToFile('data/tyrosine.xml')
 
-        self.testDia=SpinPropDialog(self,self.ss,self.res,0);
+        self.testDia=SpinDialog(self,self,0);
         self.testDia.Show();
 
     def Show(self):
@@ -200,7 +199,6 @@ class RootFrame(wx.Frame):
         elif type=="xyz":
             self.ssroot.loadFromXYZFile(filename)
         self.ss=self.ssroot.getRoot();
-        self.glc.setSpinSys(self.ss)
         self.updateSpinTree()
         self.spinGrid.refreshFromSpinSystem()
 
@@ -222,11 +220,6 @@ class RootFrame(wx.Frame):
     def onWireframe(self,e):
         self.glc.setDrawMode('wireframe')
 
-    def onDisplaySpinPropDialog(self,e):
-        """Display the spin property dialog for the selected spin"""
-        if (self.glc.hover>=0):
-            dialog=SpinPropDialog(self,self.ss,self.res,self.glc.hover)
-            dialog.Show()
 
     def onExit(self,e):
         exit(0)
@@ -234,18 +227,6 @@ class RootFrame(wx.Frame):
         
         
 
-class SpinPropDialog(wx.Frame):
-    def __init__(self,parent,ss,res,index):
-        self.ss=ss;
-        self.index=index;
-        self.parent=parent;
-        self.res=res;
-        pre = wx.PreFrame();
-        self.res.LoadOnFrame(pre,parent,"SpinDialog")
-        self.PostCreate(pre)
-
-    def Show(self):
-        wx.Frame.Show(self);
 
 
 

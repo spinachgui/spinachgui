@@ -18,6 +18,7 @@ from nuclear_data import *
 
 #Local Imports
 from utils import *
+from spinDialog import SpinDialog
 
 #Define some openGL materials
 whiteMaterial = array([0.5, 0.5, 0.5],float32); 
@@ -30,10 +31,10 @@ selectedMaterial=blueMaterial
 
 
 class glDisplay(wx.glcanvas.GLCanvas):
-    def __init__(self,parent,id=-1):
-        super(glDisplay,self).__init__(parent,id)
+    def __init__(self,parent,data,id=-1):
+        wx.glcanvas.GLCanvas.__init__(self,parent,id)
         self.parent=parent
-        self.ss=None
+        self.data=data
         self.xRotate=0
         self.yRotate=0
         self.rotationMatrix=array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, 0, 0, 1]], float64)
@@ -47,10 +48,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.yTranslate=0;
         self.selected=[]  #List containing all spins which are currently selected
         self.hover=-1   #The closest spin currently sitting under the mouse
-
-    def setSpinSys(self,ss):
-        """Set the spin system that this gl display is displaying"""
-        self.ss=ss
 
     def setDrawMode(self,mode):
         if mode=="wireframe":
@@ -168,18 +165,18 @@ class glDisplay(wx.glcanvas.GLCanvas):
             gluQuadricDrawStyle(qobj,GLU_FILL);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
-        for i in range(self.ss.getSpinCount()):   #Draw the spins and the bonds
-            thisSpin=self.ss.getSpinByIndex(i)
+        for i in range(self.data.ss.getSpinCount()):   #Draw the spins and the bonds
+            thisSpin=self.data.ss.getSpinByIndex(i)
             coords=thisSpin.getCoords()
         
             #draw in bonds to nearby atoms
 
             glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
             glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
-            nearby=self.ss.getNearbySpins(i,1.8)
+            nearby=self.data.ss.getNearbySpins(i,1.8)
             glColor3f(1.0, 0.0, 0.0);
             for index in nearby:
-                otherCoords=self.ss.getSpinByIndex(index).getCoords()
+                otherCoords=self.data.ss.getSpinByIndex(index).getCoords()
                 bondLength=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
                             (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
                             (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
@@ -233,11 +230,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         gluLookAt(self.camX,self.camY,self.camZ,0,0,-1,0,1,0);
         glMultMatrixf(self.rotationMatrix);
 
-        if self.ss==None:
+        if self.data.ss==None:
             self.SwapBuffers()
             return
 
-        spinCount=self.ss.getSpinCount()
+        spinCount=self.data.ss.getSpinCount()
 
         qobj = gluNewQuadric();
         if self.mode=="wireframe":
@@ -262,7 +259,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         worldNearX,worldNearY,worldNearZ = gluUnProject(self.mousex,height-self.mousey-1,0.0,mvmatrix,projmatrix,viewport);
         tsetup=time.time()
         for i in range(spinCount):  #Decide which spin is selected
-            thisSpin=self.ss.getSpinByIndex(i);
+            thisSpin=self.data.ss.getSpinByIndex(i);
             coords=thisSpin.getCoords()
 
             #The distance from the near clipping plane is reused in the colision detection
@@ -290,12 +287,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
         tspins=time.time()
 
         for i in range(spinCount):   #Draw the spins and the bonds
-            thisSpin=self.ss.getSpinByIndex(i)
+            thisSpin=self.data.ss.getSpinByIndex(i)
             coords=thisSpin.getCoords()
 
             glColor3f(1.0, 1.0, 1.0);
             #Draw in the single spin interaction tensor
-            mat3=self.ss.GetTotalInteractionOnSpinAsMatrix(i)
+            mat3=self.data.ss.GetTotalInteractionOnSpinAsMatrix(i)
             #Convert to a openGL 4x4 matrix
             mat=array([[abs(mat3.get(0,0)),abs(mat3.get(0,1)),abs(mat3.get(0,2)),0],
                        [abs(mat3.get(1,0)),abs(mat3.get(1,1)),abs(mat3.get(1,2)),0],
@@ -313,13 +310,13 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glCallList(self.sphereWire);
             glPopMatrix();
 
-            eValX=self.ss.getEigenValX(i).real;
-            eValY=self.ss.getEigenValY(i).real;
-            eValZ=self.ss.getEigenValZ(i).real;
+            eValX=self.data.ss.getEigenValX(i).real;
+            eValY=self.data.ss.getEigenValY(i).real;
+            eValZ=self.data.ss.getEigenValZ(i).real;
 
-            eVecX=self.ss.getEigenVecX(i);
-            eVecY=self.ss.getEigenVecY(i);
-            eVecZ=self.ss.getEigenVecZ(i);
+            eVecX=self.data.ss.getEigenVecX(i);
+            eVecY=self.data.ss.getEigenVecY(i);
+            eVecZ=self.data.ss.getEigenVecZ(i);
 
             #Draw the three eigenvectors of the interactionx
             glBegin(GL_LINES);
@@ -372,11 +369,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         for i in range(spinCount):  #Draw the J couplings
             #Do the two spin couplings
-            thisSpin=self.ss.getSpinByIndex(i)
+            thisSpin=self.data.ss.getSpinByIndex(i)
             coords=thisSpin.getCoords()            
             for j in range(i+1,spinCount):
-                coordsJ=self.ss.getSpinByIndex(j).getCoords()
-                scalar=abs(self.ss.GetTotalIsotropicInteractionOnSpinPair(i,j))/300;
+                coordsJ=self.data.ss.getSpinByIndex(j).getCoords()
+                scalar=abs(self.data.ss.GetTotalIsotropicInteractionOnSpinPair(i,j))/300;
                 glColor4f(scalar,0,0,scalar);
                 glBegin(GL_LINES);
                 glVertex3f(coords[0],coords[1],coords[2]);
@@ -425,10 +422,15 @@ class glDisplay(wx.glcanvas.GLCanvas):
             menu.Append(-1, "Test Menu Item")
             if(self.hover>=0):
                 menu.Append(-1, "Spin Properties...")
-                menu.Bind(wx.EVT_MENU,self.parent.onDisplaySpinPropDialog);
+                menu.Bind(wx.EVT_MENU,self.onDisplaySpinDialog);
             if(len(self.selected)==2):
                 menu.Append(-1, "Coupling Properties")                    
    
             self.PopupMenuXY( menu, e.GetX(), e.GetY() )
             menu.Destroy()
 
+    def onDisplaySpinDialog(self,e):
+        """Display the spin property dialog for the selected spin"""
+        if (self.hover>=0):
+            dialog=SpinDialog(self,self.data,self.hover)
+            dialog.Show()

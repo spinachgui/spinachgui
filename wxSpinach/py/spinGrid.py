@@ -69,7 +69,8 @@ class InterTransientPopup(wx.PopupTransientWindow):
         print size
         self.SetSize((size.width, size.height));
 
-    def ProcessLeftDown(self, evt):
+    def ProcessLeftDown(self, e):
+        e.Skip()
         return False
 
     def OnDismiss(self):
@@ -210,7 +211,6 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         needed.
         """
         pass
-
 
     def Destroy(self):
         """final cleanup"""

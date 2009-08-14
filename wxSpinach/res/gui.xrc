@@ -1009,7 +1009,7 @@
 		<style>wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL</style>
 		<size>442,565</size>
 		<title>Spin Properties</title>
-		<object class="wxPanel" name="m_panel15">
+		<object class="wxPanel" name="spinDialogPanel">
 			<style>wxTAB_TRAVERSAL</style>
 			<object class="wxBoxSizer">
 				<orient>wxVERTICAL</orient>
@@ -1179,53 +1179,6 @@
 					<object class="wxStaticBoxSizer">
 						<orient>wxVERTICAL</orient>
 						<label>Interactions</label>
-						<object class="sizeritem">
-							<option>1</option>
-							<flag>wxEXPAND</flag>
-							<border>5</border>
-							<object class="wxBoxSizer">
-								<orient>wxHORIZONTAL</orient>
-								<object class="sizeritem">
-									<option>0</option>
-									<flag>wxALL|wxEXPAND</flag>
-									<border>5</border>
-									<object class="wxListCtrl" name="interListBox">
-										<style>wxLC_ICON</style>
-										<size>200,-1</size>
-									</object>
-								</object>
-								<object class="sizeritem">
-									<option>1</option>
-									<flag>wxEXPAND</flag>
-									<border>5</border>
-									<object class="wxFlexGridSizer">
-										<rows>2</rows>
-										<cols>2</cols>
-										<vgap>0</vgap>
-										<hgap>0</hgap>
-										<growablecols></growablecols>
-										<growablerows></growablerows>
-										<object class="sizeritem">
-											<option>0</option>
-											<flag>wxALL</flag>
-											<border>5</border>
-											<object class="wxStaticText" name="m_staticText34">
-												<label>Interaction Type</label>
-											</object>
-										</object>
-										<object class="sizeritem">
-											<option>0</option>
-											<flag>wxALL</flag>
-											<border>5</border>
-											<object class="wxChoice" name="m_choice4">
-												<selection>0</selection>
-												<content />
-											</object>
-										</object>
-									</object>
-								</object>
-							</object>
-						</object>
 					</object>
 				</object>
 			</object>
@@ -1409,7 +1362,7 @@
 			</object>
 		</object>
 	</object>
-	<object class="wxPanel" name="EigenSysPanel">
+	<object class="wxPanel" name="EigenIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
 		<size>500,300</size>
 		<object class="wxFlexGridSizer">
@@ -1489,7 +1442,7 @@
 			</object>
 		</object>
 	</object>
-	<object class="wxPanel" name="AxRhomPanel">
+	<object class="wxPanel" name="AxRhomIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
 		<size>500,300</size>
 		<object class="wxFlexGridSizer">
@@ -1569,7 +1522,7 @@
 			</object>
 		</object>
 	</object>
-	<object class="wxPanel" name="SpanSkewPanel">
+	<object class="wxPanel" name="SpanSkewIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
 		<size>500,300</size>
 		<object class="wxFlexGridSizer">
@@ -2133,30 +2086,13 @@
 						<object class="wxBoxSizer">
 							<orient>wxHORIZONTAL</orient>
 							<object class="sizeritem">
-								<option>0</option>
-								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>5</border>
-								<object class="wxStaticText" name="m_staticText34">
-									<label>Type:</label>
-								</object>
-							</object>
-							<object class="sizeritem">
 								<option>1</option>
-								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL</flag>
+								<flag>wxEXPAND | wxALL</flag>
 								<border>5</border>
-								<object class="wxChoice" name="m_choice4">
-									<selection>0</selection>
-									<content />
+								<object class="wxChoicebook" name="TypeChoiceBook">
+									<style>wxCHB_DEFAULT</style>
 								</object>
 							</object>
-						</object>
-					</object>
-					<object class="sizeritem">
-						<option>1</option>
-						<flag>wxEXPAND | wxALL</flag>
-						<border>0</border>
-						<object class="wxPanel" name="interEditHook">
-							<style>wxTAB_TRAVERSAL</style>
 						</object>
 					</object>
 				</object>

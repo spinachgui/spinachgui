@@ -10,12 +10,12 @@ from nuclear_data import *
 
 #Local python imports
 from utils import *
-from interactionEdit import interactionEdit
+from interactionEdit import interactionEdit,InterTextEditor
 
 #Column descriptions
 
 COL_SELECTED=0;   
-COL_NAME=1;       
+COL_LABEL=1;       
 COL_ELEMENT=2;    
 COL_ISOTOPES=3;   
 COL_X=4;          
@@ -27,7 +27,7 @@ COL_QUADRAPOLAR=9;
 
 columnOrder=[
     COL_SELECTED,
-    COL_NAME,
+    COL_LABEL,
     COL_ELEMENT,
     COL_ISOTOPES,
     COL_X,
@@ -41,7 +41,7 @@ columnOrder=[
 #Name,Size
 columnDetails={
     COL_SELECTED   :  ("Selected",73),
-    COL_NAME       :  ("Name",105),
+    COL_LABEL      :  ("Label",105),
     COL_ELEMENT    :  ("Element",70),
     COL_ISOTOPES   :  ("Isotopes",70),
     COL_X          :  ("x",70),
@@ -53,47 +53,6 @@ columnDetails={
 }
 
 
-class InterTransientPopup(wx.PopupTransientWindow):
-    """Adds a bit of text and mouse movement to the wx.PopupWindow"""
-    def __init__(self, parent, style,data):
-        wx.PopupTransientWindow.__init__(self, parent, style)
-        self.data=data
-
-        self.sizer=wx.BoxSizer()
-        self.interPanel=interactionEdit(self,self.data)
-        self.sizer.Add(self.interPanel,1.0,wx.EXPAND);
-        self.SetSizer(self.sizer)
-        
-
-        size = self.interPanel.GetSize()
-        print size
-        self.SetSize((size.width, size.height));
-
-    def ProcessLeftDown(self, e):
-        e.Skip()
-        return False
-
-    def OnDismiss(self):
-        pass
-
-
-class InterTextEditor(wx.TextCtrl):
-    def __init__(self,parent,data,id=-1):
-        wx.TextCtrl.__init__(self,parent,id)
-        self.data=data
-        self.Bind(wx.EVT_SET_FOCUS, self.OnShowPopupTransient, self)
-
-
-    def OnShowPopupTransient(self, e):
-        win = InterTransientPopup(self,wx.SIMPLE_BORDER,self.data)
-
-        # Show the popup right below or above the button
-        # depending on available screen space...
-        pos = self.ClientToScreen(self.GetPosition())
-        size =  self.GetSize()
-        win.Position(pos, (0, size[1]))
-
-        win.Popup()
 
 
 
@@ -113,7 +72,7 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         *Must Override*
         """
         self._tc = InterTextEditor(parent,self.data,id)
-        self._tc.SetInsertionPoint(0)
+        #self._tc.SetInsertionPoint(0)
         self.SetControl(self._tc)
 
         if evtHandler:
@@ -262,6 +221,14 @@ class SpinGrid(wx.grid.Grid):
         for i in range(self.data.ss.getSpinCount()):
             thisSpin=self.data.ss.getSpinByIndex(i);
             coords=thisSpin.getCoords();
+
+            #Set the selected column renderers and editors to be boolian
+            self.SetCellRenderer(i,COL_SELECTED,wx.grid.GridCellBoolRenderer())
+            self.SetCellEditor(i,COL_SELECTED,wx.grid.GridCellBoolEditor())
+
+            #Setup the label and the element columns
+            self.SetCellValue(i,COL_LABEL,thisSpin.getLabel());
+
             self.SetCellValue(i,COL_X,str(coords[0]));
             self.SetCellValue(i,COL_Y,str(coords[1]));
             self.SetCellValue(i,COL_Z,str(coords[2]));

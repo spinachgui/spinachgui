@@ -1431,15 +1431,6 @@
 					<label>Orientation:</label>
 				</object>
 			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl66">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
 		</object>
 	</object>
 	<object class="wxPanel" name="AxRhomIntPanel">
@@ -1511,15 +1502,6 @@
 					<label>Orientation:</label>
 				</object>
 			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl66">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
 		</object>
 	</object>
 	<object class="wxPanel" name="SpanSkewIntPanel">
@@ -1589,15 +1571,6 @@
 				<border>5</border>
 				<object class="wxStaticText" name="m_staticText75">
 					<label>Orientation:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl66">
-					<value></value>
-					<maxlength>0</maxlength>
 				</object>
 			</object>
 		</object>
@@ -2095,6 +2068,21 @@
 							</object>
 						</object>
 					</object>
+				</object>
+			</object>
+		</object>
+	</object>
+	<object class="wxPanel" name="OrientEditPanel">
+		<style>wxTAB_TRAVERSAL</style>
+		<size>500,300</size>
+		<object class="wxBoxSizer">
+			<orient>wxVERTICAL</orient>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxEXPAND | wxALL</flag>
+				<border>5</border>
+				<object class="wxChoicebook" name="OrientChoiceBook">
+					<style>wxCHB_DEFAULT</style>
 				</object>
 			</object>
 		</object>

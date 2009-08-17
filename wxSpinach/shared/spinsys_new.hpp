@@ -16,7 +16,7 @@ class SpinSystemElement {};
 
 class Vector3 {
     Vector3();
-    Vector3(double x,double y,double z);
+    Vector3(double _x,double _y,double _z);
 
     double GetX();
     double GetY();
@@ -36,8 +36,8 @@ class Matrix3 {
     
     const double* GetRaw();
     
-    double Get(long i, long j);
-    double operator() (long i,long j);
+    double Get(long column, long row);
+    double operator() (long column, long row);
     void Set(long i,long j,double val);
   private:
     double raw[9];
@@ -65,7 +65,7 @@ class SpinSystem {
     
      vector<Spin*> mSpins;
      vector<Interaction*> mInteractions;
-     ReferenceFrame* mLabFrame; 
+     ReferenceFrame mLabFrame; 
 };
 
 class Spin {
@@ -89,7 +89,10 @@ class Spin {
     ReferenceFrame* GetFrame();
     void SetFrame(ReferenceFrame* Frame);
   private:
-    SpinSystem* Parent;
+    SpinSystem* mParent;
+    Vector3 mPosition;
+    string mLabel;
+    ReferenceFrame* mFrame;
 };
 
 class Orientation {
@@ -98,6 +101,7 @@ class Orientation {
     ~Orientation();
     
     enum Type {
+        UNDEFINED,
         EULER,
         ANGLE_AXIS,
         QUATERNION,
@@ -148,6 +152,7 @@ class Interaction {
     ~Interaction();
     
     enum Type {
+        UNDEFINED,
         SCALAR,
         MATRIX,
         EIGENVALUES,
@@ -209,6 +214,7 @@ class ReferenceFrame {
     void RemoveChild(ReferenceFrame* Child);
     
     Vector3 GetPosition();
+    void SetPosition(Vector3 Position);
     Orientation* GetOrientation();
     
   private:

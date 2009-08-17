@@ -93,9 +93,10 @@ public:
   Matrix3 getBilinearInteractionAsMatrix(long n,interactionType t) const;
   Matrix3 getQuadrapolarInteractionAsMatrix(long n,interactionType t) const;
 
-  
-
-
+  void insertInteraction(SpinachInteraction inter,long n=-1);
+  SpinachInteraction& getSpinachInteraction(long n);
+  const SpinachInteraction& getSpinachInteraction(long n) const;
+  void removeInteraction(long n) const;
 
   ///Attach a spin
   void addSpin();

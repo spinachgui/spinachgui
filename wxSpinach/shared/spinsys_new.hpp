@@ -55,8 +55,7 @@ class SpinSystem {
     void RemoveSpin(long Position);
     void RemoveSpin(Spin* _Spin);
 
-    ReferenceFrame* GetRootFrame();
-    void SetRootFrame(ReferenceFrame* Frame);
+    const ReferenceFrame* GetRootFrame();
     
     void LoadFromGamesFile(const char* filename);
     void LoadFromG03File(const char* filename);
@@ -64,7 +63,9 @@ class SpinSystem {
   private:
     friend class Spin;
     
-        
+     vector<Spin*> mSpins;
+     vector<Interaction*> mInteractions;
+     ReferenceFrame* mLabFrame; 
 };
 
 class Spin {
@@ -195,8 +196,9 @@ class Interaction {
 };
 
 class ReferenceFrame {
-public:
+  public:
     ReferenceFrame();
+    ReferenceFrame(ReferenceFrame* Parent);
     ~ReferenceFrame();
     
     long GetChildCount();
@@ -207,7 +209,14 @@ public:
     void RemoveChild(ReferenceFrame* Child);
     
     Vector3 GetPosition();
-    Orientation GetOrientation();
+    Orientation* GetOrientation();
+    
+  private:
+    ReferenceFrame* mParent;
+    vector<ReferenceFrame*> mChildren;
+    
+    Vector3 mPosition;
+    Orientation mOrient;
 };
 
 

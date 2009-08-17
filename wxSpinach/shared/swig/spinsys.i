@@ -29,6 +29,28 @@
 
 
 
+enum interactionType {
+  INTER_ANY,
+  INTER_NMR,
+  INTER_EPR,
+
+  //EPR INTERACTIONS
+  INTER_HFC,
+  INTER_GTENSER,
+  INTER_ZFS,
+  INTER_EXCHANGE,
+
+  //NMR INTERACTIONS
+  INTER_SHIELDING,
+  INTER_SCALAR,
+
+  //Interactions relevent to both nmr and epr
+  INTER_QUADRUPOLAR,
+  INTER_DIPOLAR,
+  INTER_CUSTOM
+};
+
+
 class SpinsysXMLRoot {
 public:
   SpinsysXMLRoot();
@@ -75,6 +97,15 @@ public:
   Vector getEigenVecY(long n) const;
   Vector getEigenVecZ(long n) const;
 
+  double getLinearInteractionAsScalar(long n,interactionType t) const;
+  double getBilinearInteractionAsScalar(long n,interactionType t) const;
+  double getQuadrapolarInteractionAsScalar(long n,interactionType t) const;
+
+  Matrix3 getLinearInteractionAsMatrix(long n,interactionType t) const;
+  Matrix3 getBilinearInteractionAsMatrix(long n,interactionType t) const;
+  Matrix3 getQuadrapolarInteractionAsMatrix(long n,interactionType t) const;
+
+
 };
 
 
@@ -114,7 +145,9 @@ public:
   const char* getFormAsString() const;
   double get(long x, long y) const; //get matrix elements. This really needs replacing
   Matrix3 getAsMatrix() const;
-
+  
+  bool isType(long t) const;
+  long getType() const;
 };
 
 

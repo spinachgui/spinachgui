@@ -1,4 +1,5 @@
 
+
 #include <shared/spinsys_spec.hpp>
 #include <iostream>
 #include <vector>
@@ -34,6 +35,27 @@ enum ORIENTATION {
 };
 
 
+enum interactionType {
+  INTER_ANY,
+  INTER_NMR,
+  INTER_EPR,
+
+  //EPR INTERACTIONS
+  INTER_HFC,
+  INTER_GTENSER,
+  INTER_ZFS,
+  INTER_EXCHANGE,
+
+  //NMR INTERACTIONS
+  INTER_SHIELDING,
+  INTER_SCALAR,   
+
+  //Interactions relevent to both nmr and epr
+  INTER_QUADRUPOLAR,
+  INTER_DIPOLAR,
+  INTER_CUSTOM
+};
+
 class SpinachSpinsys : public Spin_system {
   friend class SpinsysXMLRoot;
 public:
@@ -44,20 +66,37 @@ public:
   SpinachSpin getSpinByIndex(long n);
   ///Get the total number of spins in the spin system
   long getSpinCount() const;
+
   ///Get a particular interaction
   SpinachInteraction getInteractionByIndex(long n);
   ///Get the total number of interactions
   long getInteractionCount() const;  
+
   ///Get all spins within distance of spin spinNumber with a higher number
   ///than spinNumber (useful for drawing bonds. If you loop though the structure,
   ///you only need to draw a bond once)
   std::vector<long> getNearbySpins(long spinNumber,double distance);
+
   ///Sum all the interaction matricese involving a given spin and return as a single
   ///matrix
   Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
+
   ///Get the total coupling between a pair of spins (for example, scalar J coupling
   ///Counts here
   double GetTotalIsotropicInteractionOnSpinPair(long n,long m);
+
+  double getLinearInteractionAsScalar(long n,interactionType t) const;
+  double getBilinearInteractionAsScalar(long n,interactionType t) const;
+  double getQuadrapolarInteractionAsScalar(long n,interactionType t) const;
+
+  Matrix3 getLinearInteractionAsMatrix(long n,interactionType t) const;
+  Matrix3 getBilinearInteractionAsMatrix(long n,interactionType t) const;
+  Matrix3 getQuadrapolarInteractionAsMatrix(long n,interactionType t) const;
+
+  
+
+
+
   ///Attach a spin
   void addSpin();
 
@@ -113,6 +152,8 @@ public:
   const char* getFormAsString() const;
   long getForm() const;
   long getSpin1Number() const {return Interaction1::getSpin_1();}
+  bool isType(long t) const;
+  long getType() const;
   double get(long x,long y) const {
     //Danger!
     Matrix m=getMatrix().get();

@@ -8,11 +8,15 @@
 #include <shared/nuclear_data.hpp>
 #include <cmath>
 #include <complex>
+#include <map>
 
 using namespace std;
 
+
+
 //============================================================//
 // Utility Functions
+
 
 typedef complex<double> cdouble;
 
@@ -455,6 +459,95 @@ double SpinachSpinsys::GetTotalIsotropicInteractionOnSpinPair(long n,long m) {
   return totalScalar;
 }
 
+//These are the six ways of querying the value of all the interactions on a spin
+
+double SpinachSpinsys::getLinearInteractionAsScalar(long n,interactionType t) const {
+  double totalScalar=0.0;
+  for(long i=0;i < getInteraction().size();++i) {
+    SpinachInteraction inter=getInteraction()[i];
+    if(inter.getSpin_1()==n && !inter.getSpin_2().present()) {
+      //Interaction is relevent
+      if(inter.isType(t)) {
+	totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
+      }
+    }
+  }
+  return totalScalar;
+}
+
+
+double SpinachSpinsys::getBilinearInteractionAsScalar(long n,interactionType t) const {
+  double totalScalar=0.0;
+  for(long i=0;i < getInteraction().size();++i) {
+    SpinachInteraction inter=getInteraction()[i];
+    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() != n) {
+      //Interaction is relevent
+      if(inter.isType(t)) {
+	totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
+      }
+    }
+  }
+  return totalScalar;
+}
+
+double SpinachSpinsys::getQuadrapolarInteractionAsScalar(long n,interactionType t) const {
+  double totalScalar=0.0;
+  for(long i=0;i < getInteraction().size();++i) {
+    SpinachInteraction inter=getInteraction()[i];
+    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() == n) {
+      //Interaction is relevent
+      if(inter.isType(t)) {
+	totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
+      }
+    }
+  }
+  return totalScalar;
+}
+
+
+Matrix3 SpinachSpinsys::getLinearInteractionAsMatrix(long n,interactionType t) const {
+  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
+  for(long i=0;i < getInteraction().size();++i) {
+    SpinachInteraction inter=getInteraction()[i];
+    if(inter.getSpin_1()==n && !inter.getSpin_2().present()) {
+      //Interaction is relevent
+      if(inter.isType(t)) {
+	totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
+      }
+    }
+  }
+  return totalMatrix;
+}
+
+Matrix3 SpinachSpinsys::getBilinearInteractionAsMatrix(long n,interactionType t) const {
+  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
+  for(long i=0;i < getInteraction().size();++i) {
+    SpinachInteraction inter=getInteraction()[i];
+    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() != n) {
+      //Interaction is relevent
+      if(inter.isType(t)) {
+	totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
+      }
+    }
+  }
+  return totalMatrix;
+}
+
+Matrix3 SpinachSpinsys::getQuadrapolarInteractionAsMatrix(long n,interactionType t) const {
+  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
+  for(long i=0;i < getInteraction().size();++i) {
+    SpinachInteraction inter=getInteraction()[i];
+    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() == n) {
+      //Interaction is relevent
+      if(inter.isType(t)) {
+	totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
+      }
+    }
+  }
+  return totalMatrix;
+}
+
+
 
 //============================================================//
 // SpinachSpin
@@ -624,6 +717,72 @@ const char* SpinachInteraction::getFormAsString() const {
     return "span_skew";
   } else {
     //TODO Throw some sort of error here
+  }
+}
+
+bool SpinachInteraction::isType(long t) const {
+  if(t==INTER_ANY) {
+    return true;
+  }
+  if(t==INTER_EPR) {
+    switch(t) {
+    case INTER_HFC:
+    case INTER_GTENSER:
+    case INTER_ZFS: 
+    case INTER_EXCHANGE:
+    case INTER_QUADRUPOLAR:
+    case INTER_DIPOLAR:
+    case INTER_CUSTOM:
+      return true;
+    default:
+      return false;
+    }
+  }
+  if(t==INTER_NMR) {
+    switch(t) {
+    case INTER_SHIELDING:
+    case INTER_SCALAR:
+    case INTER_QUADRUPOLAR:
+    case INTER_DIPOLAR:
+    case INTER_CUSTOM:
+      return true;
+    default:
+      return false;
+    }
+  }
+  if(t==getType()) {
+    return true;
+  }
+  return false;
+}
+
+long SpinachInteraction::getType() const {
+  if(Interaction::getType()==TypeType::hfc) {
+    return INTER_HFC;
+  }
+  if(Interaction::getType()==TypeType::shielding) {
+    return INTER_SHIELDING;
+  }
+  if(Interaction::getType()==TypeType::quadrupolar) {
+    return INTER_QUADRUPOLAR;
+  }
+  if(Interaction::getType()==TypeType::scalar) {
+    return INTER_SCALAR;
+  }
+  if(Interaction::getType()==TypeType::dipolar) {
+    return INTER_DIPOLAR;
+  }
+  if(Interaction::getType()==TypeType::g_tenser) {
+    return INTER_GTENSER;
+  }
+  if(Interaction::getType()==TypeType::zfs) {
+    return INTER_ZFS;
+  }
+  if(Interaction::getType()==TypeType::exchange) {
+    return INTER_EXCHANGE;
+  }
+  if(Interaction::getType()==TypeType::custem) {
+    return INTER_CUSTOM;
   }
 }
 

@@ -18,9 +18,9 @@ class Vector3 {
     Vector3();
     Vector3(double _x,double _y,double _z);
 
-    double GetX();
-    double GetY();
-    double GetZ();    
+    double GetX() const;
+    double GetY() const;
+    double GetZ() const;    
   private:
     double x;
     double y;

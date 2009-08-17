@@ -14,14 +14,14 @@ Vector3::Vector3(double _x,double _y,double _z) : x(_x),y(_y),z(_Z) {
 
 }
 
-double Vector3::GetX() {
+double Vector3::GetX() const {
   return _x;
 }
-double Vector3::GetY() {
+double Vector3::GetY() const {
   return _y;
 }
 
-double Vector3::GetZ() {
+double Vector3::GetZ() const {
   return _z;
 }
 

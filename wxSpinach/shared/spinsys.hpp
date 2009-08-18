@@ -37,13 +37,15 @@ class Matrix3 {
     Matrix3(double a00,double a01,double a02,
             double a10,double a11,double a12,
             double a20,double a21,double a22);
+
+    void Dump() const;
     
     const double* GetRaw() const;
     
     double Get(long column, long row) const;
     double operator() (long column, long row) const;
-    Matrix3 operator+ (Matrix3 m) const;
-    void operator+= (Matrix3 m);
+    Matrix3 operator+ (const Matrix3& m) const;
+    Matrix3& operator+= (const Matrix3& m);
     void Set(long i,long j,double val);
   private:
     double raw[9];
@@ -64,8 +66,7 @@ class Orientation {
     };
     
     Type GetType() const;
-    Matrix3 GetAsMatrix3() const;
-
+ 
     void GetEuler(double* alpha,double* beta,double* gamma) const;
     void GetAngleAxis(double* angle,Vector3* axis) const;
     void GetQuaternion(double* real, double* i, double* j, double* k) const;
@@ -75,6 +76,8 @@ class Orientation {
     void SetAngleAxis(double angle,Vector3* axis);
     void SetQuaternion(double real, double i, double j, double k);
     void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
+
+    Matrix3 GetAsMatrix() const;
   private:
     union  {
         struct {
@@ -166,7 +169,6 @@ class Interaction {
     Type GetType() const;
     SubType GetSubType() const;
     bool IsSubType(SubType t) const;
-    Matrix3 GetAsMatrix3() const;
     
     void GetScalar(double* Scalar) const;
     void GetMatrix(Matrix3* Matrix) const;

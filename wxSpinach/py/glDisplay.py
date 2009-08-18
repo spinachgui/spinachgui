@@ -299,7 +299,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
                        [abs(mat3.Get(2,0)),abs(mat3.Get(2,1)),abs(mat3.Get(2,2)),0],
                        [0,0,0,1]],float32)
             #Apply the transformation matrix to warp the sphere
-            #print mat
             glPushMatrix();
 
             glTranslatef(x,y,z);

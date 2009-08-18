@@ -1,7 +1,6 @@
 
 #include <shared/spinsys_new.hpp>
 
-#include <stdio.h>
 
 //==============================================================================//
 // Vector3
@@ -10,27 +9,27 @@ Vector3::Vector3() {
     
 }
 
-Vector3::Vector3(double _x,double _y,double _z) : x(_x),y(_y),z(_Z) {
+Vector3::Vector3(double _x,double _y,double _z) : x(_x),y(_y),z(_z) {
 
 }
 
 double Vector3::GetX() const {
-  return _x;
+  return x;
 }
 double Vector3::GetY() const {
-  return _y;
+  return y;
 }
 
 double Vector3::GetZ() const {
-  return _z;
+  return z;
 }
 
 //==============================================================================//
 // Matrix3
     
-const double* IDENTITY3={1.0,0.0,0.0,
-			0.0,1.0,0.0,
-			0.0,0.0,1.0}
+const double IDENTITY3[]={1.0,0.0,0.0,
+	  		0.0,1.0,0.0,
+			  0.0,0.0,1.0};
 
 
 Matrix3::Matrix3() {
@@ -38,9 +37,9 @@ Matrix3::Matrix3() {
 }
 
 Matrix3::Matrix3(double a00,double a01,double a02,double a10,double a11,double a12,double a20,double a21,double a22) {
-  raw[0]=a00;   raw[1]=a01   raw[2]=a02;
-  raw[3]=a10;   raw[4]=a11   raw[5]=a12;
-  raw[6]=a20;   raw[7]=a21   raw[8]=a22;
+  raw[0]=a00;   raw[1]=a01;   raw[2]=a02;
+  raw[3]=a10;   raw[4]=a11;   raw[5]=a12;
+  raw[6]=a20;   raw[7]=a21;   raw[8]=a22;
 }
     
 const double* Matrix3::GetRaw() {
@@ -55,7 +54,7 @@ double Matrix3::operator() (long column, long row) {
   return raw[3*column+row];
 }
 
-void Matrix3::Set(long i,long j,double val) {
+void Matrix3::Set(long column,long row,double val) {
   raw[3*column+row]=val;
 }
 
@@ -64,7 +63,7 @@ void Matrix3::Set(long i,long j,double val) {
 //==============================================================================//
 // SpinSystem
 
-SpinSystem::SpinSystem() : mLabFrame(ReferenceFrame()) {
+SpinSystem::SpinSystem() {
   mLabFrame.SetPosition(Vector3(0,0,0));
 }
 
@@ -82,7 +81,7 @@ long SpinSystem::GetSpinCount() {
 }
 
 Spin* SpinSystem::GetSpin(long n) {
-  return mSpins[i];
+  return mSpins[n];
 }
 
 vector<Spin*> SpinSystem::GetSpins() {
@@ -93,18 +92,18 @@ void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
   if(Position==END) {
     mSpins.push_back(_Spin);
   } else {
-    mSpins.insert(Position,_Spin);
+    mSpins.insert(mSpins.begin()+Position,_Spin);
   }
 }
 
 void SpinSystem::RemoveSpin(long Position) {
-  mSpins.erase(Position);
+  mSpins.erase(mSpins.begin()+Position);
 }
 
 void SpinSystem::RemoveSpin(Spin* _Spin) {
   for(long i=0;i<mSpins.size();i++) {
     if(mSpins[i]==_Spin) {
-      mSpins[i].erase(i);
+      mSpins.erase(mSpins.begin()+i);
       return;
     }
   }
@@ -130,7 +129,7 @@ void SpinSystem::LoadFromXMLFile(const char* filename) {
 //==============================================================================//
 // Spin
 
-Spin::Spin(SpinSystem* Parent) mParent(Parent) {
+Spin::Spin(SpinSystem* Parent) : mParent(Parent) {
   
 }
 
@@ -138,36 +137,36 @@ Spin::~Spin() {
 
 }
 
-Vector3 GetPosition() {
+Vector3 Spin::GetPosition() {
   return mPosition;
 }
 
-void SetPosition(Vector3 Position) {
+void Spin::SetPosition(Vector3 Position) {
   mPosition=Position;
 }
 
-void SetLabel(string Label) {
+void Spin::SetLabel(string Label) {
   mLabel=Label;
 }
 
-const char* GetLabel() {
+const char* Spin::GetLabel() {
   return mLabel.c_str();
 }
     
-long GetInteractionCount() {
+long Spin::GetInteractionCount() {
   long count=0;
   for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i].GetSpin1()==this || mParent->mInteractions[i].GetSpin2()==this) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
       count++;
     }
   }
   return count;
 }
 
-Interaction* GetInteraction(long n) {
+Interaction* Spin::GetInteraction(long n) {
   long count=0;
   for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i].GetSpin1()==this || mParent->mInteractions[i].GetSpin2()==this) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
       if(count==n) {
 	return mParent->mInteractions[i];
       }
@@ -177,25 +176,26 @@ Interaction* GetInteraction(long n) {
   return NULL;
 }
 
-vector<Interaction*> GetInteractions() {
+vector<Interaction*> Spin::GetInteractions() {
   vector<Interaction*> InterPtrs;
   for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i].GetSpin1()==this || mParent->mInteractions[i].GetSpin2()==this) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
       InterPtrs.push_back(mParent->mInteractions[i]);
     }
   }
   return InterPtrs;
 }
 
-void InsertInteraction(Interaction* _Interaction,long Position) {
+void Spin::InsertInteraction(Interaction* _Interaction,long Position) {
   if(Position==END) {
     mParent->mInteractions.push_back(_Interaction);
   } else {
     long count=0;
     for(long i=0;i<mParent->mInteractions.size();i++) {
-      if(mParent->mInteractions[i].GetSpin1()==this || mParent->mInteractions[i].GetSpin2()==this) {
+      if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
 	if(count==Position) {
-	  return mParent->mInteractions.insert(i,_Interaction);
+	  mParent->mInteractions.insert(mParent->mInteractions.begin()+i,_Interaction);
+	  return;
 	}
 	count++;
       }
@@ -203,38 +203,34 @@ void InsertInteraction(Interaction* _Interaction,long Position) {
   }
 }
 
-void RemoveInteraction(long Position) {
-  if(Position==END) {
-    mParent->mInteractions.push_back(_Interaction);
-  } else {
-    long count=0;
-    for(long i=0;i<mParent->mInteractions.size();i++) {
-      if(mParent->mInteractions[i].GetSpin1()==this || mParent->mInteractions[i].GetSpin2()==this) {
-	if(count==Position) {
-	  mParent->mInteractions.erase(i);
-	}
-	count++;
+void Spin::RemoveInteraction(long Position) {
+  long count=0;
+  for(long i=0;i<mParent->mInteractions.size();i++) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
+      if(count==Position) {
+	mParent->mInteractions.erase(mParent->mInteractions.begin()+i);
       }
+      count++;
     }
   }
 }
 
-void RemoveInteraction(Interaction* _Interaction) {
+void Spin::RemoveInteraction(Interaction* _Interaction) {
   if(_Interaction == NULL) {
     return;
   }
   for(long i=0;i<mParent->mInteractions.size();i++) {
     if(mParent->mInteractions[i]==_Interaction) {
-      mParent->mInteractions.erase(i);
+      mParent->mInteractions.erase(mParent->mInteractions.begin()+i);
     }
   }
 }
     
-ReferenceFrame* GetFrame() {
+ReferenceFrame* Spin::GetFrame() {
   return mFrame;
 }
 
-void SetFrame(ReferenceFrame* Frame) {
+void Spin::SetFrame(ReferenceFrame* Frame) {
   mFrame=Frame;
 }
 
@@ -246,8 +242,8 @@ Orientation::Orientation() : mType(UNDEFINED) {
 }
 
 Orientation::~Orientation() {
-  if(mType==ANGLE_AXIS && mData.mAngleAxis.Vector3 != NULL) {
-    delete mData.mAngleAxis.Vector3;
+  if(mType==ANGLE_AXIS && mData.mAngleAxis.axis != NULL) {
+    delete mData.mAngleAxis.axis;
   } else if(mType==EIGENSYSTEM) {
     if(mData.mEigenSystem.XAxis != NULL) {
       delete mData.mEigenSystem.XAxis;
@@ -305,7 +301,7 @@ void Orientation::SetEuler(double alpha,double beta,double gamma) {
   return;
 }
 
-void Orientation::SetAngleAxis(double angle,Vector3 axis) {
+void Orientation::SetAngleAxis(double angle,Vector3* axis) {
   mData.mAngleAxis.angle=angle;
   mData.mAngleAxis.axis=axis;
   mType=ANGLE_AXIS;
@@ -354,6 +350,14 @@ Interaction::Type Interaction::GetType() {
 Matrix3 Interaction::GetAsMatrix3() {
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }
+
+Spin* Interaction::GetSpin1() {
+  return mSpin1;
+}
+
+Spin* Interaction::GetSpin2() {
+  return mSpin2;
+}
     
 void Interaction::GetScalar(double* Scalar) {
   *Scalar=mData.mScalar;
@@ -365,26 +369,26 @@ void Interaction::GetMatrix(Matrix3* Matrix) {
 }
 
 void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) {
-  *XX=mData.Eigenvalues.XX;
-  *YY=mData.Eigenvalues.YY;
-  *ZZ=mData.Eigenvalues.ZZ;
-  *Orient=*mData.Eigenvalues.Orient;
+  *XX=mData.mEigenvalues.XX;
+  *YY=mData.mEigenvalues.YY;
+  *ZZ=mData.mEigenvalues.ZZ;
+  *Orient=*mData.mEigenvalues.Orient;
   return;
 }
 
 void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) {
   *iso=mData.mAxRhom.iso;
   *ax=mData.mAxRhom.ax;
-  *rho=mData.mAxRhom.rho;
-  *Orient=*mData.Eigenvalues.Orient;
+  *rh=mData.mAxRhom.rh;
+  *Orient=*mData.mAxRhom.Orient;
   return;
 }
 
 void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) {
-  *iso=mData.mAxRhom.iso;
-  *Span=mData.mAxRhom.Span;
-  *Skew=mData.mAxRhom.Skew;
-  *Orient=*mData.Eigenvalues.Orient;
+  *iso=mData.mSpanSkew.iso;
+  *Span=mData.mSpanSkew.span;
+  *Skew=mData.mSpanSkew.skew;
+  *Orient=*mData.mSpanSkew.Orient;
   return;
 }
 
@@ -397,26 +401,26 @@ void Interaction::SetMatrix(Matrix3* Matrix) {
 }
 
 void Interaction::SetEigenvalues(double XX,double YY, double ZZ, Orientation* Orient) {
-  mData.Eigenvalues.XX=XX;
-  mData.Eigenvalues.YY=YY;
-  mData.Eigenvalues.ZZ=ZZ;
-  mData.Eigenvalues.Orient=Orient;
+  mData.mEigenvalues.XX=XX;
+  mData.mEigenvalues.YY=YY;
+  mData.mEigenvalues.ZZ=ZZ;
+  mData.mEigenvalues.Orient=Orient;
   return;
 }
 
 void Interaction::SetAxRhom(double iso,double ax, double rh, Orientation* Orient) {
-  *iso=mData.mAxRhom.iso;
-  *ax=mData.mAxRhom.ax;
-  *rho=mData.mAxRhom.rho;
-  *Orient=*mData.Eigenvalues.Orient;
+  iso=mData.mAxRhom.iso;
+  ax=mData.mAxRhom.ax;
+  rh=mData.mAxRhom.rh;
+  Orient=mData.mAxRhom.Orient;
   return;
 }
 
 void Interaction::SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient) {
-  mData.mAxRhom.iso=iso;
-  mData.mAxRhom.Span= Span;
-  mData.mAxRhom.Skew=Skew;
-  mData.Eigenvalues.Orient=Orient;
+  mData.mSpanSkew.iso=iso;
+  mData.mSpanSkew.span= Span;
+  mData.mSpanSkew.skew=Skew;
+  mData.mSpanSkew.Orient=Orient;
   return;
 }
 
@@ -451,26 +455,30 @@ void ReferenceFrame::InsertChild(ReferenceFrame* Frame,long Position) {
   if(Position != END) {
     mChildren.push_back(Frame);
   } else {
-    mChildren.insert(Position,Frame);
+    mChildren.insert(mChildren.begin()+Position,Frame);
   }
 }
 
 void ReferenceFrame::RemoveChild(long Position) {
-  mChildren.erase(Position);
+  mChildren.erase(mChildren.begin()+Position);
 }
 
 void ReferenceFrame::RemoveChild(ReferenceFrame* Child) {
-  if(child==NULL) {
+  if(Child==NULL) {
     return;
   }
   for(long i=0;i<mChildren.size();i++) {
-    if(mChildren[i]==child) {
-      mChildren.erase(i);
+    if(mChildren[i]==Child) {
+      mChildren.erase(mChildren.begin()+i);
       return;
     }    
   }
 }
-   
+
+void ReferenceFrame::SetPosition(Vector3 Position) {
+  mPosition=Position;
+}
+
 Vector3 ReferenceFrame::GetPosition() {
   return mPosition;
 }

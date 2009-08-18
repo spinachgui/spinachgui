@@ -1,6 +1,7 @@
 
 #include <vector>
 #include <string>
+#include <string.h>
 
 using namespace std;
 
@@ -15,6 +16,7 @@ class ReferenceFrame;
 class SpinSystemElement {};
 
 class Vector3 {
+  public:
     Vector3();
     Vector3(double _x,double _y,double _z);
 
@@ -43,30 +45,83 @@ class Matrix3 {
     double raw[9];
 };
 
-class SpinSystem {
-  public:
-    SpinSystem();
-    ~SpinSystem();
-    
-    long GetSpinCount();    
-    Spin* GetSpin(long n);
-    vector<Spin*> GetSpins();
-    void InsertSpin(Spin* _Spin,long Position=END);
-    void RemoveSpin(long Position);
-    void RemoveSpin(Spin* _Spin);
 
-    const ReferenceFrame* GetRootFrame();
+class Orientation {
+  public:
+    Orientation();
+    ~Orientation();
     
-    void LoadFromGamesFile(const char* filename);
-    void LoadFromG03File(const char* filename);
-    void LoadFromXMLFile(const char* filename);
+    enum Type {
+        UNDEFINED,
+        EULER,
+        ANGLE_AXIS,
+        QUATERNION,
+        EIGENSYSTEM
+    };
+    
+    Type GetType();
+    Matrix3 GetAsMatrix3();
+
+    void GetEuler(double* alpha,double* beta,double* gamma);
+    void GetAngleAxis(double* angle,Vector3* axis);
+    void GetQuaternion(double* real, double* i, double* j, double* k);
+    void GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
+
+    void SetEuler(double alpha,double beta,double gamma);
+    void SetAngleAxis(double angle,Vector3* axis);
+    void SetQuaternion(double real, double i, double j, double k);
+    void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
   private:
-    friend class Spin;
-    
-     vector<Spin*> mSpins;
-     vector<Interaction*> mInteractions;
-     ReferenceFrame mLabFrame; 
+    union  {
+        struct {
+            double alpha;
+            double beta;
+            double gamma;
+        } mEuler;
+        struct {
+            double angle;
+            Vector3* axis;
+        } mAngleAxis;
+        struct {
+            double real;
+            double i;
+            double j;
+            double k;
+        } mQuaternion;
+        struct {
+            Vector3* XAxis;
+            Vector3* YAxis;
+            Vector3* ZAxis;
+        } mEigenSystem;
+    } mData;
+    Type mType;
 };
+
+class ReferenceFrame {
+  public:
+    ReferenceFrame();
+    ReferenceFrame(ReferenceFrame* Parent);
+    ~ReferenceFrame();
+    
+    long GetChildCount();
+    ReferenceFrame* GetChildFrame(long n);
+    vector<ReferenceFrame*> GetChildFrames();
+    void InsertChild(ReferenceFrame* Frame,long Position=END);
+    void RemoveChild(long Position);
+    void RemoveChild(ReferenceFrame* Child);
+    
+    Vector3 GetPosition();
+    void SetPosition(Vector3 Position);
+    Orientation* GetOrientation();
+    
+  private:
+    ReferenceFrame* mParent;
+    vector<ReferenceFrame*> mChildren;
+    
+    Vector3 mPosition;
+    Orientation mOrient;
+};
+
 
 class Spin {
   public:
@@ -95,56 +150,6 @@ class Spin {
     ReferenceFrame* mFrame;
 };
 
-class Orientation {
-  public:
-    Orientation();
-    ~Orientation();
-    
-    enum Type {
-        UNDEFINED,
-        EULER,
-        ANGLE_AXIS,
-        QUATERNION,
-        EIGENSYSTEM
-    };
-    
-    Type GetType();
-    Matrix3 GetAsMatrix3();
-
-    void GetEuler(double* alpha,double* beta,double* gamma);
-    void GetAngleAxis(double* angle,Vector3* axis);
-    void GetQuaternion(double* real, double* i, double* j, double* k);
-    void GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
-
-    void SetEuler(double alpha,double beta,double gamma);
-    void SetAngleAxis(double angle,Vector3 axis);
-    void SetQuaternion(double real, double i, double j, double k);
-    void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
-  private:
-    union  {
-        struct {
-            double alpha;
-            double beta;
-            double gamma;
-        } mEuler;
-        struct {
-            double angle;
-            Vector3* axis;
-        } mAngleAxis;
-        struct {
-            double real;
-            double i;
-            double j;
-            double k;
-        } mQuaternion;
-        struct {
-            Vector3* XAxis;
-            Vector3* YAxis;
-            Vector3* ZAxis;
-        } mEigenSystem;
-    } mData;
-    Type mType;
-};
 
 class Interaction {
   public:
@@ -174,6 +179,9 @@ class Interaction {
     void SetEigenvalues(double XX,double YY, double ZZ, Orientation* Orient);
     void SetAxRhom(double iso,double ax, double rh, Orientation* Orient);
     void SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient);
+
+    Spin* GetSpin1();
+    Spin* GetSpin2();
   private:
     union  {
       double mScalar;
@@ -198,32 +206,33 @@ class Interaction {
       } mSpanSkew;
    } mData;
    Type mType;
+   Spin* mSpin1;
+   Spin* mSpin2;
 };
 
-class ReferenceFrame {
+
+class SpinSystem {
   public:
-    ReferenceFrame();
-    ReferenceFrame(ReferenceFrame* Parent);
-    ~ReferenceFrame();
+    SpinSystem();
+    ~SpinSystem();
     
-    long GetChildCount();
-    ReferenceFrame* GetChildFrame(long n);
-    vector<ReferenceFrame*> GetChildFrames();
-    void InsertChild(ReferenceFrame* Frame,long Position=END);
-    void RemoveChild(long Position);
-    void RemoveChild(ReferenceFrame* Child);
+    long GetSpinCount();    
+    Spin* GetSpin(long n);
+    vector<Spin*> GetSpins();
+    void InsertSpin(Spin* _Spin,long Position=END);
+    void RemoveSpin(long Position);
+    void RemoveSpin(Spin* _Spin);
+
+    const ReferenceFrame* GetRootFrame();
     
-    Vector3 GetPosition();
-    void SetPosition(Vector3 Position);
-    Orientation* GetOrientation();
-    
+    void LoadFromGamesFile(const char* filename);
+    void LoadFromG03File(const char* filename);
+    void LoadFromXMLFile(const char* filename);
   private:
-    ReferenceFrame* mParent;
-    vector<ReferenceFrame*> mChildren;
+    friend class Spin;
     
-    Vector3 mPosition;
-    Orientation mOrient;
+     vector<Spin*> mSpins;
+     vector<Interaction*> mInteractions;
+     ReferenceFrame mLabFrame; 
 };
-
-
 

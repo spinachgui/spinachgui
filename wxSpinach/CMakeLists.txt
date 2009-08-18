@@ -67,8 +67,10 @@ set(sharedSources ${sharedSources} "shared/spin.cpp")
 set(sharedSources ${sharedSources} "shared/spin_system.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
 
-set(pySources              "shared/spinsys.cpp")
-set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
+#set(pySources              "shared/spinsys.cpp")
+#set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
+set(pySources ${pySources} "shared/spinsys_new.cpp")
+set(pySources ${pySources} "shared/swig/spinsys_new_wrap.cpp")
 set(pySources ${pySources} "shared/spinsys_spec.cpp")
 
 set(nuclearSources  "shared/nuclear_data.cpp")
@@ -82,10 +84,10 @@ set(cmdSources "commandln/main.cpp")
 #if it were ever tried elsewhere. I'm not sure how to fix this yet.
 
 set(xsd_args cxx-tree )
-set(xsd_args ${xsd_args} --generate-default-ctor)
+#set(xsd_args ${xsd_args} --generate-default-ctor)
 set(xsd_args ${xsd_args} --generate-serialization)
-set(xsd_args ${xsd_args} --type-naming java)
-set(xsd_args ${xsd_args} --function-naming java)
+#set(xsd_args ${xsd_args} --type-naming java)
+#set(xsd_args ${xsd_args} --function-naming java)
 set(xsd_args ${xsd_args} --generate-doxygen)
 set(xsd_args ${xsd_args} --cxx-suffix .cpp --hxx-suffix .hpp)
 set(xsd_args ${xsd_args} --output-dir ${CMAKE_CURRENT_BINARY_DIR}/shared)
@@ -97,7 +99,7 @@ add_custom_command(OUTPUT shared/spinsys_spec.cpp
                    ${CMAKE_CURRENT_SOURCE_DIR}/data/spinsys_spec.xsd
                    COMMENT "Automatically generating XML parsing classes")
 
-#Use swig to generate the python bindings for the XSD C++ code.
+#Use swig to generate the python bindings for the C++ code.
 set(swig_args -c++ -python 
               -I${CMAKE_CURRENT_SOURCE_DIR}
               -outdir ${CMAKE_CURRENT_BINARY_DIR})
@@ -123,7 +125,17 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.c
                    MAIN_DEPENDENCY shared/swig/spinsys.i
 		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinsys_spec.cpp shared/spinsys.cpp
                    COMMAND COMMAND swig ${swig_args} ${swig_file}
+                   COMMENT "Automatically generating old python bindings")
+
+set(swig_file_new -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_new_wrap.cpp
+                  -oh ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_new_wrap.hpp
+                  ${CMAKE_CURRENT_SOURCE_DIR}/shared/swig/spinsys_new.i) 
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_new_wrap.cpp
+                   MAIN_DEPENDENCY shared/swig/spinsys_new.i
+		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinsys_spec.cpp shared/spinsys_new.cpp shared/spinsys_new.hpp
+                   COMMAND COMMAND swig ${swig_args} ${swig_file_new}
                    COMMENT "Automatically generating python bindings")
+
 
 set(swig_file_nuclear -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/nuclear_data_wrap.cpp
                       -oh ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/nuclear_data_wrap.hpp
@@ -167,42 +179,42 @@ target_link_libraries (_spinsys _nuclear_data xerces-c ${PYTHON_LIBRARIES})
 
 
 #command line exe
-set(spinachSources ${cmdSources} ${sharedSources})
-add_executable (spinach ${spinachSources})
+#set(spinachSources ${cmdSources} ${sharedSources})
+#add_executable (spinach ${spinachSources})
 #target_link_libraries (spinach atlas  xerces-c) 
-target_link_libraries (spinach  xerces-c) 
+#target_link_libraries (spinach  xerces-c) 
 
 
 #Create an "install" target (copy everything to a test directory)
 #This is probaly not how to do it in a production build, but it works and will
 #do for now
 add_custom_target(install-res ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/res/* ${CMAKE_CURRENT_BINARY_DIR}/install/res
-                          DEPENDS _spinsys spinach 
+                          DEPENDS _spinsys  
                           COMMENT "Copying files to /install")
 
 
 add_custom_target(install-py ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/py/* ${CMAKE_CURRENT_BINARY_DIR}/install
-                          DEPENDS _spinsys spinach 
+                          DEPENDS _spinsys  
                           COMMENT "Copying files to /install")
 
 
 
 add_custom_target(install ALL cp ${CMAKE_CURRENT_BINARY_DIR}/*.py  ${CMAKE_CURRENT_BINARY_DIR}/install/
-                          DEPENDS _spinsys spinach 
+                          DEPENDS _spinsys  
                           COMMENT "Copying files to /install")
 
 
 
 add_custom_target(install-so ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_spinsys.so ${CMAKE_CURRENT_BINARY_DIR}/install/_spinsys.so
-                          DEPENDS _spinsys spinach 
+                          DEPENDS _spinsys  
                           COMMENT "Copying files to /install")
 
 add_custom_target(install-so2 ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_nuclear_data.so ${CMAKE_CURRENT_BINARY_DIR}/install/_nuclear_data.so
-                          DEPENDS _spinsys spinach 
+                          DEPENDS _spinsys  
                           COMMENT "Copying files to /install")
 
 
 add_custom_target(install-data ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/data/* ${CMAKE_CURRENT_BINARY_DIR}/install/data
-                          DEPENDS _spinsys spinach 
+                          DEPENDS _spinsys  
                           COMMENT "Copying files to /install")
 

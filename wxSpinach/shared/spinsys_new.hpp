@@ -181,7 +181,10 @@ class Interaction {
     void SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient);
 
     Spin* GetSpin1() const;
+    void SetSpin1(Spin* Spin1);
     Spin* GetSpin2() const;
+    void SetSpin2(Spin* Spin2);
+
   private:
     union  {
       double mScalar;
@@ -223,7 +226,7 @@ class SpinSystem {
     void RemoveSpin(long Position);
     void RemoveSpin(Spin* _Spin);
 
-    const ReferenceFrame* GetRootFrame() const;
+    ReferenceFrame* GetRootFrame() const;
     
     void LoadFromGamesFile(const char* filename);
     void LoadFromG03File(const char* filename);
@@ -233,6 +236,6 @@ class SpinSystem {
     
      vector<Spin*> mSpins;
      vector<Interaction*> mInteractions;
-     ReferenceFrame mLabFrame; 
+     ReferenceFrame* mLabFrame; 
 };
 

@@ -71,7 +71,7 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         Called to create the control, which must derive from wx.Control.
         *Must Override*
         """
-        self._tc = InterTextEditor(parent,self.data,id)
+        self._tc = interactionEdit(parent,self.data,id)
         #self._tc.SetInsertionPoint(0)
         self.SetControl(self._tc)
 
@@ -85,9 +85,9 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         If you don't fill the cell (the rect) then be sure to override
         PaintBackground and do something meaningful there.
         """
-        self._tc.SetDimensions(rect.x, rect.y, rect.width+2, rect.height+2,
-                               wx.SIZE_ALLOW_MINUS_ONE)
-
+        #self._tc.SetDimensions(rect.x, rect.y, rect.width+2, rect.height+2,
+        #                       wx.SIZE_ALLOW_MINUS_ONE)
+        pass
 
     def Show(self, show, attr):
         """
@@ -104,12 +104,12 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         *Must Override*
         """
         self.startValue = grid.GetTable().GetValue(row, col)
-        self._tc.SetValue(self.startValue)
-        self._tc.SetInsertionPointEnd()
-        self._tc.SetFocus()
+        #self._tc.SetValue(self.startValue)
+        #self._tc.SetInsertionPointEnd()
+        #self._tc.SetFocus()
 
         # For this example, select the text
-        self._tc.SetSelection(0, self._tc.GetLastPosition())
+        #self._tc.SetSelection(0, self._tc.GetLastPosition())
 
 
     def EndEdit(self, row, col, grid):
@@ -120,14 +120,14 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         """
         changed = False
 
-        val = self._tc.GetValue()
+        #val = self._tc.GetValue()
         
-        if val != self.startValue:
-            changed = True
-            grid.GetTable().SetValue(row, col, val) # update the table
+        #if val != self.startValue:
+        #    changed = True
+        #    grid.GetTable().SetValue(row, col, val) # update the table
 
-        self.startValue = ''
-        self._tc.SetValue('')
+        #self.startValue = ''
+        #self._tc.SetValue('')
         return changed
 
 
@@ -136,9 +136,9 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         Reset the value in the control back to its starting value.
         *Must Override*
         """
-        self._tc.SetValue(self.startValue)
-        self._tc.SetInsertionPointEnd()
-
+        #self._tc.SetValue(self.startValue)
+        #self._tc.SetInsertionPointEnd()
+        pass
 
     def IsAcceptedKey(self, evt):
         """

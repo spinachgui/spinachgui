@@ -76,13 +76,10 @@ def getARotation(parent):
 
 
 class RootFrame(wx.Frame):
-    def __init__(self,res,ssroot):
-        self.res=res;
-        self.ssroot=ssroot
-        self.ss=self.ssroot.getRoot()
+    def __init__(self):
 
         pre = wx.PreFrame();
-        self.res.LoadOnFrame(pre,None,"rootFrameBase");
+        wx.GetApp().res.LoadOnFrame(pre,None,"rootFrameBase");
         self.PostCreate(pre);
         self.SetSize(wx.Size(1024,768));
         self.init_frame();
@@ -121,15 +118,15 @@ class RootFrame(wx.Frame):
         self.auiPanel=xrc.XRCCTRL(self,'auiPanel');
         self.notebook=wx.aui.AuiNotebook(self.auiPanel,-1);
 
-        self.spinGrid=SpinGrid(self.notebook,self)
+        self.spinGrid=SpinGrid(self.notebook)
 
-        self.glc = glDisplay(self.notebook,self);
+        self.glc = glDisplay(self.notebook);
         self.dc=wx.PaintDC(self.glc);
 
 
         # add the panes to the manager
-        self.notebook.AddPage(self.spinGrid, 'Grid View')
         self.notebook.AddPage(self.glc, '3D View')
+        self.notebook.AddPage(self.spinGrid, 'Grid View')
 
         self.auiPanel.GetSizer().Add(self.notebook,1,wx.EXPAND);
 
@@ -143,7 +140,7 @@ class RootFrame(wx.Frame):
         #self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_9.log','g03');
         #self.saveToFile('data/tyrosine.xml')
 
-        self.testDia=SpinDialog(self,self,0);
+        self.testDia=SpinDialog(self,0);
         self.testDia.Show();
 
     def Show(self):
@@ -152,11 +149,11 @@ class RootFrame(wx.Frame):
 
  
     def updateSpinTree(self):
-        count=self.ss.getSpinCount()
+        count=wx.GetApp().ss.GetSpinCount()
         print "Count=",count
         for i in range(count):
-            spin=self.ss.getSpinByIndex(i)
-            string=spin.getLabel() + " (" + spin.getIsotope()  + ")"
+            spin=wx.GetApp().ss.GetSpin(i)
+            string=spin.GetLabel() + " (" + "<ISOTOPE>"  + ")"
             self.spinTree.AppendItem(self.spinTree.GetRootItem(),string)
 
     def onSpinButton(self,e):
@@ -193,12 +190,11 @@ class RootFrame(wx.Frame):
             
     def loadFromFile(self,filename,type="xml"):
         if type=="xml":
-            self.ssroot.loadFromFile(filename)
+            wx.GetApp().ss.LoadFromFile(filename)
         elif type=="g03":
-            self.ssroot.loadFromG03File(filename)
+            wx.GetApp().ss.LoadFromG03File(filename)
         elif type=="xyz":
-            self.ssroot.loadFromXYZFile(filename)
-        self.ss=self.ssroot.getRoot();
+            wx.GetApp().ss.LoadFromXYZFile(filename)
         self.updateSpinTree()
         self.spinGrid.refreshFromSpinSystem()
 
@@ -235,11 +231,12 @@ class MyApp(wx.App):
 
     def OnInit(self):
         self.res = xrc.XmlResource('res/gui.xrc')
-        self.ssroot=spinsys.SpinsysXMLRoot()
+        self.ss=spinsys.SpinSystem()
+
         self.filename=""
         self.filepath=""
 
-        self.rootFrame=RootFrame(self.res,self.ssroot);
+        self.rootFrame=RootFrame();
         self.rootFrame.Show()
 
         return True

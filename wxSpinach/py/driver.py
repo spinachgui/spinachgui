@@ -4,6 +4,20 @@ import spinsys
 
 ss=spinsys.SpinSystem();
 ss.LoadFromG03File('data/tyrosine.log')
+#ss.Dump()
+
+spin=ss.GetSpin(0);
+print spin;
+inter=spin.GetInteraction(0);
+print inter.GetType()
+
+inter.SetScalar(4);
+print inter.GetScalar();
+
+o=spinsys.Orientation();
+o.SetQuaternion(0.4,0.4,2.0,2.0);
+real,i,j,k = o.GetQuaternion()
+print (real,i,j,k);
 
 #iden=spinsys.Matrix3(1,0,0,0,1,0,0,0,1)
 #print iden.getEigenValX()

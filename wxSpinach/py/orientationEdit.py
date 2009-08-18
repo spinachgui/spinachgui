@@ -17,46 +17,41 @@ INTERTYPE_QUATERNION=2;
 INTERTYPE_EIGENSYSTEM=3;
 
 class EulerEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"EulerPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"EulerPanel");
         self.PostCreate(pre);
 
-        self.data=data
 
 class AngleAxisEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"AngleAxisPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"AngleAxisPanel");
         self.PostCreate(pre);
 
-        self.data=data
 
 class QuaternionEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"QuaternionPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"QuaternionPanel");
         self.PostCreate(pre);
 
-        self.data=data
 
 class EigensystemEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"EigensystemPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"EigensystemPanel");
         self.PostCreate(pre);
 
-        self.data=data
 
 
 class OrientTransientPopup(wx.PopupTransientWindow):
     """Adds a bit of text and mouse movement to the wx.PopupWindow"""
-    def __init__(self, parent, style,data):
+    def __init__(self, parent, style):
         wx.PopupTransientWindow.__init__(self, parent, style)
-        self.data=data
 
         self.sizer=wx.BoxSizer()
-        self.orientPanel=OrientEdit(self,self.data)
+        self.orientPanel=OrientEdit(self)
         self.sizer.Add(self.orientPanel,1.0,wx.EXPAND);
         self.SetSizer(self.sizer)
         
@@ -74,14 +69,13 @@ class OrientTransientPopup(wx.PopupTransientWindow):
 
 
 class OrientTextEditor(wx.TextCtrl):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         wx.TextCtrl.__init__(self,parent,id)
-        self.data=data
         self.Bind(wx.EVT_SET_FOCUS, self.OnShowPopupTransient, self)
 
 
     def OnShowPopupTransient(self, e):
-        win = OrientTransientPopup(self,wx.SIMPLE_BORDER,self.data)
+        win = OrientTransientPopup(self,wx.SIMPLE_BORDER)
 
         # Show the popup right below or above the button
         # depending on available screen space...
@@ -93,19 +87,18 @@ class OrientTextEditor(wx.TextCtrl):
 
 
 class OrientEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
-        self.data=data
+    def __init__(self,parent,id=-1):
 
         pre = wx.PrePanel();
-        self.data.res.LoadOnPanel(pre,parent,"OrientEditPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"OrientEditPanel");
         self.PostCreate(pre)
 
         self.typeChoiceBook=xrc.XRCCTRL(self,"OrientChoiceBook");
 
-        self.eulerPage=      self.data.res.LoadPanel(self.typeChoiceBook,"EulerPanel")
-        self.angleAxisPage=  self.data.res.LoadPanel(self.typeChoiceBook,"AngleAxisPanel")
-        self.quaternionPage= self.data.res.LoadPanel(self.typeChoiceBook,"QuaternionPanel")
-        self.eigensystemPage=self.data.res.LoadPanel(self.typeChoiceBook,"EigensystemPanel")
+        self.eulerPage=      wx.GetApp().res.LoadPanel(self.typeChoiceBook,"EulerPanel")
+        self.angleAxisPage=  wx.GetApp().res.LoadPanel(self.typeChoiceBook,"AngleAxisPanel")
+        self.quaternionPage= wx.GetApp().res.LoadPanel(self.typeChoiceBook,"QuaternionPanel")
+        self.eigensystemPage=wx.GetApp().res.LoadPanel(self.typeChoiceBook,"EigensystemPanel")
 
         self.typeChoiceBook.AddPage(self.eulerPage,"Euler")
         self.typeChoiceBook.AddPage(self.angleAxisPage,"Angle Axis")

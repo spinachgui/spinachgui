@@ -67,10 +67,8 @@ set(sharedSources ${sharedSources} "shared/spin.cpp")
 set(sharedSources ${sharedSources} "shared/spin_system.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
 
-#set(pySources              "shared/spinsys.cpp")
-#set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
-set(pySources ${pySources} "shared/spinsys_new.cpp")
-set(pySources ${pySources} "shared/swig/spinsys_new_wrap.cpp")
+set(pySources              "shared/spinsys.cpp")
+set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
 set(pySources ${pySources} "shared/spinsys_spec.cpp")
 
 set(nuclearSources  "shared/nuclear_data.cpp")
@@ -125,16 +123,8 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.c
                    MAIN_DEPENDENCY shared/swig/spinsys.i
 		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinsys_spec.cpp shared/spinsys.cpp
                    COMMAND COMMAND swig ${swig_args} ${swig_file}
-                   COMMENT "Automatically generating old python bindings")
+                   COMMENT "Automatically generating  python bindings")
 
-set(swig_file_new -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_new_wrap.cpp
-                  -oh ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_new_wrap.hpp
-                  ${CMAKE_CURRENT_SOURCE_DIR}/shared/swig/spinsys_new.i) 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_new_wrap.cpp
-                   MAIN_DEPENDENCY shared/swig/spinsys_new.i
-		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinsys_spec.cpp shared/spinsys_new.cpp shared/spinsys_new.hpp
-                   COMMAND COMMAND swig ${swig_args} ${swig_file_new}
-                   COMMENT "Automatically generating python bindings")
 
 
 set(swig_file_nuclear -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/nuclear_data_wrap.cpp

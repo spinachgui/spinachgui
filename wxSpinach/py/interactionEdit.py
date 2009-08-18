@@ -21,63 +21,53 @@ INTERTYPE_AXRHOM=3;
 INTERTYPE_SPANSKEW=4;
 
 class ScalarEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"ScalarIntPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"ScalarIntPanel");
         self.PostCreate(pre);
 
-        self.data=data
 
 class MatrixEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"MatrixIntPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"MatrixIntPanel");
         self.PostCreate(pre);
-
-        self.data=data
 
 class EigenEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"EigenIntPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"EigenIntPanel");
         self.PostCreate(pre);
 
-        self.data=data
-        
-        self.orientEdit=OrientTextEditor(self,data);
+        self.orientEdit=OrientTextEditor(self);
         self.GetSizer().Add(self.orientEdit,1.0,wx.ALL);
 
 class AxRhomEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"AxRhomIntPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"AxRhomIntPanel");
         self.PostCreate(pre);
 
-        self.data=data
-
-        self.orientEdit=OrientTextEditor(self,data);
+        self.orientEdit=OrientTextEditor(self);
         self.GetSizer().Add(self.orientEdit,1.0,wx.ALL);
 
 class SpanSkewEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         pre = wx.PrePanel();
-        data.res.LoadOnPanel(pre,parent,"SpanSkewIntPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"SpanSkewIntPanel");
         self.PostCreate(pre);
 
-        self.data=data
-
-        self.orientEdit=OrientTextEditor(self,data);
+        self.orientEdit=OrientTextEditor(self);
         self.GetSizer().Add(self.orientEdit,1.0,wx.ALL);
 
 
 class InterPopup(wx.Frame):
     """Adds a bit of text and mouse movement to the wx.PopupWindow"""
-    def __init__(self, parent,data):
+    def __init__(self, parent):
         wx.Frame.__init__(self, parent,style=wx.FRAME_FLOAT_ON_PARENT|wx.FRAME_NO_TASKBAR)
-        self.data=data
 
         self.sizer=wx.BoxSizer()
-        self.interPanel=interactionEdit(self,self.data)
+        self.interPanel=interactionEdit(self)
         self.sizer.Add(self.interPanel,1.0,wx.EXPAND);
         self.SetSizer(self.sizer)
         
@@ -99,11 +89,10 @@ class InterPopup(wx.Frame):
 
 
 class InterTextEditor(wx.TextCtrl):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         wx.TextCtrl.__init__(self,parent,id)
-        self.data=data
 
-        self.win = InterPopup(self,self.data)
+        self.win = InterPopup(self)
 
         self.Bind(wx.EVT_KILL_FOCUS, self.onUnFocus, self)
         self.Bind(wx.EVT_SET_FOCUS, self.onFocus, self)
@@ -127,21 +116,20 @@ class InterTextEditor(wx.TextCtrl):
 
 
 class interactionEdit(wx.Panel):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         wx.Panel.__init__(self,parent,id)
-        self.data=data
 
         pre = wx.PrePanel();
-        self.data.res.LoadOnPanel(pre,parent,"InterEditPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"InterEditPanel");
         self.PostCreate(pre);
 
         self.typeChoiceBook=xrc.XRCCTRL(self,"TypeChoiceBook");
 
-        self.scalarPage=  ScalarEdit  (self.typeChoiceBook,self.data)
-        self.matrixPage=  MatrixEdit  (self.typeChoiceBook,self.data)
-        self.eigenPage=   EigenEdit   (self.typeChoiceBook,self.data)
-        self.axrhomPage=  AxRhomEdit  (self.typeChoiceBook,self.data)
-        self.spanskewPage=SpanSkewEdit(self.typeChoiceBook,self.data)
+        self.scalarPage=  ScalarEdit  (self.typeChoiceBook)
+        self.matrixPage=  MatrixEdit  (self.typeChoiceBook)
+        self.eigenPage=   EigenEdit   (self.typeChoiceBook)
+        self.axrhomPage=  AxRhomEdit  (self.typeChoiceBook)
+        self.spanskewPage=SpanSkewEdit(self.typeChoiceBook)
 
         self.typeChoiceBook.AddPage(self.scalarPage,"Scalar")
         self.typeChoiceBook.AddPage(self.matrixPage,"Matrix")

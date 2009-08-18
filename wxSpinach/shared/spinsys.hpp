@@ -1,235 +1,291 @@
 
-
-#include <shared/spinsys_spec.hpp>
-#include <iostream>
 #include <vector>
-#include <complex>
+#include <string>
+#include <string.h>
 
 using namespace std;
 
-//Forward declare the classes in this file
-class SpinsysXMLRoot;
-class SpinachSpinsys;
-class Spinsys;
-class SpinachSpin;
-class SpinachInteraction;
-class SpinachFrame;
-class SpinachOrientation;
-class Matrix3;
-class intList;
+const long END=-1;
 
-///Enumeration of the various types of interaction
-enum INTERACTION {
-  INTER_SCALER,
-  INTER_MATRIX,
-  INTER_EIGENVALUES,
-  INTER_AXIALITY_RHOMBICITY,
-  INTER_SPAN_SKEW
+class SpinSystem;
+class Spin;
+class Orientation;
+class Interaction;
+class ReferenceFrame;
+
+class SpinSystemElement {};
+
+class Vector3 {
+  public:
+    Vector3();
+    Vector3(double _x,double _y,double _z);
+
+    void GetCoordinates(double* _x,double* _y, double* _z);
+
+    double GetX() const;
+    double GetY() const;
+    double GetZ() const;    
+  private:
+    double x;
+    double y;
+    double z;
 };
 
-enum ORIENTATION {
-  ORIENT_EULER,
-  ORIENT_ANGLE_AXIS,
-  ORIENT_QUATERNION,
-  ORIENT_EIGENSYSTEM
-};
-
-
-enum interactionType {
-  INTER_ANY,
-  INTER_NMR,
-  INTER_EPR,
-
-  //EPR INTERACTIONS
-  INTER_HFC,
-  INTER_GTENSER,
-  INTER_ZFS,
-  INTER_EXCHANGE,
-
-  //NMR INTERACTIONS
-  INTER_SHIELDING,
-  INTER_SCALAR,   
-
-  //Interactions relevent to both nmr and epr
-  INTER_QUADRUPOLAR,
-  INTER_DIPOLAR,
-  INTER_CUSTOM
-};
-
-class SpinachSpinsys : public Spin_system {
-  friend class SpinsysXMLRoot;
-public:
-  SpinachSpinsys() : Spin_system() {}
-  SpinachSpinsys(Spin_system& s) : Spin_system(s) {}
-  void dump() const;
-  ///Get a particular spin number
-  SpinachSpin getSpinByIndex(long n);
-  ///Get the total number of spins in the spin system
-  long getSpinCount() const;
-
-  ///Get a particular interaction
-  SpinachInteraction getInteractionByIndex(long n);
-  ///Get the total number of interactions
-  long getInteractionCount() const;  
-
-  ///Get all spins within distance of spin spinNumber with a higher number
-  ///than spinNumber (useful for drawing bonds. If you loop though the structure,
-  ///you only need to draw a bond once)
-  std::vector<long> getNearbySpins(long spinNumber,double distance);
-
-  ///Sum all the interaction matricese involving a given spin and return as a single
-  ///matrix
-  Matrix3 GetTotalInteractionOnSpinAsMatrix(long n);
-
-  ///Get the total coupling between a pair of spins (for example, scalar J coupling
-  ///Counts here
-  double GetTotalIsotropicInteractionOnSpinPair(long n,long m);
-
-  double getLinearInteractionAsScalar(long n,interactionType t) const;
-  double getBilinearInteractionAsScalar(long n,interactionType t) const;
-  double getQuadrapolarInteractionAsScalar(long n,interactionType t) const;
-
-  Matrix3 getLinearInteractionAsMatrix(long n,interactionType t) const;
-  Matrix3 getBilinearInteractionAsMatrix(long n,interactionType t) const;
-  Matrix3 getQuadrapolarInteractionAsMatrix(long n,interactionType t) const;
-
-  void insertInteraction(SpinachInteraction inter,long n=-1);
-  SpinachInteraction& getSpinachInteraction(long n);
-  const SpinachInteraction& getSpinachInteraction(long n) const;
-  void removeInteraction(long n) const;
-
-  ///Attach a spin
-  void addSpin();
-
-  complex<double> getEigenValX(long n) const {return complex<double>(1,0);}
-  complex<double> getEigenValY(long n) const {return complex<double>(1,0);}
-  complex<double> getEigenValZ(long n) const {return complex<double>(1,0);}
-
-  Vector getEigenVecX(long n) const {return Vector(1,0,0);}
-  Vector getEigenVecY(long n) const {return Vector(0,1,0);}
-  Vector getEigenVecZ(long n) const {return Vector(0,0,1);}
-
-
-protected:
-  void loadFromG03File(const char* filename);
-  void loadFromXYZFile(const char* filename);
-};
-
-class SpinsysXMLRoot {
-public:
-  SpinsysXMLRoot();
-  void clear();
-  ///Load a spin system from an XML file located at filename
-  void loadFromFile(const char* filename);
-  ///Load a spin system from a g03 output file
-  ///Save the spin system to an XML file at filename
-  void loadFromG03File(const char* filename);
-  ///Save the spin system to an XML file at filename
-  void loadFromXYZFile(const char* filename);
-  void saveToFile(const char* filename) const;
-  ///Output the spin system in a human readable format to the standard
-  ///output for debugging purposes.
-  SpinachSpinsys getRoot() const {return *mXMLSpinSys;}
-  void setRoot(SpinachSpinsys ss) {mXMLSpinSys.reset(new SpinachSpinsys(ss));}
-protected:
-  auto_ptr<SpinachSpinsys> mXMLSpinSys;
+class Matrix3 {
+  public:
+    Matrix3();
+    Matrix3(double a00,double a01,double a02,
+            double a10,double a11,double a12,
+            double a20,double a21,double a22);
+    
+    const double* GetRaw() const;
+    
+    double Get(long column, long row) const;
+    double operator() (long column, long row) const;
+    Matrix3 operator+ (Matrix3 m) const;
+    void operator+= (Matrix3 m);
+    void Set(long i,long j,double val);
+  private:
+    double raw[9];
 };
 
 
-class SpinachOrientation : public Orientation{
-public:
-  SpinachOrientation() : Orientation() {}
-  SpinachOrientation(const Orientation& _O) : Orientation(_O) {}
-  Matrix3 getAsMatrix() const;
-  long getForm() const;
+class Orientation {
+  public:
+    Orientation();
+    ~Orientation();
+    
+    enum Type {
+        UNDEFINED,
+        EULER,
+        ANGLE_AXIS,
+        QUATERNION,
+        EIGENSYSTEM
+    };
+    
+    Type GetType() const;
+    Matrix3 GetAsMatrix3() const;
+
+    void GetEuler(double* alpha,double* beta,double* gamma) const;
+    void GetAngleAxis(double* angle,Vector3* axis) const;
+    void GetQuaternion(double* real, double* i, double* j, double* k) const;
+    void GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) const;
+
+    void SetEuler(double alpha,double beta,double gamma);
+    void SetAngleAxis(double angle,Vector3* axis);
+    void SetQuaternion(double real, double i, double j, double k);
+    void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
+  private:
+    union  {
+        struct {
+            double alpha;
+            double beta;
+            double gamma;
+        } mEuler;
+        struct {
+            double angle;
+            Vector3* axis;
+        } mAngleAxis;
+        struct {
+            double real;
+            double i;
+            double j;
+            double k;
+        } mQuaternion;
+        struct {
+            Vector3* XAxis;
+            Vector3* YAxis;
+            Vector3* ZAxis;
+        } mEigenSystem;
+    } mData;
+    Type mType;
 };
 
-
-class SpinachInteraction : public Interaction1 {
-public:
-  SpinachInteraction() : Interaction1() {}
-  SpinachInteraction(const Interaction1& _Int) : Interaction1(_Int) {}
-  SpinachOrientation getSpinachOrientation();
-  const char* getFormAsString() const;
-  long getForm() const;
-  long getSpin1Number() const {return Interaction1::getSpin_1();}
-  bool isType(long t) const;
-  long getType() const;
-  double get(long x,long y) const {
-    //Danger!
-    Matrix m=getMatrix().get();
-    return m.getElement()[3*y+x];
-  }
-  Matrix3 getAsMatrix() const;
-  double getAsScalar() const;
+class ReferenceFrame {
+  public:
+    ReferenceFrame();
+    ReferenceFrame(ReferenceFrame* Parent,Vector3* Position,Orientation* Orient);
+    ~ReferenceFrame();
+    
+    long GetChildCount() const;
+    ReferenceFrame* GetChildFrame(long n) const;
+    vector<ReferenceFrame*> GetChildFrames() const;
+    void InsertChild(ReferenceFrame* Frame,long Position=END);
+    void RemoveChild(long Position);
+    void RemoveChild(ReferenceFrame* Child);
+    
+    Vector3* GetPosition() const;
+    void SetPosition(Vector3* Position);
+    Orientation* GetOrientation() const;
+    
+  private:
+    ReferenceFrame* mParent;
+    vector<ReferenceFrame*> mChildren;
+    
+    Vector3* mPosition;
+    Orientation* mOrient;
 };
 
-class SpinachSpin : public Spin {
-public:
-  SpinachSpin() : Spin() {}
-  SpinachSpin(const Spin& _Spin) : Spin(_Spin) {}
-  long getNumber() {return Spin::getNumber();}
-  const char* getIsotope() {return Spin::getIsotope().c_str();}
-  const char* getLabel() {
-    LabelOptional la = Spin::getLabel();
-    if(la.present()) {
-      return la.get().c_str();
-    } else {
-      return "";
-    }
-  }
+class Interaction {
+  public:
+    Interaction();
+    ~Interaction();
+    
+     void Dump() const;
 
-  Matrix3 GetTotalInteractionAsMatrix();
-  void dump();
-  Vector getCoords();
+    enum Type {
+        UNDEFINED,
+        SCALAR,
+        MATRIX,
+        EIGENVALUES,
+        AXRHOM,
+        SPANSKEW
+    };
+
+    enum SubType {
+      ST_ANY,
+      ST_NMR,
+      ST_EPR,
+
+      //EPR INTERACTIONS
+      ST_HFC,
+      ST_G_TENSER,
+      ST_ZFS,
+      ST_EXCHANGE,
+
+      //NMR INTERACTIONS
+      ST_SHIELDING,
+      ST_SCALAR,   
+
+      //Interactions relevent to both nmr and epr
+      ST_QUADRUPOLAR,
+      ST_DIPOLAR,
+      ST_CUSTOM
+    };
+    
+    Type GetType() const;
+    SubType GetSubType() const;
+    bool IsSubType(SubType t) const;
+    Matrix3 GetAsMatrix3() const;
+    
+    void GetScalar(double* Scalar) const;
+    void GetMatrix(Matrix3* Matrix) const;
+    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) const;
+    void GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) const;
+    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) const;
+
+    void SetScalar(double Scalar);
+    void SetMatrix(Matrix3* Matrix);
+    void SetEigenvalues(double XX,double YY, double ZZ, Orientation* Orient);
+    void SetAxRhom(double iso,double ax, double rh, Orientation* Orient);
+    void SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient);
+
+    Spin* GetSpin1() const;
+    void SetSpin1(Spin* Spin1);
+    Spin* GetSpin2() const;
+    void SetSpin2(Spin* Spin2);
+
+    double GetAsScalar() const;
+    Matrix3 GetAsMatrix() const;
+
+  private:
+    union  {
+      double mScalar;
+      Matrix3* mMatrix;
+      struct {
+        double XX;
+        double YY;
+        double ZZ;
+        Orientation* Orient;
+      } mEigenvalues;
+      struct {
+          double iso;
+          double ax;
+          double rh;
+          Orientation* Orient;
+      } mAxRhom;
+      struct {
+          double iso;
+          double span;
+          double skew;
+          Orientation* Orient;
+      } mSpanSkew;
+   } mData;
+   Type mType;
+   SubType mSubType;
+   Spin* mSpin1;
+   Spin* mSpin2;
 };
 
-
-
-class SpinachFrame : public Reference_frame {
-public:
-  SpinachFrame() : Reference_frame() {}
-  SpinachFrame(const Reference_frame& _rf);
-  SpinachOrientation getOrientation() {SpinachOrientation orient(Reference_frame::getOrientation()); return orient;};
-};
-
-class Matrix3 : public Matrix {
-public:
-  Matrix3() : Matrix() {}
-  Matrix3(const Matrix& _m) : Matrix(_m) {}
-  Matrix3(double a00,double a01,double a02,
-	  double a10,double a11,double a12,
-	  double a20,double a21,double a22);
-  double get(long i1,long i2) const {return getElement()[3*i1+i2];}
-  double get(long i) const {return getElement()[i];}
-  void set(long i1,long i2, double a) {foundEigenVals=false;getElement()[3*i1+i2]=a;}
-  double trace(){return getElement()[0]+getElement()[4]+getElement()[8];}
-  void dump() const;  
-  ///Add two matricese together in the expected way.
-  Matrix3 operator+(const Matrix3& m) const;
-
-private:
-  ///Calculate the eigenvalus of the matrix and store them
-  ///in eigx, eigy, eigz, which act as a mutable cache.
-  void calcEigenvalues() const;
-public:
-  ///Eigenvalues and eigenvectors
-  complex<double> getEigenValX() const {if(!foundEigenVals){calcEigenvalues();} return eigx;}
-  complex<double> getEigenValY() const {if(!foundEigenVals){calcEigenvalues();} return eigy;}
-  complex<double> getEigenValZ() const {if(!foundEigenVals){calcEigenvalues();} return eigz;}
-
-  Vector getEigenvectorX() const;
-  Vector getEigenvectorY() const;
-  Vector getEigenvectorZ() const;
-
-  ///Use the matrix as a set of simultaious equations
-  Vector solveSimEq(double y1,double y2,double y3) const;
+class Spin {
+  public:
+    Spin(SpinSystem* Parent,Vector3* mPosition,string mLabel,ReferenceFrame* mFrame);
+    ~Spin();
   
-  ///Get the determinate of the matrix
-  double det() const;
-private:
-  mutable bool foundEigenVals;
-  mutable complex<double> eigx;
-  mutable complex<double> eigy;
-  mutable complex<double> eigz;
+    void Dump() const;
+
+    Vector3* GetPosition() const;
+    void SetPosition(Vector3* Position);
+    void GetCoordinates(double* _x,double* _y, double* _z) const;
+
+    void SetLabel(string Label);
+    const char* GetLabel() const;
+
+    long GetInteractionCount() const;
+    Interaction* GetInteraction(long n) const;
+    vector<Interaction*> GetInteractions() const;
+    void InsertInteraction(Interaction* _Interaction,long Position=END);
+    void RemoveInteraction(long Position);
+    void RemoveInteraction(Interaction* _Interaction);
+
+    double GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
+    double GetBilinearInteractionAsScalar(Spin* OtherSpin,Interaction::SubType t=Interaction::ST_ANY) const;
+    double GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
+
+    Matrix3 GetLinearInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
+    Matrix3 GetBilinearInteractionAsMatrix(Spin* OtherSpin,Interaction::SubType t=Interaction::ST_ANY) const;
+    Matrix3 GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
+
+    
+    ReferenceFrame* GetFrame() const;
+    void SetFrame(ReferenceFrame* Frame);
+
+    std::vector<Spin*> GetNearbySpins(double distance);
+
+  private:
+    SpinSystem* mParent;
+    Vector3* mPosition;
+    string mLabel;
+    ReferenceFrame* mFrame;
 };
+
+
+
+
+class SpinSystem {
+  public:
+    SpinSystem();
+    ~SpinSystem();
+    
+    void Dump() const;
+
+    long GetSpinCount() const;
+    Spin* GetSpin(long n) const;
+    vector<Spin*> GetSpins() const;
+    void InsertSpin(Spin* _Spin,long Position=END);
+    void RemoveSpin(long Position);
+    void RemoveSpin(Spin* _Spin);
+
+    ReferenceFrame* GetRootFrame() const;
+    
+    void LoadFromGamesFile(const char* filename);
+    void LoadFromG03File(const char* filename);
+    void LoadFromXMLFile(const char* filename);
+  private:
+    friend class Spin;
+    
+     vector<Spin*> mSpins;
+     vector<Interaction*> mInteractions;
+     ReferenceFrame* mLabFrame; 
+};
+

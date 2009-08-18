@@ -31,10 +31,12 @@ selectedMaterial=blueMaterial
 
 
 class glDisplay(wx.glcanvas.GLCanvas):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         wx.glcanvas.GLCanvas.__init__(self,parent,id)
         self.parent=parent
-        self.data=data
+
+        self.ss=wx.GetApp().ss
+
         self.xRotate=0
         self.yRotate=0
         self.rotationMatrix=array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, 0, 0, 1]], float64)
@@ -165,27 +167,25 @@ class glDisplay(wx.glcanvas.GLCanvas):
             gluQuadricDrawStyle(qobj,GLU_FILL);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
-        for i in range(self.data.ss.getSpinCount()):   #Draw the spins and the bonds
-            thisSpin=self.data.ss.getSpinByIndex(i)
-            coords=thisSpin.getCoords()
+        for i in range(self.ss.GetSpinCount()):   #Draw the spins and the bonds
+            thisSpin=self.ss.GetSpin(i)
+            x1,y1,z1=thisSpin.GetCoordinates()
         
             #draw in bonds to nearby atoms
 
             glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
             glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
-            nearby=self.data.ss.getNearbySpins(i,1.8)
+            nearby=thisSpin.GetNearbySpins(1.8)
             glColor3f(1.0, 0.0, 0.0);
-            for index in nearby:
-                otherCoords=self.data.ss.getSpinByIndex(index).getCoords()
-                bondLength=((coords[0]-otherCoords[0])*(coords[0]-otherCoords[0])+
-                            (coords[1]-otherCoords[1])*(coords[1]-otherCoords[1])+
-                            (coords[2]-otherCoords[2])*(coords[2]-otherCoords[2]))**0.5
+            for nearbySpin in nearby:
+                x2,y2,z2=nearbySpin.GetCoordinates()
+                bondLength=((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2))**0.5
 
                #Now we need to find the rotation between the z axis
-                angle=acos((otherCoords[2]-coords[2])/bondLength)
+                angle=acos((z2-z1)/bondLength)
                 glPushMatrix();
-                glTranslatef(coords[0],coords[1],coords[2]);
-                glRotate(angle/2/pi*360,coords[1]-otherCoords[1],otherCoords[0]-coords[0],0)
+                glTranslatef(x1,y1,z1);
+                glRotate(angle/2/pi*360,y1-y2,x2-x1,0)
                 gluCylinder(qobj,0.1,0.1,bondLength,7,7)
                 glPopMatrix();
 
@@ -230,11 +230,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         gluLookAt(self.camX,self.camY,self.camZ,0,0,-1,0,1,0);
         glMultMatrixf(self.rotationMatrix);
 
-        if self.data.ss==None:
+        if self.ss==None:
             self.SwapBuffers()
             return
 
-        spinCount=self.data.ss.getSpinCount()
+        spinCount=self.ss.GetSpinCount()
 
         qobj = gluNewQuadric();
         if self.mode=="wireframe":
@@ -259,11 +259,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         worldNearX,worldNearY,worldNearZ = gluUnProject(self.mousex,height-self.mousey-1,0.0,mvmatrix,projmatrix,viewport);
         tsetup=time.time()
         for i in range(spinCount):  #Decide which spin is selected
-            thisSpin=self.data.ss.getSpinByIndex(i);
-            coords=thisSpin.getCoords()
+            thisSpin=self.ss.GetSpin(i);
+            x,y,z=thisSpin.GetCoordinates()
 
             #The distance from the near clipping plane is reused in the colision detection
-            clipDist2=(worldNearX-coords[0])**2 +    (worldNearY-coords[1])**2 + (worldNearZ-coords[2])**2
+            clipDist2=(worldNearX-x)**2 +    (worldNearY-y)**2 + (worldNearZ-z)**2
             if clipDist2 > self.hoverDist and self.hover!=-1:
                 continue; #We already found a closer spin, so there isn't any point in checking this one
 
@@ -275,7 +275,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
             Rz=worldNearZ-worldFarZ
 
             A =    Rx**2+                         Ry**2                    + Rz**2
-            B = 2*(Rx*(worldNearX-coords[0]) +    Ry*(worldNearY-coords[1]) + Rz*(worldNearZ-coords[2]))
+            B = 2*(Rx*(worldNearX-x) +            Ry*(worldNearY-y) +        Rz*(worldNearZ-z))
             C =    clipDist2 - radius2
 
             desc=B**2-4*A*C
@@ -287,22 +287,22 @@ class glDisplay(wx.glcanvas.GLCanvas):
         tspins=time.time()
 
         for i in range(spinCount):   #Draw the spins and the bonds
-            thisSpin=self.data.ss.getSpinByIndex(i)
-            coords=thisSpin.getCoords()
+            thisSpin=self.ss.GetSpin(i)
+            x,y,z=thisSpin.GetCoordinates()
 
             glColor3f(1.0, 1.0, 1.0);
             #Draw in the single spin interaction tensor
-            mat3=self.data.ss.GetTotalInteractionOnSpinAsMatrix(i)
+            mat3=thisSpin.GetLinearInteractionAsMatrix()
             #Convert to a openGL 4x4 matrix
-            mat=array([[abs(mat3.get(0,0)),abs(mat3.get(0,1)),abs(mat3.get(0,2)),0],
-                       [abs(mat3.get(1,0)),abs(mat3.get(1,1)),abs(mat3.get(1,2)),0],
-                       [abs(mat3.get(2,0)),abs(mat3.get(2,1)),abs(mat3.get(2,2)),0],
+            mat=array([[abs(mat3.Get(0,0)),abs(mat3.Get(0,1)),abs(mat3.Get(0,2)),0],
+                       [abs(mat3.Get(1,0)),abs(mat3.Get(1,1)),abs(mat3.Get(1,2)),0],
+                       [abs(mat3.Get(2,0)),abs(mat3.Get(2,1)),abs(mat3.Get(2,2)),0],
                        [0,0,0,1]],float32)
             #Apply the transformation matrix to warp the sphere
             #print mat
             glPushMatrix();
 
-            glTranslatef(coords[0],coords[1],coords[2]);
+            glTranslatef(x,y,z);
 
             glPushMatrix();
             glMultMatrixf(mat)
@@ -310,13 +310,13 @@ class glDisplay(wx.glcanvas.GLCanvas):
             glCallList(self.sphereWire);
             glPopMatrix();
 
-            eValX=self.data.ss.getEigenValX(i).real;
-            eValY=self.data.ss.getEigenValY(i).real;
-            eValZ=self.data.ss.getEigenValZ(i).real;
+            eValX=1#self.ss.getEigenValX(i).real;
+            eValY=1#self.ss.getEigenValY(i).real;
+            eValZ=1#self.ss.getEigenValZ(i).real;
 
-            eVecX=self.data.ss.getEigenVecX(i);
-            eVecY=self.data.ss.getEigenVecY(i);
-            eVecZ=self.data.ss.getEigenVecZ(i);
+            eVecX=[1,0,0]#self.ss.getEigenVecX(i);
+            eVecY=[0,1,0]#self.ss.getEigenVecY(i);
+            eVecZ=[0,0,1]#self.ss.getEigenVecZ(i);
 
             #Draw the three eigenvectors of the interactionx
             glBegin(GL_LINES);
@@ -344,12 +344,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
                 glMaterialfv(GL_FRONT, GL_SPECULAR, selectedMaterial);
                 glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);                
             else:
-                letter,num=splitSymbol(thisSpin.getIsotope())
+                letter,num=splitSymbol("H1")
                 if (letter in self.colourDict):
                      glMaterialfv(GL_FRONT, GL_SPECULAR, self.colourDict[letter]);
                      glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, self.colourDict[letter]);
             glPushMatrix();
-            glTranslatef(coords[0],coords[1],coords[2]);
+            glTranslatef(x,y,z);
             glScale(radius,radius,radius);
             if(self.mode=="wireframe"):
                 glCallList(self.sphereWire);
@@ -369,15 +369,16 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         for i in range(spinCount):  #Draw the J couplings
             #Do the two spin couplings
-            thisSpin=self.data.ss.getSpinByIndex(i)
-            coords=thisSpin.getCoords()            
+            thisSpin=self.ss.GetSpin(i)
+            x1,y1,z1=thisSpin.GetCoordinates()            
             for j in range(i+1,spinCount):
-                coordsJ=self.data.ss.getSpinByIndex(j).getCoords()
-                scalar=abs(self.data.ss.GetTotalIsotropicInteractionOnSpinPair(i,j))/300;
+                jSpin=self.ss.GetSpin(j)
+                x2,y2,z2=jSpin.GetCoordinates()
+                scalar=abs(thisSpin.GetBilinearInteractionAsScalar(jSpin))/300;
                 glColor4f(scalar,0,0,scalar);
                 glBegin(GL_LINES);
-                glVertex3f(coords[0],coords[1],coords[2]);
-                glVertex3f(coordsJ[0],coordsJ[1],coordsJ[2]);
+                glVertex3f(x1,y1,z1);
+                glVertex3f(x2,y2,z2);
                 glEnd();
         glDisable(GL_BLEND);
         glEnable(GL_LIGHTING);   
@@ -432,5 +433,5 @@ class glDisplay(wx.glcanvas.GLCanvas):
     def onDisplaySpinDialog(self,e):
         """Display the spin property dialog for the selected spin"""
         if (self.hover>=0):
-            dialog=SpinDialog(self,self.data,self.hover)
+            dialog=SpinDialog(self,self.hover)
             dialog.Show()

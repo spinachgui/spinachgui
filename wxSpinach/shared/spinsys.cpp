@@ -1,173 +1,178 @@
 
-#include "spinsys.hpp"
-#include <iostream>
+#include <shared/spinsys.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <fstream>
 #include <sstream>
-#include <string>
-#include <boost/algorithm/string/trim.hpp>
+#include <iostream>
 #include <shared/nuclear_data.hpp>
-#include <cmath>
-#include <complex>
-#include <map>
-
-using namespace std;
 
 
+//==============================================================================//
+// Vector3
 
-//============================================================//
-// Utility Functions
+Vector3::Vector3() {
+    
+}
 
+Vector3::Vector3(double _x,double _y,double _z) : x(_x),y(_y),z(_z) {
 
-typedef complex<double> cdouble;
+}
 
-void solveCubic(const cdouble a,const cdouble b,const cdouble c,cdouble& z1, cdouble& z2, cdouble& z3) {
-  //Define some numerical constants
+double Vector3::GetX() const {
+  return x;
+}
+double Vector3::GetY() const {
+  return y;
+}
 
-  static const cdouble i=cdouble(0.0,1.0);
-  static const double root3(sqrt(3.0));
-  static const double croot2(pow(2.0,1.0/3.0));
-  static const double croot3(pow(3.0,1.0/3.0));
+double Vector3::GetZ() const {
+  return z;
+}
 
-  static const double twoToTheFiveThirds=pow(2.0,5.0/3.0);
-  static const double threeToTheFiveSixths=pow(3.0,5.0/6.0);
-  
-  static const double pi=3.141592654;
-
-  //Equation is in the form z^3 + az^2 + bz + c = 0
-  const cdouble n=-a*a/3.0 + b;
-  const cdouble m=2.0*a*a*a/27.0 - a*b/3.0 + c;
-
-  //Equation is now in the form x^3 + nx + m == 0 where x = z - a/3
-
-  //And has a simpler solution (see the mathmatica notebook
-
-  //Use vieta's substitution x=w-n/(3w) to get the the cubic equation into the form
-  // w^6 - m w^3 + n^3/27, a quadratic, solve for w^3. Only the positive roots
-  // are required as the negative roots give identical results.
-  const cdouble w3= (-m + sqrt(m*m + 4.0*n*n*n/27.0))/2.0;
-
-  cout << "Should be 0 = " << w3*w3 + m*w3 - n*n*n/27.0 << endl;
-  
-  //There are three roots of w3
-  const cdouble r1 = polar(abs(w3),arg(w3)/3.0);
-  const cdouble r2 = polar(abs(w3),arg(w3)/3.0+2.0*pi/3.0);
-  const cdouble r3 = polar(abs(w3),arg(w3)/3.0+4.0*pi/3.0);
-
-
-  const cdouble x1=r1-n/(3.0*r1);
-  const cdouble x2=r2-n/(3.0*r2);
-  const cdouble x3=r3-n/(3.0*r3);
-
-  cout << "x1=" << x1 << " x2=" << x2 << " x3=" << x3 << endl;
-  cout << "g(x1)=" << x1*x1*x1 + n*x1 + m << endl;
-  cout << "g(x2)=" << x2*x2*x2 + n*x2 + m << endl;
-  cout << "g(x3)=" << x3*x3*x3 + n*x3 + m << endl;
-
-
-  //z1=x1num/x1denom - a/3.0;
-  //z2=x2num/x2denom - a/3.0;
-  //z3=x3num/x3denom - a/3.0;
+void Vector3::GetCoordinates(double* _x,double* _y, double* _z) {
+  *_x=x;
+  *_y=y;
+  *_z=z;
   return;
 }
 
-//============================================================//
-//
 
-SpinsysXMLRoot::SpinsysXMLRoot() : mXMLSpinSys(new SpinachSpinsys()) {
-  cout << "The size of a newly created set of spins is " << mXMLSpinSys->getSpin().size() << endl;
+//==============================================================================//
+// Matrix3
+    
+const double IDENTITY3[]={1.0,0.0,0.0,
+	  		0.0,1.0,0.0,
+			  0.0,0.0,1.0};
+
+
+Matrix3::Matrix3() {
+  memcpy(raw,IDENTITY3,9*sizeof(double));
 }
 
-void SpinsysXMLRoot::loadFromFile(const char* filename) {
-  clear();
-  try {
-    auto_ptr<Spin_system> tmpPtr(parseSpin_system(filename));
-    mXMLSpinSys.reset(new SpinachSpinsys(*tmpPtr));
-  } catch(const xml_schema::Exception& e) {
-    cerr << e << endl;
-    exit(1);
+Matrix3::Matrix3(double a00,double a01,double a02,double a10,double a11,double a12,double a20,double a21,double a22) {
+  raw[0]=a00;   raw[1]=a01;   raw[2]=a02;
+  raw[3]=a10;   raw[4]=a11;   raw[5]=a12;
+  raw[6]=a20;   raw[7]=a21;   raw[8]=a22;
+}
+    
+const double* Matrix3::GetRaw() const {
+  return raw;
+}
+    
+double Matrix3::Get(long column, long row) const {
+  return raw[3*column+row];
+}
+
+double Matrix3::operator() (long column, long row) const {
+  return raw[3*column+row];
+}
+
+Matrix3 Matrix3::operator+ (Matrix3 m) const {
+  Matrix3 result;
+  result.raw[0]=raw[0]+m.raw[0];
+  result.raw[1]=raw[1]+m.raw[1];
+  result.raw[2]=raw[2]+m.raw[2];
+	      	     	       
+  result.raw[3]=raw[3]+m.raw[3];
+  result.raw[4]=raw[4]+m.raw[4];
+  result.raw[5]=raw[5]+m.raw[5];
+	      	     	       
+  result.raw[6]=raw[6]+m.raw[6];
+  result.raw[7]=raw[7]+m.raw[7];
+  result.raw[8]=raw[8]+m.raw[8];
+  return result;
+}
+
+void Matrix3::operator+= (Matrix3 m) {
+  raw[0]=raw[0]+m.raw[0];
+  raw[1]=raw[1]+m.raw[1];
+  raw[2]=raw[2]+m.raw[2];
+       	     	       
+  raw[3]=raw[3]+m.raw[3];
+  raw[4]=raw[4]+m.raw[4];
+  raw[5]=raw[5]+m.raw[5];
+       	     	       
+  raw[6]=raw[6]+m.raw[6];
+  raw[7]=raw[7]+m.raw[7];
+  raw[8]=raw[8]+m.raw[8];
+}
+
+void Matrix3::Set(long column,long row,double val) {
+  raw[3*column+row]=val;
+}
+
+
+
+//==============================================================================//
+// SpinSystem
+
+SpinSystem::SpinSystem() : mLabFrame(new ReferenceFrame(NULL,new Vector3(0,0,0),new Orientation())) {
+  mLabFrame->GetOrientation()->SetQuaternion(1.0,0.0,0.0,0.0);
+}
+
+SpinSystem::~SpinSystem() {
+  for(long i=0;i<mSpins.size();i++) {
+    delete mSpins[i];
+  }
+  for(long i=0;i<mInteractions.size();i++) {
+    delete mInteractions[i];
   }
 }
 
-void SpinsysXMLRoot::saveToFile(const char* filename) const {
-  xml_schema::NamespaceInfomap map;
-  map[""].name = "";
-  map[""].schema = "../data/spinsys_spec.xsd";
+void SpinSystem::Dump() const {
+  cout << "Dumping SpinSystem:" << endl;
+  cout << " Spin count=" << mSpins.size() << endl;
+  cout << " Interaction count=" << mInteractions.size() << endl;
+  cout << endl;
 
-  ofstream fout(filename);
-  if(!fout.is_open()) {
-    cerr << "Could not open " << filename << endl;
-    return;
-  }
-  Spin_system ss(*mXMLSpinSys);
-  cout << "About to save" << endl;
-  try {
-    serializeSpin_system(fout, ss, map);
-  } catch (const xml_schema::Exception& e) {
-    cerr << e << endl;
-    exit(1);
+  cout << "Dumping Spins:" << endl;
+  for(long i=0;i<mSpins.size();i++) {
+    mSpins[i]->Dump();
   }
 }
-
-void SpinsysXMLRoot::loadFromG03File(const char* filename) {
-  clear();
-  mXMLSpinSys->loadFromG03File(filename);
+    
+long SpinSystem::GetSpinCount() const {
+  return mSpins.size();
 }
 
-void SpinsysXMLRoot::loadFromXYZFile(const char* filename) {
-  clear();
-  mXMLSpinSys->loadFromXYZFile(filename);
+Spin* SpinSystem::GetSpin(long n) const {
+  return mSpins[n];
 }
 
-void SpinsysXMLRoot::clear() {
-  mXMLSpinSys.reset(new SpinachSpinsys());
+vector<Spin*> SpinSystem::GetSpins() const {
+  return mSpins;
 }
 
-
-//============================================================//
-//
-
-void SpinachSpinsys::dump() const {
-  cout << "Printing out a spin system" << endl;
-  cout << "Spins:" << endl;
-  for (SpinConstIterator i(getSpin().begin()); i != getSpin().end(); ++i) {
-    cout << " Spin name=" << i->getLabel() << endl;
-    cout << "      number=" << i->getNumber() << endl;
-    cout << "      isotope=" << i->getIsotope() << endl;
-    cout << "      coords=(" << i->getCoordinates().getX() << ",";
-    cout << "              " << i->getCoordinates().getY() << ",";
-    cout << "              " << i->getCoordinates().getZ() << ")" << endl;
-  }
-  for (InteractionConstIterator i(getInteraction().begin()); i != getInteraction().end();  ++i) {
-    SpinachInteraction so(*i);
-    cout << " Interaction type=" << so.getFormAsString() << endl;
-    cout << "      Spin_1=" << so.getSpin_1() << endl;
+void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
+  if(Position==END) {
+    mSpins.push_back(_Spin);
+  } else {
+    mSpins.insert(mSpins.begin()+Position,_Spin);
   }
 }
 
-void SpinachSpinsys::loadFromXYZFile(const char* filename) {
-  ifstream fin(filename);
-  cout << "Opening an xyz file " << filename << endl;
-  if(!fin.is_open()) {
-    //Throw some sort of error here
-    cerr << "Couhn't open the file" << endl;
-  }
-  SpinSequence Spins;
-  string element;
-  double x,y,z;
-  long nAtoms=0;
-  while(!fin.eof()) {
-    fin >> element >> x >> y >> z >> ws;
-    cout << element << " " << x << "  " << y << " " << z << endl;
-    Spin s(Vector(x,y,z),nAtoms,element,0);  //Last paramiter is the reference frame
-    s.setLabel("Spin");
-    Spins.push_back(s);
-    nAtoms++;
-  } 
-  setSpin(Spins);
+void SpinSystem::RemoveSpin(long Position) {
+  mSpins.erase(mSpins.begin()+Position);
 }
 
+void SpinSystem::RemoveSpin(Spin* _Spin) {
+  for(long i=0;i<mSpins.size();i++) {
+    if(mSpins[i]==_Spin) {
+      mSpins.erase(mSpins.begin()+i);
+      return;
+    }
+  }
+}
 
-void SpinachSpinsys::loadFromG03File(const char* filename) {
+ReferenceFrame* SpinSystem::GetRootFrame() const {
+  return mLabFrame;
+}
+
+void SpinSystem::LoadFromGamesFile(const char* filename) {
+  
+}
+
+void SpinSystem::LoadFromG03File(const char* filename) {
   /*
     This function really needs some work done on in, as it's not using C++
     streams properly. This is due to it being adapted from matlab code (which uses
@@ -180,8 +185,6 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
     cerr << "Couldn't open file" << endl;
     return;
   }
-  SpinSequence Spins;
-  InteractionSequence Interactions;
   long nAtoms=0;
   bool standardOrientFound=false; //Some files seem to have many standard orientation sections.
   while(!fin.eof()) {
@@ -209,8 +212,8 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
 	if(standardOrientFound) {
 	  //Update an existing spin
-	  if(Spins.size() > nAtoms) {
-	    Spins[nAtoms].setCoordinates(Vector(x,y,z));
+	  if(mSpins.size() > nAtoms) {
+	    mSpins[nAtoms]->SetPosition(new Vector3(x,y,z));
 	  } else {
 	    cerr << "Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables" << endl;
 	  }
@@ -218,16 +221,14 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	  //Create a new spin
 	  string isotopeSymbol(getElementSymbol(atomicNumber));
 	  isotopeSymbol=isotopeSymbol+"1"; //We have no clue what the mass number is yet
-	  Spin s(Vector(x,y,z),nAtoms,isotopeSymbol,0);
-	  s.setLabel("A Spin");
-	  Spins.push_back(s);
+	  Spin* s=new Spin(this,new Vector3(x,y,z),string("A Spin")+isotopeSymbol,GetRootFrame());
+	  mSpins.push_back(s);
 	}
 	nAtoms++;
       }
       standardOrientFound=true;
 
-    } else if(line=="g tensor (ppm):") {
-      
+    } else if(line=="g tensor (ppm):") {      
     } else if(line=="g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:") {
     } else if(line=="SCF GIAO Magnetic shielding tensor (ppm):") {
       for(long i=0;i<nAtoms;i++) {
@@ -312,11 +313,11 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	    istringstream stream;
 	    stream.str(JCouplingStr);
 	    stream >> JCoupling;
-	    //cout << "J(" << j+1 << "," << i*5+k+1 << ")=" << JCoupling << endl;
-	    Interaction1 inter("J","MHz",j+1,0);
-	    inter.setScalar(JCoupling);
-	    inter.setSpin_2(i*5+k+1);
-	    Interactions.push_back(inter);
+	    Interaction* inter=new Interaction();
+            inter->SetScalar(JCoupling);
+	    inter->SetSpin1(GetSpin(j+1));
+            inter->SetSpin2(GetSpin(i*5+k+1));
+	    mInteractions.push_back(new Interaction());
 	  }
 	}
       }
@@ -332,9 +333,12 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	stream.clear(); stream.str(line);
 	//Read the coupling strength (in megaherz)
 	stream >> dummy1 >> dummy2 >> dummy3 >> isoCoupling;
-	Interaction1 inter("Isotropic","MHz",i,0); //Last paramiter is reference frame, which is always lab
-	inter.setScalar(isoCoupling);
-	Interactions.push_back(inter);
+        
+        Interaction* inter=new Interaction();
+        inter->SetScalar(isoCoupling);
+	inter->SetSpin1(GetSpin(i));
+        inter->SetSpin2(GetSpin(NULL));
+	mInteractions.push_back(inter);
       }          
     }
     if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
@@ -361,660 +365,572 @@ void SpinachSpinsys::loadFromG03File(const char* filename) {
 	//Skip a line
 	fin.getline(buff,500); line=buff; //Read a line
 
-	Interaction1 inter("Isotropic","MHz",i,0); //Last paramiter is reference frame, which is always lab
-	inter.setEigenvalues(Eigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05));
-	Orientation o;
-	o.setEigensystem(Eigensystem(Vector(x1,y1,z1),Vector(x2,y2,z2),Vector(x3,y3,z3)));
-	inter.setOrientation(o);
-	Interactions.push_back(inter);
+	Orientation* o=new Orientation();
+	o->SetEigenSystem(new Vector3(x1,y1,z1),new Vector3(x2,y2,z2),new Vector3(x3,y3,z3));
 
-	//Now process the isotope
-	long leftBracket=isotope.find("(");
-	long rightBracket=isotope.find(")");
-	string element=isotope.substr(0,leftBracket);
-	string massnum=isotope.substr(leftBracket+1,rightBracket-leftBracket-1);
-	isotope=element+massnum;
-	Spins[i].setIsotope(isotope);
+	Interaction* inter=new Interaction(); //Last paramiter is reference frame, which is always lab
+	inter->SetEigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05,o);
+	inter->SetSpin1(GetSpin(i));
+        inter->SetSpin2(GetSpin(NULL));
+	
+	mInteractions.push_back(inter);
       }
     }
   }
-  cout << "Finished loading the g03 file, saving spins.size()=" << Spins.size() << endl;
-  setSpin(Spins);
-  cout << " and getSpin().size()=" << getSpin().size() << endl;
-  setInteraction(Interactions);
+  cout << "Finished loading the g03 file, saving mSpins.size()=" << mSpins.size() << endl;
 }
 
-void SpinachSpinsys::addSpin() {
-  //  Spin s();
-  //  mXMLSpinSys->getSpin().push_back(s);
-}
+void SpinSystem::LoadFromXMLFile(const char* filename) {
 
-long SpinachSpinsys::getSpinCount() const {
-  return getSpin().size();
 }
 
 
+//==============================================================================//
+// Spin
 
-SpinachSpin SpinachSpinsys::getSpinByIndex(long n) {
-  if(n>=0 && n<getSpin().size()) {
-    return getSpin()[n];
+Spin::Spin(SpinSystem* Parent,Vector3* Position,string Label,ReferenceFrame* mFrame) : mParent(Parent),mPosition(Position),mLabel(Label) {
+  
+}
+
+Spin::~Spin() {
+  if(mPosition != NULL) {
+    delete mPosition;
   }
-  SpinachSpin s;
-  return s;
 }
 
-SpinachInteraction SpinachSpinsys::getInteractionByIndex(long n) {
-  if(n>=0 && n<getInteraction().size()) {
-    return getInteraction()[n];
+void Spin::Dump() const {
+  cout << "  Dumping class Spin" << endl;
+  cout << "    Label=" << mLabel << endl;
+  cout << "    Position=(" << mPosition->GetX() << "," << mPosition->GetY() << "," << mPosition->GetZ() << ")" << endl;
+  cout << "    Interaction Count=" << GetInteractionCount() << endl;
+}
+
+Vector3* Spin::GetPosition() const {
+  return mPosition;
+}
+
+void Spin::SetPosition(Vector3* Position) {
+  if(mPosition != NULL) {
+    delete mPosition;
   }
-  SpinachInteraction inter;
-  return inter;
+  mPosition=Position;
 }
 
-long SpinachSpinsys::getInteractionCount() const {
-  return getInteraction().size();
+void Spin::GetCoordinates(double* _x,double* _y, double* _z) const {
+  mPosition->GetCoordinates(_x,_y,_z);
 }
 
-std::vector<long> SpinachSpinsys::getNearbySpins(long spinNumber,double distance) {
-  SpinSequence Spins(getSpin());
-  std::vector<long> result;
-  double dist2=distance*distance;
-  Vector coords1=Spins[spinNumber].getCoordinates();
-  double x1=coords1.getX();
-  double y1=coords1.getY();
-  double z1=coords1.getZ();
+void Spin::SetLabel(string Label) {
+  mLabel=Label;
+}
 
-  for(long i=spinNumber+1;i<getSpin().size();i++) {
-    Vector coords2=Spins[i].getCoordinates();
-    double x2=coords2.getX();
-    double y2=coords2.getY();
-    double z2=coords2.getZ();
-    double deltaX=(x1-x2);
-    double deltaY=(y1-y2);
-    double deltaZ=(z1-z2);
-    if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ < dist2) {
-      result.push_back(i);
+const char* Spin::GetLabel() const {
+  return mLabel.c_str();
+}
+    
+long Spin::GetInteractionCount() const {
+  long count=0;
+  for(long i=0;i<mParent->mInteractions.size();i++) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
+      count++;
     }
   }
-  return result;
+  return count;
 }
 
-Matrix3 SpinachSpinsys::GetTotalInteractionOnSpinAsMatrix(long n) {
-  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
-  for(long i=0;i < getInteraction().size();++i) {
-    if(getInteraction()[i].getSpin_1()==n && !getInteraction()[i].getSpin_2().present()) {
-      totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
-    }
-  }
-  return totalMatrix;
-}
-
-double SpinachSpinsys::GetTotalIsotropicInteractionOnSpinPair(long n,long m) {
-  double totalScalar=0.0;
-  for(long i=0;i < getInteraction().size();++i) {
-    if(getInteraction()[i].getSpin_1()==n && getInteraction()[i].getSpin_2().present()) {
-      totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
-    }
-  }
-  return totalScalar;
-}
-
-//These are the six ways of querying the value of all the interactions on a spin
-
-double SpinachSpinsys::getLinearInteractionAsScalar(long n,interactionType t) const {
-  double totalScalar=0.0;
-  for(long i=0;i < getInteraction().size();++i) {
-    SpinachInteraction inter=getInteraction()[i];
-    if(inter.getSpin_1()==n && !inter.getSpin_2().present()) {
-      //Interaction is relevent
-      if(inter.isType(t)) {
-	totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
+Interaction* Spin::GetInteraction(long n) const {
+  long count=0;
+  for(long i=0;i<mParent->mInteractions.size();i++) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
+      if(count==n) {
+	return mParent->mInteractions[i];
       }
+      count++;
     }
   }
-  return totalScalar;
+  return NULL;
 }
 
-
-double SpinachSpinsys::getBilinearInteractionAsScalar(long n,interactionType t) const {
-  double totalScalar=0.0;
-  for(long i=0;i < getInteraction().size();++i) {
-    SpinachInteraction inter=getInteraction()[i];
-    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() != n) {
-      //Interaction is relevent
-      if(inter.isType(t)) {
-	totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
-      }
+vector<Interaction*> Spin::GetInteractions() const {
+  vector<Interaction*> InterPtrs;
+  for(long i=0;i<mParent->mInteractions.size();i++) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
+      InterPtrs.push_back(mParent->mInteractions[i]);
     }
   }
-  return totalScalar;
+  return InterPtrs;
 }
 
-double SpinachSpinsys::getQuadrapolarInteractionAsScalar(long n,interactionType t) const {
-  double totalScalar=0.0;
-  for(long i=0;i < getInteraction().size();++i) {
-    SpinachInteraction inter=getInteraction()[i];
-    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() == n) {
-      //Interaction is relevent
-      if(inter.isType(t)) {
-	totalScalar+=SpinachInteraction(getInteraction()[i]).getAsScalar();
-      }
-    }
-  }
-  return totalScalar;
-}
-
-
-Matrix3 SpinachSpinsys::getLinearInteractionAsMatrix(long n,interactionType t) const {
-  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
-  for(long i=0;i < getInteraction().size();++i) {
-    SpinachInteraction inter=getInteraction()[i];
-    if(inter.getSpin_1()==n && !inter.getSpin_2().present()) {
-      //Interaction is relevent
-      if(inter.isType(t)) {
-	totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
-      }
-    }
-  }
-  return totalMatrix;
-}
-
-Matrix3 SpinachSpinsys::getBilinearInteractionAsMatrix(long n,interactionType t) const {
-  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
-  for(long i=0;i < getInteraction().size();++i) {
-    SpinachInteraction inter=getInteraction()[i];
-    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() != n) {
-      //Interaction is relevent
-      if(inter.isType(t)) {
-	totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
-      }
-    }
-  }
-  return totalMatrix;
-}
-
-Matrix3 SpinachSpinsys::getQuadrapolarInteractionAsMatrix(long n,interactionType t) const {
-  Matrix3 totalMatrix(0,0,0,0,0,0,0,0,0);
-  for(long i=0;i < getInteraction().size();++i) {
-    SpinachInteraction inter=getInteraction()[i];
-    if(inter.getSpin_1()==n && inter.getSpin_2().present() && inter.getSpin_2().get() == n) {
-      //Interaction is relevent
-      if(inter.isType(t)) {
-	totalMatrix=totalMatrix+SpinachInteraction(getInteraction()[i]).getAsMatrix();
-      }
-    }
-  }
-  return totalMatrix;
-}
-
-
-
-//============================================================//
-// SpinachSpin
-
-Vector SpinachSpin::getCoords() {
-  return getCoordinates();
-}
-
-void SpinachSpin::dump() {
-  cout << "Spin name=" << getLabel() << endl;
-  //const Spin::CoordinatesType c = getCoordinates();
-  //cout << c.getX() << endl;
-  //cout << c.getY() << endl;
-  //cout << c.getZ() << endl;
-  //cout << "IsotopeE = " << getIsotope() << endl;
-}
-
-
-//============================================================//
-// SpinachOrientation
-
-long SpinachOrientation::getForm() const {
-  if(getEuler_angles().present()) {
-    return ORIENT_EULER;
-  } else if(getAngle_axis().present()) {
-    return ORIENT_ANGLE_AXIS;
-  } else if(getQuaternion().present()) {
-    return ORIENT_QUATERNION;
-  } else if(getEigensystem().present()) {
-    return ORIENT_EIGENSYSTEM;
+void Spin::InsertInteraction(Interaction* _Interaction,long Position) {
+  if(Position==END) {
+    mParent->mInteractions.push_back(_Interaction);
   } else {
-    //TODO Throw some sort of error here
+    long count=0;
+    for(long i=0;i<mParent->mInteractions.size();i++) {
+      if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
+	if(count==Position) {
+	  mParent->mInteractions.insert(mParent->mInteractions.begin()+i,_Interaction);
+	  return;
+	}
+	count++;
+      }
+    }
   }
 }
 
-
-Matrix3 SpinachOrientation::getAsMatrix() const {
-  if(getForm()==ORIENT_EIGENSYSTEM) {
-    Eigensystem sys=getEigensystem().get();
-    Vector xa=sys.getX_axis();
-    Vector ya=sys.getY_axis();
-    Vector za=sys.getZ_axis();
-
-    return Matrix3(xa.getX(),ya.getX(),za.getX(),
-		   xa.getY(),ya.getY(),za.getY(),
-		   xa.getZ(),ya.getZ(),za.getZ());
+void Spin::RemoveInteraction(long Position) {
+  long count=0;
+  for(long i=0;i<mParent->mInteractions.size();i++) {
+    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
+      if(count==Position) {
+	mParent->mInteractions.erase(mParent->mInteractions.begin()+i);
+      }
+      count++;
+    }
   }
+}
+
+void Spin::RemoveInteraction(Interaction* _Interaction) {
+  if(_Interaction == NULL) {
+    return;
+  }
+  for(long i=0;i<mParent->mInteractions.size();i++) {
+    if(mParent->mInteractions[i]==_Interaction) {
+      mParent->mInteractions.erase(mParent->mInteractions.begin()+i);
+    }
+  }
+}
+
+double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
+  double total=0.0;
+  long interCount=mParent->mInteractions.size();
+  for(long i=0;i < interCount;++i) {
+    Interaction* inter=mParent->mInteractions[i];
+    if(inter->GetSpin2()!=NULL) {
+      continue;
+    }
+    if(inter->GetSpin1()==this) {
+      //Interaction is relevent
+      if(inter->IsSubType(t)) {
+	total+=inter->GetAsScalar();
+      }
+    }
+  }
+  return total;
+}
+
+double Spin::GetBilinearInteractionAsScalar(Spin* OtherSpin,Interaction::SubType t) const {
+  return 0;
+}
+
+double Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
+  return 0;
+}
+
+Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
+  Matrix3 total=Matrix3(0,0,0,
+			0,0,0,
+			0,0,0);
+  long interCount=mParent->mInteractions.size();
+  for(long i=0;i < interCount;++i) {
+    Interaction* inter=mParent->mInteractions[i];
+    if(inter->GetSpin2()!=NULL) {
+      continue;
+    }
+    if(inter->GetSpin1()==this) {
+      //Interaction is relevent
+      if(inter->IsSubType(t)) {
+	total+=inter->GetAsMatrix();
+      }
+    }
+  }
+  return total;
+}
+
+Matrix3 Spin::GetBilinearInteractionAsMatrix(Spin* OtherSpin,Interaction::SubType t) const {
+  return Matrix3(1,0,0,0,1,0,0,0,1);
+}
+
+Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }
 
 
-
-//============================================================//
-// SpinachInteraction
-
-
-
-SpinachOrientation SpinachInteraction::getSpinachOrientation() {
-  OrientationOptional orentOpt=Interaction1::getOrientation();
-  if(orentOpt.present()) {
-    SpinachOrientation orient(orentOpt.get());
-    return orient;
-  } else {
-    //TODO Return some sort of exception to the calling code at this point
-    cerr << "Trying to get the orientation when this type of interaction doesn't need it" << endl;
-    const SpinachOrientation so;
-    return so;
-  }
-};
-
-Matrix3 SpinachInteraction::getAsMatrix() const {
-  if(getForm()==INTER_SCALER) {
-    //Return the identity multipled by the scalar
-    double s=getScalar().get();
-    Matrix3 m(s,0,0,0,s,0,0,0,s);
-    return m;
-  } else if(getForm()==INTER_MATRIX) {
-    //Just return the matrix
-    Matrix3 m(getMatrix().get());
-    return m;
-  } else if(getForm()==INTER_EIGENVALUES || getForm() == INTER_AXIALITY_RHOMBICITY) {
-    //Convert to a matrix
-    double xx,yy,zz;
-
-    if(getForm()==INTER_EIGENVALUES) {
-      const Eigenvalues ev=getEigenvalues().get();
-    
-      xx=ev.getXX();
-      yy=ev.getYY();
-      zz=ev.getZZ();
-    } else if(getForm()==INTER_AXIALITY_RHOMBICITY) {
-      const Axiality_rhombicity ar=getAxiality_rhombicity().get();
-      double a=ar.getAx();
-      double r=ar.getRh();
-      double iso=ar.getIso();
-      xx=a/3+iso/3;
-      yy=-r/2-a/6+iso/3;
-      zz= r/2-a/6+iso/3;
-    } else if(getForm()==INTER_SPAN_SKEW) {
-      const Span_skew ss=getSpan_skew().get();
-      double span=ss.getSpan();
-      double skew=ss.getSkew();
-      double iso=ss.getIso();
-      xx=span*skew/6-span/2;
-      yy=iso-span*skew/3;
-      zz=span*skew/6+span/2;
-    }
-    const SpinachOrientation o=getOrientation().get();
-    Matrix3 intMatrix=o.getAsMatrix();
-
-    intMatrix.set(0,0,intMatrix.get(0,0)*xx);
-    intMatrix.set(0,1,intMatrix.get(0,1)*yy);
-    intMatrix.set(0,2,intMatrix.get(0,2)*zz);
-
-    intMatrix.set(1,0,intMatrix.get(1,0)*xx);
-    intMatrix.set(1,1,intMatrix.get(1,1)*yy);
-    intMatrix.set(1,2,intMatrix.get(1,2)*zz);
-
-    intMatrix.set(2,0,intMatrix.get(2,0)*xx);
-    intMatrix.set(2,1,intMatrix.get(2,1)*yy);
-    intMatrix.set(2,2,intMatrix.get(2,2)*zz);
-    return intMatrix;
-  } else {
-    cerr << "Unknown interaction type returned by SpinachInteraction::getForm(). This is a serious error" << endl;
-  }
-  //Return the zero matrix identity
-  Matrix3 zero(0,0,0,0,0,0,0,0,0);
-  return zero;
+Interaction::SubType Interaction::GetSubType() const {
+  return mSubType;
 }
 
-double SpinachInteraction::getAsScalar() const {
-  if(getForm()==INTER_SCALER) {
-    //Return the identity multipled by the scalar
-    double s=getScalar().get();
-    return s;
-  } else {
-    return getAsMatrix().trace();
-  }
-}
-
-long SpinachInteraction::getForm() const {
-  if(getScalar().present()) {
-    return INTER_SCALER;
-  } else if(getMatrix().present()) {
-    return INTER_MATRIX;
-  } else if(getEigenvalues().present()) {
-    return INTER_EIGENVALUES;
-  } else if(getAxiality_rhombicity().present()) {
-    return INTER_AXIALITY_RHOMBICITY;
-  } else if(getSpan_skew().present()) {
-    return INTER_SPAN_SKEW;
-  } else {
-    //TODO Throw some sort of error here
-  }
-}
-
-const char* SpinachInteraction::getFormAsString() const {
-  if(getScalar().present()) {
-    return "scalar";
-  } else if(getMatrix().present()) {
-    return "matrix";
-  } else if(getEigenvalues().present()) {
-    return "eigenvalues";
-  } else if(getAxiality_rhombicity().present()) {
-    return "axiality_rhombicity";
-  } else if(getSpan_skew().present()) {
-    return "span_skew";
-  } else {
-    //TODO Throw some sort of error here
-  }
-}
-
-bool SpinachInteraction::isType(long t) const {
-  if(t==INTER_ANY) {
+bool Interaction::IsSubType(SubType t) const {
+  if(t==ST_ANY) {
     return true;
   }
-  if(t==INTER_EPR) {
+  if(t==ST_EPR) {
     switch(t) {
-    case INTER_HFC:
-    case INTER_GTENSER:
-    case INTER_ZFS: 
-    case INTER_EXCHANGE:
-    case INTER_QUADRUPOLAR:
-    case INTER_DIPOLAR:
-    case INTER_CUSTOM:
+    case ST_HFC:
+    case ST_G_TENSER:
+    case ST_ZFS: 
+    case ST_EXCHANGE:
+    case ST_QUADRUPOLAR:
+    case ST_DIPOLAR:
+    case ST_CUSTOM:
       return true;
     default:
       return false;
     }
   }
-  if(t==INTER_NMR) {
+  if(t==ST_NMR) {
     switch(t) {
-    case INTER_SHIELDING:
-    case INTER_SCALAR:
-    case INTER_QUADRUPOLAR:
-    case INTER_DIPOLAR:
-    case INTER_CUSTOM:
+    case ST_SHIELDING:
+    case ST_SCALAR:
+    case ST_QUADRUPOLAR:
+    case ST_DIPOLAR:
+    case ST_CUSTOM:
       return true;
     default:
       return false;
     }
   }
-  if(t==getType()) {
+  if(t==mSubType) {
     return true;
   }
   return false;
 }
 
-long SpinachInteraction::getType() const {
-  if(Interaction::getType()==TypeType::hfc) {
-    return INTER_HFC;
-  }
-  if(Interaction::getType()==TypeType::shielding) {
-    return INTER_SHIELDING;
-  }
-  if(Interaction::getType()==TypeType::quadrupolar) {
-    return INTER_QUADRUPOLAR;
-  }
-  if(Interaction::getType()==TypeType::scalar) {
-    return INTER_SCALAR;
-  }
-  if(Interaction::getType()==TypeType::dipolar) {
-    return INTER_DIPOLAR;
-  }
-  if(Interaction::getType()==TypeType::g_tenser) {
-    return INTER_GTENSER;
-  }
-  if(Interaction::getType()==TypeType::zfs) {
-    return INTER_ZFS;
-  }
-  if(Interaction::getType()==TypeType::exchange) {
-    return INTER_EXCHANGE;
-  }
-  if(Interaction::getType()==TypeType::custem) {
-    return INTER_CUSTOM;
-  }
+    
+ReferenceFrame* Spin::GetFrame() const {
+  return mFrame;
 }
 
-//============================================================//
-// SpinachFrame
+void Spin::SetFrame(ReferenceFrame* Frame) {
+  mFrame=Frame;
+}
 
-SpinachFrame::SpinachFrame(const Reference_frame& _rf) : Reference_frame(_rf) {
+
+std::vector<Spin*> Spin::GetNearbySpins(double distance) {
+  std::vector<Spin*> result;
+
+  double dist2=distance*distance;
+  double x1,y1,z1;
+  GetCoordinates(&x1,&y1,&z1);
+
+  long spinCount=mParent->mSpins.size();
+  //Skip spins up to this spin in mParent->mSpins
+  long pos;
+  for(pos=0;mParent->mSpins[pos]!=this && pos<spinCount;pos++){}
+
+  
+  for(long i=pos+1;i<spinCount;i++) {
+    double x2,y2,z2;
+    mParent->mSpins[i]->GetCoordinates(&x2,&y2,&z2);
+    double deltaX=(x1-x2);
+    double deltaY=(y1-y2);
+    double deltaZ=(z1-z2);
+    if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ < dist2) {
+      result.push_back(mParent->mSpins[i]);
+    }
+  }
+  return result;
+}
+
+
+//==============================================================================//
+// Orientation
+
+Orientation::Orientation() : mType(UNDEFINED) {
   
 }
 
-
-  //============================================================//
-
-Matrix3::Matrix3(double a00,double a01,double a02,
-		 double a10,double a11,double a12,
-		 double a20,double a21,double a22) : foundEigenVals(false) {
-  ElementSequence elements;
-  elements.resize(9);
-  elements[0]=a00;
-  elements[1]=a01;
-  elements[2]=a02;
-
-  elements[3]=a10;
-  elements[4]=a11;
-  elements[5]=a12;
-
-  elements[6]=a20;
-  elements[7]=a21;
-  elements[8]=a22;
-  setElement(elements);
-}
-
-double Matrix3::det() const {
-  return
-    get(0,0)  *  (get(1,1)*get(2,2)-get(1,2)*get(2,1))+
-    get(1,0)  *  (get(0,1)*get(2,2)-get(0,2)*get(2,1))-
-    get(2,0)  *  (get(0,1)*get(1,2)-get(1,1)*get(0,1));
-}
-
-void Matrix3::calcEigenvalues() const {
-  //Find the 3 coefficents of the characteristic polynomial
-  //This formulate was taken from the wikipedia page, the correctness should
-  //be evident when it is used for arrow drawing
-
-
-  //Fun fact, a,b,c are coefficents of the characteristic polynomial. They are also the three
-  //invarients of the matrix. Coincidence? I think not.
-  double a=-(get(0,0)+get(1,1)+get(2,2));
-  double b=-(get(1,0)*get(0,1) + get(2,0)*get(0,2) + get(1,2)*get(2,1) -
-	     get(0,0)*get(1,1) - get(0,0)*get(2,2) - get(1,1)*get(2,2))/2.0;
-  double c=-det();
-
-  cout << "a=" << a << " b=" << b << " c=" << c << endl;
-
-  solveCubic(a,b,c,eigx,eigy,eigz);
-
-  cdouble x1=eigx,x2=eigy,x3=eigz;
-  cout << "x1=" << x1 << " x2=" << x2 << " x3=" << x3 << endl;
-  cout << "f(x1)=" << x1*x1*x1 + a*x1*x1 + b*x1 + c << endl;
-  cout << "f(x2)=" << x2*x2*x2 + a*x2*x2 + b*x2 + c << endl;
-  cout << "f(x3)=" << x3*x3*x3 + a*x3*x3 + b*x3 + c << endl;
-
-
-  cout << "eigx=" << eigx << " eigy=" << eigy << " eigz=" << eigz << endl;
-}
-
-void Matrix3::dump() const {
-  const ElementSequence elements=getElement();
-  double a00=elements[0];
-  double a01=elements[1];
-  double a02=elements[2];
-
-  double a10=elements[3];
-  double a11=elements[4];
-  double a12=elements[5];
-
-  double a20=elements[6];
-  double a21=elements[7];
-  double a22=elements[8];
-
-  cout << "Matrix3:" << endl;
-  cout << " (" << a00 << " " << a01 << " " << a02 << endl;
-  cout << " (" << a10 << " " << a11 << " " << a12 << endl;
-  cout << " (" << a20 << " " << a21 << " " << a22 << ")" << endl;
-}
-
-Matrix3 Matrix3::operator+(const Matrix3& m) const {
-  //Well unlike with a serious matrix class, this doesn't have to be efficent
-  Matrix3 retVal(get(0,0)+m.get(0,0),
-		 get(0,1)+m.get(0,1),
-		 get(0,2)+m.get(0,2),
-		 get(1,0)+m.get(1,0),
-		 get(1,1)+m.get(1,1),
-		 get(1,2)+m.get(1,2),
-		 get(2,0)+m.get(2,0),
-		 get(2,1)+m.get(2,1),
-		 get(2,2)+m.get(2,2));
-  return retVal;
-}
-
-Vector Matrix3::getEigenvectorX() const {
-  if(!foundEigenVals) {
-    calcEigenvalues();
+Orientation::~Orientation() {
+  if(mType==ANGLE_AXIS && mData.mAngleAxis.axis != NULL) {
+    delete mData.mAngleAxis.axis;
+  } else if(mType==EIGENSYSTEM) {
+    if(mData.mEigenSystem.XAxis != NULL) {
+      delete mData.mEigenSystem.XAxis;
+    }
+    if(mData.mEigenSystem.YAxis != NULL) {
+      delete mData.mEigenSystem.YAxis;
+    }
+    if(mData.mEigenSystem.ZAxis != NULL) {
+      delete mData.mEigenSystem.ZAxis;
+    }
   }
-  //Chose a value for x1, in this case, let x1=1
-  //Then solve the two remaining simultanious equations
-  cdouble y1=-get(0,1);
-  cdouble y2=-get(0,2);
+}
+ 
+Orientation::Type Orientation::GetType() const {
+  return mType;
+}
 
-  //Diagonalise the 2 by 2 submatrix, watching out for any division by zero
-  cdouble j,k,w1,w2;
-  if(get(1,2)!=0) {
-    j=get(2,1)/(get(1,1)-eigx);
-    w1=y1/(get(1,1)-eigx);
+Matrix3 Orientation::GetAsMatrix3() const {
+  return Matrix3(1,0,0,0,1,0,0,0,1);
+}
 
-    k=(get(2,2)-eigx)/get(1,2) - j;
-    w2=y2/get(1,2)-w1;
+void Orientation::GetEuler(double* alpha,double* beta,double* gamma) const {
+  *alpha = mData.mEuler.alpha;
+  *beta = mData.mEuler.beta;
+  *gamma = mData.mEuler.gamma;
+  return;
+}
+
+void Orientation::GetAngleAxis(double* angle,Vector3* axis) const {
+  *angle = mData.mAngleAxis.angle;
+  *axis = *mData.mAngleAxis.axis;
+  return;
+}
+
+void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) const {
+  *real = mData.mQuaternion.real;
+  *i = mData.mQuaternion.i;
+  *j = mData.mQuaternion.j;
+  *k = mData.mQuaternion.k;
+  return;
+}
+
+void Orientation::GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) const {
+  *XAxis = *mData.mEigenSystem.XAxis;
+  *YAxis = *mData.mEigenSystem.YAxis;
+  *ZAxis = *mData.mEigenSystem.ZAxis;
+  return;
+}
+
+void Orientation::SetEuler(double alpha,double beta,double gamma) {
+  mData.mEuler.alpha=alpha;
+  mData.mEuler.beta=beta;
+  mData.mEuler.gamma=gamma;
+  mType=EULER;
+  return;
+}
+
+void Orientation::SetAngleAxis(double angle,Vector3* axis) {
+  mData.mAngleAxis.angle=angle;
+  mData.mAngleAxis.axis=axis;
+  mType=ANGLE_AXIS;
+  return;
+
+}
+
+void Orientation::SetQuaternion(double real, double i, double j, double k) {
+  mData.mQuaternion.real=real;
+  mData.mQuaternion.i=i;
+  mData.mQuaternion.j=j;
+  mData.mQuaternion.k=k;
+  mType=QUATERNION;
+  return;
+}
+
+void Orientation::SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) {
+  mData.mEigenSystem.XAxis=XAxis;
+  mData.mEigenSystem.YAxis=YAxis;
+  mData.mEigenSystem.ZAxis=ZAxis;
+  return;
+}
+
+
+//==============================================================================//
+// Interaction
+
+Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY) {
+  
+}
+
+Interaction::~Interaction() {
+  if(mType==EIGENVALUES && mData.mEigenvalues.Orient != NULL) {
+    delete mData.mEigenvalues.Orient;
+  } else if(mType==AXRHOM && mData.mAxRhom.Orient != NULL) {
+    delete mData.mEigenvalues.Orient;
+  } else if(mType==SPANSKEW && mData.mSpanSkew.Orient != NULL) {
+    delete mData.mSpanSkew.Orient;
+  }
+}
+
+void Interaction::Dump() const {
+  cout << "  Dumping an Interaction" << endl;
+  switch (GetType()) {
+  case UNDEFINED:
+    cout << "    Type=Undefined" <<  endl;
+  case SCALAR:
+    cout << "    Type=Scalar" <<  endl;
+    cout << "    Value=" << mData.mScalar << endl;
+  case MATRIX:
+    cout << "    Type=Matrix" <<  endl;
+    cout << "    Value=" << endl;
+  case EIGENVALUES:
+    cout << "    Type=Eigenvalues" <<  endl;
+    cout << "    Value=" << endl;
+  case AXRHOM:
+    cout << "    Type=Axiality Rhombicity" <<  endl;
+    cout << "    Value=" << endl; 
+  case SPANSKEW:
+    cout << "    Type=Span-Skew" <<  endl;
+    cout << "    Value=" << endl;
+  }
+}
+  
+Interaction::Type Interaction::GetType() const {
+  return mType;
+}
+
+Matrix3 Interaction::GetAsMatrix3() const {
+  return Matrix3(1,0,0,0,1,0,0,0,1);
+}
+
+void Interaction::SetSpin1(Spin* Spin1) {
+  mSpin1=Spin1;
+}
+
+void Interaction::SetSpin2(Spin* Spin2) {
+  mSpin2=Spin2;
+}
+
+Spin* Interaction::GetSpin1() const {
+  return mSpin1;
+}
+
+Spin* Interaction::GetSpin2() const {
+  return mSpin2;
+}
+    
+void Interaction::GetScalar(double* Scalar) const {
+  *Scalar=mData.mScalar;
+}
+
+void Interaction::GetMatrix(Matrix3* Matrix) const {
+  *Matrix=*mData.mMatrix;
+  return;
+}
+
+void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) const {
+  *XX=mData.mEigenvalues.XX;
+  *YY=mData.mEigenvalues.YY;
+  *ZZ=mData.mEigenvalues.ZZ;
+  *Orient=*mData.mEigenvalues.Orient;
+  return;
+}
+
+void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) const {
+  *iso=mData.mAxRhom.iso;
+  *ax=mData.mAxRhom.ax;
+  *rh=mData.mAxRhom.rh;
+  *Orient=*mData.mAxRhom.Orient;
+  return;
+}
+
+void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) const {
+  *iso=mData.mSpanSkew.iso;
+  *Span=mData.mSpanSkew.span;
+  *Skew=mData.mSpanSkew.skew;
+  *Orient=*mData.mSpanSkew.Orient;
+  return;
+}
+
+void Interaction::SetScalar(double Scalar) {
+  mData.mScalar=Scalar;
+}
+
+void Interaction::SetMatrix(Matrix3* Matrix) {
+  mData.mMatrix=Matrix;
+}
+
+void Interaction::SetEigenvalues(double XX,double YY, double ZZ, Orientation* Orient) {
+  mData.mEigenvalues.XX=XX;
+  mData.mEigenvalues.YY=YY;
+  mData.mEigenvalues.ZZ=ZZ;
+  mData.mEigenvalues.Orient=Orient;
+  return;
+}
+
+void Interaction::SetAxRhom(double iso,double ax, double rh, Orientation* Orient) {
+  iso=mData.mAxRhom.iso;
+  ax=mData.mAxRhom.ax;
+  rh=mData.mAxRhom.rh;
+  Orient=mData.mAxRhom.Orient;
+  return;
+}
+
+void Interaction::SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient) {
+  mData.mSpanSkew.iso=iso;
+  mData.mSpanSkew.span= Span;
+  mData.mSpanSkew.skew=Skew;
+  mData.mSpanSkew.Orient=Orient;
+  return;
+}
+
+double Interaction::GetAsScalar() const {
+  return 0;
+}
+
+
+Matrix3 Interaction::GetAsMatrix() const {
+  return Matrix3(1,0,0,0,1,0,0,0,1);
+}
+
+
+//==============================================================================//
+// Reference Frame
+
+ReferenceFrame::ReferenceFrame() : mParent(NULL),mPosition(NULL){
+  
+}
+
+ReferenceFrame::ReferenceFrame(ReferenceFrame* Parent,Vector3* Position,Orientation* Orient) : mParent(Parent),mPosition(Position),mOrient(Orient) {
+
+}
+
+ReferenceFrame::~ReferenceFrame() {
+  if(mPosition != NULL) {
+    delete mPosition;
+  }
+  if(mOrient != NULL) {
+    delete mOrient;
+  }
+}
+    
+long ReferenceFrame::GetChildCount() const {
+  return mChildren.size();
+}
+
+ReferenceFrame* ReferenceFrame::GetChildFrame(long n) const {
+  return mChildren[n];
+}
+
+vector<ReferenceFrame*> ReferenceFrame::GetChildFrames() const {
+  return mChildren;
+}
+
+void ReferenceFrame::InsertChild(ReferenceFrame* Frame,long Position) {
+  if(Position != END) {
+    mChildren.push_back(Frame);
   } else {
-    cout << "zero found " << endl;
-    j=get(2,1)/(get(1,1)-eigx);
-    w1=y1/(get(1,1)-eigx);
-
-    k=(get(2,2)-eigx);
-    w2=y2;
-    cout << " j=" << j << " w1=" << w1 << endl;
+    mChildren.insert(mChildren.begin()+Position,Frame);
   }
-
-
-  cdouble v2=w2/k;
-  cdouble v1=w1-j*v2;
-
-  cout << " unnormaized=(1.0," << v1 << ","  << v2 << ")" << endl;
-
-  //Normalise
-  cout << " w1=" << w1 << " v2=" << v2 << endl;
-  cdouble norm=sqrt(1.0+w1*w1+v2*v2);
-
-  Vector eig((1.0/norm).real(),(w1/norm).real(),(v2/norm).real());
-
-  return eig;
 }
 
-Vector Matrix3::getEigenvectorY() const {
-  if(!foundEigenVals) {
-    calcEigenvalues();
+void ReferenceFrame::RemoveChild(long Position) {
+  mChildren.erase(mChildren.begin()+Position);
+}
+
+void ReferenceFrame::RemoveChild(ReferenceFrame* Child) {
+  if(Child==NULL) {
+    return;
   }
-  /*n  //Chose a value for x1, in this case, let x1=1
-  //Then solve the two remaining simultanious equations
-  double y1=eigx-get(0,0);
-  double y2=eigx-get(0,2);
-
-  double j=get(2,0)/get(0,0);
-  double k=get(2,2)/get(0,2) - j;
-
-  double w1=y1/get(0,0);
-  double w2=y2/get(0,2)-y2/get(0,0);
-
-  double v3=w2/k;
-
-  //Normalise
-  double norm=sqrt(1+w1*w1+v3*v3);
-
-  Vector eig(1.0/norm,w1/norm,v3/norm);
-  */
-  return Vector(1.0,1.0,1.0);
-}
-
-Vector Matrix3::getEigenvectorZ() const {
-  if(!foundEigenVals) {
-    calcEigenvalues();
+  for(long i=0;i<mChildren.size();i++) {
+    if(mChildren[i]==Child) {
+      mChildren.erase(mChildren.begin()+i);
+      return;
+    }    
   }
-  //Chose a value for x1, in this case, let x1=1
-  //Then solve the two remaining simultanious equations
-  /*double y1=eigx-get(0,0);
-  double y2=eigx-get(0,1);
-
-  double j=get(1,0)/get(0,0);
-  double k=get(1,1)/get(0,1) - j;
-
-  double w1=y1/get(0,0);
-  double w2=y2/get(0,1)-y2/get(0,0);
-
-  double v3=w2/k;
-
-  //Normalise
-  double norm=sqrt(1+w1*w1+v3*v3);
-
-  Vector eig(1/norm,w1/norm,v3/norm);
-  */
-  return Vector(1.0,1.0,1.0);
 }
 
-Vector Matrix3::solveSimEq(double y1,double y2,double y3) const {
-  //This function may not actually be needed
-  //First iteration, make every value on the top first collum zero except the first
-  //Which will be one.
-
-  //Start with the following matrix:
-  // (a,b,c,
-  //  d,e,f
-  //  g,h,i) where b=get(1,0) for example
-
-  double j = get(1,0)/get(0,0);
-  double k = get(2,0)/get(0,0);
-  double l = get(1,1)/get(0,1)-j;
-  double m = get(2,1)/get(0,1)-k;
-  double n = get(1,2)/get(0,2)-j;
-  double p = get(2,2)/get(0,2)-k;;
-
-  //Now we have
-  // (1,j,k,
-  //  0,l,m,
-  //  0,n,p)
-  //Repeate the process with the lower 2x2 matrix
-
-  double q=m/l;
-  double r=p/n-q;
-
-  //Matrix is in the form
-  // (1,j,k,
-  //  0,1,q,
-  //  0,0,r)
-
-  double w1=y1/get(0,0);
-  double w2=y2/get(0,1)-w1;
-  double w3=y2/get(0,2)-w1;
-
-  //z1=w1
-  double z2=w2/l;
-  double z3=(w3/n-w2/l)/r;
-
-  return Vector(w1,z2,z3);
+void ReferenceFrame::SetPosition(Vector3* Position) {
+  mPosition=Position;
 }
 
+Vector3* ReferenceFrame::GetPosition() const {
+  return mPosition;
+}
+
+Orientation* ReferenceFrame::GetOrientation() const {
+  return mOrient;
+}
+
+    
 

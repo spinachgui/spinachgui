@@ -61,17 +61,15 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
     This is a custem cell editor for editing interactions. It's based off the exmaple code in
     GridCustEditor.py in the wxPython samples
     """
-    def __init__(self,data):
+    def __init__(self):
         wx.grid.PyGridCellEditor.__init__(self)
-        self.data=data
-
 
     def Create(self, parent, id, evtHandler):
         """
         Called to create the control, which must derive from wx.Control.
         *Must Override*
         """
-        self._tc = interactionEdit(parent,self.data,id)
+        self._tc = InterTextEditor(parent,id)
         #self._tc.SetInsertionPoint(0)
         self.SetControl(self._tc)
 
@@ -185,11 +183,11 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
 
 
 class SpinGrid(wx.grid.Grid):
-    def __init__(self,parent,data,id=-1):
+    def __init__(self,parent,id=-1):
         wx.grid.Grid.__init__(self,parent,id=-1)
-        self.data=data
+        self.ss=wx.GetApp().ss;
 
-        self.CreateGrid( self.data.ss.getSpinCount()+1, len(columnOrder) );
+        self.CreateGrid( self.ss.GetSpinCount()+1, len(columnOrder) );
 
         self.EnableEditing( True );
         self.EnableGridLines( True );
@@ -217,21 +215,21 @@ class SpinGrid(wx.grid.Grid):
 
     def refreshFromSpinSystem(self):
         self.ClearGrid();
-        self.AppendRows(self.data.ss.getSpinCount());
-        for i in range(self.data.ss.getSpinCount()):
-            thisSpin=self.data.ss.getSpinByIndex(i);
-            coords=thisSpin.getCoords();
+        self.AppendRows(self.ss.GetSpinCount());
+        for i in range(self.ss.GetSpinCount()):
+            thisSpin=self.ss.GetSpin(i);
+            x,y,z=thisSpin.GetPosition().GetCoordinates();
 
             #Set the selected column renderers and editors to be boolian
             self.SetCellRenderer(i,COL_SELECTED,wx.grid.GridCellBoolRenderer())
             self.SetCellEditor(i,COL_SELECTED,wx.grid.GridCellBoolEditor())
 
             #Setup the label and the element columns
-            self.SetCellValue(i,COL_LABEL,thisSpin.getLabel());
+            self.SetCellValue(i,COL_LABEL,thisSpin.GetLabel());
 
-            self.SetCellValue(i,COL_X,str(coords[0]));
-            self.SetCellValue(i,COL_Y,str(coords[1]));
-            self.SetCellValue(i,COL_Z,str(coords[2]));
+            self.SetCellValue(i,COL_X,str(x));
+            self.SetCellValue(i,COL_Y,str(y));
+            self.SetCellValue(i,COL_Z,str(z));
             
             #Set up floating point editors, so the user can't enter something stupid
             self.SetCellEditor(i,COL_X,wx.grid.GridCellFloatEditor());
@@ -239,9 +237,9 @@ class SpinGrid(wx.grid.Grid):
             self.SetCellEditor(i,COL_Z,wx.grid.GridCellFloatEditor());
             
             #Set up the special interaction editors
-            self.SetCellEditor(i,COL_LINEAR,InterCellEditor(self.data))
-            self.SetCellEditor(i,COL_BILINEAR,InterCellEditor(self.data))
-            self.SetCellEditor(i,COL_QUADRAPOLAR,InterCellEditor(self.data))
+            self.SetCellEditor(i,COL_LINEAR,InterCellEditor())
+            self.SetCellEditor(i,COL_BILINEAR,InterCellEditor())
+            self.SetCellEditor(i,COL_QUADRAPOLAR,InterCellEditor())
 
 
 

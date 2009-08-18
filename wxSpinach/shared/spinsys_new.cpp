@@ -42,15 +42,15 @@ Matrix3::Matrix3(double a00,double a01,double a02,double a10,double a11,double a
   raw[6]=a20;   raw[7]=a21;   raw[8]=a22;
 }
     
-const double* Matrix3::GetRaw() {
+const double* Matrix3::GetRaw() const {
   return raw;
 }
     
-double Matrix3::Get(long column, long row) {
+double Matrix3::Get(long column, long row) const {
   return raw[3*column+row];
 }
 
-double Matrix3::operator() (long column, long row) {
+double Matrix3::operator() (long column, long row) const {
   return raw[3*column+row];
 }
 
@@ -64,7 +64,7 @@ void Matrix3::Set(long column,long row,double val) {
 // SpinSystem
 
 SpinSystem::SpinSystem() {
-  mLabFrame.SetPosition(Vector3(0,0,0));
+  mLabFrame.SetPosition(new Vector3(0,0,0));
 }
 
 SpinSystem::~SpinSystem() {
@@ -76,15 +76,15 @@ SpinSystem::~SpinSystem() {
   }
 }
     
-long SpinSystem::GetSpinCount() {
+long SpinSystem::GetSpinCount() const {
   return mSpins.size();
 }
 
-Spin* SpinSystem::GetSpin(long n) {
+Spin* SpinSystem::GetSpin(long n) const {
   return mSpins[n];
 }
 
-vector<Spin*> SpinSystem::GetSpins() {
+vector<Spin*> SpinSystem::GetSpins() const {
   return mSpins;
 }
 
@@ -109,7 +109,7 @@ void SpinSystem::RemoveSpin(Spin* _Spin) {
   }
 }
 
-const ReferenceFrame* SpinSystem::GetRootFrame() {
+const ReferenceFrame* SpinSystem::GetRootFrame() const {
   return &mLabFrame;
 }
 
@@ -129,19 +129,21 @@ void SpinSystem::LoadFromXMLFile(const char* filename) {
 //==============================================================================//
 // Spin
 
-Spin::Spin(SpinSystem* Parent) : mParent(Parent) {
+Spin::Spin(SpinSystem* Parent,Vector3* Position,string Label,ReferenceFrame* mFrame) : mParent(Parent),mPosition(Position),mLabel(Label) {
   
 }
 
 Spin::~Spin() {
-
+  if(mPosition != NULL) {
+    delete mPosition;
+  }
 }
 
-Vector3 Spin::GetPosition() {
+Vector3* Spin::GetPosition() const {
   return mPosition;
 }
 
-void Spin::SetPosition(Vector3 Position) {
+void Spin::SetPosition(Vector3* Position) {
   mPosition=Position;
 }
 
@@ -149,11 +151,11 @@ void Spin::SetLabel(string Label) {
   mLabel=Label;
 }
 
-const char* Spin::GetLabel() {
+const char* Spin::GetLabel() const {
   return mLabel.c_str();
 }
     
-long Spin::GetInteractionCount() {
+long Spin::GetInteractionCount() const {
   long count=0;
   for(long i=0;i<mParent->mInteractions.size();i++) {
     if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
@@ -163,7 +165,7 @@ long Spin::GetInteractionCount() {
   return count;
 }
 
-Interaction* Spin::GetInteraction(long n) {
+Interaction* Spin::GetInteraction(long n) const {
   long count=0;
   for(long i=0;i<mParent->mInteractions.size();i++) {
     if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
@@ -176,7 +178,7 @@ Interaction* Spin::GetInteraction(long n) {
   return NULL;
 }
 
-vector<Interaction*> Spin::GetInteractions() {
+vector<Interaction*> Spin::GetInteractions() const {
   vector<Interaction*> InterPtrs;
   for(long i=0;i<mParent->mInteractions.size();i++) {
     if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
@@ -226,7 +228,7 @@ void Spin::RemoveInteraction(Interaction* _Interaction) {
   }
 }
     
-ReferenceFrame* Spin::GetFrame() {
+ReferenceFrame* Spin::GetFrame() const {
   return mFrame;
 }
 
@@ -257,28 +259,28 @@ Orientation::~Orientation() {
   }
 }
  
-Orientation::Type Orientation::GetType() {
+Orientation::Type Orientation::GetType() const {
   return mType;
 }
 
-Matrix3 Orientation::GetAsMatrix3() {
+Matrix3 Orientation::GetAsMatrix3() const {
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }
 
-void Orientation::GetEuler(double* alpha,double* beta,double* gamma) {
+void Orientation::GetEuler(double* alpha,double* beta,double* gamma) const {
   *alpha = mData.mEuler.alpha;
   *beta = mData.mEuler.beta;
   *gamma = mData.mEuler.gamma;
   return;
 }
 
-void Orientation::GetAngleAxis(double* angle,Vector3* axis) {
+void Orientation::GetAngleAxis(double* angle,Vector3* axis) const {
   *angle = mData.mAngleAxis.angle;
   *axis = *mData.mAngleAxis.axis;
   return;
 }
 
-void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) {
+void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) const {
   *real = mData.mQuaternion.real;
   *i = mData.mQuaternion.i;
   *j = mData.mQuaternion.j;
@@ -286,7 +288,7 @@ void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) {
   return;
 }
 
-void Orientation::GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) {
+void Orientation::GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) const {
   *XAxis = *mData.mEigenSystem.XAxis;
   *YAxis = *mData.mEigenSystem.YAxis;
   *ZAxis = *mData.mEigenSystem.ZAxis;
@@ -343,32 +345,32 @@ Interaction::~Interaction() {
   }
 }
   
-Interaction::Type Interaction::GetType() {
+Interaction::Type Interaction::GetType() const {
   return mType;
 }
 
-Matrix3 Interaction::GetAsMatrix3() {
+Matrix3 Interaction::GetAsMatrix3() const {
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }
 
-Spin* Interaction::GetSpin1() {
+Spin* Interaction::GetSpin1() const {
   return mSpin1;
 }
 
-Spin* Interaction::GetSpin2() {
+Spin* Interaction::GetSpin2() const {
   return mSpin2;
 }
     
-void Interaction::GetScalar(double* Scalar) {
+void Interaction::GetScalar(double* Scalar) const {
   *Scalar=mData.mScalar;
 }
 
-void Interaction::GetMatrix(Matrix3* Matrix) {
+void Interaction::GetMatrix(Matrix3* Matrix) const {
   *Matrix=*mData.mMatrix;
   return;
 }
 
-void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) {
+void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) const {
   *XX=mData.mEigenvalues.XX;
   *YY=mData.mEigenvalues.YY;
   *ZZ=mData.mEigenvalues.ZZ;
@@ -376,7 +378,7 @@ void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation*
   return;
 }
 
-void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) {
+void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) const {
   *iso=mData.mAxRhom.iso;
   *ax=mData.mAxRhom.ax;
   *rh=mData.mAxRhom.rh;
@@ -384,7 +386,7 @@ void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* Ori
   return;
 }
 
-void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) {
+void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) const {
   *iso=mData.mSpanSkew.iso;
   *Span=mData.mSpanSkew.span;
   *Skew=mData.mSpanSkew.skew;
@@ -427,27 +429,32 @@ void Interaction::SetSpanSkew(double iso,double Span, double Skew, Orientation* 
 //==============================================================================//
 // Reference Frame
 
-ReferenceFrame::ReferenceFrame() : mParent(NULL),mPosition(0,0,0){
+ReferenceFrame::ReferenceFrame() : mParent(NULL),mPosition(NULL){
   
 }
 
-ReferenceFrame::ReferenceFrame(ReferenceFrame* Parent) : mParent(Parent) {
+ReferenceFrame::ReferenceFrame(ReferenceFrame* Parent,Vector3* Position,Orientation* Orient) : mParent(Parent),mPosition(Position),mOrient(Orient) {
 
 }
 
 ReferenceFrame::~ReferenceFrame() {
-
+  if(mPosition != NULL) {
+    delete mPosition;
+  }
+  if(mOrient != NULL) {
+    delete mOrient;
+  }
 }
     
-long ReferenceFrame::GetChildCount() {
+long ReferenceFrame::GetChildCount() const {
   return mChildren.size();
 }
 
-ReferenceFrame* ReferenceFrame::GetChildFrame(long n) {
+ReferenceFrame* ReferenceFrame::GetChildFrame(long n) const {
   return mChildren[n];
 }
 
-vector<ReferenceFrame*> ReferenceFrame::GetChildFrames() {
+vector<ReferenceFrame*> ReferenceFrame::GetChildFrames() const {
   return mChildren;
 }
 
@@ -475,16 +482,16 @@ void ReferenceFrame::RemoveChild(ReferenceFrame* Child) {
   }
 }
 
-void ReferenceFrame::SetPosition(Vector3 Position) {
+void ReferenceFrame::SetPosition(Vector3* Position) {
   mPosition=Position;
 }
 
-Vector3 ReferenceFrame::GetPosition() {
+Vector3* ReferenceFrame::GetPosition() const {
   return mPosition;
 }
 
-Orientation* ReferenceFrame::GetOrientation() {
-  return &mOrient;
+Orientation* ReferenceFrame::GetOrientation() const {
+  return mOrient;
 }
 
     

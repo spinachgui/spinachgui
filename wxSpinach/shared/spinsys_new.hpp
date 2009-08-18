@@ -36,10 +36,10 @@ class Matrix3 {
             double a10,double a11,double a12,
             double a20,double a21,double a22);
     
-    const double* GetRaw();
+    const double* GetRaw() const;
     
-    double Get(long column, long row);
-    double operator() (long column, long row);
+    double Get(long column, long row) const;
+    double operator() (long column, long row) const;
     void Set(long i,long j,double val);
   private:
     double raw[9];
@@ -59,13 +59,13 @@ class Orientation {
         EIGENSYSTEM
     };
     
-    Type GetType();
-    Matrix3 GetAsMatrix3();
+    Type GetType() const;
+    Matrix3 GetAsMatrix3() const;
 
-    void GetEuler(double* alpha,double* beta,double* gamma);
-    void GetAngleAxis(double* angle,Vector3* axis);
-    void GetQuaternion(double* real, double* i, double* j, double* k);
-    void GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
+    void GetEuler(double* alpha,double* beta,double* gamma) const;
+    void GetAngleAxis(double* angle,Vector3* axis) const;
+    void GetQuaternion(double* real, double* i, double* j, double* k) const;
+    void GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) const;
 
     void SetEuler(double alpha,double beta,double gamma);
     void SetAngleAxis(double angle,Vector3* axis);
@@ -100,52 +100,52 @@ class Orientation {
 class ReferenceFrame {
   public:
     ReferenceFrame();
-    ReferenceFrame(ReferenceFrame* Parent);
+    ReferenceFrame(ReferenceFrame* Parent,Vector3* Position,Orientation* Orient);
     ~ReferenceFrame();
     
-    long GetChildCount();
-    ReferenceFrame* GetChildFrame(long n);
-    vector<ReferenceFrame*> GetChildFrames();
+    long GetChildCount() const;
+    ReferenceFrame* GetChildFrame(long n) const;
+    vector<ReferenceFrame*> GetChildFrames() const;
     void InsertChild(ReferenceFrame* Frame,long Position=END);
     void RemoveChild(long Position);
     void RemoveChild(ReferenceFrame* Child);
     
-    Vector3 GetPosition();
-    void SetPosition(Vector3 Position);
-    Orientation* GetOrientation();
+    Vector3* GetPosition() const;
+    void SetPosition(Vector3* Position);
+    Orientation* GetOrientation() const;
     
   private:
     ReferenceFrame* mParent;
     vector<ReferenceFrame*> mChildren;
     
-    Vector3 mPosition;
-    Orientation mOrient;
+    Vector3* mPosition;
+    Orientation* mOrient;
 };
 
 
 class Spin {
   public:
-    Spin(SpinSystem* Parent);
+    Spin(SpinSystem* Parent,Vector3* mPosition,string mLabel,ReferenceFrame* mFrame);
     ~Spin();
 
-    Vector3 GetPosition();
-    void SetPosition(Vector3 Position);
+    Vector3* GetPosition() const;
+    void SetPosition(Vector3* Position);
 
     void SetLabel(string Label);
-    const char* GetLabel();
+    const char* GetLabel() const;
     
-    long GetInteractionCount();
-    Interaction* GetInteraction(long n);
-    vector<Interaction*> GetInteractions();
+    long GetInteractionCount() const;
+    Interaction* GetInteraction(long n) const;
+    vector<Interaction*> GetInteractions() const;
     void InsertInteraction(Interaction* _Interaction,long Position=END);
     void RemoveInteraction(long Position);
     void RemoveInteraction(Interaction* _Interaction);
     
-    ReferenceFrame* GetFrame();
+    ReferenceFrame* GetFrame() const;
     void SetFrame(ReferenceFrame* Frame);
   private:
     SpinSystem* mParent;
-    Vector3 mPosition;
+    Vector3* mPosition;
     string mLabel;
     ReferenceFrame* mFrame;
 };
@@ -165,14 +165,14 @@ class Interaction {
         SPANSKEW
     };
     
-    Type GetType();
-    Matrix3 GetAsMatrix3();
+    Type GetType() const;
+    Matrix3 GetAsMatrix3() const;
     
-    void GetScalar(double* Scalar);
-    void GetMatrix(Matrix3* Matrix);
-    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient);
-    void GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient);
-    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient);
+    void GetScalar(double* Scalar) const;
+    void GetMatrix(Matrix3* Matrix) const;
+    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) const;
+    void GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) const;
+    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) const;
 
     void SetScalar(double Scalar);
     void SetMatrix(Matrix3* Matrix);
@@ -180,8 +180,8 @@ class Interaction {
     void SetAxRhom(double iso,double ax, double rh, Orientation* Orient);
     void SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient);
 
-    Spin* GetSpin1();
-    Spin* GetSpin2();
+    Spin* GetSpin1() const;
+    Spin* GetSpin2() const;
   private:
     union  {
       double mScalar;
@@ -216,14 +216,14 @@ class SpinSystem {
     SpinSystem();
     ~SpinSystem();
     
-    long GetSpinCount();    
-    Spin* GetSpin(long n);
-    vector<Spin*> GetSpins();
+    long GetSpinCount() const;
+    Spin* GetSpin(long n) const;
+    vector<Spin*> GetSpins() const;
     void InsertSpin(Spin* _Spin,long Position=END);
     void RemoveSpin(long Position);
     void RemoveSpin(Spin* _Spin);
 
-    const ReferenceFrame* GetRootFrame();
+    const ReferenceFrame* GetRootFrame() const;
     
     void LoadFromGamesFile(const char* filename);
     void LoadFromG03File(const char* filename);

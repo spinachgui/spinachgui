@@ -16,97 +16,39 @@
   </div>
 </div>
 <div class="contents">
-<h1>/home/gareth/src/cspinich/wxSpinach/shared/spinsys.cpp File Reference</h1><code>#include &quot;<a class="el" href="spinsys_8hpp-source.html">spinsys.hpp</a>&quot;</code><br>
-<code>#include &lt;iostream&gt;</code><br>
+<h1>/home/gareth/src/cspinich/wxSpinach/shared/spinsys.cpp File Reference</h1><code>#include &lt;<a class="el" href="spinsys_8hpp-source.html">shared/spinsys.hpp</a>&gt;</code><br>
+<code>#include &lt;boost/algorithm/string/trim.hpp&gt;</code><br>
 <code>#include &lt;fstream&gt;</code><br>
 <code>#include &lt;sstream&gt;</code><br>
-<code>#include &lt;string&gt;</code><br>
-<code>#include &lt;boost/algorithm/string/trim.hpp&gt;</code><br>
+<code>#include &lt;iostream&gt;</code><br>
 <code>#include &lt;<a class="el" href="nuclear__data_8hpp-source.html">shared/nuclear_data.hpp</a>&gt;</code><br>
-<code>#include &lt;cmath&gt;</code><br>
-<code>#include &lt;complex&gt;</code><br>
-<code>#include &lt;map&gt;</code><br>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
-<tr><td colspan="2"><br><h2>Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">typedef complex&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a></td></tr>
-
-<tr><td colspan="2"><br><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="spinsys_8cpp.html#3147103cceb2470c8c5157b594e851fe">solveCubic</a> (const <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> a, const <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> b, const <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> c, <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> &amp;z1, <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> &amp;z2, <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> &amp;z3)</td></tr>
+<tr><td colspan="2"><br><h2>Variables</h2></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">const double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="spinsys_8cpp.html#01494d4ab4aa2374424e5a7600037aa2">IDENTITY3</a> []</td></tr>
 
 </table>
-<hr><h2>Typedef Documentation</h2>
-<a class="anchor" name="4dbe69e758edd9472f9792e8f7c3c80b"></a><!-- doxytag: member="spinsys.cpp::cdouble" ref="4dbe69e758edd9472f9792e8f7c3c80b" args="" -->
+<hr><h2>Variable Documentation</h2>
+<a class="anchor" name="01494d4ab4aa2374424e5a7600037aa2"></a><!-- doxytag: member="spinsys.cpp::IDENTITY3" ref="01494d4ab4aa2374424e5a7600037aa2" args="[]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef complex&lt;double&gt; <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a>          </td>
+          <td class="memname">const double <a class="el" href="spinsys__new_8cpp.html#01494d4ab4aa2374424e5a7600037aa2">IDENTITY3</a>[]          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-
-</div>
-</div><p>
-<hr><h2>Function Documentation</h2>
-<a class="anchor" name="3147103cceb2470c8c5157b594e851fe"></a><!-- doxytag: member="spinsys.cpp::solveCubic" ref="3147103cceb2470c8c5157b594e851fe" args="(const cdouble a, const cdouble b, const cdouble c, cdouble &amp;z1, cdouble &amp;z2, cdouble &amp;z3)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void solveCubic           </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a>&nbsp;</td>
-          <td class="paramname"> <em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a>&nbsp;</td>
-          <td class="paramname"> <em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a>&nbsp;</td>
-          <td class="paramname"> <em>c</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>z1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>z2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="spinsys_8cpp.html#4dbe69e758edd9472f9792e8f7c3c80b">cdouble</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>z3</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
+<b>Initial value:</b><div class="fragment"><pre class="fragment">{1.0,0.0,0.0,
+                        0.0,1.0,0.0,
+                          0.0,0.0,1.0}
+</pre></div>
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Aug 16 16:38:39 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 19 20:08:23 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

@@ -15,216 +15,300 @@
     </ul>
   </div>
 <h1>/home/gareth/src/cspinich/wxSpinach/shared/spinsys.hpp</h1><a href="spinsys_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00002"></a>00002 
-<a name="l00003"></a>00003 <span class="preprocessor">#include &lt;<a class="code" href="spinsys__spec_8hpp.html" title="Generated from /home/gareth/src/cspinich/wxSpinach/data/spinsys_spec.xsd.">shared/spinsys_spec.hpp</a>&gt;</span>
-<a name="l00004"></a>00004 <span class="preprocessor">#include &lt;iostream&gt;</span>
-<a name="l00005"></a>00005 <span class="preprocessor">#include &lt;vector&gt;</span>
-<a name="l00006"></a>00006 <span class="preprocessor">#include &lt;complex&gt;</span>
+<a name="l00002"></a>00002 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00003"></a>00003 <span class="preprocessor">#include &lt;string&gt;</span>
+<a name="l00004"></a>00004 <span class="preprocessor">#include &lt;string.h&gt;</span>
+<a name="l00005"></a>00005 
+<a name="l00006"></a>00006 <span class="keyword">using namespace </span>std;
 <a name="l00007"></a>00007 
-<a name="l00008"></a>00008 <span class="keyword">using namespace </span>std;
+<a name="l00008"></a><a class="code" href="spinsys_8hpp.html#006a302e80285eb7d251159a00553438">00008</a> <span class="keyword">const</span> <span class="keywordtype">long</span> <a class="code" href="spinsys_8hpp.html#006a302e80285eb7d251159a00553438">END</a>=-1;
 <a name="l00009"></a>00009 
-<a name="l00010"></a>00010 <span class="comment">//Forward declare the classes in this file</span>
-<a name="l00011"></a>00011 <span class="keyword">class </span><a class="code" href="classSpinsysXMLRoot.html">SpinsysXMLRoot</a>;
-<a name="l00012"></a>00012 <span class="keyword">class </span><a class="code" href="classSpinachSpinsys.html">SpinachSpinsys</a>;
-<a name="l00013"></a>00013 <span class="keyword">class </span>Spinsys;
-<a name="l00014"></a>00014 <span class="keyword">class </span><a class="code" href="classSpinachSpin.html">SpinachSpin</a>;
-<a name="l00015"></a>00015 <span class="keyword">class </span><a class="code" href="classSpinachInteraction.html">SpinachInteraction</a>;
-<a name="l00016"></a>00016 <span class="keyword">class </span><a class="code" href="classSpinachFrame.html">SpinachFrame</a>;
-<a name="l00017"></a>00017 <span class="keyword">class </span><a class="code" href="classSpinachOrientation.html">SpinachOrientation</a>;
-<a name="l00018"></a>00018 <span class="keyword">class </span><a class="code" href="classMatrix3.html">Matrix3</a>;
-<a name="l00019"></a>00019 <span class="keyword">class </span>intList;
-<a name="l00020"></a>00020 
-<a name="l00022"></a><a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e648">00022</a> <span class="keyword">enum</span> <a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e648" title="Enumeration of the various types of interaction.">INTERACTION</a> {
-<a name="l00023"></a><a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e6488f4c9ca0e34db1c34f5b6d854569cfa9">00023</a>   <a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e6488f4c9ca0e34db1c34f5b6d854569cfa9">INTER_SCALER</a>,
-<a name="l00024"></a><a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e6480ffcc7d87d4d56fe819ac1ffec8cfb5a">00024</a>   <a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e6480ffcc7d87d4d56fe819ac1ffec8cfb5a">INTER_MATRIX</a>,
-<a name="l00025"></a><a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e64812a8fdb750de404ea246d7c5196d5bb8">00025</a>   <a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e64812a8fdb750de404ea246d7c5196d5bb8">INTER_EIGENVALUES</a>,
-<a name="l00026"></a><a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e6481eed3aaaf0822c48f27c6fbbcfdb3107">00026</a>   <a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e6481eed3aaaf0822c48f27c6fbbcfdb3107">INTER_AXIALITY_RHOMBICITY</a>,
-<a name="l00027"></a><a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e64819cffc3a31d2bcd849afe1c144c80e18">00027</a>   <a class="code" href="spinsys_8hpp.html#de18c0d0fd06f11e90360eb67c57e64819cffc3a31d2bcd849afe1c144c80e18">INTER_SPAN_SKEW</a>
-<a name="l00028"></a>00028 };
-<a name="l00029"></a>00029 
-<a name="l00030"></a><a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c">00030</a> <span class="keyword">enum</span> <a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c">ORIENTATION</a> {
-<a name="l00031"></a><a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c4617f0964383601a99a53c34bc97f3f8">00031</a>   <a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c4617f0964383601a99a53c34bc97f3f8">ORIENT_EULER</a>,
-<a name="l00032"></a><a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c44442dbb0941402ffe61bc8211ac7243">00032</a>   <a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c44442dbb0941402ffe61bc8211ac7243">ORIENT_ANGLE_AXIS</a>,
-<a name="l00033"></a><a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c97d05f0be1b78d35dcd5f1d13aa6752c">00033</a>   <a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c97d05f0be1b78d35dcd5f1d13aa6752c">ORIENT_QUATERNION</a>,
-<a name="l00034"></a><a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c2135b0d125a85795083e0d309ec556db">00034</a>   <a class="code" href="spinsys_8hpp.html#dc460053ab2088d3fe74b8b90a7a1c4c2135b0d125a85795083e0d309ec556db">ORIENT_EIGENSYSTEM</a>
-<a name="l00035"></a>00035 };
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037 
-<a name="l00038"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">00038</a> <span class="keyword">enum</span> <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">interactionType</a> {
-<a name="l00039"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a1eaf6a499b4cdf32a59531449ef08e72">00039</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a1eaf6a499b4cdf32a59531449ef08e72">INTER_ANY</a>,
-<a name="l00040"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a1f6151dbca40592a7625b5e44ea9a849">00040</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a1f6151dbca40592a7625b5e44ea9a849">INTER_NMR</a>,
-<a name="l00041"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a2226788404e1afdff1f47302c2241120">00041</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a2226788404e1afdff1f47302c2241120">INTER_EPR</a>,
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043   <span class="comment">//EPR INTERACTIONS</span>
-<a name="l00044"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a84b49f16c8d39d62884ba909246f8dad">00044</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a84b49f16c8d39d62884ba909246f8dad">INTER_HFC</a>,
-<a name="l00045"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a7bf047b41520eb0d59f2ad1e7ec3dade">00045</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a7bf047b41520eb0d59f2ad1e7ec3dade">INTER_GTENSER</a>,
-<a name="l00046"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2ab6ea3ea1095c81c06c912fde852ffcc1">00046</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2ab6ea3ea1095c81c06c912fde852ffcc1">INTER_ZFS</a>,
-<a name="l00047"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2aa1bf634e352314e33f1f53f6d9389823">00047</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2aa1bf634e352314e33f1f53f6d9389823">INTER_EXCHANGE</a>,
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049   <span class="comment">//NMR INTERACTIONS</span>
-<a name="l00050"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a6b6a27566fb51c9f0efa34d1daee8dc9">00050</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a6b6a27566fb51c9f0efa34d1daee8dc9">INTER_SHIELDING</a>,
-<a name="l00051"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a16ea1b6f75267d2f546326498684710f">00051</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a16ea1b6f75267d2f546326498684710f">INTER_SCALAR</a>,   
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053   <span class="comment">//Interactions relevent to both nmr and epr</span>
-<a name="l00054"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a279e781e54bc867d49d5478e18072825">00054</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a279e781e54bc867d49d5478e18072825">INTER_QUADRUPOLAR</a>,
-<a name="l00055"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2acae0a42f80e5968b17c7398be2584498">00055</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2acae0a42f80e5968b17c7398be2584498">INTER_DIPOLAR</a>,
-<a name="l00056"></a><a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a773d6d8bf7842d120901c611b4f839a0">00056</a>   <a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a773d6d8bf7842d120901c611b4f839a0">INTER_CUSTOM</a>
-<a name="l00057"></a>00057 };
-<a name="l00058"></a>00058 
-<a name="l00059"></a><a class="code" href="classSpinachSpinsys.html">00059</a> <span class="keyword">class </span><a class="code" href="classSpinachSpinsys.html">SpinachSpinsys</a> : <span class="keyword">public</span> <a class="code" href="classSpin__system.html" title="Class corresponding to the spin_system schema type.">Spin_system</a> {
-<a name="l00060"></a><a class="code" href="classSpinachSpinsys.html#9c23d1ae948bf1b6065497645e7aad38">00060</a>   <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classSpinsysXMLRoot.html">SpinsysXMLRoot</a>;
-<a name="l00061"></a>00061 <span class="keyword">public</span>:
-<a name="l00062"></a><a class="code" href="classSpinachSpinsys.html#702d1a93765fcc47f3f8100de1da1577">00062</a>   <a class="code" href="classSpinachSpinsys.html#702d1a93765fcc47f3f8100de1da1577">SpinachSpinsys</a>() : <a class="code" href="classSpin__system.html" title="Class corresponding to the spin_system schema type.">Spin_system</a>() {}
-<a name="l00063"></a><a class="code" href="classSpinachSpinsys.html#b0e30773bf43ec0182473c4ba752785e">00063</a>   <a class="code" href="classSpinachSpinsys.html#702d1a93765fcc47f3f8100de1da1577">SpinachSpinsys</a>(<a class="code" href="classSpin__system.html" title="Class corresponding to the spin_system schema type.">Spin_system</a>&amp; s) : <a class="code" href="classSpin__system.html" title="Class corresponding to the spin_system schema type.">Spin_system</a>(s) {}
-<a name="l00064"></a>00064   <span class="keywordtype">void</span> <a class="code" href="classSpinachSpinsys.html#504ecc3e5462a0a9b27c7fa69efc6891">dump</a>() <span class="keyword">const</span>;
-<a name="l00066"></a>00066   <a class="code" href="classSpinachSpin.html">SpinachSpin</a> <a class="code" href="classSpinachSpinsys.html#e0a4ed715306d4bc0f7e13ff6583b4d4" title="Get a particular spin number.">getSpinByIndex</a>(<span class="keywordtype">long</span> n);
-<a name="l00068"></a>00068   <span class="keywordtype">long</span> <a class="code" href="classSpinachSpinsys.html#01ad0fc144de04deec9325438287e43c" title="Get the total number of spins in the spin system.">getSpinCount</a>() <span class="keyword">const</span>;
-<a name="l00069"></a>00069 
-<a name="l00071"></a>00071   <a class="code" href="classSpinachInteraction.html">SpinachInteraction</a> <a class="code" href="classSpinachSpinsys.html#cda78cb5951143acdb832ef9e31cc2d8" title="Get a particular interaction.">getInteractionByIndex</a>(<span class="keywordtype">long</span> n);
-<a name="l00073"></a>00073   <span class="keywordtype">long</span> <a class="code" href="classSpinachSpinsys.html#50ed65b50c5c4de826f380b14723df13" title="Get the total number of interactions.">getInteractionCount</a>() <span class="keyword">const</span>;  
+<a name="l00010"></a>00010 <span class="keyword">class </span><a class="code" href="classSpinSystem.html">SpinSystem</a>;
+<a name="l00011"></a>00011 <span class="keyword">class </span><a class="code" href="classSpin.html">Spin</a>;
+<a name="l00012"></a>00012 <span class="keyword">class </span><a class="code" href="classOrientation.html">Orientation</a>;
+<a name="l00013"></a>00013 <span class="keyword">class </span><a class="code" href="classInteraction.html">Interaction</a>;
+<a name="l00014"></a>00014 <span class="keyword">class </span><a class="code" href="classReferenceFrame.html">ReferenceFrame</a>;
+<a name="l00015"></a>00015 
+<a name="l00016"></a><a class="code" href="classSpinSystemElement.html">00016</a> <span class="keyword">class </span><a class="code" href="classSpinSystemElement.html">SpinSystemElement</a> {};
+<a name="l00017"></a>00017 
+<a name="l00018"></a><a class="code" href="classVector3.html">00018</a> <span class="keyword">class </span><a class="code" href="classVector3.html">Vector3</a> {
+<a name="l00019"></a>00019   <span class="keyword">public</span>:
+<a name="l00020"></a>00020     <a class="code" href="classVector3.html#0f49191f7e001e7f7ae1cb49522118b4">Vector3</a>();
+<a name="l00021"></a>00021     <a class="code" href="classVector3.html#0f49191f7e001e7f7ae1cb49522118b4">Vector3</a>(<span class="keywordtype">double</span> _x,<span class="keywordtype">double</span> _y,<span class="keywordtype">double</span> _z);
+<a name="l00022"></a>00022 
+<a name="l00023"></a>00023     <span class="keywordtype">void</span> <a class="code" href="classVector3.html#226d5d6b71339f2efa30fb8f326d9508">GetCoordinates</a>(<span class="keywordtype">double</span>* _x,<span class="keywordtype">double</span>* _y, <span class="keywordtype">double</span>* _z);
+<a name="l00024"></a>00024 
+<a name="l00025"></a>00025     <span class="keywordtype">double</span> <a class="code" href="classVector3.html#d225c041b07a6753b4c9ee0ae276231b">GetX</a>() <span class="keyword">const</span>;
+<a name="l00026"></a>00026     <span class="keywordtype">double</span> <a class="code" href="classVector3.html#3ed91e832b8d30d3e1489fd461894173">GetY</a>() <span class="keyword">const</span>;
+<a name="l00027"></a>00027     <span class="keywordtype">double</span> <a class="code" href="classVector3.html#619ad73f51cdf91a7cc691b525c40b90">GetZ</a>() <span class="keyword">const</span>;    
+<a name="l00028"></a>00028   <span class="keyword">private</span>:
+<a name="l00029"></a>00029     <span class="keywordtype">double</span> x;
+<a name="l00030"></a>00030     <span class="keywordtype">double</span> y;
+<a name="l00031"></a>00031     <span class="keywordtype">double</span> z;
+<a name="l00032"></a>00032 };
+<a name="l00033"></a>00033 
+<a name="l00034"></a><a class="code" href="classMatrix3.html">00034</a> <span class="keyword">class </span><a class="code" href="classMatrix3.html">Matrix3</a> {
+<a name="l00035"></a>00035   <span class="keyword">public</span>:
+<a name="l00036"></a>00036     <a class="code" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">Matrix3</a>();
+<a name="l00037"></a>00037     <a class="code" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">Matrix3</a>(<span class="keywordtype">double</span> a00,<span class="keywordtype">double</span> a01,<span class="keywordtype">double</span> a02,
+<a name="l00038"></a>00038             <span class="keywordtype">double</span> a10,<span class="keywordtype">double</span> a11,<span class="keywordtype">double</span> a12,
+<a name="l00039"></a>00039             <span class="keywordtype">double</span> a20,<span class="keywordtype">double</span> a21,<span class="keywordtype">double</span> a22);
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041     <span class="keywordtype">void</span> <a class="code" href="classMatrix3.html#29461e771e8c13f667a258fea75263c9">Dump</a>() <span class="keyword">const</span>;
+<a name="l00042"></a>00042     
+<a name="l00043"></a>00043     <span class="keyword">const</span> <span class="keywordtype">double</span>* <a class="code" href="classMatrix3.html#ac3ee10fd9844f2f490a54bdbb08b9d3">GetRaw</a>() <span class="keyword">const</span>;
+<a name="l00044"></a>00044     
+<a name="l00045"></a>00045     <span class="keywordtype">double</span> <a class="code" href="classMatrix3.html#6567833f6afbed0f3111a1e33da14ca9">Get</a>(<span class="keywordtype">long</span> column, <span class="keywordtype">long</span> row) <span class="keyword">const</span>;
+<a name="l00046"></a>00046     <span class="keywordtype">double</span> <a class="code" href="classMatrix3.html#3c9cbf0818f2d5b20e8692cf7a305835">operator() </a>(<span class="keywordtype">long</span> column, <span class="keywordtype">long</span> row) <span class="keyword">const</span>;
+<a name="l00047"></a>00047     <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classMatrix3.html#dfdc8d05f9736bf96d0881a0e9e35c59">operator+ </a>(<span class="keyword">const</span> <a class="code" href="classMatrix3.html">Matrix3</a>&amp; m) <span class="keyword">const</span>;
+<a name="l00048"></a>00048     <a class="code" href="classMatrix3.html">Matrix3</a>&amp; <a class="code" href="classMatrix3.html#b5ae5deb0550ed113d36a4bf602eb221">operator+= </a>(<span class="keyword">const</span> <a class="code" href="classMatrix3.html">Matrix3</a>&amp; m);
+<a name="l00049"></a>00049     <span class="keywordtype">void</span> <a class="code" href="classMatrix3.html#353b43054b83b06c5ffdffd41a5d9c5b">Set</a>(<span class="keywordtype">long</span> i,<span class="keywordtype">long</span> j,<span class="keywordtype">double</span> val);
+<a name="l00050"></a>00050   <span class="keyword">private</span>:
+<a name="l00051"></a>00051     <span class="keywordtype">double</span> raw[9];
+<a name="l00052"></a>00052 };
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054 
+<a name="l00055"></a><a class="code" href="classOrientation.html">00055</a> <span class="keyword">class </span><a class="code" href="classOrientation.html">Orientation</a> {
+<a name="l00056"></a>00056   <span class="keyword">public</span>:
+<a name="l00057"></a>00057     <a class="code" href="classOrientation.html#fa8e101af342cdf57d5e33109ffc6529">Orientation</a>();
+<a name="l00058"></a>00058     <a class="code" href="classOrientation.html#8c96df6f0b3b9a9edc7f9a0a9cc10741">~Orientation</a>();
+<a name="l00059"></a>00059     
+<a name="l00060"></a><a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc">00060</a>     <span class="keyword">enum</span> <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc">Type</a> {
+<a name="l00061"></a><a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc1b720f1228d010ba84e31844237a0d1e">00061</a>         <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc1b720f1228d010ba84e31844237a0d1e">UNDEFINED</a>,
+<a name="l00062"></a><a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc92fea642c256167009a039d43423098a">00062</a>         <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc92fea642c256167009a039d43423098a">EULER</a>,
+<a name="l00063"></a><a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc49c79de0cab2b757cf80f5f80f96a8dc">00063</a>         <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc49c79de0cab2b757cf80f5f80f96a8dc">ANGLE_AXIS</a>,
+<a name="l00064"></a><a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc39fa7cb645fb2e447c53452b4c84af01">00064</a>         <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc39fa7cb645fb2e447c53452b4c84af01">QUATERNION</a>,
+<a name="l00065"></a><a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcccf7b678d8f6c496c6b7d67300499210b">00065</a>         <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcccf7b678d8f6c496c6b7d67300499210b">EIGENSYSTEM</a>
+<a name="l00066"></a>00066     };
+<a name="l00067"></a>00067     
+<a name="l00068"></a>00068     <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc">Type</a> <a class="code" href="classOrientation.html#74f4679aec6c764adff84554af44d642">GetType</a>() <span class="keyword">const</span>;
+<a name="l00069"></a>00069  
+<a name="l00070"></a>00070     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#c423325680478624e97b4a5daded2a65">GetEuler</a>(<span class="keywordtype">double</span>* <a class="code" href="classalpha.html" title="Class corresponding to the alpha schema type.">alpha</a>,<span class="keywordtype">double</span>* <a class="code" href="classbeta.html" title="Class corresponding to the beta schema type.">beta</a>,<span class="keywordtype">double</span>* <a class="code" href="classgamma.html" title="Class corresponding to the gamma schema type.">gamma</a>) <span class="keyword">const</span>;
+<a name="l00071"></a>00071     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#ec45322720c7d4d21fcc1f41d458ad48">GetAngleAxis</a>(<span class="keywordtype">double</span>* <a class="code" href="classangle.html" title="Class corresponding to the angle schema type.">angle</a>,<a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#bc5c6e15f27beea29ad74cecceeb9a7a">axis</a>) <span class="keyword">const</span>;
+<a name="l00072"></a>00072     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#9a01d52c1d649d7118b2d9300ff52736">GetQuaternion</a>(<span class="keywordtype">double</span>* <a class="code" href="classOrientation.html#d84c468423bf19e3986133f2e20086d1">real</a>, <span class="keywordtype">double</span>* <a class="code" href="classOrientation.html#cd2abd87ebe1cf54e1eadfc2da112afa">i</a>, <span class="keywordtype">double</span>* <a class="code" href="classOrientation.html#5645719c7bb9b0c39f1930432613ad37">j</a>, <span class="keywordtype">double</span>* <a class="code" href="classOrientation.html#2d5e238feb4e75c546b8247953d8fe99">k</a>) <span class="keyword">const</span>;
+<a name="l00073"></a>00073     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#56468a12ba88823899c9469395a84b4e">GetEigenSystem</a>(<a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#ef4865bb93cb88b5ce68aa156a4f4c0d">XAxis</a>,<a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#185a7f6bf4641339646151298d11a916">YAxis</a>, <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#ffa7cc35023b876cba791782e122cefd">ZAxis</a>) <span class="keyword">const</span>;
 <a name="l00074"></a>00074 
-<a name="l00078"></a>00078   std::vector&lt;long&gt; <a class="code" href="classSpinachSpinsys.html#8a3126234faabbc9012aac7f9268e086">getNearbySpins</a>(<span class="keywordtype">long</span> spinNumber,<span class="keywordtype">double</span> distance);
+<a name="l00075"></a>00075     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#a56d75a36b8c8eec8963b0b385354186">SetEuler</a>(<span class="keywordtype">double</span> <a class="code" href="classalpha.html" title="Class corresponding to the alpha schema type.">alpha</a>,<span class="keywordtype">double</span> <a class="code" href="classbeta.html" title="Class corresponding to the beta schema type.">beta</a>,<span class="keywordtype">double</span> <a class="code" href="classgamma.html" title="Class corresponding to the gamma schema type.">gamma</a>);
+<a name="l00076"></a>00076     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#119b447e44e5898b68e18e329ab654b7">SetAngleAxis</a>(<span class="keywordtype">double</span> <a class="code" href="classangle.html" title="Class corresponding to the angle schema type.">angle</a>,<a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#bc5c6e15f27beea29ad74cecceeb9a7a">axis</a>);
+<a name="l00077"></a>00077     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#6e4c4d88b0e8a7ef783642ce48483fa2">SetQuaternion</a>(<span class="keywordtype">double</span> <a class="code" href="classOrientation.html#d84c468423bf19e3986133f2e20086d1">real</a>, <span class="keywordtype">double</span> <a class="code" href="classOrientation.html#cd2abd87ebe1cf54e1eadfc2da112afa">i</a>, <span class="keywordtype">double</span> <a class="code" href="classOrientation.html#5645719c7bb9b0c39f1930432613ad37">j</a>, <span class="keywordtype">double</span> <a class="code" href="classOrientation.html#2d5e238feb4e75c546b8247953d8fe99">k</a>);
+<a name="l00078"></a>00078     <span class="keywordtype">void</span> <a class="code" href="classOrientation.html#9e779aec6f67740a8949d62c8305a8ac">SetEigenSystem</a>(<a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#ef4865bb93cb88b5ce68aa156a4f4c0d">XAxis</a>,<a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#185a7f6bf4641339646151298d11a916">YAxis</a>, <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#ffa7cc35023b876cba791782e122cefd">ZAxis</a>);
 <a name="l00079"></a>00079 
-<a name="l00082"></a>00082   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpinachSpinsys.html#bae46011ec013d4f3bb6ceda63b8dcb0">GetTotalInteractionOnSpinAsMatrix</a>(<span class="keywordtype">long</span> n);
-<a name="l00083"></a>00083 
-<a name="l00086"></a>00086   <span class="keywordtype">double</span> <a class="code" href="classSpinachSpinsys.html#844ba18b234a8d8bae1502101d717920">GetTotalIsotropicInteractionOnSpinPair</a>(<span class="keywordtype">long</span> n,<span class="keywordtype">long</span> m);
-<a name="l00087"></a>00087 
-<a name="l00088"></a>00088   <span class="keywordtype">double</span> <a class="code" href="classSpinachSpinsys.html#187a6016fe5ac972b3663fc1e3dfa2a0">getLinearInteractionAsScalar</a>(<span class="keywordtype">long</span> n,<a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">interactionType</a> t) <span class="keyword">const</span>;
-<a name="l00089"></a>00089   <span class="keywordtype">double</span> <a class="code" href="classSpinachSpinsys.html#cee329ff93b2915393768c53c3ba0b41">getBilinearInteractionAsScalar</a>(<span class="keywordtype">long</span> n,<a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">interactionType</a> t) <span class="keyword">const</span>;
-<a name="l00090"></a>00090   <span class="keywordtype">double</span> <a class="code" href="classSpinachSpinsys.html#e0bb0ff1c536c7dc6ba0fa12b3c96ef8">getQuadrapolarInteractionAsScalar</a>(<span class="keywordtype">long</span> n,<a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">interactionType</a> t) <span class="keyword">const</span>;
-<a name="l00091"></a>00091 
-<a name="l00092"></a>00092   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpinachSpinsys.html#e2aadbd4a8c93c91dd3dfc6ba8069b1a">getLinearInteractionAsMatrix</a>(<span class="keywordtype">long</span> n,<a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">interactionType</a> t) <span class="keyword">const</span>;
-<a name="l00093"></a>00093   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpinachSpinsys.html#6ba0b2c191e959044739640a387d29fd">getBilinearInteractionAsMatrix</a>(<span class="keywordtype">long</span> n,<a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">interactionType</a> t) <span class="keyword">const</span>;
-<a name="l00094"></a>00094   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpinachSpinsys.html#cc3f9b6355755d44bea61f7787fbb2f7">getQuadrapolarInteractionAsMatrix</a>(<span class="keywordtype">long</span> n,<a class="code" href="spinsys_8hpp.html#92e87ef624293110fcae578d99950e2a">interactionType</a> t) <span class="keyword">const</span>;
-<a name="l00095"></a>00095 
-<a name="l00096"></a>00096   
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098 
-<a name="l00099"></a>00099 
-<a name="l00101"></a>00101   <span class="keywordtype">void</span> <a class="code" href="classSpinachSpinsys.html#ff89e165994e76b50c3be22d89b8debc" title="Attach a spin.">addSpin</a>();
-<a name="l00102"></a>00102 
-<a name="l00103"></a><a class="code" href="classSpinachSpinsys.html#3396cbbe02f7dca39da71a1dadd19e1c">00103</a>   complex&lt;double&gt; <a class="code" href="classSpinachSpinsys.html#3396cbbe02f7dca39da71a1dadd19e1c">getEigenValX</a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{<span class="keywordflow">return</span> complex&lt;double&gt;(1,0);}
-<a name="l00104"></a><a class="code" href="classSpinachSpinsys.html#64bedc938579ced9ccca23d0ecdfea69">00104</a>   complex&lt;double&gt; <a class="code" href="classSpinachSpinsys.html#64bedc938579ced9ccca23d0ecdfea69">getEigenValY</a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{<span class="keywordflow">return</span> complex&lt;double&gt;(1,0);}
-<a name="l00105"></a><a class="code" href="classSpinachSpinsys.html#d4687957a119e10b0e8077e5bd94b522">00105</a>   complex&lt;double&gt; <a class="code" href="classSpinachSpinsys.html#d4687957a119e10b0e8077e5bd94b522">getEigenValZ</a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{<span class="keywordflow">return</span> complex&lt;double&gt;(1,0);}
+<a name="l00080"></a>00080     <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classOrientation.html#ef9b94b4e767847c695d42af11e87505">GetAsMatrix</a>() <span class="keyword">const</span>;
+<a name="l00081"></a>00081   <span class="keyword">private</span>:
+<a name="l00082"></a>00082     <span class="keyword">union  </span>{
+<a name="l00083"></a>00083         <span class="keyword">struct </span>{
+<a name="l00084"></a><a class="code" href="classOrientation.html#6c74f24ac48bd9fdbada2ae67860afe1">00084</a>             <span class="keywordtype">double</span> <a class="code" href="classalpha.html" title="Class corresponding to the alpha schema type.">alpha</a>;
+<a name="l00085"></a><a class="code" href="classOrientation.html#cffab8b9c7a0f6b4a5e24d049f736abe">00085</a>             <span class="keywordtype">double</span> <a class="code" href="classbeta.html" title="Class corresponding to the beta schema type.">beta</a>;
+<a name="l00086"></a><a class="code" href="classOrientation.html#a745459cdf332f9ad128d2194ce02f9d">00086</a>             <span class="keywordtype">double</span> <a class="code" href="classgamma.html" title="Class corresponding to the gamma schema type.">gamma</a>;
+<a name="l00087"></a>00087         } <a class="code" href="classOrientation.html#c81726c2bc156fcdb7748a606ff780b5">mEuler</a>;
+<a name="l00088"></a>00088         <span class="keyword">struct </span>{
+<a name="l00089"></a><a class="code" href="classOrientation.html#e2cce89c276e2efa268774c337f76638">00089</a>             <span class="keywordtype">double</span> <a class="code" href="classangle.html" title="Class corresponding to the angle schema type.">angle</a>;
+<a name="l00090"></a><a class="code" href="classOrientation.html#bc5c6e15f27beea29ad74cecceeb9a7a">00090</a>             <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#bc5c6e15f27beea29ad74cecceeb9a7a">axis</a>;
+<a name="l00091"></a>00091         } <a class="code" href="classOrientation.html#3c76a2070c443b41e14813bac5551f6e">mAngleAxis</a>;
+<a name="l00092"></a>00092         <span class="keyword">struct </span>{
+<a name="l00093"></a><a class="code" href="classOrientation.html#d84c468423bf19e3986133f2e20086d1">00093</a>             <span class="keywordtype">double</span> <a class="code" href="classOrientation.html#d84c468423bf19e3986133f2e20086d1">real</a>;
+<a name="l00094"></a><a class="code" href="classOrientation.html#cd2abd87ebe1cf54e1eadfc2da112afa">00094</a>             <span class="keywordtype">double</span> <a class="code" href="classOrientation.html#cd2abd87ebe1cf54e1eadfc2da112afa">i</a>;
+<a name="l00095"></a><a class="code" href="classOrientation.html#5645719c7bb9b0c39f1930432613ad37">00095</a>             <span class="keywordtype">double</span> <a class="code" href="classOrientation.html#5645719c7bb9b0c39f1930432613ad37">j</a>;
+<a name="l00096"></a><a class="code" href="classOrientation.html#2d5e238feb4e75c546b8247953d8fe99">00096</a>             <span class="keywordtype">double</span> <a class="code" href="classOrientation.html#2d5e238feb4e75c546b8247953d8fe99">k</a>;
+<a name="l00097"></a>00097         } <a class="code" href="classOrientation.html#f53e45cc5277a44b4e22df43f3f9e90b">mQuaternion</a>;
+<a name="l00098"></a>00098         <span class="keyword">struct </span>{
+<a name="l00099"></a><a class="code" href="classOrientation.html#ef4865bb93cb88b5ce68aa156a4f4c0d">00099</a>             <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#ef4865bb93cb88b5ce68aa156a4f4c0d">XAxis</a>;
+<a name="l00100"></a><a class="code" href="classOrientation.html#185a7f6bf4641339646151298d11a916">00100</a>             <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#185a7f6bf4641339646151298d11a916">YAxis</a>;
+<a name="l00101"></a><a class="code" href="classOrientation.html#ffa7cc35023b876cba791782e122cefd">00101</a>             <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classOrientation.html#ffa7cc35023b876cba791782e122cefd">ZAxis</a>;
+<a name="l00102"></a>00102         } <a class="code" href="classOrientation.html#87929fe1033d51e171c7a4cf534d9aa1">mEigenSystem</a>;
+<a name="l00103"></a>00103     } mData;
+<a name="l00104"></a>00104     <a class="code" href="classOrientation.html#fb5ce0d7d32be3a6d7b8eb7d51993bcc">Type</a> mType;
+<a name="l00105"></a>00105 };
 <a name="l00106"></a>00106 
-<a name="l00107"></a><a class="code" href="classSpinachSpinsys.html#7c1a3956da0bfd10c3853e5dc57677c9">00107</a>   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classSpinachSpinsys.html#7c1a3956da0bfd10c3853e5dc57677c9">getEigenVecX</a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{<span class="keywordflow">return</span> <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a>(1,0,0);}
-<a name="l00108"></a><a class="code" href="classSpinachSpinsys.html#ecdeddb563ddd26826cb1ce31033aa15">00108</a>   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classSpinachSpinsys.html#ecdeddb563ddd26826cb1ce31033aa15">getEigenVecY</a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{<span class="keywordflow">return</span> <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a>(0,1,0);}
-<a name="l00109"></a><a class="code" href="classSpinachSpinsys.html#e190840ed7fad29d5be5981190a8c797">00109</a>   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classSpinachSpinsys.html#e190840ed7fad29d5be5981190a8c797">getEigenVecZ</a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{<span class="keywordflow">return</span> <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a>(0,0,1);}
-<a name="l00110"></a>00110 
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112 <span class="keyword">protected</span>:
-<a name="l00113"></a>00113   <span class="keywordtype">void</span> <a class="code" href="classSpinachSpinsys.html#7c997ed0a3c45ca86c65147d5591a0bc">loadFromG03File</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
-<a name="l00114"></a>00114   <span class="keywordtype">void</span> <a class="code" href="classSpinachSpinsys.html#816cf92dc12856919e0f47f673110f36">loadFromXYZFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
-<a name="l00115"></a>00115 };
-<a name="l00116"></a>00116 
-<a name="l00117"></a><a class="code" href="classSpinsysXMLRoot.html">00117</a> <span class="keyword">class </span><a class="code" href="classSpinsysXMLRoot.html">SpinsysXMLRoot</a> {
-<a name="l00118"></a>00118 <span class="keyword">public</span>:
-<a name="l00119"></a>00119   <a class="code" href="classSpinsysXMLRoot.html#873dd218bcbcc57cf5182a83cf5dcb69">SpinsysXMLRoot</a>();
-<a name="l00120"></a>00120   <span class="keywordtype">void</span> <a class="code" href="classSpinsysXMLRoot.html#66a0bbe3cb1a1966f41414406e9f3eb8">clear</a>();
-<a name="l00122"></a>00122   <span class="keywordtype">void</span> <a class="code" href="classSpinsysXMLRoot.html#ed525d3a8cef03051e9cbc8a6da6f456" title="Load a spin system from an XML file located at filename.">loadFromFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
-<a name="l00125"></a>00125   <span class="keywordtype">void</span> <a class="code" href="classSpinsysXMLRoot.html#18c1bb05b3cb2c7eb4326c2b35569119">loadFromG03File</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
-<a name="l00127"></a>00127   <span class="keywordtype">void</span> <a class="code" href="classSpinsysXMLRoot.html#36cbb61a11db73c55e0e0eab9990d44b" title="Save the spin system to an XML file at filename.">loadFromXYZFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
-<a name="l00128"></a>00128   <span class="keywordtype">void</span> <a class="code" href="classSpinsysXMLRoot.html#7066fd5773bbc90bb53fe70099bf7192">saveToFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename) <span class="keyword">const</span>;
-<a name="l00131"></a><a class="code" href="classSpinsysXMLRoot.html#1fca48c14e7faf12834a7015c98dadcf">00131</a>   <a class="code" href="classSpinachSpinsys.html">SpinachSpinsys</a> <a class="code" href="classSpinsysXMLRoot.html#1fca48c14e7faf12834a7015c98dadcf">getRoot</a>()<span class="keyword"> const </span>{<span class="keywordflow">return</span> *<a class="code" href="classSpinsysXMLRoot.html#41ddcc3f646ae14f6c813a899f4b0c40">mXMLSpinSys</a>;}
-<a name="l00132"></a><a class="code" href="classSpinsysXMLRoot.html#85c05caae36d33f0155385dd8b681302">00132</a>   <span class="keywordtype">void</span> <a class="code" href="classSpinsysXMLRoot.html#85c05caae36d33f0155385dd8b681302">setRoot</a>(<a class="code" href="classSpinachSpinsys.html">SpinachSpinsys</a> <a class="code" href="namespacedriver.html#1756445117c449cde7dc44d3197ec8f2">ss</a>) {<a class="code" href="classSpinsysXMLRoot.html#41ddcc3f646ae14f6c813a899f4b0c40">mXMLSpinSys</a>.reset(<span class="keyword">new</span> <a class="code" href="classSpinachSpinsys.html">SpinachSpinsys</a>(ss));}
-<a name="l00133"></a>00133 <span class="keyword">protected</span>:
-<a name="l00134"></a><a class="code" href="classSpinsysXMLRoot.html#41ddcc3f646ae14f6c813a899f4b0c40">00134</a>   auto_ptr&lt;SpinachSpinsys&gt; <a class="code" href="classSpinsysXMLRoot.html#41ddcc3f646ae14f6c813a899f4b0c40">mXMLSpinSys</a>;
-<a name="l00135"></a>00135 };
-<a name="l00136"></a>00136 
-<a name="l00137"></a>00137 
-<a name="l00138"></a><a class="code" href="classSpinachOrientation.html">00138</a> <span class="keyword">class </span><a class="code" href="classSpinachOrientation.html">SpinachOrientation</a> : <span class="keyword">public</span> <a class="code" href="classOrientation.html" title="Class corresponding to the orientation schema type.">Orientation</a>{
-<a name="l00139"></a>00139 <span class="keyword">public</span>:
-<a name="l00140"></a><a class="code" href="classSpinachOrientation.html#cf7d26dff3a7483dbe51940ddb348af0">00140</a>   <a class="code" href="classSpinachOrientation.html#cf7d26dff3a7483dbe51940ddb348af0">SpinachOrientation</a>() : <a class="code" href="classOrientation.html" title="Class corresponding to the orientation schema type.">Orientation</a>() {}
-<a name="l00141"></a><a class="code" href="classSpinachOrientation.html#b0a74a152751b7e0bfc8409ce02666ee">00141</a>   <a class="code" href="classSpinachOrientation.html#cf7d26dff3a7483dbe51940ddb348af0">SpinachOrientation</a>(<span class="keyword">const</span> <a class="code" href="classOrientation.html" title="Class corresponding to the orientation schema type.">Orientation</a>&amp; _O) : <a class="code" href="classOrientation.html" title="Class corresponding to the orientation schema type.">Orientation</a>(_O) {}
-<a name="l00142"></a>00142   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpinachOrientation.html#05793a71a5ba4c6837021718972c344a">getAsMatrix</a>() <span class="keyword">const</span>;
-<a name="l00143"></a>00143   <span class="keywordtype">long</span> <a class="code" href="classSpinachOrientation.html#9dd685af9edd8850f485f88bab88212c">getForm</a>() <span class="keyword">const</span>;
-<a name="l00144"></a>00144 };
-<a name="l00145"></a>00145 
-<a name="l00146"></a>00146 
-<a name="l00147"></a><a class="code" href="classSpinachInteraction.html">00147</a> <span class="keyword">class </span><a class="code" href="classSpinachInteraction.html">SpinachInteraction</a> : <span class="keyword">public</span> <a class="code" href="classInteraction1.html" title="Class corresponding to the interaction1 schema type.">Interaction1</a> {
-<a name="l00148"></a>00148 <span class="keyword">public</span>:
-<a name="l00149"></a><a class="code" href="classSpinachInteraction.html#bc64fc33b48ca858d3fdc4520054886a">00149</a>   <a class="code" href="classSpinachInteraction.html#bc64fc33b48ca858d3fdc4520054886a">SpinachInteraction</a>() : <a class="code" href="classInteraction1.html" title="Class corresponding to the interaction1 schema type.">Interaction1</a>() {}
-<a name="l00150"></a><a class="code" href="classSpinachInteraction.html#96d7511096f973d98c5087e54a1fd847">00150</a>   <a class="code" href="classSpinachInteraction.html#bc64fc33b48ca858d3fdc4520054886a">SpinachInteraction</a>(<span class="keyword">const</span> <a class="code" href="classInteraction1.html" title="Class corresponding to the interaction1 schema type.">Interaction1</a>&amp; _Int) : <a class="code" href="classInteraction1.html" title="Class corresponding to the interaction1 schema type.">Interaction1</a>(_Int) {}
-<a name="l00151"></a>00151   <a class="code" href="classSpinachOrientation.html">SpinachOrientation</a> <a class="code" href="classSpinachInteraction.html#dd99fcadad7d2e331b4a1c025ffa9f34">getSpinachOrientation</a>();
-<a name="l00152"></a>00152   <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classSpinachInteraction.html#750e5cde0071a9527758dac62134079a">getFormAsString</a>() <span class="keyword">const</span>;
-<a name="l00153"></a>00153   <span class="keywordtype">long</span> <a class="code" href="classSpinachInteraction.html#a62eb4ae61f1d6beb6726fd218d55036">getForm</a>() <span class="keyword">const</span>;
-<a name="l00154"></a><a class="code" href="classSpinachInteraction.html#88d6e54f4d1be2882ad3fa12a00e35f9">00154</a>   <span class="keywordtype">long</span> <a class="code" href="classSpinachInteraction.html#88d6e54f4d1be2882ad3fa12a00e35f9">getSpin1Number</a>()<span class="keyword"> const </span>{<span class="keywordflow">return</span> <a class="code" href="classInteraction.html#33c458c8be2fbe70d0130157d31e0e56" title="Return a read-only (constant) reference to the attribute.">Interaction1::getSpin_1</a>();}
-<a name="l00155"></a>00155   <span class="keywordtype">bool</span> <a class="code" href="classSpinachInteraction.html#e7eb9d06be14f9be94d38d6b10592f9c">isType</a>(<span class="keywordtype">long</span> t) <span class="keyword">const</span>;
-<a name="l00156"></a>00156   <span class="keywordtype">long</span> <a class="code" href="classSpinachInteraction.html#8735355bac7e37be412dcc5546ac7521" title="Return a read-only (constant) reference to the attribute.">getType</a>() <span class="keyword">const</span>;
-<a name="l00157"></a><a class="code" href="classSpinachInteraction.html#48bac65f017942f5d20c04e91461d035">00157</a>   <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keywordtype">long</span> x,<span class="keywordtype">long</span> y) <span class="keyword">const</span> {
-<a name="l00158"></a>00158     <span class="comment">//Danger!</span>
-<a name="l00159"></a>00159     <a class="code" href="classMatrix.html" title="Class corresponding to the matrix schema type.">Matrix</a> m=<a class="code" href="classInteraction.html#6dee05c8ace0d7efd98a4b4968717d2d" title="Return a read-only (constant) reference to the element container.">getMatrix</a>().get();
-<a name="l00160"></a>00160     <span class="keywordflow">return</span> m.<a class="code" href="classMatrix.html#c49cf3abf6314b433e14e474e3fd18c7" title="Return a read-only (constant) reference to the element sequence.">getElement</a>()[3*y+x];
-<a name="l00161"></a>00161   }
-<a name="l00162"></a>00162   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpinachInteraction.html#ea72d390f1da13a73c574ac19103b2bf">getAsMatrix</a>() <span class="keyword">const</span>;
-<a name="l00163"></a>00163   <span class="keywordtype">double</span> <a class="code" href="classSpinachInteraction.html#d0041dfa2d0fc542092001be5ce48577">getAsScalar</a>() <span class="keyword">const</span>;
-<a name="l00164"></a>00164 };
-<a name="l00165"></a>00165 
-<a name="l00166"></a><a class="code" href="classSpinachSpin.html">00166</a> <span class="keyword">class </span><a class="code" href="classSpinachSpin.html">SpinachSpin</a> : <span class="keyword">public</span> <a class="code" href="classSpin.html" title="Class corresponding to the spin schema type.">Spin</a> {
-<a name="l00167"></a>00167 <span class="keyword">public</span>:
-<a name="l00168"></a><a class="code" href="classSpinachSpin.html#84d3f219a236fb4fed4f179b297268f0">00168</a>   <a class="code" href="classSpinachSpin.html#84d3f219a236fb4fed4f179b297268f0">SpinachSpin</a>() : <a class="code" href="classSpin.html" title="Class corresponding to the spin schema type.">Spin</a>() {}
-<a name="l00169"></a><a class="code" href="classSpinachSpin.html#178505bdd5fa3fa3c31c7578c1a1ccd1">00169</a>   <a class="code" href="classSpinachSpin.html#84d3f219a236fb4fed4f179b297268f0">SpinachSpin</a>(<span class="keyword">const</span> <a class="code" href="classSpin.html" title="Class corresponding to the spin schema type.">Spin</a>&amp; _Spin) : <a class="code" href="classSpin.html" title="Class corresponding to the spin schema type.">Spin</a>(_Spin) {}
-<a name="l00170"></a><a class="code" href="classSpinachSpin.html#4734bb72db39474ca1d6d2a603a6703b">00170</a>   <span class="keywordtype">long</span> <a class="code" href="classSpinachSpin.html#4734bb72db39474ca1d6d2a603a6703b" title="Return a read-write reference to the attribute.">getNumber</a>() {<span class="keywordflow">return</span> <a class="code" href="classSpin.html#0d9dc450f18f9a20826b485dfa8f4a6e" title="Return a read-only (constant) reference to the attribute.">Spin::getNumber</a>();}
-<a name="l00171"></a><a class="code" href="classSpinachSpin.html#2e26695191f523fd375fc8e446f185a7">00171</a>   <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classSpinachSpin.html#2e26695191f523fd375fc8e446f185a7" title="Return a read-write reference to the attribute.">getIsotope</a>() {<span class="keywordflow">return</span> <a class="code" href="classSpin.html#7011c0ebacbd0b9a300cbf215e345aa8" title="Return a read-only (constant) reference to the attribute.">Spin::getIsotope</a>().c_str();}
-<a name="l00172"></a><a class="code" href="classSpinachSpin.html#8e0db866efd4e6d43c970f281a70847c">00172</a>   <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classSpinachSpin.html#8e0db866efd4e6d43c970f281a70847c" title="Return a read-write reference to the attribute container.">getLabel</a>() {
-<a name="l00173"></a>00173     <a class="code" href="classSpin.html#f79b27306bf2d551418b0fe16d9168ad" title="Attribute optional container type.">LabelOptional</a> la = <a class="code" href="classSpin.html#28cd7f33140e1114a9358d751f635e82" title="Return a read-only (constant) reference to the attribute container.">Spin::getLabel</a>();
-<a name="l00174"></a>00174     <span class="keywordflow">if</span>(la.present()) {
-<a name="l00175"></a>00175       <span class="keywordflow">return</span> la.get().c_str();
-<a name="l00176"></a>00176     } <span class="keywordflow">else</span> {
-<a name="l00177"></a>00177       <span class="keywordflow">return</span> <span class="stringliteral">""</span>;
-<a name="l00178"></a>00178     }
-<a name="l00179"></a>00179   }
-<a name="l00180"></a>00180 
-<a name="l00181"></a>00181   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpinachSpin.html#7c02302fa9f3db05c9b5c7d2a7281ca3">GetTotalInteractionAsMatrix</a>();
-<a name="l00182"></a>00182   <span class="keywordtype">void</span> <a class="code" href="classSpinachSpin.html#c83e52e9de9652fd3489ef284c624cae">dump</a>();
-<a name="l00183"></a>00183   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classSpinachSpin.html#f876fb54364c63d32842ba5fa71de018">getCoords</a>();
-<a name="l00184"></a>00184 };
-<a name="l00185"></a>00185 
-<a name="l00186"></a>00186 
-<a name="l00187"></a>00187 
-<a name="l00188"></a><a class="code" href="classSpinachFrame.html">00188</a> <span class="keyword">class </span><a class="code" href="classSpinachFrame.html">SpinachFrame</a> : <span class="keyword">public</span> <a class="code" href="classReference__frame.html" title="Class corresponding to the reference_frame schema type.">Reference_frame</a> {
-<a name="l00189"></a>00189 <span class="keyword">public</span>:
-<a name="l00190"></a><a class="code" href="classSpinachFrame.html#b29a5b4b09878cbdaae9dd5a7d4de1d0">00190</a>   <a class="code" href="classSpinachFrame.html#b29a5b4b09878cbdaae9dd5a7d4de1d0">SpinachFrame</a>() : <a class="code" href="classReference__frame.html" title="Class corresponding to the reference_frame schema type.">Reference_frame</a>() {}
-<a name="l00191"></a>00191   <a class="code" href="classSpinachFrame.html#b29a5b4b09878cbdaae9dd5a7d4de1d0">SpinachFrame</a>(<span class="keyword">const</span> <a class="code" href="classReference__frame.html" title="Class corresponding to the reference_frame schema type.">Reference_frame</a>&amp; _rf);
-<a name="l00192"></a><a class="code" href="classSpinachFrame.html#a3c4690786e8add488bac4d981c257ca">00192</a>   <a class="code" href="classSpinachOrientation.html">SpinachOrientation</a> <a class="code" href="classSpinachFrame.html#a3c4690786e8add488bac4d981c257ca" title="Return a read-write reference to the element.">getOrientation</a>() {<a class="code" href="classSpinachOrientation.html">SpinachOrientation</a> orient(<a class="code" href="classReference__frame.html#161576cd68a9939f80bfedf58de37209" title="Return a read-only (constant) reference to the element.">Reference_frame::getOrientation</a>()); <span class="keywordflow">return</span> orient;};
-<a name="l00193"></a>00193 };
-<a name="l00194"></a>00194 
-<a name="l00195"></a><a class="code" href="classMatrix3.html">00195</a> <span class="keyword">class </span><a class="code" href="classMatrix3.html">Matrix3</a> : <span class="keyword">public</span> <a class="code" href="classMatrix.html" title="Class corresponding to the matrix schema type.">Matrix</a> {
-<a name="l00196"></a>00196 <span class="keyword">public</span>:
-<a name="l00197"></a><a class="code" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">00197</a>   <a class="code" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">Matrix3</a>() : <a class="code" href="classMatrix.html" title="Class corresponding to the matrix schema type.">Matrix</a>() {}
-<a name="l00198"></a><a class="code" href="classMatrix3.html#311e7cf30b5089c737e3aa79adcd977f">00198</a>   <a class="code" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">Matrix3</a>(<span class="keyword">const</span> <a class="code" href="classMatrix.html" title="Class corresponding to the matrix schema type.">Matrix</a>&amp; _m) : <a class="code" href="classMatrix.html" title="Class corresponding to the matrix schema type.">Matrix</a>(_m) {}
-<a name="l00199"></a>00199   <a class="code" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">Matrix3</a>(<span class="keywordtype">double</span> a00,<span class="keywordtype">double</span> a01,<span class="keywordtype">double</span> a02,
-<a name="l00200"></a>00200           <span class="keywordtype">double</span> a10,<span class="keywordtype">double</span> a11,<span class="keywordtype">double</span> a12,
-<a name="l00201"></a>00201           <span class="keywordtype">double</span> a20,<span class="keywordtype">double</span> a21,<span class="keywordtype">double</span> a22);
-<a name="l00202"></a><a class="code" href="classMatrix3.html#dcc8db612e12edf9d3204dcf271f8f4f">00202</a>   <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keywordtype">long</span> i1,<span class="keywordtype">long</span> i2) <span class="keyword">const</span> {<span class="keywordflow">return</span> <a class="code" href="classMatrix.html#c49cf3abf6314b433e14e474e3fd18c7" title="Return a read-only (constant) reference to the element sequence.">getElement</a>()[3*i1+i2];}
-<a name="l00203"></a><a class="code" href="classMatrix3.html#677cb4de732678c29a192dc318d0b2b9">00203</a>   <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keywordtype">long</span> i) <span class="keyword">const</span> {<span class="keywordflow">return</span> <a class="code" href="classMatrix.html#c49cf3abf6314b433e14e474e3fd18c7" title="Return a read-only (constant) reference to the element sequence.">getElement</a>()[i];}
-<a name="l00204"></a><a class="code" href="classMatrix3.html#3b867bdda1519503d05e97ec956ec553">00204</a>   <span class="keywordtype">void</span> <span class="keyword">set</span>(<span class="keywordtype">long</span> i1,<span class="keywordtype">long</span> i2, <span class="keywordtype">double</span> a) {foundEigenVals=<span class="keyword">false</span>;<a class="code" href="classMatrix.html#c49cf3abf6314b433e14e474e3fd18c7" title="Return a read-only (constant) reference to the element sequence.">getElement</a>()[3*i1+i2]=a;}
-<a name="l00205"></a><a class="code" href="classMatrix3.html#8b1c3c83ced7d4181ba02cde4167b550">00205</a>   <span class="keywordtype">double</span> <a class="code" href="classMatrix3.html#8b1c3c83ced7d4181ba02cde4167b550">trace</a>(){<span class="keywordflow">return</span> <a class="code" href="classMatrix.html#c49cf3abf6314b433e14e474e3fd18c7" title="Return a read-only (constant) reference to the element sequence.">getElement</a>()[0]+<a class="code" href="classMatrix.html#c49cf3abf6314b433e14e474e3fd18c7" title="Return a read-only (constant) reference to the element sequence.">getElement</a>()[4]+<a class="code" href="classMatrix.html#c49cf3abf6314b433e14e474e3fd18c7" title="Return a read-only (constant) reference to the element sequence.">getElement</a>()[8];}
-<a name="l00206"></a>00206   <span class="keywordtype">void</span> <a class="code" href="classMatrix3.html#b08850988bd6fb945df4cbb11b5baea1">dump</a>() <span class="keyword">const</span>;  
-<a name="l00208"></a>00208   <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classMatrix3.html#dfdc8d05f9736bf96d0881a0e9e35c59" title="Add two matricese together in the expected way.">operator+</a>(<span class="keyword">const</span> <a class="code" href="classMatrix3.html">Matrix3</a>&amp; m) <span class="keyword">const</span>;
-<a name="l00209"></a>00209 
-<a name="l00210"></a>00210 <span class="keyword">private</span>:
-<a name="l00213"></a>00213   <span class="keywordtype">void</span> calcEigenvalues() <span class="keyword">const</span>;
-<a name="l00214"></a>00214 <span class="keyword">public</span>:
-<a name="l00216"></a><a class="code" href="classMatrix3.html#2a8bd398e885a0ad43da8f2d7d4317a0">00216</a>   complex&lt;double&gt; <a class="code" href="classMatrix3.html#2a8bd398e885a0ad43da8f2d7d4317a0" title="Eigenvalues and eigenvectors.">getEigenValX</a>()<span class="keyword"> const </span>{<span class="keywordflow">if</span>(!foundEigenVals){calcEigenvalues();} <span class="keywordflow">return</span> eigx;}
-<a name="l00217"></a><a class="code" href="classMatrix3.html#7e8b6f4c24ecf319f1a67503609fa4f4">00217</a>   complex&lt;double&gt; <a class="code" href="classMatrix3.html#7e8b6f4c24ecf319f1a67503609fa4f4">getEigenValY</a>()<span class="keyword"> const </span>{<span class="keywordflow">if</span>(!foundEigenVals){calcEigenvalues();} <span class="keywordflow">return</span> eigy;}
-<a name="l00218"></a><a class="code" href="classMatrix3.html#d913a219c4be84c80c46d098698fd821">00218</a>   complex&lt;double&gt; <a class="code" href="classMatrix3.html#d913a219c4be84c80c46d098698fd821">getEigenValZ</a>()<span class="keyword"> const </span>{<span class="keywordflow">if</span>(!foundEigenVals){calcEigenvalues();} <span class="keywordflow">return</span> eigz;}
-<a name="l00219"></a>00219 
-<a name="l00220"></a>00220   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classMatrix3.html#dd068bc6133793e403741714f42e5645">getEigenvectorX</a>() <span class="keyword">const</span>;
-<a name="l00221"></a>00221   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classMatrix3.html#43ca734acea82846cd1ca4f1e0853892">getEigenvectorY</a>() <span class="keyword">const</span>;
-<a name="l00222"></a>00222   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classMatrix3.html#e333f8db3cc345ff2983bd17f25965d4">getEigenvectorZ</a>() <span class="keyword">const</span>;
-<a name="l00223"></a>00223 
-<a name="l00225"></a>00225   <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> <a class="code" href="classMatrix3.html#9c4d37866e0c7cebf2000cbdbddb4137" title="Use the matrix as a set of simultaious equations.">solveSimEq</a>(<span class="keywordtype">double</span> y1,<span class="keywordtype">double</span> y2,<span class="keywordtype">double</span> y3) <span class="keyword">const</span>;
+<a name="l00107"></a><a class="code" href="classReferenceFrame.html">00107</a> <span class="keyword">class </span><a class="code" href="classReferenceFrame.html">ReferenceFrame</a> {
+<a name="l00108"></a>00108   <span class="keyword">public</span>:
+<a name="l00109"></a>00109     <a class="code" href="classReferenceFrame.html#60f710081c1db89223e3210c48b2edac">ReferenceFrame</a>();
+<a name="l00110"></a>00110     <a class="code" href="classReferenceFrame.html#60f710081c1db89223e3210c48b2edac">ReferenceFrame</a>(<a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* Parent,<a class="code" href="classVector3.html">Vector3</a>* Position,<a class="code" href="classOrientation.html">Orientation</a>* Orient);
+<a name="l00111"></a>00111     <a class="code" href="classReferenceFrame.html#c4a1af76abfdfa80c86fec3744f89a60">~ReferenceFrame</a>();
+<a name="l00112"></a>00112     
+<a name="l00113"></a>00113     <span class="keywordtype">long</span> <a class="code" href="classReferenceFrame.html#4291c27930e098c8e7c720228a72e004">GetChildCount</a>() <span class="keyword">const</span>;
+<a name="l00114"></a>00114     <a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* <a class="code" href="classReferenceFrame.html#f6db296d05a5311b79fc04f389e4a565">GetChildFrame</a>(<span class="keywordtype">long</span> n) <span class="keyword">const</span>;
+<a name="l00115"></a>00115     vector&lt;ReferenceFrame*&gt; <a class="code" href="classReferenceFrame.html#85a0b55de0bc6b1822891b6ae929db35">GetChildFrames</a>() <span class="keyword">const</span>;
+<a name="l00116"></a>00116     <span class="keywordtype">void</span> <a class="code" href="classReferenceFrame.html#1a35fd23f040048db0cfed5e6a8d8515">InsertChild</a>(<a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* Frame,<span class="keywordtype">long</span> Position=<a class="code" href="spinsys_8hpp.html#006a302e80285eb7d251159a00553438">END</a>);
+<a name="l00117"></a>00117     <span class="keywordtype">void</span> <a class="code" href="classReferenceFrame.html#f92c8c8d7060d49e77c74d9e3e00bef5">RemoveChild</a>(<span class="keywordtype">long</span> Position);
+<a name="l00118"></a>00118     <span class="keywordtype">void</span> <a class="code" href="classReferenceFrame.html#f92c8c8d7060d49e77c74d9e3e00bef5">RemoveChild</a>(<a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* Child);
+<a name="l00119"></a>00119     
+<a name="l00120"></a>00120     <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classReferenceFrame.html#7f6e19a8b8a931b8ceb1c4003d7e9b04">GetPosition</a>() <span class="keyword">const</span>;
+<a name="l00121"></a>00121     <span class="keywordtype">void</span> <a class="code" href="classReferenceFrame.html#b129a052cb505fb7ac7b176d0a849d3c">SetPosition</a>(<a class="code" href="classVector3.html">Vector3</a>* Position);
+<a name="l00122"></a>00122     <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classReferenceFrame.html#3cf5230af972f89342be8c51bcbbb6d1">GetOrientation</a>() <span class="keyword">const</span>;
+<a name="l00123"></a>00123     
+<a name="l00124"></a>00124   <span class="keyword">private</span>:
+<a name="l00125"></a>00125     <a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* mParent;
+<a name="l00126"></a>00126     vector&lt;ReferenceFrame*&gt; mChildren;
+<a name="l00127"></a>00127     
+<a name="l00128"></a>00128     <a class="code" href="classVector3.html">Vector3</a>* mPosition;
+<a name="l00129"></a>00129     <a class="code" href="classOrientation.html">Orientation</a>* mOrient;
+<a name="l00130"></a>00130 };
+<a name="l00131"></a>00131 
+<a name="l00132"></a><a class="code" href="classInteraction.html">00132</a> <span class="keyword">class </span><a class="code" href="classInteraction.html">Interaction</a> {
+<a name="l00133"></a>00133   <span class="keyword">public</span>:
+<a name="l00134"></a>00134     <a class="code" href="classInteraction.html#adfd0e254296043c26508d47090ace76">Interaction</a>();
+<a name="l00135"></a>00135     <a class="code" href="classInteraction.html#6610199fedc7fae617003cb2f397c825">~Interaction</a>();
+<a name="l00136"></a>00136     
+<a name="l00137"></a>00137      <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#5d78946e4602e219cfecdec731da16c9">Dump</a>() <span class="keyword">const</span>;
+<a name="l00138"></a>00138 
+<a name="l00139"></a><a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb">00139</a>     <span class="keyword">enum</span> <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb">Type</a> {
+<a name="l00140"></a><a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bbb15d3e861610b598875946011afe37c3">00140</a>         <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bbb15d3e861610b598875946011afe37c3">UNDEFINED</a>,
+<a name="l00141"></a><a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb63179b8a7bb90a3d4085c8a4ae378c3e">00141</a>         <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb63179b8a7bb90a3d4085c8a4ae378c3e">SCALAR</a>,
+<a name="l00142"></a><a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb83ad725518e1b715b167508a0ad9c200">00142</a>         <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb83ad725518e1b715b167508a0ad9c200">MATRIX</a>,
+<a name="l00143"></a><a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bbff57d58cfc57184c55e6c425545e4e98">00143</a>         <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bbff57d58cfc57184c55e6c425545e4e98">EIGENVALUES</a>,
+<a name="l00144"></a><a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb64dac647aa9b5e3a74ba9f4892b87a3e">00144</a>         <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb64dac647aa9b5e3a74ba9f4892b87a3e">AXRHOM</a>,
+<a name="l00145"></a><a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb1bb4d990658f29243a056a15cd330706">00145</a>         <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb1bb4d990658f29243a056a15cd330706">SPANSKEW</a>
+<a name="l00146"></a>00146     };
+<a name="l00147"></a>00147 
+<a name="l00148"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">00148</a>     <span class="keyword">enum</span> <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">SubType</a> {
+<a name="l00149"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">00149</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">ST_ANY</a>,
+<a name="l00150"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf2cd336a5b2797e4456f17d4a7e50181">00150</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf2cd336a5b2797e4456f17d4a7e50181">ST_NMR</a>,
+<a name="l00151"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec418244e9a7532e161b62d8dace3e0f60">00151</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec418244e9a7532e161b62d8dace3e0f60">ST_EPR</a>,
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153       <span class="comment">//EPR INTERACTIONS</span>
+<a name="l00154"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec596989c3d945fb83f7e12fd01d3aab75">00154</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec596989c3d945fb83f7e12fd01d3aab75">ST_HFC</a>,
+<a name="l00155"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecca921ba96645701b18011e3b5dcf12d0">00155</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecca921ba96645701b18011e3b5dcf12d0">ST_G_TENSER</a>,
+<a name="l00156"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf7d7276c222375741dd0329fe7d49c3c">00156</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf7d7276c222375741dd0329fe7d49c3c">ST_ZFS</a>,
+<a name="l00157"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec0b6e81d5824dd16d1d5730caba464185">00157</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec0b6e81d5824dd16d1d5730caba464185">ST_EXCHANGE</a>,
+<a name="l00158"></a>00158 
+<a name="l00159"></a>00159       <span class="comment">//NMR INTERACTIONS</span>
+<a name="l00160"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec02a20b9be9d3cfe502b14133a9462d57">00160</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec02a20b9be9d3cfe502b14133a9462d57">ST_SHIELDING</a>,
+<a name="l00161"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf02f255f0fbf78e6053979a3d44a6dd9">00161</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf02f255f0fbf78e6053979a3d44a6dd9">ST_SCALAR</a>,   
+<a name="l00162"></a>00162 
+<a name="l00163"></a>00163       <span class="comment">//Interactions relevent to both nmr and epr</span>
+<a name="l00164"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec39c1349cb3ffe4f4095917b46232158e">00164</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec39c1349cb3ffe4f4095917b46232158e">ST_QUADRUPOLAR</a>,
+<a name="l00165"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecfd068d2222921c7c51e038e02d560158">00165</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecfd068d2222921c7c51e038e02d560158">ST_DIPOLAR</a>,
+<a name="l00166"></a><a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecdc6934ddb48fd6fd8ad0e7b0b48b4cf3">00166</a>       <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecdc6934ddb48fd6fd8ad0e7b0b48b4cf3">ST_CUSTOM</a>
+<a name="l00167"></a>00167     };
+<a name="l00168"></a>00168     
+<a name="l00169"></a>00169     <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb">Type</a> <a class="code" href="classInteraction.html#12567a9cd97dd77f59e75cb00704abcb">GetType</a>() <span class="keyword">const</span>;
+<a name="l00170"></a>00170     <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">SubType</a> <a class="code" href="classInteraction.html#bc013b5a594dc71ee363132731e9d5a5">GetSubType</a>() <span class="keyword">const</span>;
+<a name="l00171"></a>00171     <span class="keywordtype">bool</span> <a class="code" href="classInteraction.html#993de79c09206176f0070f62c69d42c5">IsSubType</a>(<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">SubType</a> t) <span class="keyword">const</span>;
+<a name="l00172"></a>00172     
+<a name="l00173"></a>00173     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#c14994c2f82b778fae0ce5eed4550d8a">GetScalar</a>(<span class="keywordtype">double</span>* Scalar) <span class="keyword">const</span>;
+<a name="l00174"></a>00174     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#fe82f6aab136ec2a67a24ae92e5e6661">GetMatrix</a>(<a class="code" href="classMatrix3.html">Matrix3</a>* Matrix) <span class="keyword">const</span>;
+<a name="l00175"></a>00175     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#1bd2f14692c7a731515e29d6a33a8cd8">GetEigenvalues</a>(<span class="keywordtype">double</span>* <a class="code" href="classInteraction.html#11f169116ed835785678ad9eb3d5ef92">XX</a>,<span class="keywordtype">double</span>* <a class="code" href="classInteraction.html#22e26bed273cfd8fb1d81efb37c2b8c8">YY</a>, <span class="keywordtype">double</span>* <a class="code" href="classInteraction.html#952998522bbe878862aa1a92e306ba96">ZZ</a>, <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>) <span class="keyword">const</span>;
+<a name="l00176"></a>00176     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#3a9a8ebf5d4f4edcf65db7629a4e207b">GetAxRhom</a>(<span class="keywordtype">double</span>* <a class="code" href="classInteraction.html#0864977eb2262e0358a076743c9e49f4">iso</a>,<span class="keywordtype">double</span>* <a class="code" href="classInteraction.html#142746e040b2efbfb73c503ee591b7ef">ax</a>, <span class="keywordtype">double</span>* <a class="code" href="classInteraction.html#14557c74bf80f840f7fee727a5307b42">rh</a>, <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>) <span class="keyword">const</span>;
+<a name="l00177"></a>00177     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#a278caa4f31ec342875c57f2c1e80e13">GetSpanSkew</a>(<span class="keywordtype">double</span>* <a class="code" href="classInteraction.html#0864977eb2262e0358a076743c9e49f4">iso</a>,<span class="keywordtype">double</span>* Span, <span class="keywordtype">double</span>* Skew, <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>) <span class="keyword">const</span>;
+<a name="l00178"></a>00178 
+<a name="l00179"></a>00179     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#789433064b7fdfec4652e4a01e722f8e">SetScalar</a>(<span class="keywordtype">double</span> Scalar);
+<a name="l00180"></a>00180     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#416ca3ff0aaba35ec2133bd31105bdf9">SetMatrix</a>(<a class="code" href="classMatrix3.html">Matrix3</a>* Matrix);
+<a name="l00181"></a>00181     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#33d61fbf9d29daf89171b0edaa73b827">SetEigenvalues</a>(<span class="keywordtype">double</span> <a class="code" href="classInteraction.html#11f169116ed835785678ad9eb3d5ef92">XX</a>,<span class="keywordtype">double</span> <a class="code" href="classInteraction.html#22e26bed273cfd8fb1d81efb37c2b8c8">YY</a>, <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#952998522bbe878862aa1a92e306ba96">ZZ</a>, <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>);
+<a name="l00182"></a>00182     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#09d5b4e6971e40eb338fa5beae424f92">SetAxRhom</a>(<span class="keywordtype">double</span> <a class="code" href="classInteraction.html#0864977eb2262e0358a076743c9e49f4">iso</a>,<span class="keywordtype">double</span> <a class="code" href="classInteraction.html#142746e040b2efbfb73c503ee591b7ef">ax</a>, <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#14557c74bf80f840f7fee727a5307b42">rh</a>, <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>);
+<a name="l00183"></a>00183     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#13dd619dfd347ef3a905556579c21126">SetSpanSkew</a>(<span class="keywordtype">double</span> <a class="code" href="classInteraction.html#0864977eb2262e0358a076743c9e49f4">iso</a>,<span class="keywordtype">double</span> Span, <span class="keywordtype">double</span> Skew, <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>);
+<a name="l00184"></a>00184 
+<a name="l00185"></a>00185     <a class="code" href="classSpin.html">Spin</a>* <a class="code" href="classInteraction.html#a1a75cba5c79494072c964d040634010">GetSpin1</a>() <span class="keyword">const</span>;
+<a name="l00186"></a>00186     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#54cd675939a4dc864737ef100d14eb8b">SetSpin1</a>(<a class="code" href="classSpin.html">Spin</a>* Spin1);
+<a name="l00187"></a>00187     <a class="code" href="classSpin.html">Spin</a>* <a class="code" href="classInteraction.html#672f0f17e38197abcfdb6e5b69da4e7b">GetSpin2</a>() <span class="keyword">const</span>;
+<a name="l00188"></a>00188     <span class="keywordtype">void</span> <a class="code" href="classInteraction.html#34b043e4b2cbb37ff3bde098ed440000">SetSpin2</a>(<a class="code" href="classSpin.html">Spin</a>* Spin2);
+<a name="l00189"></a>00189 
+<a name="l00190"></a>00190     <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#070b723f58b076c115fb2c9f27a4934b">GetAsScalar</a>() <span class="keyword">const</span>;
+<a name="l00191"></a>00191     <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classInteraction.html#fc69c323a2422e6fd70d706f0195a6be">GetAsMatrix</a>() <span class="keyword">const</span>;
+<a name="l00192"></a>00192 
+<a name="l00193"></a>00193   <span class="keyword">private</span>:
+<a name="l00194"></a>00194     <span class="keyword">union  </span>{
+<a name="l00195"></a><a class="code" href="classInteraction.html#ab8cc19279b9cde935a9d1ff6c1287ff">00195</a>       <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#ab8cc19279b9cde935a9d1ff6c1287ff">mScalar</a>;
+<a name="l00196"></a><a class="code" href="classInteraction.html#787dc25665e869d08f2f81d57ecf358d">00196</a>       <a class="code" href="classMatrix3.html">Matrix3</a>* <a class="code" href="classInteraction.html#787dc25665e869d08f2f81d57ecf358d">mMatrix</a>;
+<a name="l00197"></a>00197       <span class="keyword">struct </span>{
+<a name="l00198"></a><a class="code" href="classInteraction.html#11f169116ed835785678ad9eb3d5ef92">00198</a>         <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#11f169116ed835785678ad9eb3d5ef92">XX</a>;
+<a name="l00199"></a><a class="code" href="classInteraction.html#22e26bed273cfd8fb1d81efb37c2b8c8">00199</a>         <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#22e26bed273cfd8fb1d81efb37c2b8c8">YY</a>;
+<a name="l00200"></a><a class="code" href="classInteraction.html#952998522bbe878862aa1a92e306ba96">00200</a>         <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#952998522bbe878862aa1a92e306ba96">ZZ</a>;
+<a name="l00201"></a><a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">00201</a>         <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>;
+<a name="l00202"></a>00202       } <a class="code" href="classInteraction.html#b03fb869cd975758933c9e0bb99a8de0">mEigenvalues</a>;
+<a name="l00203"></a>00203       <span class="keyword">struct </span>{
+<a name="l00204"></a><a class="code" href="classInteraction.html#0864977eb2262e0358a076743c9e49f4">00204</a>           <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#0864977eb2262e0358a076743c9e49f4">iso</a>;
+<a name="l00205"></a><a class="code" href="classInteraction.html#142746e040b2efbfb73c503ee591b7ef">00205</a>           <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#142746e040b2efbfb73c503ee591b7ef">ax</a>;
+<a name="l00206"></a><a class="code" href="classInteraction.html#14557c74bf80f840f7fee727a5307b42">00206</a>           <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#14557c74bf80f840f7fee727a5307b42">rh</a>;
+<a name="l00207"></a>00207           <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>;
+<a name="l00208"></a>00208       } <a class="code" href="classInteraction.html#d934670c6a7220bbeec314b37a041856">mAxRhom</a>;
+<a name="l00209"></a>00209       <span class="keyword">struct </span>{
+<a name="l00210"></a>00210           <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#0864977eb2262e0358a076743c9e49f4">iso</a>;
+<a name="l00211"></a><a class="code" href="classInteraction.html#de16e364745709ba69dd16bee02922a0">00211</a>           <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#de16e364745709ba69dd16bee02922a0">span</a>;
+<a name="l00212"></a><a class="code" href="classInteraction.html#229ab71574a04511c76c6a245783e9ac">00212</a>           <span class="keywordtype">double</span> <a class="code" href="classInteraction.html#229ab71574a04511c76c6a245783e9ac">skew</a>;
+<a name="l00213"></a>00213           <a class="code" href="classOrientation.html">Orientation</a>* <a class="code" href="classInteraction.html#da752ee1c1b156d3ca7c1b99b9285bd5">Orient</a>;
+<a name="l00214"></a>00214       } <a class="code" href="classInteraction.html#62ec143e0ed68029fd11ca2ce3ac61d0">mSpanSkew</a>;
+<a name="l00215"></a>00215    } mData;
+<a name="l00216"></a>00216    <a class="code" href="classInteraction.html#a69f52a25e872bf63c9a61e2a9ac42bb">Type</a> mType;
+<a name="l00217"></a>00217    <a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">SubType</a> mSubType;
+<a name="l00218"></a>00218    <a class="code" href="classSpin.html">Spin</a>* mSpin1;
+<a name="l00219"></a>00219    <a class="code" href="classSpin.html">Spin</a>* mSpin2;
+<a name="l00220"></a>00220 };
+<a name="l00221"></a>00221 
+<a name="l00222"></a>00222 <span class="keyword">class </span><a class="code" href="classSpin.html">Spin</a> {
+<a name="l00223"></a>00223   <span class="keyword">public</span>:
+<a name="l00224"></a>00224     <a class="code" href="classSpin.html#9d437eeef08788d5a2488c55a629128d">Spin</a>(<a class="code" href="classSpinSystem.html">SpinSystem</a>* Parent,<a class="code" href="classVector3.html">Vector3</a>* mPosition,<span class="keywordtype">string</span> mLabel,<a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* mFrame);
+<a name="l00225"></a>00225     <a class="code" href="classSpin.html#0ce76f80c18facfe4bc1bfd399aab9d4">~Spin</a>();
 <a name="l00226"></a>00226   
-<a name="l00228"></a>00228   <span class="keywordtype">double</span> <a class="code" href="classMatrix3.html#4be2168a5314291215b264b2d28b2645" title="Get the determinate of the matrix.">det</a>() <span class="keyword">const</span>;
-<a name="l00229"></a>00229 <span class="keyword">private</span>:
-<a name="l00230"></a>00230   <span class="keyword">mutable</span> <span class="keywordtype">bool</span> foundEigenVals;
-<a name="l00231"></a>00231   <span class="keyword">mutable</span> complex&lt;double&gt; eigx;
-<a name="l00232"></a>00232   <span class="keyword">mutable</span> complex&lt;double&gt; eigy;
-<a name="l00233"></a>00233   <span class="keyword">mutable</span> complex&lt;double&gt; eigz;
-<a name="l00234"></a>00234 };
+<a name="l00227"></a>00227     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#a342c561a6ba5e681584ddd56d241dfe">Dump</a>() <span class="keyword">const</span>;
+<a name="l00228"></a>00228 
+<a name="l00229"></a>00229     <a class="code" href="classVector3.html">Vector3</a>* <a class="code" href="classSpin.html#8b37dee88e8f4902fb0b5c07a96b21bd">GetPosition</a>() <span class="keyword">const</span>;
+<a name="l00230"></a>00230     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#163c1a3c80e7912bdbefb7a834c0b84a">SetPosition</a>(<a class="code" href="classVector3.html">Vector3</a>* Position);
+<a name="l00231"></a>00231     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#626e15ffe2a8bf7987c6a2b563be19c9">GetCoordinates</a>(<span class="keywordtype">double</span>* _x,<span class="keywordtype">double</span>* _y, <span class="keywordtype">double</span>* _z) <span class="keyword">const</span>;
+<a name="l00232"></a>00232 
+<a name="l00233"></a>00233     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#efe24cd4b741cb98ae4086327d7bec56">SetLabel</a>(<span class="keywordtype">string</span> Label);
+<a name="l00234"></a>00234     <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classSpin.html#2a7860c666655ac8b747c1c0318f7356">GetLabel</a>() <span class="keyword">const</span>;
+<a name="l00235"></a>00235 
+<a name="l00236"></a>00236     <span class="keywordtype">long</span> <a class="code" href="classSpin.html#51d9c8c62385ce2d6ac5dd38b647159c">GetInteractionCount</a>() <span class="keyword">const</span>;
+<a name="l00237"></a>00237     <a class="code" href="classInteraction.html">Interaction</a>* <a class="code" href="classSpin.html#dc49cb3180811dfc3f4193e1254b71b9">GetInteraction</a>(<span class="keywordtype">long</span> n) <span class="keyword">const</span>;
+<a name="l00238"></a>00238     vector&lt;Interaction*&gt; <a class="code" href="classSpin.html#f29751e3e901d768b7c74301e4e0ce08">GetInteractions</a>() <span class="keyword">const</span>;
+<a name="l00239"></a>00239     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#3266db6117369a63cdbfc56ec8db439d">InsertInteraction</a>(<a class="code" href="classInteraction.html">Interaction</a>* _Interaction,<span class="keywordtype">long</span> Position=<a class="code" href="spinsys_8hpp.html#006a302e80285eb7d251159a00553438">END</a>);
+<a name="l00240"></a>00240     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#77cb665220aa887ea14e56ab2a679c58">RemoveInteraction</a>(<span class="keywordtype">long</span> Position);
+<a name="l00241"></a>00241     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#77cb665220aa887ea14e56ab2a679c58">RemoveInteraction</a>(<a class="code" href="classInteraction.html">Interaction</a>* _Interaction);
+<a name="l00242"></a>00242 
+<a name="l00243"></a>00243     <span class="keywordtype">double</span> <a class="code" href="classSpin.html#cc610794589d896499eac48f3e6dcbc4">GetLinearInteractionAsScalar</a>(<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">Interaction::SubType</a> t=<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">Interaction::ST_ANY</a>) <span class="keyword">const</span>;
+<a name="l00244"></a>00244     <span class="keywordtype">double</span> <a class="code" href="classSpin.html#026bdd1050d07b4a4527b2ecc82d8244">GetBilinearInteractionAsScalar</a>(<a class="code" href="classSpin.html">Spin</a>* OtherSpin,<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">Interaction::SubType</a> t=<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">Interaction::ST_ANY</a>) <span class="keyword">const</span>;
+<a name="l00245"></a>00245     <span class="keywordtype">double</span> <a class="code" href="classSpin.html#4a75407431d1cbdb795f5a922ad04f8e">GetQuadrapolarInteractionAsScalar</a>(<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">Interaction::SubType</a> t=<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">Interaction::ST_ANY</a>) <span class="keyword">const</span>;
+<a name="l00246"></a>00246 
+<a name="l00247"></a>00247     <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpin.html#653c475c2312b48b7d2e5ddffcb7788b">GetLinearInteractionAsMatrix</a>(<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">Interaction::SubType</a> t=<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">Interaction::ST_ANY</a>) <span class="keyword">const</span>;
+<a name="l00248"></a>00248     <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpin.html#b4ec2209312f97abc30dbdaeb5884a5c">GetBilinearInteractionAsMatrix</a>(<a class="code" href="classSpin.html">Spin</a>* OtherSpin,<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">Interaction::SubType</a> t=<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">Interaction::ST_ANY</a>) <span class="keyword">const</span>;
+<a name="l00249"></a>00249     <a class="code" href="classMatrix3.html">Matrix3</a> <a class="code" href="classSpin.html#fb41b8e3e97a414f436d83f2c9b7c734">GetQuadrapolarInteractionAsMatrix</a>(<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afec">Interaction::SubType</a> t=<a class="code" href="classInteraction.html#7f9a3851af74c4a427c2256c4ee5afecf6d5646fb1f0eb6ae9cf78a3983c41c5">Interaction::ST_ANY</a>) <span class="keyword">const</span>;
+<a name="l00250"></a>00250 
+<a name="l00251"></a>00251     
+<a name="l00252"></a>00252     <a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* <a class="code" href="classSpin.html#1529f340928bec4115c7cbd46208b5b3">GetFrame</a>() <span class="keyword">const</span>;
+<a name="l00253"></a>00253     <span class="keywordtype">void</span> <a class="code" href="classSpin.html#3706194a445a383ca1ad155d086cf633">SetFrame</a>(<a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* Frame);
+<a name="l00254"></a>00254 
+<a name="l00255"></a>00255     std::vector&lt;Spin*&gt; <a class="code" href="classSpin.html#7ab7683068f4efd1b9585fde2a029228">GetNearbySpins</a>(<span class="keywordtype">double</span> distance);
+<a name="l00256"></a>00256 
+<a name="l00257"></a>00257   <span class="keyword">private</span>:
+<a name="l00258"></a>00258     <a class="code" href="classSpinSystem.html">SpinSystem</a>* mParent;
+<a name="l00259"></a>00259     <a class="code" href="classVector3.html">Vector3</a>* mPosition;
+<a name="l00260"></a>00260     <span class="keywordtype">string</span> mLabel;
+<a name="l00261"></a>00261     <a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* mFrame;
+<a name="l00262"></a>00262 };
+<a name="l00263"></a>00263 
+<a name="l00264"></a>00264 
+<a name="l00265"></a>00265 
+<a name="l00266"></a>00266 
+<a name="l00267"></a>00267 <span class="keyword">class </span><a class="code" href="classSpinSystem.html">SpinSystem</a> {
+<a name="l00268"></a>00268   <span class="keyword">public</span>:
+<a name="l00269"></a>00269     <a class="code" href="classSpinSystem.html#b04d168d3fed213fc52970006961eeb9">SpinSystem</a>();
+<a name="l00270"></a>00270     <a class="code" href="classSpinSystem.html#3874456d3016f8d935e0bb1a794a56be">~SpinSystem</a>();
+<a name="l00271"></a>00271     
+<a name="l00272"></a>00272     <span class="keywordtype">void</span> <a class="code" href="classSpinSystem.html#e1600afe0d5b6b63e7e7bff2b74383f1">Dump</a>() <span class="keyword">const</span>;
+<a name="l00273"></a>00273 
+<a name="l00274"></a>00274     <span class="keywordtype">long</span> <a class="code" href="classSpinSystem.html#f13f40fe2f79ae795e907ad50e0d2c50">GetSpinCount</a>() <span class="keyword">const</span>;
+<a name="l00275"></a>00275     <a class="code" href="classSpin.html">Spin</a>* <a class="code" href="classSpinSystem.html#213764fe2a6e86cd8ef38b00aeb05e69">GetSpin</a>(<span class="keywordtype">long</span> n) <span class="keyword">const</span>;
+<a name="l00276"></a>00276     vector&lt;Spin*&gt; <a class="code" href="classSpinSystem.html#d71848fd1ab5debc38d6f0a7c1b822fb">GetSpins</a>() <span class="keyword">const</span>;
+<a name="l00277"></a>00277     <span class="keywordtype">void</span> <a class="code" href="classSpinSystem.html#4721097240cea64fb2536cb96d577944">InsertSpin</a>(<a class="code" href="classSpin.html">Spin</a>* _Spin,<span class="keywordtype">long</span> Position=<a class="code" href="spinsys_8hpp.html#006a302e80285eb7d251159a00553438">END</a>);
+<a name="l00278"></a>00278     <span class="keywordtype">void</span> <a class="code" href="classSpinSystem.html#cccb3d8f67a019d85f55843524b8248c">RemoveSpin</a>(<span class="keywordtype">long</span> Position);
+<a name="l00279"></a>00279     <span class="keywordtype">void</span> <a class="code" href="classSpinSystem.html#cccb3d8f67a019d85f55843524b8248c">RemoveSpin</a>(<a class="code" href="classSpin.html">Spin</a>* _Spin);
+<a name="l00280"></a>00280 
+<a name="l00281"></a>00281     <a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* <a class="code" href="classSpinSystem.html#09e0443db789a4c66235a4cc930b8a01">GetRootFrame</a>() <span class="keyword">const</span>;
+<a name="l00282"></a>00282     
+<a name="l00283"></a>00283     <span class="keywordtype">void</span> <a class="code" href="classSpinSystem.html#85ba6d9af6e575d38e90fcda2cbf3692">LoadFromGamesFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
+<a name="l00284"></a>00284     <span class="keywordtype">void</span> <a class="code" href="classSpinSystem.html#c3a745d0085815d051b01be2b16c4e66">LoadFromG03File</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
+<a name="l00285"></a>00285     <span class="keywordtype">void</span> <a class="code" href="classSpinSystem.html#95c784f2b86a81ab97f66333c3bd6fbb">LoadFromXMLFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);
+<a name="l00286"></a>00286   <span class="keyword">private</span>:
+<a name="l00287"></a><a class="code" href="classSpinSystem.html#e370bb4e14420126298ed761063baec3">00287</a>     <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classSpin.html">Spin</a>;
+<a name="l00288"></a>00288     
+<a name="l00289"></a>00289      vector&lt;Spin*&gt; <a class="code" href="classSpinSystem.html#43d0149174331dce9bb369a945ed7acf">mSpins</a>;
+<a name="l00290"></a>00290      vector&lt;Interaction*&gt; mInteractions;
+<a name="l00291"></a>00291      <a class="code" href="classReferenceFrame.html">ReferenceFrame</a>* mLabFrame; 
+<a name="l00292"></a>00292 };
+<a name="l00293"></a>00293 
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Aug 16 16:38:38 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 19 20:08:22 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

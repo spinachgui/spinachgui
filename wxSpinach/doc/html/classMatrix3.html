@@ -23,17 +23,8 @@
   </div>
 </div>
 <div class="contents">
-<h1>Matrix3 Class Reference</h1><!-- doxytag: class="Matrix3" --><!-- doxytag: inherits="Matrix" --><code>#include &lt;<a class="el" href="spinsys_8hpp-source.html">spinsys.hpp</a>&gt;</code>
+<h1>Matrix3 Class Reference</h1><!-- doxytag: class="Matrix3" --><code>#include &lt;<a class="el" href="spinsys_8hpp-source.html">spinsys.hpp</a>&gt;</code>
 <p>
-<div class="dynheader">
-Inheritance diagram for Matrix3:</div>
-<div class="dynsection">
-
-<p><center><img src="classMatrix3.png" usemap="#Matrix3_map" border="0" alt=""></center>
-<map name="Matrix3_map">
-<area href="classMatrix.html" alt="Matrix" shape="rect" coords="0,0,54,24">
-</map>
-</div>
 
 <p>
 <a href="classMatrix3-members.html">List of all members.</a><table border="0" cellpadding="0" cellspacing="0">
@@ -41,42 +32,34 @@ Inheritance diagram for Matrix3:</div>
 <tr><td colspan="2"><br><h2>Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">Matrix3</a> ()</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#311e7cf30b5089c737e3aa79adcd977f">Matrix3</a> (const <a class="el" href="classMatrix.html">Matrix</a> &amp;_m)</td></tr>
-
 <tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#3c2f9654a72579dac23d49172ff2a633">Matrix3</a> (double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#dcc8db612e12edf9d3204dcf271f8f4f">get</a> (long i1, long i2) const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#29461e771e8c13f667a258fea75263c9">Dump</a> () const </td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#677cb4de732678c29a192dc318d0b2b9">get</a> (long i) const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">const double *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#ac3ee10fd9844f2f490a54bdbb08b9d3">GetRaw</a> () const </td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#3b867bdda1519503d05e97ec956ec553">set</a> (long i1, long i2, double a)</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#6567833f6afbed0f3111a1e33da14ca9">Get</a> (long column, long row) const </td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#8b1c3c83ced7d4181ba02cde4167b550">trace</a> ()</td></tr>
-
-<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#b08850988bd6fb945df4cbb11b5baea1">dump</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#3c9cbf0818f2d5b20e8692cf7a305835">operator()</a> (long column, long row) const </td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classMatrix3.html">Matrix3</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#dfdc8d05f9736bf96d0881a0e9e35c59">operator+</a> (const <a class="el" href="classMatrix3.html">Matrix3</a> &amp;m) const </td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Add two matricese together in the expected way.  <a href="#dfdc8d05f9736bf96d0881a0e9e35c59"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">complex&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#2a8bd398e885a0ad43da8f2d7d4317a0">getEigenValX</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classMatrix3.html">Matrix3</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#b5ae5deb0550ed113d36a4bf602eb221">operator+=</a> (const <a class="el" href="classMatrix3.html">Matrix3</a> &amp;m)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><a class="el" href="classEigenvalues.html" title="Class corresponding to the eigenvalues schema type.">Eigenvalues</a> and eigenvectors.  <a href="#2a8bd398e885a0ad43da8f2d7d4317a0"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">complex&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#7e8b6f4c24ecf319f1a67503609fa4f4">getEigenValY</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#353b43054b83b06c5ffdffd41a5d9c5b">Set</a> (long i, long j, double val)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">complex&lt; double &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#d913a219c4be84c80c46d098698fd821">getEigenValZ</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#773fdcf139826ddb39c30e7d08bbdb90">Matrix3</a> ()</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classVector.html">Vector</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#dd068bc6133793e403741714f42e5645">getEigenvectorX</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#3c2f9654a72579dac23d49172ff2a633">Matrix3</a> (double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classVector.html">Vector</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#43ca734acea82846cd1ca4f1e0853892">getEigenvectorY</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">const double *&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#2959ede8e9a10300c2ff5c7e0d8bee9d">GetRaw</a> () const </td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classVector.html">Vector</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#e333f8db3cc345ff2983bd17f25965d4">getEigenvectorZ</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#6567833f6afbed0f3111a1e33da14ca9">Get</a> (long column, long row) const </td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classVector.html">Vector</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#9c4d37866e0c7cebf2000cbdbddb4137">solveSimEq</a> (double y1, double y2, double y3) const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#3c9cbf0818f2d5b20e8692cf7a305835">operator()</a> (long column, long row) const </td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Use the matrix as a set of simultaious equations.  <a href="#9c4d37866e0c7cebf2000cbdbddb4137"></a><br></td></tr>
-<tr><td class="memItemLeft" nowrap align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#4be2168a5314291215b264b2d28b2645">det</a> () const </td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMatrix3.html#353b43054b83b06c5ffdffd41a5d9c5b">Set</a> (long i, long j, double val)</td></tr>
 
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the determinate of the matrix.  <a href="#4be2168a5314291215b264b2d28b2645"></a><br></td></tr>
 </table>
 <hr><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" name="773fdcf139826ddb39c30e7d08bbdb90"></a><!-- doxytag: member="Matrix3::Matrix3" ref="773fdcf139826ddb39c30e7d08bbdb90" args="()" -->
@@ -88,7 +71,7 @@ Inheritance diagram for Matrix3:</div>
           <td>(</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline]</code></td>
+          <td></td>
         </tr>
       </table>
 </div>
@@ -98,17 +81,87 @@ Inheritance diagram for Matrix3:</div>
 
 </div>
 </div><p>
-<a class="anchor" name="311e7cf30b5089c737e3aa79adcd977f"></a><!-- doxytag: member="Matrix3::Matrix3" ref="311e7cf30b5089c737e3aa79adcd977f" args="(const Matrix &amp;_m)" -->
+<a class="anchor" name="3c2f9654a72579dac23d49172ff2a633"></a><!-- doxytag: member="Matrix3::Matrix3" ref="3c2f9654a72579dac23d49172ff2a633" args="(double a00, double a01, double a02, double a10, double a11, double a12, double a20, double a21, double a22)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Matrix3::Matrix3           </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classMatrix.html">Matrix</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>_m</em>          </td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a00</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a01</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a02</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a10</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a11</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a12</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a20</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a21</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>a22</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="773fdcf139826ddb39c30e7d08bbdb90"></a><!-- doxytag: member="Matrix3::Matrix3" ref="773fdcf139826ddb39c30e7d08bbdb90" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Matrix3::Matrix3           </td>
+          <td>(</td>
+          <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline]</code></td>
+          <td></td>
         </tr>
       </table>
 </div>
@@ -190,119 +243,93 @@ Inheritance diagram for Matrix3:</div>
 </div>
 </div><p>
 <hr><h2>Member Function Documentation</h2>
-<a class="anchor" name="dcc8db612e12edf9d3204dcf271f8f4f"></a><!-- doxytag: member="Matrix3::get" ref="dcc8db612e12edf9d3204dcf271f8f4f" args="(long i1, long i2) const " -->
+<a class="anchor" name="29461e771e8c13f667a258fea75263c9"></a><!-- doxytag: member="Matrix3::Dump" ref="29461e771e8c13f667a258fea75263c9" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double Matrix3::get           </td>
-          <td>(</td>
-          <td class="paramtype">long&nbsp;</td>
-          <td class="paramname"> <em>i1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&nbsp;</td>
-          <td class="paramname"> <em>i2</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="677cb4de732678c29a192dc318d0b2b9"></a><!-- doxytag: member="Matrix3::get" ref="677cb4de732678c29a192dc318d0b2b9" args="(long i) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double Matrix3::get           </td>
-          <td>(</td>
-          <td class="paramtype">long&nbsp;</td>
-          <td class="paramname"> <em>i</em>          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="3b867bdda1519503d05e97ec956ec553"></a><!-- doxytag: member="Matrix3::set" ref="3b867bdda1519503d05e97ec956ec553" args="(long i1, long i2, double a)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Matrix3::set           </td>
-          <td>(</td>
-          <td class="paramtype">long&nbsp;</td>
-          <td class="paramname"> <em>i1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&nbsp;</td>
-          <td class="paramname"> <em>i2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>a</em></td><td>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td><td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="8b1c3c83ced7d4181ba02cde4167b550"></a><!-- doxytag: member="Matrix3::trace" ref="8b1c3c83ced7d4181ba02cde4167b550" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double Matrix3::trace           </td>
-          <td>(</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="b08850988bd6fb945df4cbb11b5baea1"></a><!-- doxytag: member="Matrix3::dump" ref="b08850988bd6fb945df4cbb11b5baea1" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Matrix3::dump           </td>
+          <td class="memname">void Matrix3::Dump           </td>
           <td>(</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="ac3ee10fd9844f2f490a54bdbb08b9d3"></a><!-- doxytag: member="Matrix3::GetRaw" ref="ac3ee10fd9844f2f490a54bdbb08b9d3" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double * Matrix3::GetRaw           </td>
+          <td>(</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6567833f6afbed0f3111a1e33da14ca9"></a><!-- doxytag: member="Matrix3::Get" ref="6567833f6afbed0f3111a1e33da14ca9" args="(long column, long row) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Matrix3::Get           </td>
+          <td>(</td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>column</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>row</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="3c9cbf0818f2d5b20e8692cf7a305835"></a><!-- doxytag: member="Matrix3::operator()" ref="3c9cbf0818f2d5b20e8692cf7a305835" args="(long column, long row) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Matrix3::operator()           </td>
+          <td>(</td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>column</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>row</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const</td>
         </tr>
       </table>
 </div>
@@ -329,42 +356,20 @@ Inheritance diagram for Matrix3:</div>
 <div class="memdoc">
 
 <p>
-Add two matricese together in the expected way. 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="2a8bd398e885a0ad43da8f2d7d4317a0"></a><!-- doxytag: member="Matrix3::getEigenValX" ref="2a8bd398e885a0ad43da8f2d7d4317a0" args="() const " -->
+<a class="anchor" name="b5ae5deb0550ed113d36a4bf602eb221"></a><!-- doxytag: member="Matrix3::operator+=" ref="b5ae5deb0550ed113d36a4bf602eb221" args="(const Matrix3 &amp;m)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">complex&lt;double&gt; Matrix3::getEigenValX           </td>
+          <td class="memname"><a class="el" href="classMatrix3.html">Matrix3</a> &amp; Matrix3::operator+=           </td>
           <td>(</td>
-          <td class="paramname">          </td>
+          <td class="paramtype">const <a class="el" href="classMatrix3.html">Matrix3</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>m</em>          </td>
           <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-<a class="el" href="classEigenvalues.html" title="Class corresponding to the eigenvalues schema type.">Eigenvalues</a> and eigenvectors. 
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="7e8b6f4c24ecf319f1a67503609fa4f4"></a><!-- doxytag: member="Matrix3::getEigenValY" ref="7e8b6f4c24ecf319f1a67503609fa4f4" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">complex&lt;double&gt; Matrix3::getEigenValY           </td>
-          <td>(</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline]</code></td>
+          <td></td>
         </tr>
       </table>
 </div>
@@ -374,103 +379,75 @@ Add two matricese together in the expected way.
 
 </div>
 </div><p>
-<a class="anchor" name="d913a219c4be84c80c46d098698fd821"></a><!-- doxytag: member="Matrix3::getEigenValZ" ref="d913a219c4be84c80c46d098698fd821" args="() const " -->
+<a class="anchor" name="353b43054b83b06c5ffdffd41a5d9c5b"></a><!-- doxytag: member="Matrix3::Set" ref="353b43054b83b06c5ffdffd41a5d9c5b" args="(long i, long j, double val)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">complex&lt;double&gt; Matrix3::getEigenValZ           </td>
+          <td class="memname">void Matrix3::Set           </td>
           <td>(</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline]</code></td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>i</em>, </td>
         </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="dd068bc6133793e403741714f42e5645"></a><!-- doxytag: member="Matrix3::getEigenvectorX" ref="dd068bc6133793e403741714f42e5645" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classVector.html">Vector</a> Matrix3::getEigenvectorX           </td>
-          <td>(</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="43ca734acea82846cd1ca4f1e0853892"></a><!-- doxytag: member="Matrix3::getEigenvectorY" ref="43ca734acea82846cd1ca4f1e0853892" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classVector.html">Vector</a> Matrix3::getEigenvectorY           </td>
-          <td>(</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="e333f8db3cc345ff2983bd17f25965d4"></a><!-- doxytag: member="Matrix3::getEigenvectorZ" ref="e333f8db3cc345ff2983bd17f25965d4" args="() const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classVector.html">Vector</a> Matrix3::getEigenvectorZ           </td>
-          <td>(</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-<a class="anchor" name="9c4d37866e0c7cebf2000cbdbddb4137"></a><!-- doxytag: member="Matrix3::solveSimEq" ref="9c4d37866e0c7cebf2000cbdbddb4137" args="(double y1, double y2, double y3) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classVector.html">Vector</a> Matrix3::solveSimEq           </td>
-          <td>(</td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>y1</em>, </td>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>j</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>y2</em>, </td>
+          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="2959ede8e9a10300c2ff5c7e0d8bee9d"></a><!-- doxytag: member="Matrix3::GetRaw" ref="2959ede8e9a10300c2ff5c7e0d8bee9d" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const double* Matrix3::GetRaw           </td>
+          <td>(</td>
+          <td class="paramname">          </td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="6567833f6afbed0f3111a1e33da14ca9"></a><!-- doxytag: member="Matrix3::Get" ref="6567833f6afbed0f3111a1e33da14ca9" args="(long column, long row) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Matrix3::Get           </td>
+          <td>(</td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>column</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&nbsp;</td>
-          <td class="paramname"> <em>y3</em></td><td>&nbsp;</td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>row</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -482,36 +459,77 @@ Add two matricese together in the expected way.
 <div class="memdoc">
 
 <p>
-Use the matrix as a set of simultaious equations. 
-<p>
 
 </div>
 </div><p>
-<a class="anchor" name="4be2168a5314291215b264b2d28b2645"></a><!-- doxytag: member="Matrix3::det" ref="4be2168a5314291215b264b2d28b2645" args="() const " -->
+<a class="anchor" name="3c9cbf0818f2d5b20e8692cf7a305835"></a><!-- doxytag: member="Matrix3::operator()" ref="3c9cbf0818f2d5b20e8692cf7a305835" args="(long column, long row) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double Matrix3::det           </td>
+          <td class="memname">double Matrix3::operator()           </td>
           <td>(</td>
-          <td class="paramname">          </td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const</td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>column</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>row</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-Get the determinate of the matrix. 
+
+</div>
+</div><p>
+<a class="anchor" name="353b43054b83b06c5ffdffd41a5d9c5b"></a><!-- doxytag: member="Matrix3::Set" ref="353b43054b83b06c5ffdffd41a5d9c5b" args="(long i, long j, double val)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Matrix3::Set           </td>
+          <td>(</td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>i</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&nbsp;</td>
+          <td class="paramname"> <em>j</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&nbsp;</td>
+          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
 <p>
 
 </div>
 </div><p>
 <hr>The documentation for this class was generated from the following files:<ul>
-<li>/home/gareth/src/cspinich/wxSpinach/shared/<a class="el" href="spinsys_8hpp-source.html">spinsys.hpp</a><li>/home/gareth/src/cspinich/wxSpinach/shared/<a class="el" href="spinsys_8cpp.html">spinsys.cpp</a></ul>
+<li>/home/gareth/src/cspinich/wxSpinach/shared/<a class="el" href="spinsys_8hpp-source.html">spinsys.hpp</a><li>/home/gareth/src/cspinich/wxSpinach/shared/<a class="el" href="spinsys__new_8hpp-source.html">spinsys_new.hpp</a><li>/home/gareth/src/cspinich/wxSpinach/shared/<a class="el" href="spinsys_8cpp.html">spinsys.cpp</a><li>/home/gareth/src/cspinich/wxSpinach/shared/<a class="el" href="spinsys__new_8cpp.html">spinsys_new.cpp</a></ul>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Aug 16 16:38:39 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 19 20:08:23 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

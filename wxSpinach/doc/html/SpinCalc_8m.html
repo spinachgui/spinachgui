@@ -25,11 +25,11 @@
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">'Error:Input DCM(s&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#63d674a2e1704413a0bcf7ced67825e4">improper</a> ()</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">end if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#ebfa851c8af58da8bc15ed6634c8d1cf">errordlg</a> ('Warning:Input DCM matrix determinant(s) off from 1 by more than tolerance.') end end <a class="el" href="SpinCalc_8m.html#d56fd1f2de63b3ed9296d2aba8074442">DCM_flag</a>=0</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">end if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#ebfa851c8af58da8bc15ed6634c8d1cf">errordlg</a> ('Warning:Input DCM <a class="el" href="classmatrix.html">matrix</a> determinant(s) off from 1 by more than tolerance.') end end <a class="el" href="SpinCalc_8m.html#d56fd1f2de63b3ed9296d2aba8074442">DCM_flag</a>=0</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">if for for for if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#f3f46933dc5e07a176551ddbac84b343">perturbed</a> (<a class="el" href="SpinCalc_8m.html#bf9d47cd7d4fbc942e618bb1977019c2">ii</a>, <a class="el" href="SpinCalc_8m.html#0ed892381b3cada12b0cb806289d0aef">jj</a>, <a class="el" href="SpinCalc_8m.html#e9c83588c3b519e86d31c2d977ce16dc">kk</a>)&gt;<a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">end end end end if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#859fe483ef1b2cb3b60c8c45ad4fd749">fprintf</a> ('Warning:Input DCM(s) matrix not orthogonal to precision tolerance.') end end clear perturbed <a class="el" href="SpinCalc_8m.html#d56fd1f2de63b3ed9296d2aba8074442">DCM_flag</a> Q</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">end end end end if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#859fe483ef1b2cb3b60c8c45ad4fd749">fprintf</a> ('Warning:Input DCM(s) <a class="el" href="classmatrix.html">matrix</a> not orthogonal to precision tolerance.') end end clear perturbed <a class="el" href="SpinCalc_8m.html#d56fd1f2de63b3ed9296d2aba8074442">DCM_flag</a> Q</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#bb6964066c60f067a5ee07f270875a3f">denom</a> (1)=0.5 *sqrt(1+INPUT(1</td></tr>
 
@@ -53,7 +53,7 @@ maximize denominator switch&nbsp;</td><td class="memItemRight" valign="bottom"><
 <tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#8df71f6833fa784eae6b623e79dc13af">Q</a> (1, <a class="el" href="SpinCalc_8m.html#bf9d47cd7d4fbc942e618bb1977019c2">ii</a>)</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">clear denom case EV Euler <br>
-<a class="el" href="classVector.html">Vector</a> Input <a class="el" href="classType.html">Type</a> if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#866ab28a6820ec61ca04ff96cca4096b">size</a> (INPUT, 2)~</td></tr>
+Vector Input Type if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#866ab28a6820ec61ca04ff96cca4096b">size</a> (INPUT, 2)~</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">assign mu name for clarity if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#f544559f74ca73ba8fb38244ebdd9655">sqrt</a> (INPUT(:, 1).^2+INPUT(:, 2).^2+INPUT(:, 3).^2)-ones(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a></td></tr>
 
@@ -61,21 +61,21 @@ maximize denominator switch&nbsp;</td><td class="memItemRight" valign="bottom"><
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">assign mu name for clarity if <br>
 <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *check that input m s <br>
-constitute unit vector&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#50f7869e996fc52acbac674b8352aed2">error</a> ('Input euler vector(s) components do not constitute a unit vector') end if <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a>&lt; zeros(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a></td></tr>
+constitute unit <a class="el" href="classvector.html">vector</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#50f7869e996fc52acbac674b8352aed2">error</a> ('Input euler <a class="el" href="classvector.html">vector</a>(s) components do not constitute a unit <a class="el" href="classvector.html">vector</a>') end if <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a>&lt; zeros(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a></td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">assign mu name for clarity if <br>
 <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *check that input m s <br>
-constitute unit vector <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *pi <br>
+constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *pi <br>
 *check if rotation about euler <br>
-vector is between and&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#69f5ecef6ec83bdfd5a4f986a96a3b7a">error</a> ('Input euler rotation angle(s) not between 0 and 360 degrees') end Q</td></tr>
+<a class="el" href="classvector.html">vector</a> is between and&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#69f5ecef6ec83bdfd5a4f986a96a3b7a">error</a> ('Input euler rotation <a class="el" href="classangle.html">angle</a>(s) not between 0 and 360 degrees') end Q</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">psi./2&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#6758ec9ad92579b01e5948ed8517b2c8">cos</a> ()</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">else&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#88fdf02949935c7dc69dd9fcca277904">error</a> ('Error:Invalid input Euler angle order type(conversion string)')</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">else&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#88fdf02949935c7dc69dd9fcca277904">error</a> ('Error:Invalid input Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion string)')</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">number of orientations if if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#69e3f9f94a81ed53410c3dcee6c5869d">abs</a> (sqrt(INPUT(:, 1).^2+INPUT(:, 2).^2+INPUT(:, 3).^2+INPUT(:, 4).^2)-ones(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a>, 1))&gt;<a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *ones(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classnumber.html">number</a> of orientations if if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#69e3f9f94a81ed53410c3dcee6c5869d">abs</a> (sqrt(INPUT(:, 1).^2+INPUT(:, 2).^2+INPUT(:, 3).^2+INPUT(:, 4).^2)-ones(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a>, 1))&gt;<a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *ones(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a></td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">number of orientations if if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#03917dbd55c0ebe6fbff27c52e49d0f6">errordlg</a> ('Warning:Input quaternion norm(s) deviate(s) from unity by more than tolerance') end end Q</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classnumber.html">number</a> of orientations if if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#03917dbd55c0ebe6fbff27c52e49d0f6">errordlg</a> ('Warning:Input <a class="el" href="classquaternion.html">quaternion</a> norm(s) deviate(s) from unity by more than tolerance') end end Q</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">*&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#1caf5889e40550fb9724cdc9036c29eb">Q</a> (1, 1,:).*Q(1</td></tr>
 
@@ -89,7 +89,7 @@ vector is between and&nbsp;</td><td class="memItemRight" valign="bottom"><a clas
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">for if&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#e41672582abde52b1fda6fd69bbcbb68">OUTPUT</a> (<a class="el" href="SpinCalc_8m.html#bf9d47cd7d4fbc942e618bb1977019c2">ii</a>, 1:4)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">else&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#55e4b6a7ded41d706058ec87a097e04f">error</a> ('Error:Invalid output Euler angle order type(conversion string).')</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">else&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#55e4b6a7ded41d706058ec87a097e04f">error</a> ('Error:Invalid output Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion string).')</td></tr>
 
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">function&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#9702a4c625a53d56ec69bc3271cc6d6b">OUTPUT</a></td></tr>
@@ -122,7 +122,7 @@ OUTPUT_TYPE];if strcmpi(CONVERSION, <br>
 CC)==0;error('Error:Invalid <br>
 entry for CONVERSION input <br>
 string');endelse if i_type==4,%if <br>
-input type is Euler angles, <br>
+input <a class="el" href="classtype.html">type</a> is Euler angles, <br>
 determine the order of <br>
 rotations <a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>=str2double(CONVERSION(1, <br>
 3:5));rot_1_in=floor(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>/100);%first <br>
@@ -134,16 +134,16 @@ rotation if rot_1_in<br>
 &lt; 1||rot_2_in&lt; 1||rot_3_in<br>
 &lt; 1||rot_1_in &gt;3||rot_2_in &gt;<br>
 3||rot_3_in &gt;3, error('Error:Invalid <br>
-input Euler angle order type(conversion <br>
+input Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion <br>
 string).');%check that all <br>
 orders are between 1 and <br>
 3 elseif rot_1_in==rot_2_in||rot_2_in==rot_3_in, <br>
 error('Error:Invalid input <br>
-Euler angle order type(conversion <br>
+Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion <br>
 string).');%check that no <br>
 2 consecutive orders are equal(invalid) <br>
 end%check input dimensions to <br>
-be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle data vector is not Nx3') end%verify angles are between 0 and 360 and identify singularities if INPUT(:, 1)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 1)&gt;360 *ones(size(INPUT, 1), 1), error('Error:First input Euler angle(s) outside 0 to 360 degree range') end if rot_1_in==rot_3_in,%Type 2 rotation(first and third rotations about same axis) if INPUT(:, 2)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 2)&gt;180 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside 0 to 180 degree range') elseif abs(INPUT(:, 2))&lt; 2 *ones(size(INPUT, 1), 1)|abs(INPUT(:, 2))&gt;178 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle rotation(s) near a singularity.Second angle near 0 or 180 degrees.') end end else%Type 1 rotation(all rotationas about each of three axes) if abs(INPUT(:, 2))&gt;=90 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside-90 to 90 degree range') elseif abs(INPUT(:, 2))&gt;88 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle(s) rotation near a singularity.Second angle near-90 or 90 degrees.') end end end if INPUT(:, 3)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 3)&gt;360 *ones(size(INPUT, 1), 1), error('Error:Third input Euler angle(s) outside 0 to 360 degree range') end end if o_type==4,%if output type is Euler angles, determine order of rotations EULER_order_out=str2double(CONVERSION(1, length-2:length));rot_1_out=floor(EULER_order_out/100);%first rotation rot_2_out=floor((EULER_order_out-rot_1_out *100)/10);%second rotation rot_3_out=(EULER_order_out-rot_1_out *100-rot_2_out *10);%third rotation if rot_1_out&lt; 1||rot_2_out&lt; 1||rot_3_out&lt; 1||rot_1_out &gt;3||rot_2_out &gt;3||rot_3_out &gt;3, error('Error:Invalid output Euler angle order type(conversion string).');%check that all orders are between 1 and 3 elseif rot_1_out==rot_2_out||rot_2_out==rot_3_out, error('Error:Invalid output Euler angle order type(conversion string).');%check that no 2 consecutive orders are equal end end if i_type==4 &amp;&amp;o_type~=4,%if input are euler angles but not output CC=&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> ['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to', OUTPUT_TYPE];%construct program conversion string for checking against user input elseif o_type==4 &amp;&amp;i_type~=4,%if output are euler angles but not input CC=[INPUT_TYPE,'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string for checking against user input elseif i_type==4 &amp;&amp;o_type==4,%if both input and output are euler angles CC=['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string end if strcmpi(CONVERSION, CC)==0;%check program conversion string against user input to confirm the conversion command error('Error:Invalid entry for CONVERSION input string');endendclear i_type o_type CC%From the input, determine the quaternions that uniquely describe the%rotation prescribed by that input.The output will be calculated in the%second portion of the code from these quaternions.switch INPUT_TYPE case 'DCM'if size(INPUT, 1)~=3||size(INPUT, 2)~=3%check DCM dimensions error('Error:DCM matrix is not 3x3xN');end N=size(INPUT, 3);%number of orientations%Check if matrix is indeed orthogonal perturbed=NaN(3, 3, N);DCM_flag=0;for ii=1:N, perturbed(:,:, ii)=abs(INPUT(:,:, ii)*INPUT(:,:, ii)'-eye(3));%perturbed array shows difference between DCM *DCM'and I if abs(det(INPUT(:,:, ii))-1)&gt;</td></tr>
+be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle data vector is not Nx3') end%verify angles are between 0 and 360 and identify singularities if INPUT(:, 1)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 1)&gt;360 *ones(size(INPUT, 1), 1), error('Error:First input Euler angle(s) outside 0 to 360 degree range') end if rot_1_in==rot_3_in,%Type 2 rotation(first and third rotations about same axis) if INPUT(:, 2)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 2)&gt;180 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside 0 to 180 degree range') elseif abs(INPUT(:, 2))&lt; 2 *ones(size(INPUT, 1), 1)|abs(INPUT(:, 2))&gt;178 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle rotation(s) near a singularity.Second angle near 0 or 180 degrees.') end end else%Type 1 rotation(all rotationas about each of three axes) if abs(INPUT(:, 2))&gt;=90 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside-90 to 90 degree range') elseif abs(INPUT(:, 2))&gt;88 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle(s) rotation near a singularity.Second angle near-90 or 90 degrees.') end end end if INPUT(:, 3)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 3)&gt;360 *ones(size(INPUT, 1), 1), error('Error:Third input Euler angle(s) outside 0 to 360 degree range') end end if o_type==4,%if output type is Euler angles, determine order of rotations EULER_order_out=str2double(CONVERSION(1, length-2:length));rot_1_out=floor(EULER_order_out/100);%first rotation rot_2_out=floor((EULER_order_out-rot_1_out *100)/10);%second rotation rot_3_out=(EULER_order_out-rot_1_out *100-rot_2_out *10);%third rotation if rot_1_out&lt; 1||rot_2_out&lt; 1||rot_3_out&lt; 1||rot_1_out &gt;3||rot_2_out &gt;3||rot_3_out &gt;3, error('Error:Invalid output Euler angle order type(conversion string).');%check that all orders are between 1 and 3 elseif rot_1_out==rot_2_out||rot_2_out==rot_3_out, error('Error:Invalid output Euler angle order type(conversion string).');%check that no 2 consecutive orders are equal end end if i_type==4 &amp;&amp;o_type~=4,%if input are euler angles but not output CC=&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> ['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to', OUTPUT_TYPE];%construct program conversion string for checking against user input elseif o_type==4 &amp;&amp;i_type~=4,%if output are euler angles but not input CC=[INPUT_TYPE,'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string for checking against user input elseif i_type==4 &amp;&amp;o_type==4,%if both input and output are euler angles CC=['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string end if strcmpi(CONVERSION, CC)==0;%check program conversion string against user input to confirm the conversion command error('Error:Invalid entry for CONVERSION input string');endendclear i_type o_type CC%From the input, determine the quaternions that uniquely describe the%rotation prescribed by that input.The output will be calculated in the%second portion of the code from these quaternions.switch INPUT_TYPE case 'DCM'if size(INPUT, 1)~=3||size(INPUT, 2)~=3%check DCM dimensions error('Error:DCM <a class="el" href="classmatrix.html">matrix</a> is not 3x3xN');end N=size(INPUT, 3);%number of orientations%Check if matrix is indeed orthogonal perturbed=NaN(3, 3, N);DCM_flag=0;for ii=1:N, perturbed(:,:, ii)=abs(INPUT(:,:, ii)*INPUT(:,:, ii)'-eye(3));%perturbed array shows difference between DCM *DCM'and I if abs(det(INPUT(:,:, ii))-1)&gt;</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">if <a class="el" href="SpinCalc_8m.html#f9d495c1655d813d553030485d00fea7">length</a> <a class="el" href="SpinCalc_8m.html#f9d495c1655d813d553030485d00fea7">length</a>&lt; 4,%no <br>
 CONVERSION string can be <br>
@@ -168,7 +168,7 @@ OUTPUT_TYPE];if strcmpi(CONVERSION, <br>
 CC)==0;error('Error:Invalid <br>
 entry for CONVERSION input <br>
 string');endelse if i_type==4,%if <br>
-input type is Euler angles, <br>
+input <a class="el" href="classtype.html">type</a> is Euler angles, <br>
 determine the order of <br>
 rotations <a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>=str2double(CONVERSION(1, <br>
 3:5));rot_1_in=floor(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>/100);%first <br>
@@ -180,16 +180,16 @@ rotation if rot_1_in<br>
 &lt; 1||rot_2_in&lt; 1||rot_3_in<br>
 &lt; 1||rot_1_in &gt;3||rot_2_in &gt;<br>
 3||rot_3_in &gt;3, error('Error:Invalid <br>
-input Euler angle order type(conversion <br>
+input Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion <br>
 string).');%check that all <br>
 orders are between 1 and <br>
 3 elseif rot_1_in==rot_2_in||rot_2_in==rot_3_in, <br>
 error('Error:Invalid input <br>
-Euler angle order type(conversion <br>
+Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion <br>
 string).');%check that no <br>
 2 consecutive orders are equal(invalid) <br>
 end%check input dimensions to <br>
-be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle data vector is not Nx3') end%verify angles are between 0 and 360 and identify singularities if INPUT(:, 1)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 1)&gt;360 *ones(size(INPUT, 1), 1), error('Error:First input Euler angle(s) outside 0 to 360 degree range') end if rot_1_in==rot_3_in,%Type 2 rotation(first and third rotations about same axis) if INPUT(:, 2)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 2)&gt;180 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside 0 to 180 degree range') elseif abs(INPUT(:, 2))&lt; 2 *ones(size(INPUT, 1), 1)|abs(INPUT(:, 2))&gt;178 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle rotation(s) near a singularity.Second angle near 0 or 180 degrees.') end end else%Type 1 rotation(all rotationas about each of three axes) if abs(INPUT(:, 2))&gt;=90 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside-90 to 90 degree range') elseif abs(INPUT(:, 2))&gt;88 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle(s) rotation near a singularity.Second angle near-90 or 90 degrees.') end end end if INPUT(:, 3)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 3)&gt;360 *ones(size(INPUT, 1), 1), error('Error:Third input Euler angle(s) outside 0 to 360 degree range') end end if o_type==4,%if output type is Euler angles, determine order of rotations EULER_order_out=str2double(CONVERSION(1, length-2:length));rot_1_out=floor(EULER_order_out/100);%first rotation rot_2_out=floor((EULER_order_out-rot_1_out *100)/10);%second rotation rot_3_out=(EULER_order_out-rot_1_out *100-rot_2_out *10);%third rotation if rot_1_out&lt; 1||rot_2_out&lt; 1||rot_3_out&lt; 1||rot_1_out &gt;3||rot_2_out &gt;3||rot_3_out &gt;3, error('Error:Invalid output Euler angle order type(conversion string).');%check that all orders are between 1 and 3 elseif rot_1_out==rot_2_out||rot_2_out==rot_3_out, error('Error:Invalid output Euler angle order type(conversion string).');%check that no 2 consecutive orders are equal end end if i_type==4 &amp;&amp;o_type~=4,%if input are euler angles but not output CC=&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#04d7174125b069e3d35c922196718668">ichk</a> ['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to', OUTPUT_TYPE];%construct program conversion string for checking against user input elseif o_type==4 &amp;&amp;i_type~=4,%if output are euler angles but not input CC=[INPUT_TYPE,'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string for checking against user input elseif i_type==4 &amp;&amp;o_type==4,%if both input and output are euler angles CC=['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string end if strcmpi(CONVERSION, CC)==0;%check program conversion string against user input to confirm the conversion command error('Error:Invalid entry for CONVERSION input string');endendclear i_type o_type CC%From the input, determine the quaternions that uniquely describe the%rotation prescribed by that input.The output will be calculated in the%second portion of the code from these quaternions.switch INPUT_TYPE case 'DCM'if size(INPUT, 1)~=3||size(INPUT, 2)~=3%check DCM dimensions error('Error:DCM matrix is not 3x3xN');end N=size(INPUT, 3);%number of orientations%Check if matrix is indeed orthogonal perturbed=NaN(3, 3, N);DCM_flag=0;for ii=1:N, perturbed(:,:, ii)=abs(INPUT(:,:, ii)*INPUT(:,:, ii)'-eye(3));%perturbed array shows difference between DCM *DCM'and I if abs(det(INPUT(:,:, ii))-1)&gt; if determinant is off by one more than user is warned if = =1</td></tr>
+be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle data vector is not Nx3') end%verify angles are between 0 and 360 and identify singularities if INPUT(:, 1)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 1)&gt;360 *ones(size(INPUT, 1), 1), error('Error:First input Euler angle(s) outside 0 to 360 degree range') end if rot_1_in==rot_3_in,%Type 2 rotation(first and third rotations about same axis) if INPUT(:, 2)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 2)&gt;180 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside 0 to 180 degree range') elseif abs(INPUT(:, 2))&lt; 2 *ones(size(INPUT, 1), 1)|abs(INPUT(:, 2))&gt;178 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle rotation(s) near a singularity.Second angle near 0 or 180 degrees.') end end else%Type 1 rotation(all rotationas about each of three axes) if abs(INPUT(:, 2))&gt;=90 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside-90 to 90 degree range') elseif abs(INPUT(:, 2))&gt;88 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle(s) rotation near a singularity.Second angle near-90 or 90 degrees.') end end end if INPUT(:, 3)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 3)&gt;360 *ones(size(INPUT, 1), 1), error('Error:Third input Euler angle(s) outside 0 to 360 degree range') end end if o_type==4,%if output type is Euler angles, determine order of rotations EULER_order_out=str2double(CONVERSION(1, length-2:length));rot_1_out=floor(EULER_order_out/100);%first rotation rot_2_out=floor((EULER_order_out-rot_1_out *100)/10);%second rotation rot_3_out=(EULER_order_out-rot_1_out *100-rot_2_out *10);%third rotation if rot_1_out&lt; 1||rot_2_out&lt; 1||rot_3_out&lt; 1||rot_1_out &gt;3||rot_2_out &gt;3||rot_3_out &gt;3, error('Error:Invalid output Euler angle order type(conversion string).');%check that all orders are between 1 and 3 elseif rot_1_out==rot_2_out||rot_2_out==rot_3_out, error('Error:Invalid output Euler angle order type(conversion string).');%check that no 2 consecutive orders are equal end end if i_type==4 &amp;&amp;o_type~=4,%if input are euler angles but not output CC=&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#04d7174125b069e3d35c922196718668">ichk</a> ['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to', OUTPUT_TYPE];%construct program conversion string for checking against user input elseif o_type==4 &amp;&amp;i_type~=4,%if output are euler angles but not input CC=[INPUT_TYPE,'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string for checking against user input elseif i_type==4 &amp;&amp;o_type==4,%if both input and output are euler angles CC=['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string end if strcmpi(CONVERSION, CC)==0;%check program conversion string against user input to confirm the conversion command error('Error:Invalid entry for CONVERSION input string');endendclear i_type o_type CC%From the input, determine the quaternions that uniquely describe the%rotation prescribed by that input.The output will be calculated in the%second portion of the code from these quaternions.switch INPUT_TYPE case 'DCM'if size(INPUT, 1)~=3||size(INPUT, 2)~=3%check DCM dimensions error('Error:DCM <a class="el" href="classmatrix.html">matrix</a> is not 3x3xN');end N=size(INPUT, 3);%number of orientations%Check if matrix is indeed orthogonal perturbed=NaN(3, 3, N);DCM_flag=0;for ii=1:N, perturbed(:,:, ii)=abs(INPUT(:,:, ii)*INPUT(:,:, ii)'-eye(3));%perturbed array shows difference between DCM *DCM'and I if abs(det(INPUT(:,:, ii))-1)&gt; if determinant is off by one more than user is warned if = =1</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">if <a class="el" href="SpinCalc_8m.html#f9d495c1655d813d553030485d00fea7">length</a> <a class="el" href="SpinCalc_8m.html#f9d495c1655d813d553030485d00fea7">length</a>&lt; 4,%no <br>
 CONVERSION string can be <br>
@@ -214,7 +214,7 @@ OUTPUT_TYPE];if strcmpi(CONVERSION, <br>
 CC)==0;error('Error:Invalid <br>
 entry for CONVERSION input <br>
 string');endelse if i_type==4,%if <br>
-input type is Euler angles, <br>
+input <a class="el" href="classtype.html">type</a> is Euler angles, <br>
 determine the order of <br>
 rotations <a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>=str2double(CONVERSION(1, <br>
 3:5));rot_1_in=floor(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>/100);%first <br>
@@ -226,16 +226,16 @@ rotation if rot_1_in<br>
 &lt; 1||rot_2_in&lt; 1||rot_3_in<br>
 &lt; 1||rot_1_in &gt;3||rot_2_in &gt;<br>
 3||rot_3_in &gt;3, error('Error:Invalid <br>
-input Euler angle order type(conversion <br>
+input Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion <br>
 string).');%check that all <br>
 orders are between 1 and <br>
 3 elseif rot_1_in==rot_2_in||rot_2_in==rot_3_in, <br>
 error('Error:Invalid input <br>
-Euler angle order type(conversion <br>
+Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion <br>
 string).');%check that no <br>
 2 consecutive orders are equal(invalid) <br>
 end%check input dimensions to <br>
-be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle data vector is not Nx3') end%verify angles are between 0 and 360 and identify singularities if INPUT(:, 1)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 1)&gt;360 *ones(size(INPUT, 1), 1), error('Error:First input Euler angle(s) outside 0 to 360 degree range') end if rot_1_in==rot_3_in,%Type 2 rotation(first and third rotations about same axis) if INPUT(:, 2)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 2)&gt;180 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside 0 to 180 degree range') elseif abs(INPUT(:, 2))&lt; 2 *ones(size(INPUT, 1), 1)|abs(INPUT(:, 2))&gt;178 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle rotation(s) near a singularity.Second angle near 0 or 180 degrees.') end end else%Type 1 rotation(all rotationas about each of three axes) if abs(INPUT(:, 2))&gt;=90 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside-90 to 90 degree range') elseif abs(INPUT(:, 2))&gt;88 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle(s) rotation near a singularity.Second angle near-90 or 90 degrees.') end end end if INPUT(:, 3)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 3)&gt;360 *ones(size(INPUT, 1), 1), error('Error:Third input Euler angle(s) outside 0 to 360 degree range') end end if o_type==4,%if output type is Euler angles, determine order of rotations EULER_order_out=str2double(CONVERSION(1, length-2:length));rot_1_out=floor(EULER_order_out/100);%first rotation rot_2_out=floor((EULER_order_out-rot_1_out *100)/10);%second rotation rot_3_out=(EULER_order_out-rot_1_out *100-rot_2_out *10);%third rotation if rot_1_out&lt; 1||rot_2_out&lt; 1||rot_3_out&lt; 1||rot_1_out &gt;3||rot_2_out &gt;3||rot_3_out &gt;3, error('Error:Invalid output Euler angle order type(conversion string).');%check that all orders are between 1 and 3 elseif rot_1_out==rot_2_out||rot_2_out==rot_3_out, error('Error:Invalid output Euler angle order type(conversion string).');%check that no 2 consecutive orders are equal end end if i_type==4 &amp;&amp;o_type~=4,%if input are euler angles but not output CC=&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#d56fd1f2de63b3ed9296d2aba8074442">DCM_flag</a> ['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to', OUTPUT_TYPE];%construct program conversion string for checking against user input elseif o_type==4 &amp;&amp;i_type~=4,%if output are euler angles but not input CC=[INPUT_TYPE,'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string for checking against user input elseif i_type==4 &amp;&amp;o_type==4,%if both input and output are euler angles CC=['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string end if strcmpi(CONVERSION, CC)==0;%check program conversion string against user input to confirm the conversion command error('Error:Invalid entry for CONVERSION input string');endendclear i_type o_type CC%From the input, determine the quaternions that uniquely describe the%rotation prescribed by that input.The output will be calculated in the%second portion of the code from these quaternions.switch INPUT_TYPE case 'DCM'if size(INPUT, 1)~=3||size(INPUT, 2)~=3%check DCM dimensions error('Error:DCM matrix is not 3x3xN');end N=size(INPUT, 3);%number of orientations%Check if matrix is indeed orthogonal perturbed=NaN(3, 3, N);DCM_flag=0;for ii=1:N, perturbed(:,:, ii)=abs(INPUT(:,:, ii)*INPUT(:,:, ii)'-eye(3));%perturbed array shows difference between DCM *DCM'and I if abs(det(INPUT(:,:, ii))-1)&gt; if determinant is off by one more than user is warned if = 1</td></tr>
+be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle data vector is not Nx3') end%verify angles are between 0 and 360 and identify singularities if INPUT(:, 1)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 1)&gt;360 *ones(size(INPUT, 1), 1), error('Error:First input Euler angle(s) outside 0 to 360 degree range') end if rot_1_in==rot_3_in,%Type 2 rotation(first and third rotations about same axis) if INPUT(:, 2)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 2)&gt;180 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside 0 to 180 degree range') elseif abs(INPUT(:, 2))&lt; 2 *ones(size(INPUT, 1), 1)|abs(INPUT(:, 2))&gt;178 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle rotation(s) near a singularity.Second angle near 0 or 180 degrees.') end end else%Type 1 rotation(all rotationas about each of three axes) if abs(INPUT(:, 2))&gt;=90 *ones(size(INPUT, 1), 1),%confirm second angle within range error('Error:Second input Euler angle(s) outside-90 to 90 degree range') elseif abs(INPUT(:, 2))&gt;88 *ones(size(INPUT, 1), 1),%check for singularity if ichk==1, errordlg('Warning:Input Euler angle(s) rotation near a singularity.Second angle near-90 or 90 degrees.') end end end if INPUT(:, 3)&lt; zeros(size(INPUT, 1), 1)|INPUT(:, 3)&gt;360 *ones(size(INPUT, 1), 1), error('Error:Third input Euler angle(s) outside 0 to 360 degree range') end end if o_type==4,%if output type is Euler angles, determine order of rotations EULER_order_out=str2double(CONVERSION(1, length-2:length));rot_1_out=floor(EULER_order_out/100);%first rotation rot_2_out=floor((EULER_order_out-rot_1_out *100)/10);%second rotation rot_3_out=(EULER_order_out-rot_1_out *100-rot_2_out *10);%third rotation if rot_1_out&lt; 1||rot_2_out&lt; 1||rot_3_out&lt; 1||rot_1_out &gt;3||rot_2_out &gt;3||rot_3_out &gt;3, error('Error:Invalid output Euler angle order type(conversion string).');%check that all orders are between 1 and 3 elseif rot_1_out==rot_2_out||rot_2_out==rot_3_out, error('Error:Invalid output Euler angle order type(conversion string).');%check that no 2 consecutive orders are equal end end if i_type==4 &amp;&amp;o_type~=4,%if input are euler angles but not output CC=&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#d56fd1f2de63b3ed9296d2aba8074442">DCM_flag</a> ['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to', OUTPUT_TYPE];%construct program conversion string for checking against user input elseif o_type==4 &amp;&amp;i_type~=4,%if output are euler angles but not input CC=[INPUT_TYPE,'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string for checking against user input elseif i_type==4 &amp;&amp;o_type==4,%if both input and output are euler angles CC=['EA', num2str(<a class="el" href="SpinCalc_8m.html#7f8e480875d8fdaebd739efe18fc2eba">EULER_order_in</a>),'to','EA', num2str(<a class="el" href="SpinCalc_8m.html#429bbaab204238974f580e683e2cb46f">EULER_order_out</a>)];%construct program conversion string end if strcmpi(CONVERSION, CC)==0;%check program conversion string against user input to confirm the conversion command error('Error:Invalid entry for CONVERSION input string');endendclear i_type o_type CC%From the input, determine the quaternions that uniquely describe the%rotation prescribed by that input.The output will be calculated in the%second portion of the code from these quaternions.switch INPUT_TYPE case 'DCM'if size(INPUT, 1)~=3||size(INPUT, 2)~=3%check DCM dimensions error('Error:DCM <a class="el" href="classmatrix.html">matrix</a> is not 3x3xN');end N=size(INPUT, 3);%number of orientations%Check if matrix is indeed orthogonal perturbed=NaN(3, 3, N);DCM_flag=0;for ii=1:N, perturbed(:,:, ii)=abs(INPUT(:,:, ii)*INPUT(:,:, ii)'-eye(3));%perturbed array shows difference between DCM *DCM'and I if abs(det(INPUT(:,:, ii))-1)&gt; if determinant is off by one more than user is warned if = 1</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">if for&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#e9c83588c3b519e86d31c2d977ce16dc">kk</a> = 1:<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a></td></tr>
 
@@ -249,7 +249,7 @@ be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle 
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> = INPUT(:,4)*pi/180</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">quaternion clear m1 m2 m3 <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> <br>
+<tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classquaternion.html">quaternion</a> clear m1 m2 m3 <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> <br>
 case EA&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#7f5635b58d789ed876db4b1b73bf1384">psi</a> = INPUT(:,1)*pi/180</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#ebf487f5d315cb61f0bd86455edff1fd">theta</a> = INPUT(:,2)*pi/180</td></tr>
@@ -316,7 +316,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">number of orientations if if abs           </td>
+          <td class="memname"><a class="el" href="classnumber.html">number</a> of orientations if if abs           </td>
           <td>(</td>
           <td class="paramtype">sqrt(INPUT(:, 1).^2+INPUT(:, 2).^2+INPUT(:, 3).^2+INPUT(:, 4).^2)-ones(<a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a>, 1)&nbsp;</td>
           <td class="paramname">          </td>
@@ -463,7 +463,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
         <tr>
           <td class="memname">else error           </td>
           <td>(</td>
-          <td class="paramtype">'Error:Invalid output Euler angle order type(conversion string).'&nbsp;</td>
+          <td class="paramtype">'Error:Invalid output Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion string).'&nbsp;</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -483,7 +483,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
         <tr>
           <td class="memname">else error           </td>
           <td>(</td>
-          <td class="paramtype">'Error:Invalid input Euler angle order type(conversion string)'&nbsp;</td>
+          <td class="paramtype">'Error:Invalid input Euler <a class="el" href="classangle.html">angle</a> order <a class="el" href="classtype.html">type</a>(conversion string)'&nbsp;</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -501,9 +501,9 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>* check that input m s constitute unit vector <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a>* pi* check if rotation about euler vector is between and error           </td>
+          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>* check that input m s constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a>* pi* check if rotation about euler <a class="el" href="classvector.html">vector</a> is between and error           </td>
           <td>(</td>
-          <td class="paramtype">'Input euler rotation angle(s) not between 0 and 360 degrees'&nbsp;</td>
+          <td class="paramtype">'Input euler rotation <a class="el" href="classangle.html">angle</a>(s) not between 0 and 360 degrees'&nbsp;</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -521,9 +521,9 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>* check that input m s constitute unit vector error           </td>
+          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>* check that input m s constitute unit <a class="el" href="classvector.html">vector</a> error           </td>
           <td>(</td>
-          <td class="paramtype">'Input euler vector(s) components do not constitute a unit vector'&nbsp;</td>
+          <td class="paramtype">'Input euler <a class="el" href="classvector.html">vector</a>(s) components do not constitute a unit <a class="el" href="classvector.html">vector</a>'&nbsp;</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -541,9 +541,9 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">number of orientations if if errordlg           </td>
+          <td class="memname"><a class="el" href="classnumber.html">number</a> of orientations if if errordlg           </td>
           <td>(</td>
-          <td class="paramtype">'Warning:Input quaternion norm(s) deviate(s) from unity by more than tolerance'&nbsp;</td>
+          <td class="paramtype">'Warning:Input <a class="el" href="classquaternion.html">quaternion</a> norm(s) deviate(s) from unity by more than tolerance'&nbsp;</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -563,7 +563,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
         <tr>
           <td class="memname">end if errordlg           </td>
           <td>(</td>
-          <td class="paramtype">'Warning:Input DCM matrix determinant(s) off from 1 by more than tolerance.'&nbsp;</td>
+          <td class="paramtype">'Warning:Input DCM <a class="el" href="classmatrix.html">matrix</a> determinant(s) off from 1 by more than tolerance.'&nbsp;</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td><code> [pure virtual]</code></td>
@@ -665,7 +665,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
         <tr>
           <td class="memname">end end end end if fprintf           </td>
           <td>(</td>
-          <td class="paramtype">'Warning:Input DCM(s) matrix not orthogonal to precision tolerance.'&nbsp;</td>
+          <td class="paramtype">'Warning:Input DCM(s) <a class="el" href="classmatrix.html">matrix</a> not orthogonal to precision tolerance.'&nbsp;</td>
           <td class="paramname">          </td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -727,7 +727,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *check that input m s constitute unit vector <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *pi * ones           </td>
+          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *check that input m s constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *pi * ones           </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a>&nbsp;</td>
           <td class="paramname">, </td>
@@ -1111,7 +1111,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 
 <p>
 <b>Initial value:</b><div class="fragment"><pre class="fragment">4 || <a class="code" href="SpinCalc_8m.html#866ab28a6820ec61ca04ff96cca4096b">size</a>(<a class="code" href="SpinCalc_8m.html#15ed543820920ab86d1ddff006bdc6ce">INPUT</a>,3)~=1
-            <a class="code" href="SpinCalc_8m.html#50f7869e996fc52acbac674b8352aed2">error</a>(<span class="stringliteral">'Error: Input quaternion matrix is not Nx4'</span>)
+            <a class="code" href="namespacexml__schema.html#13e2122658f2abee3c2da9829f2de129" title="Error condition.">error</a>(<span class="stringliteral">'Error: Input quaternion matrix is not Nx4'</span>)
 </pre></div>
 </div>
 </div><p>
@@ -1426,7 +1426,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">number of orientations if <a class="el" href="SpinCalc_8m.html#04d7174125b069e3d35c922196718668">ichk</a> = =1          </td>
+          <td class="memname"><a class="el" href="classnumber.html">number</a> of orientations if <a class="el" href="SpinCalc_8m.html#04d7174125b069e3d35c922196718668">ichk</a> = =1          </td>
         </tr>
       </table>
 </div>
@@ -1539,11 +1539,11 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 
 <p>
 <b>Initial value:</b><div class="fragment"><pre class="fragment">SpinCalc(CONVERSION,<a class="code" href="SpinCalc_8m.html#15ed543820920ab86d1ddff006bdc6ce">INPUT</a>,<a class="code" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>,<a class="code" href="SpinCalc_8m.html#04d7174125b069e3d35c922196718668">ichk</a>)
-%Function <span class="keywordflow">for</span> the conversion of one rotation input type to desired output.
-%Supported conversion input/output types are as follows:
+%Function <span class="keywordflow">for</span> the conversion of one rotation input <a class="code" href="classtype.html" title="Enumeration class corresponding to the type schema type.">type</a> to desired output.
+%Supported conversion input/output types are <a class="code" href="namespaceswig.html#c9211ac7e952eb9fd9f9839889b3432f">as</a> follows:
 %   1: <a class="code" href="SpinCalc_8m.html#6a376f3700939431a3e2ff6782e20411">Q</a>        Rotation Quaternions
-%   2: EV       Euler <a class="code" href="classVector.html" title="Class corresponding to the vector schema type.">Vector</a> and rotation angle (degrees)
-%   3: DCM      Orthogonal DCM Rotation <a class="code" href="classMatrix.html" title="Class corresponding to the matrix schema type.">Matrix</a>
+%   2: EV       Euler Vector and rotation <a class="code" href="classangle.html" title="Class corresponding to the angle schema type.">angle</a> (degrees)
+%   3: DCM      Orthogonal DCM Rotation Matrix
 %   4: EA###    Euler angles (12 possible sets) (degrees)
 %
 %Author: John Fuller
@@ -1733,7 +1733,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Aug 16 16:38:39 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 19 20:08:23 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

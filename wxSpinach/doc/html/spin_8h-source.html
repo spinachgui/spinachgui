@@ -27,10 +27,10 @@
 <a name="l00011"></a>00011 <span class="keyword">using namespace </span>std;
 <a name="l00012"></a>00012 
 <a name="l00013"></a>00013 
-<a name="l00014"></a>00014 <span class="keyword">class </span><a class="code" href="classSpin.html" title="Class corresponding to the spin schema type.">Spin</a> {
+<a name="l00014"></a><a class="code" href="classSpin.html">00014</a> <span class="keyword">class </span><a class="code" href="classSpin.html">Spin</a> {
 <a name="l00015"></a>00015 <span class="keyword">public</span>:
-<a name="l00016"></a>00016     <a class="code" href="classSpin.html#9d437eeef08788d5a2488c55a629128d" title="Default constructor.">Spin</a>();
-<a name="l00017"></a><a class="code" href="classSpin.html#2ebbe4bbf40769d0bfd3c003f8c07116">00017</a>     <a class="code" href="classSpin.html#9d437eeef08788d5a2488c55a629128d" title="Default constructor.">Spin</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code" href="namespacegenerateDS.html#ed532e5cc8ae03bd01a12ea1cb0ebe70" title="processed = [] for element in root.getChildren(): name = element.getCleanName() if...">name</a>,<span class="keywordtype">double</span> _x,<span class="keywordtype">double</span> _y,<span class="keywordtype">double</span> _z,<span class="keywordtype">double</span> isotropic): <a class="code" href="classSpin.html#c5de3a05541ab82bf0bf565a2d0b88ed">mName</a>(name),<a class="code" href="classSpin.html#c7c530d14dfbef1b65c11fc7bb2b6d0e">x</a>(_x),<a class="code" href="classSpin.html#ffc4ef7d44e88a2f15a4236525f71b23">y</a>(_y),<a class="code" href="classSpin.html#026d64bddff96114c984e9d9e4403e35">z</a>(_z),<a class="code" href="classSpin.html#4dde0a27c0d58e70a06a9bf523c156f0">mIsotropic</a>(isotropic) {
+<a name="l00016"></a>00016     <a class="code" href="classSpin.html#9d437eeef08788d5a2488c55a629128d">Spin</a>();
+<a name="l00017"></a><a class="code" href="classSpin.html#2ebbe4bbf40769d0bfd3c003f8c07116">00017</a>     <a class="code" href="classSpin.html#9d437eeef08788d5a2488c55a629128d">Spin</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <a class="code" href="namespacexml__schema.html#befc242069a8a8b837230355cbc238a1" title="C++ type corresponding to the Name XML Schema built-in type.">name</a>,<span class="keywordtype">double</span> _x,<span class="keywordtype">double</span> _y,<span class="keywordtype">double</span> _z,<span class="keywordtype">double</span> isotropic): <a class="code" href="classSpin.html#c5de3a05541ab82bf0bf565a2d0b88ed">mName</a>(name),<a class="code" href="classSpin.html#c7c530d14dfbef1b65c11fc7bb2b6d0e">x</a>(_x),<a class="code" href="classSpin.html#ffc4ef7d44e88a2f15a4236525f71b23">y</a>(_y),<a class="code" href="classSpin.html#026d64bddff96114c984e9d9e4403e35">z</a>(_z),<a class="code" href="classSpin.html#4dde0a27c0d58e70a06a9bf523c156f0">mIsotropic</a>(isotropic) {
 <a name="l00018"></a>00018       <span class="comment">//Eigenvalues 1 2 3 rotated about x by pi/4</span>
 <a name="l00019"></a>00019         <span class="keywordtype">double</span> dA[] = { 1.5, 0.5, 0,
 <a name="l00020"></a>00020                        -0.5, 1.5, 0,
@@ -55,7 +55,7 @@
 <a name="l00039"></a><a class="code" href="classSpin.html#3201f3a92c6bf8b5571572322f858db7">00039</a>     <span class="keywordtype">double</span> <a class="code" href="classSpin.html#3201f3a92c6bf8b5571572322f858db7">mRelaxationRate</a>;
 <a name="l00040"></a>00040 
 <a name="l00041"></a>00041 <span class="keyword">private</span>:
-<a name="l00042"></a>00042     <a class="code" href="classSpin.html#9d437eeef08788d5a2488c55a629128d" title="Default constructor.">Spin</a>(<a class="code" href="classSpin.html" title="Class corresponding to the spin schema type.">Spin</a>&amp;);
+<a name="l00042"></a>00042     <a class="code" href="classSpin.html#9d437eeef08788d5a2488c55a629128d">Spin</a>(<a class="code" href="classSpin.html">Spin</a>&amp;);
 <a name="l00043"></a>00043 };
 <a name="l00044"></a>00044 
 <a name="l00045"></a><a class="code" href="spin_8h.html#c913b458cdc2943207eef71713861b05">00045</a> <span class="keyword">typedef</span> boost::shared_ptr&lt;Spin&gt; <a class="code" href="spin_8h.html#c913b458cdc2943207eef71713861b05">SpinPnt</a>;
@@ -64,7 +64,7 @@
 <a name="l00048"></a>00048 <span class="preprocessor"></span>
 <a name="l00049"></a>00049 
 </pre></div></div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Aug 16 16:38:38 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 19 20:08:22 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

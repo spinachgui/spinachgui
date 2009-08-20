@@ -2138,7 +2138,7 @@ self.dbgcount = 1 self.dbgnames = []
 <p>
 def process_include(inpath, outpath): from xml.etree import ElementTree as etree if inpath: doc = etree.parse(inpath) root = doc.getroot() process_include_tree(root) else: s1 = sys.stdin.read() root = etree.fromstring(s1) process_include_tree(root) doc = etree.ElementTree(root) if outpath: outfile = make_file(outpath) if outfile: doc.write(outfile) outfile.close() else: doc.write(sys.stdout) 
 <p>
-def process_include_tree(root): idx = 0 children = root.getchildren() while idx &lt; len(children): child = children[idx] tag = child.tag if type(tag) == type(""): tag = NAMESPACE_PAT.sub("", tag) else: tag = None if tag == 'include' and 'schemaLocation' in child.attrib: root.remove(child) path = child.attrib['schemaLocation'] if os.path.exists(path): doc = etree.parse(path) node = doc.getroot() process_include_tree(node) children1 = node.getchildren() for child1 in children1: root.insert(idx, child1) idx += 1 else: process_include_tree(child) idx += 1 children = root.getchildren() 
+def process_include_tree(root): idx = 0 children = root.getchildren() while idx &lt; len(children): child = children[idx] tag = child.tag if type(tag) == <a class="el" href="classtype.html" title="Enumeration class corresponding to the type schema type.">type</a>(""): tag = NAMESPACE_PAT.sub("", tag) else: tag = None if tag == 'include' and 'schemaLocation' in child.attrib: root.remove(child) path = child.attrib['schemaLocation'] if os.path.exists(path): doc = etree.parse(path) node = doc.getroot() process_include_tree(node) children1 = node.getchildren() for child1 in children1: root.insert(idx, child1) idx += 1 else: process_include_tree(child) idx += 1 children = root.getchildren() 
 </div>
 </div><p>
 <a class="anchor" name="453b7dcf7667caba59c1582e2750af4d"></a><!-- doxytag: member="generateDS::pplist" ref="453b7dcf7667caba59c1582e2750af4d" args="" -->
@@ -3597,7 +3597,7 @@ import warnings warnings.warn('importing IPShellEmbed', UserWarning) from IPytho
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Aug 16 16:38:39 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 19 20:08:23 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

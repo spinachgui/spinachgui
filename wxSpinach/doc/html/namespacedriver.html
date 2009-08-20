@@ -29,28 +29,57 @@
 <tr><td colspan="2"><br><h2>Variables</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedriver.html#1756445117c449cde7dc44d3197ec8f2">ss</a> = <a class="el" href="classspinsys_1_1Spinsys.html">spinsys.Spinsys</a>()</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedriver.html#09ebb61227937b197c60603732b4eafe">diag</a></td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedriver.html#616ad306be15bf7718093e60371f6135">spin</a> = ss.GetSpin(0)</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedriver.html#f1ab11ec337c414744de09abb76d8223">v</a> = diag.getEigenvectorX()</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedriver.html#194d821941eede93c0740517e81b931a">inter</a> = spin.GetInteraction(0)</td></tr>
+
+<tr><td class="memItemLeft" nowrap align="right" valign="top">tuple&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedriver.html#b913fd412d16e3a50bb999b06eaa93d2">o</a> = <a class="el" href="classspinsys_1_1Orientation.html">spinsys.Orientation</a>()</td></tr>
 
 </table>
 <hr><h2>Variable Documentation</h2>
-<a class="anchor" name="09ebb61227937b197c60603732b4eafe"></a><!-- doxytag: member="driver::diag" ref="09ebb61227937b197c60603732b4eafe" args="" -->
+<a class="anchor" name="194d821941eede93c0740517e81b931a"></a><!-- doxytag: member="driver::inter" ref="194d821941eede93c0740517e81b931a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">tuple <a class="el" href="namespacedriver.html#09ebb61227937b197c60603732b4eafe">driver::diag</a>          </td>
+          <td class="memname">tuple <a class="el" href="namespacedriver.html#194d821941eede93c0740517e81b931a">driver::inter</a> = spin.GetInteraction(0)          </td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>
-<b>Initial value:</b><div class="fragment"><pre class="fragment">spinsys.Matrix3(1,1,1,
-                     1,2,1,
-                     1,1,3)
-</pre></div>
+
+</div>
+</div><p>
+<a class="anchor" name="b913fd412d16e3a50bb999b06eaa93d2"></a><!-- doxytag: member="driver::o" ref="b913fd412d16e3a50bb999b06eaa93d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">tuple <a class="el" href="namespacedriver.html#b913fd412d16e3a50bb999b06eaa93d2">driver::o</a> = <a class="el" href="classspinsys_1_1Orientation.html">spinsys.Orientation</a>()          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
+</div>
+</div><p>
+<a class="anchor" name="616ad306be15bf7718093e60371f6135"></a><!-- doxytag: member="driver::spin" ref="616ad306be15bf7718093e60371f6135" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">tuple <a class="el" href="namespacedriver.html#616ad306be15bf7718093e60371f6135">driver::spin</a> = ss.GetSpin(0)          </td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>
+
 </div>
 </div><p>
 <a class="anchor" name="1756445117c449cde7dc44d3197ec8f2"></a><!-- doxytag: member="driver::ss" ref="1756445117c449cde7dc44d3197ec8f2" args="" -->
@@ -68,23 +97,8 @@
 
 </div>
 </div><p>
-<a class="anchor" name="f1ab11ec337c414744de09abb76d8223"></a><!-- doxytag: member="driver::v" ref="f1ab11ec337c414744de09abb76d8223" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">tuple <a class="el" href="namespacedriver.html#f1ab11ec337c414744de09abb76d8223">driver::v</a> = diag.getEigenvectorX()          </td>
-        </tr>
-      </table>
 </div>
-<div class="memdoc">
-
-<p>
-
-</div>
-</div><p>
-</div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Sun Aug 16 16:38:39 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Wed Aug 19 20:08:23 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.6 </small></address>
 </body>

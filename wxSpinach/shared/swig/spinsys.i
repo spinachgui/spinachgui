@@ -8,6 +8,7 @@
 // STD Vector handling
 namespace std {
    %template(SpinVector) vector<Spin*>;
+   %template(InteractionVector) vector<Interaction*>;
 }
 
 

@@ -139,7 +139,7 @@ class RootFrame(wx.Frame):
         #self.loadFromFile('../../../testing_kit/Gaussian/NMR spectroscopy/molecule_9.log','g03');
         #self.saveToFile('data/tyrosine.xml')
 
-        self.testDia=SpinDialog(self,0);
+        self.testDia=SpinDialog(self,wx.GetApp().ss.GetSpin(0));
         self.testDia.Show();
 
     def Show(self):

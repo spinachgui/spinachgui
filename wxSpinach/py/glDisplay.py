@@ -436,5 +436,5 @@ class glDisplay(wx.glcanvas.GLCanvas):
     def onDisplaySpinDialog(self,e):
         """Display the spin property dialog for the selected spin"""
         if (self.hover>=0):
-            dialog=SpinDialog(self,self.hover)
+            dialog=SpinDialog(self,self.ss.GetSpin(self.hover))
             dialog.Show()

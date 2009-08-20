@@ -9,7 +9,7 @@
 			<object class="wxMenu" name="mMenuFile">
 				<label>_File</label>
 				<object class="wxMenuItem" name="mMenuItemNew">
-					<label>&amp;New</label>
+					<label>_New</label>
 					<help></help>
 				</object>
 				<object class="wxMenuItem" name="mMenuItemOpen">
@@ -21,7 +21,7 @@
 					<help></help>
 				</object>
 				<object class="wxMenuItem" name="mMenuItemSaveAs">
-					<label>Save &amp;As</label>
+					<label>Save _As</label>
 					<help></help>
 				</object>
 				<object class="separator" />
@@ -31,12 +31,12 @@
 				</object>
 				<object class="separator" />
 				<object class="wxMenuItem" name="mMenuItemOptions">
-					<label>&amp;Options...</label>
+					<label>_Options...</label>
 					<help></help>
 				</object>
 				<object class="separator" />
 				<object class="wxMenuItem" name="mMenuItemExit">
-					<label>E&amp;xit</label>
+					<label>E_xit</label>
 					<help></help>
 				</object>
 			</object>
@@ -1007,7 +1007,6 @@
 	</object>
 	<object class="wxFrame" name="SpinDialog">
 		<style>wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL</style>
-		<size>442,565</size>
 		<title>Spin Properties</title>
 		<object class="wxPanel" name="spinDialogPanel">
 			<style>wxTAB_TRAVERSAL</style>
@@ -1043,7 +1042,7 @@
 									<option>0</option>
 									<flag>wxALL</flag>
 									<border>5</border>
-									<object class="wxTextCtrl" name="m_textCtrl22">
+									<object class="wxTextCtrl" name="spinTitle">
 										<value></value>
 										<maxlength>0</maxlength>
 									</object>
@@ -1082,7 +1081,7 @@
 									<option>0</option>
 									<flag>wxALL</flag>
 									<border>5</border>
-									<object class="wxTextCtrl" name="m_textCtrl21">
+									<object class="wxTextCtrl" name="xpos">
 										<value></value>
 										<maxlength>0</maxlength>
 									</object>
@@ -1099,7 +1098,7 @@
 									<option>0</option>
 									<flag>wxALL</flag>
 									<border>5</border>
-									<object class="wxTextCtrl" name="m_textCtrl20">
+									<object class="wxTextCtrl" name="ypos">
 										<value></value>
 										<maxlength>0</maxlength>
 									</object>
@@ -1116,7 +1115,7 @@
 									<option>0</option>
 									<flag>wxALL</flag>
 									<border>5</border>
-									<object class="wxTextCtrl" name="m_textCtrl19">
+									<object class="wxTextCtrl" name="zpos">
 										<value></value>
 										<maxlength>0</maxlength>
 									</object>
@@ -1146,7 +1145,7 @@
 									<option>1</option>
 									<flag>wxALL</flag>
 									<border>5</border>
-									<object class="wxComboBox" name="m_comboBox8">
+									<object class="wxComboBox" name="elementCombo">
 										<value></value>
 										<content />
 									</object>
@@ -1163,7 +1162,7 @@
 									<option>1</option>
 									<flag>wxALL</flag>
 									<border>5</border>
-									<object class="wxComboBox" name="m_comboBox7">
+									<object class="wxComboBox" name="isotopeCombo">
 										<value></value>
 										<content />
 									</object>
@@ -1186,7 +1185,6 @@
 	</object>
 	<object class="wxPanel" name="ScalarIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
-		<size>500,300</size>
 		<object class="wxFlexGridSizer">
 			<rows>2</rows>
 			<cols>2</cols>
@@ -1206,7 +1204,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl23">
+				<object class="wxTextCtrl" name="scalarCtrl">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1215,7 +1213,6 @@
 	</object>
 	<object class="wxPanel" name="MatrixIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
-		<size>500,300</size>
 		<object class="wxFlexGridSizer">
 			<rows>4</rows>
 			<cols>4</cols>
@@ -1264,28 +1261,28 @@
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl24">
+				<object class="wxTextCtrl" name="matxx">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl25">
+				<object class="wxTextCtrl" name="matyx">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl26">
+				<object class="wxTextCtrl" name="matzx">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1299,28 +1296,28 @@
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl27">
+				<object class="wxTextCtrl" name="matxy">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl28">
+				<object class="wxTextCtrl" name="matyy">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl29">
+				<object class="wxTextCtrl" name="matzy">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1334,28 +1331,28 @@
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl30">
+				<object class="wxTextCtrl" name="matxz">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl31">
+				<object class="wxTextCtrl" name="matyz">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
+				<option>1</option>
+				<flag>wxALL|wxEXPAND</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl32">
+				<object class="wxTextCtrl" name="matzz">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1364,7 +1361,6 @@
 	</object>
 	<object class="wxPanel" name="EigenIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
-		<size>500,300</size>
 		<object class="wxFlexGridSizer">
 			<rows>4</rows>
 			<cols>2</cols>
@@ -1384,7 +1380,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl63">
+				<object class="wxTextCtrl" name="eigenxx">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1401,7 +1397,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl64">
+				<object class="wxTextCtrl" name="eigenyy">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1418,7 +1414,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl65">
+				<object class="wxTextCtrl" name="eigenzz">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1435,7 +1431,6 @@
 	</object>
 	<object class="wxPanel" name="AxRhomIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
-		<size>500,300</size>
 		<object class="wxFlexGridSizer">
 			<rows>4</rows>
 			<cols>2</cols>
@@ -1455,7 +1450,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl63">
+				<object class="wxTextCtrl" name="ax">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1472,7 +1467,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl64">
+				<object class="wxTextCtrl" name="rhom">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1489,7 +1484,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl65">
+				<object class="wxTextCtrl" name="axrhomiso">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1506,7 +1501,6 @@
 	</object>
 	<object class="wxPanel" name="SpanSkewIntPanel">
 		<style>wxTAB_TRAVERSAL</style>
-		<size>500,300</size>
 		<object class="wxFlexGridSizer">
 			<rows>4</rows>
 			<cols>2</cols>
@@ -1526,7 +1520,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl63">
+				<object class="wxTextCtrl" name="span">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1543,7 +1537,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl64">
+				<object class="wxTextCtrl" name="skew">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1560,7 +1554,7 @@
 				<option>0</option>
 				<flag>wxALL</flag>
 				<border>5</border>
-				<object class="wxTextCtrl" name="m_textCtrl65">
+				<object class="wxTextCtrl" name="spanskewiso">
 					<value></value>
 					<maxlength>0</maxlength>
 				</object>
@@ -1577,7 +1571,6 @@
 	</object>
 	<object class="wxPanel" name="gridPanel">
 		<style>wxTAB_TRAVERSAL</style>
-		<size>500,300</size>
 		<object class="wxBoxSizer">
 			<orient>wxVERTICAL</orient>
 			<object class="sizeritem">
@@ -2013,9 +2006,8 @@
 						<option>1</option>
 						<flag>wxALL|wxEXPAND</flag>
 						<border>5</border>
-						<object class="wxListCtrl" name="interListBox">
-							<style>wxLC_ICON</style>
-							<size>200,-1</size>
+						<object class="wxListBox" name="interEditCtrl">
+							<content />
 						</object>
 					</object>
 					<object class="sizeritem">
@@ -2028,7 +2020,7 @@
 								<option>0</option>
 								<flag>wxALL</flag>
 								<border>5</border>
-								<object class="wxButton" name="m_button3">
+								<object class="wxButton" name="addButon">
 									<label>Add</label>
 									<default>0</default>
 								</object>
@@ -2037,7 +2029,7 @@
 								<option>0</option>
 								<flag>wxALL</flag>
 								<border>5</border>
-								<object class="wxButton" name="m_button2">
+								<object class="wxButton" name="deleteButon">
 									<label>Delete</label>
 									<default>0</default>
 								</object>

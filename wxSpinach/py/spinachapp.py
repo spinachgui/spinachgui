@@ -13,8 +13,7 @@ from nuclear_data import *
 from glDisplay import glDisplay
 from spinGrid import SpinGrid
 from spinDialog import SpinDialog
-
-
+from eventManager import EventManager
 
 def getARotation(parent):
     class rotDialog():
@@ -236,6 +235,7 @@ class MyApp(wx.App):
     def OnInit(self):
         self.res = xrc.XmlResource('res/gui.xrc')
         self.ss=spinsys.SpinSystem()
+        self.em=EventManager();
 
         self.filename=""
         self.filepath=""

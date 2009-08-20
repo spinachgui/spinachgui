@@ -50,6 +50,10 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.yTranslate=0;
         self.selected=[]  #List containing all spins which are currently selected
         self.hover=-1   #The closest spin currently sitting under the mouse
+        wx.GetApp().em.RegisterHandler(self.onSystemChange);
+
+    def onSystemChange(self):
+        self.Refresh()
 
     def setDrawMode(self,mode):
         if mode=="wireframe":

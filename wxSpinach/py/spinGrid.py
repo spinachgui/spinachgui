@@ -250,7 +250,7 @@ class SpinGrid(wx.grid.Grid):
             self.ss.GetSpin(e.GetRow()).GetPosition().SetY(float(self.GetCellValue(e.GetRow(),e.GetCol())));
         elif(e.GetCol()==COL_Z):
             self.ss.GetSpin(e.GetRow()).GetPosition().SetZ(float(self.GetCellValue(e.GetRow(),e.GetCol())));
-
+        wx.GetApp().em.Trigger();
 
     def onCellSelect(self,e):
         col=e.GetCol()

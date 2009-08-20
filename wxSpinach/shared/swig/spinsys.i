@@ -11,9 +11,10 @@ namespace std {
 }
 
 
-
 %include "typemaps.i"
+
  //Assume all double* arguments are outputs
 %apply double *OUTPUT {double *};
+
 
 %include "shared/spinsys.hpp"

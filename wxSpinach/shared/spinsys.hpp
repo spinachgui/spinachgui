@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <string.h>
+#include <stdexcept>
 
 using namespace std;
 
@@ -25,6 +26,12 @@ class Vector3 {
     double GetX() const;
     double GetY() const;
     double GetZ() const;    
+
+    void SetX(double _x);
+    void SetY(double _y);
+    void SetZ(double _z);
+
+
   private:
     double x;
     double y;
@@ -77,7 +84,7 @@ class Orientation {
     void SetQuaternion(double real, double i, double j, double k);
     void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
 
-    Matrix3 GetAsMatrix() const;
+  Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
   private:
     union  {
         struct {
@@ -188,7 +195,7 @@ class Interaction {
     void SetSpin2(Spin* Spin2);
 
     double GetAsScalar() const;
-    Matrix3 GetAsMatrix() const;
+  Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
 
   private:
     union  {
@@ -281,7 +288,7 @@ class SpinSystem {
     ReferenceFrame* GetRootFrame() const;
     
     void LoadFromGamesFile(const char* filename);
-    void LoadFromG03File(const char* filename);
+    void LoadFromG03File(const char* filename) throw(runtime_error);
     void LoadFromXMLFile(const char* filename);
   private:
     friend class Spin;

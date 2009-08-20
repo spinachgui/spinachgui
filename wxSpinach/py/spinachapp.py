@@ -192,7 +192,11 @@ class RootFrame(wx.Frame):
         if type=="xml":
             wx.GetApp().ss.LoadFromFile(filename)
         elif type=="g03":
-            wx.GetApp().ss.LoadFromG03File(filename)
+            try:
+                wx.GetApp().ss.LoadFromG03File(filename)
+            except RuntimeError as error:
+                wx.LogError("Error reading log file, file may be corrupt. Message was: \""+error.message+"\"");
+                return
         elif type=="xyz":
             wx.GetApp().ss.LoadFromXYZFile(filename)
         self.updateSpinTree()

@@ -212,7 +212,7 @@ class SpinGrid(wx.grid.Grid):
 
 	#Event Handling
         #self.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onCellSelect,id=self.GetId());
-
+        self.Bind(wx.grid.EVT_GRID_CMD_CELL_CHANGE,self.onCellChange,id=self.GetId());
     def refreshFromSpinSystem(self):
         self.ClearGrid();
         self.AppendRows(self.ss.GetSpinCount());
@@ -241,6 +241,15 @@ class SpinGrid(wx.grid.Grid):
             self.SetCellEditor(i,COL_BILINEAR,InterCellEditor())
             self.SetCellEditor(i,COL_QUADRAPOLAR,InterCellEditor())
 
+    def onCellChange(self,e):
+        print "Cell change"
+        if(e.GetCol()==COL_X):
+            print "X Change"
+            self.ss.GetSpin(e.GetRow()).GetPosition().SetX(float(self.GetCellValue(e.GetRow(),e.GetCol())));
+        elif(e.GetCol()==COL_Y):
+            self.ss.GetSpin(e.GetRow()).GetPosition().SetY(float(self.GetCellValue(e.GetRow(),e.GetCol())));
+        elif(e.GetCol()==COL_Z):
+            self.ss.GetSpin(e.GetRow()).GetPosition().SetZ(float(self.GetCellValue(e.GetRow(),e.GetCol())));
 
 
     def onCellSelect(self,e):

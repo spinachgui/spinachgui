@@ -1,4 +1,3 @@
-
 #include <shared/spinsys.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <fstream>
@@ -27,6 +26,21 @@ double Vector3::GetY() const {
 
 double Vector3::GetZ() const {
   return z;
+}
+
+void Vector3::SetX(double _x) {
+  x=_x;
+  return;
+}
+
+void Vector3::SetY(double _y) {
+  y=_y;
+  return;
+}
+
+void Vector3::SetZ(double _z) {
+  z=_z;
+  return;
 }
 
 void Vector3::GetCoordinates(double* _x,double* _y, double* _z) {
@@ -180,7 +194,7 @@ void SpinSystem::LoadFromGamesFile(const char* filename) {
   
 }
 
-void SpinSystem::LoadFromG03File(const char* filename) {
+void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
   /*
     This function really needs some work done on in, as it's not using C++
     streams properly. This is due to it being adapted from matlab code (which uses
@@ -191,7 +205,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
   if(!fin.is_open()) {
     //Throw some sort of error here
     cerr << "Couldn't open file" << endl;
-    return;
+    throw runtime_error("Couldn't Open File");
   }
   long nAtoms=0;
   bool standardOrientFound=false; //Some files seem to have many standard orientation sections.
@@ -224,6 +238,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	    mSpins[nAtoms]->SetPosition(new Vector3(x,y,z));
 	  } else {
 	    cerr << "Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables" << endl;
+	    throw runtime_error("Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables");
 	  }
 	} else {
 	  //Create a new spin
@@ -264,23 +279,25 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	   ||sXX!="XX="||sYX!="YX="||sZX!="ZX=" 
 	   ||sXY!="XY="||sYY!="YY="||sZY!="ZY="
 	   ||sXZ!="XZ="||sYZ!="YZ="||sZZ!="ZZ=") {
-	  cerr << "Error reading GIAO Magnetic shielding tensor" << endl;
-	  cerr << "Expected 'Isotropic' got " << Isotropic << endl;
-	  cerr << "Expected 'Anisotropy' got " << Anisotropy << endl;
-	  cerr << "Expected 'Eigenvalues:' got " << Eigenvalues << endl;
+	  ostringstream eout;
+	  eout << "Error reading GIAO Magnetic shielding tensor" << endl;
+	  eout << "Expected 'Isotropic' got " << Isotropic << endl;
+	  eout << "Expected 'Anisotropy' got " << Anisotropy << endl;
+	  eout << "Expected 'Eigenvalues:' got " << Eigenvalues << endl;
 
-	  cerr << "XX=" << sXX;
-	  cerr << " XY=" << sXY;
-	  cerr << " XZ=" << sXZ << endl;
+	  eout << "XX=" << sXX;
+	  eout << " XY=" << sXY;
+	  eout << " XZ=" << sXZ << endl;
 
-	  cerr << "YX=" << sYX;
-	  cerr << " YY=" << sYY;
-	  cerr << " YZ=" << sYZ << endl;
+	  eout << "YX=" << sYX;
+	  eout << " YY=" << sYY;
+	  eout << " YZ=" << sYZ << endl;
 
-	  cerr << "ZX=" << sZX;
-	  cerr << " ZY=" << sZY;
-	  cerr << " ZZ=" << sZZ << endl;
-
+	  eout << "ZX=" << sZX;
+	  eout << " ZY=" << sZY;
+	  eout << " ZZ=" << sZZ << endl;
+	  cerr << eout.str();
+	  throw runtime_error(eout.str());
 	} else {
 	  //Store the interaction
 	}
@@ -295,7 +312,10 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	  long topCenterNumber;
 	  fin >> topCenterNumber;
 	  if(i*5+k+1 != topCenterNumber) {
-	    cerr << "Error reading J couplings, found topCenterNumber=" << topCenterNumber << " expected " << i*5+k+1 << endl; 
+	    ostringstream eout;
+	    eout << "Error reading J couplings, found topCenterNumber=" << topCenterNumber << " expected " << i*5+k+1 << endl; 
+	    cerr << eout.str();
+	    throw runtime_error(eout.str());
 	  }
 	}
 
@@ -303,7 +323,10 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	  long centerNumber;
 	  fin >> centerNumber;
 	  if(centerNumber != j+1) {
-	    cerr << "Error reading J Couplings, found centerNumber=" << centerNumber << " expected " << j+1 << endl;
+	    ostringstream eout;
+	    eout << "Error reading J Couplings, found centerNumber=" << centerNumber << " expected " << j+1 << endl;
+	    cerr << eout.str();
+	    throw runtime_error(eout.str());
 	  }
 	  for(long k=0;k<5 && k < j+1-i*5;k++) {
 	    string JCouplingStr;
@@ -315,7 +338,10 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	    if(Dpos >= 0) {
 	      JCouplingStr.replace(Dpos,1,"e");
 	    } else {
-	      cerr << "Was expecting a J coupling value in the form +-0.00000D00 but there was no D. Got" << JCouplingStr << endl;
+	      ostringstream eout;
+	      eout << "Was expecting a J coupling value in the form +-0.00000D00 but there was no D. Got" << JCouplingStr << endl;
+	      cerr << eout.str();
+	      throw runtime_error(eout.str());
 	    }
 	    //Pack it back into a istream and parse
 	    istringstream stream;
@@ -666,7 +692,7 @@ Orientation::Type Orientation::GetType() const {
   return mType;
 }
 
-Matrix3 Orientation::GetAsMatrix() const {
+Matrix3 Orientation::GetAsMatrix() const throw(logic_error) {
   if(mType==EIGENSYSTEM) {
     const Vector3* xa=mData.mEigenSystem.XAxis;
     const Vector3* ya=mData.mEigenSystem.YAxis;
@@ -879,7 +905,7 @@ double Interaction::GetAsScalar() const {
   return 0;
 }
 
-Matrix3 Interaction::GetAsMatrix() const {
+Matrix3 Interaction::GetAsMatrix() const throw(logic_error) {
   if(mType==SCALAR) {
     //Return the identity multipled by the scalar
     double s=mData.mScalar;
@@ -932,7 +958,8 @@ Matrix3 Interaction::GetAsMatrix() const {
     intMatrix.Set(2,2,intMatrix.Get(2,2)*zz);
     return intMatrix;
   } else {
-    cerr << "Interaction::mType is set to an invalid type! This is a serious programing error." << endl;
+    cerr << "Interaction::mType is set to an invalid type! This is a serious programing error.\n" << endl;
+    throw logic_error("Interaction::mType is set to an invalid type! This is a serious programing error.\n");
   }
   //Return the zero matrix identity
   Matrix3 zero(0,0,0,0,0,0,0,0,0);

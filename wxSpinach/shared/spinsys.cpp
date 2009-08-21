@@ -68,6 +68,10 @@ Matrix3::Matrix3(double a00,double a01,double a02,double a10,double a11,double a
   raw[3]=a10;   raw[4]=a11;   raw[5]=a12;
   raw[6]=a20;   raw[7]=a21;   raw[8]=a22;
 }
+
+Matrix3::Matrix3(const Matrix3& m) {
+  memcpy(raw,m.raw,9*sizeof(double));
+}
     
 const double* Matrix3::GetRaw() const {
   return raw;
@@ -110,6 +114,10 @@ Matrix3& Matrix3::operator+= (const Matrix3& m) {
   raw[7]=raw[7]+m.raw[7];
   raw[8]=raw[8]+m.raw[8];
   return *this;
+}
+
+Matrix3& Matrix3::operator= (const Matrix3& m) {
+  memcpy(raw,m.raw,9*sizeof(double));
 }
 
 void Matrix3::Set(long column,long row,double val) {
@@ -835,32 +843,32 @@ void Interaction::GetScalar(double* Scalar) const {
   *Scalar=mData.mScalar;
 }
 
-void Interaction::GetMatrix(Matrix3* Matrix) const {
-  *Matrix=*mData.mMatrix;
+void Interaction::GetMatrix(Matrix3* OutMatrix) const {
+  *OutMatrix=*mData.mMatrix;
   return;
 }
 
-void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) const {
+void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const {
   *XX=mData.mEigenvalues.XX;
   *YY=mData.mEigenvalues.YY;
   *ZZ=mData.mEigenvalues.ZZ;
-  *Orient=*mData.mEigenvalues.Orient;
+  *OrientOut=*mData.mEigenvalues.Orient;
   return;
 }
 
-void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) const {
+void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const {
   *iso=mData.mAxRhom.iso;
   *ax=mData.mAxRhom.ax;
   *rh=mData.mAxRhom.rh;
-  *Orient=*mData.mAxRhom.Orient;
+  *OrientOut=*mData.mAxRhom.Orient;
   return;
 }
 
-void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) const {
+void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const {
   *iso=mData.mSpanSkew.iso;
   *Span=mData.mSpanSkew.span;
   *Skew=mData.mSpanSkew.skew;
-  *Orient=*mData.mSpanSkew.Orient;
+  *OrientOut=*mData.mSpanSkew.Orient;
   return;
 }
 

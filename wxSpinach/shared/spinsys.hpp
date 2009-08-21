@@ -44,6 +44,7 @@ class Matrix3 {
     Matrix3(double a00,double a01,double a02,
             double a10,double a11,double a12,
             double a20,double a21,double a22);
+    Matrix3(const Matrix3& m);
 
     void Dump() const;
     
@@ -53,6 +54,7 @@ class Matrix3 {
     double operator() (long column, long row) const;
     Matrix3 operator+ (const Matrix3& m) const;
     Matrix3& operator+= (const Matrix3& m);
+    Matrix3& operator= (const Matrix3& m);
     void Set(long i,long j,double val);
   private:
     double raw[9];
@@ -84,7 +86,7 @@ class Orientation {
     void SetQuaternion(double real, double i, double j, double k);
     void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
 
-  Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
+    Matrix3 GetAsMatrix() const;
   private:
     union  {
         struct {
@@ -178,13 +180,13 @@ class Interaction {
     bool IsSubType(SubType t) const;
     
     void GetScalar(double* Scalar) const;
-    void GetMatrix(Matrix3* Matrix) const;
-    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* Orient) const;
-    void GetAxRhom(double* iso,double* ax, double* rh, Orientation* Orient) const;
-    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* Orient) const;
+    void GetMatrix(Matrix3* OutMatrix) const;
+    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const;
+    void GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const;
+    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const;
 
     void SetScalar(double Scalar);
-    void SetMatrix(Matrix3* Matrix);
+    void SetMatrix(Matrix3* InMatrix);
     void SetEigenvalues(double XX,double YY, double ZZ, Orientation* Orient);
     void SetAxRhom(double iso,double ax, double rh, Orientation* Orient);
     void SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient);

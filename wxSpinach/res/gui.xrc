@@ -9,7 +9,7 @@
 			<object class="wxMenu" name="mMenuFile">
 				<label>_File</label>
 				<object class="wxMenuItem" name="mMenuItemNew">
-					<label>_New</label>
+					<label>&amp;New</label>
 					<help></help>
 				</object>
 				<object class="wxMenuItem" name="mMenuItemOpen">
@@ -21,7 +21,7 @@
 					<help></help>
 				</object>
 				<object class="wxMenuItem" name="mMenuItemSaveAs">
-					<label>Save _As</label>
+					<label>Save &amp;As</label>
 					<help></help>
 				</object>
 				<object class="separator" />
@@ -31,12 +31,12 @@
 				</object>
 				<object class="separator" />
 				<object class="wxMenuItem" name="mMenuItemOptions">
-					<label>_Options...</label>
+					<label>&amp;Options...</label>
 					<help></help>
 				</object>
 				<object class="separator" />
 				<object class="wxMenuItem" name="mMenuItemExit">
-					<label>E_xit</label>
+					<label>E&amp;xit</label>
 					<help></help>
 				</object>
 			</object>
@@ -1183,392 +1183,6 @@
 			</object>
 		</object>
 	</object>
-	<object class="wxPanel" name="ScalarIntPanel">
-		<style>wxTAB_TRAVERSAL</style>
-		<object class="wxFlexGridSizer">
-			<rows>2</rows>
-			<cols>2</cols>
-			<vgap>0</vgap>
-			<hgap>0</hgap>
-			<growablecols></growablecols>
-			<growablerows></growablerows>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText36">
-					<label>Scalar Value:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="scalarCtrl">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-		</object>
-	</object>
-	<object class="wxPanel" name="MatrixIntPanel">
-		<style>wxTAB_TRAVERSAL</style>
-		<object class="wxFlexGridSizer">
-			<rows>4</rows>
-			<cols>4</cols>
-			<vgap>0</vgap>
-			<hgap>0</hgap>
-			<growablecols></growablecols>
-			<growablerows></growablerows>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText38">
-					<label>\\</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText39">
-					<label>x</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText40">
-					<label>y</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText41">
-					<label>z</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText42">
-					<label>x</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matxx">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matyx">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matzx">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText43">
-					<label>y</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matxy">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matyy">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matzy">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText44">
-					<label>z</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matxz">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matyz">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="matzz">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-		</object>
-	</object>
-	<object class="wxPanel" name="EigenIntPanel">
-		<style>wxTAB_TRAVERSAL</style>
-		<object class="wxFlexGridSizer">
-			<rows>4</rows>
-			<cols>2</cols>
-			<vgap>0</vgap>
-			<hgap>0</hgap>
-			<growablecols></growablecols>
-			<growablerows></growablerows>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText71">
-					<label>XX</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="eigenxx">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText72">
-					<label>YY</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="eigenyy">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText73">
-					<label>ZZ</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="eigenzz">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText75">
-					<label>Orientation:</label>
-				</object>
-			</object>
-		</object>
-	</object>
-	<object class="wxPanel" name="AxRhomIntPanel">
-		<style>wxTAB_TRAVERSAL</style>
-		<object class="wxFlexGridSizer">
-			<rows>4</rows>
-			<cols>2</cols>
-			<vgap>0</vgap>
-			<hgap>0</hgap>
-			<growablecols></growablecols>
-			<growablerows></growablerows>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText71">
-					<label>Axiality:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="ax">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText72">
-					<label>Rhombicity:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="rhom">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText73">
-					<label>Isotropic:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="axrhomiso">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText75">
-					<label>Orientation:</label>
-				</object>
-			</object>
-		</object>
-	</object>
-	<object class="wxPanel" name="SpanSkewIntPanel">
-		<style>wxTAB_TRAVERSAL</style>
-		<object class="wxFlexGridSizer">
-			<rows>4</rows>
-			<cols>2</cols>
-			<vgap>0</vgap>
-			<hgap>0</hgap>
-			<growablecols></growablecols>
-			<growablerows></growablerows>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText71">
-					<label>Span:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="span">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText72">
-					<label>Skew:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="skew">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText73">
-					<label>Isotropic:</label>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxTextCtrl" name="spanskewiso">
-					<value></value>
-					<maxlength>0</maxlength>
-				</object>
-			</object>
-			<object class="sizeritem">
-				<option>0</option>
-				<flag>wxALL</flag>
-				<border>5</border>
-				<object class="wxStaticText" name="m_staticText75">
-					<label>Orientation:</label>
-				</object>
-			</object>
-		</object>
-	</object>
 	<object class="wxPanel" name="gridPanel">
 		<style>wxTAB_TRAVERSAL</style>
 		<object class="wxBoxSizer">
@@ -1991,7 +1605,7 @@
 			</object>
 		</object>
 	</object>
-	<object class="wxPanel" name="InterEditPanel">
+	<object class="wxPanel" name="SpinInterEditPanel">
 		<style>wxTAB_TRAVERSAL</style>
 		<size>500,300</size>
 		<object class="wxBoxSizer">
@@ -2038,33 +1652,13 @@
 					</object>
 				</object>
 			</object>
-			<object class="sizeritem">
-				<option>1</option>
-				<flag>wxEXPAND</flag>
-				<border>5</border>
-				<object class="wxBoxSizer">
-					<orient>wxVERTICAL</orient>
-					<object class="sizeritem">
-						<option>0</option>
-						<flag>wxEXPAND</flag>
-						<border>0</border>
-						<object class="wxBoxSizer">
-							<orient>wxHORIZONTAL</orient>
-							<object class="sizeritem">
-								<option>1</option>
-								<flag>wxEXPAND | wxALL</flag>
-								<border>5</border>
-								<object class="wxChoicebook" name="TypeChoiceBook">
-									<style>wxCHB_DEFAULT</style>
-								</object>
-							</object>
-						</object>
-					</object>
-				</object>
-			</object>
 		</object>
 	</object>
 	<object class="wxPanel" name="OrientEditPanel">
+		<style>wxTAB_TRAVERSAL</style>
+		<size>500,300</size>
+	</object>
+	<object class="wxPanel" name="InterEditPanel">
 		<style>wxTAB_TRAVERSAL</style>
 		<size>500,300</size>
 		<object class="wxBoxSizer">
@@ -2073,8 +1667,414 @@
 				<option>1</option>
 				<flag>wxEXPAND | wxALL</flag>
 				<border>5</border>
-				<object class="wxChoicebook" name="OrientChoiceBook">
+				<object class="wxChoicebook" name="TypeChoiceBook">
 					<style>wxCHB_DEFAULT</style>
+					<object class="choicebookpage">
+						<label>Scalar</label>
+						<selected>0</selected>
+						<object class="wxPanel" name="ScalarEditPanel">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxFlexGridSizer">
+								<rows>2</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText36">
+										<label>Scalar Value:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="scalarCtrl">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object class="choicebookpage">
+						<label>Matrix</label>
+						<selected>0</selected>
+						<object class="wxPanel" name="MatrixEditPanel">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxFlexGridSizer">
+								<rows>4</rows>
+								<cols>4</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText38">
+										<label>\\</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText39">
+										<label>x</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText40">
+										<label>y</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText41">
+										<label>z</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText42">
+										<label>x</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matxx">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matyx">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matzx">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText43">
+										<label>y</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matxy">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matyy">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matzy">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText44">
+										<label>z</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matxz">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matyz">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxALL|wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="matzz">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object class="choicebookpage">
+						<label>Eigenvalues</label>
+						<selected>0</selected>
+						<object class="wxPanel" name="EigenEditPanel">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxFlexGridSizer">
+								<rows>4</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText71">
+										<label>XX</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="eigenxx">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText72">
+										<label>YY</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="eigenyy">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText73">
+										<label>ZZ</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="eigenzz">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText75">
+										<label>Orientation:</label>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object class="choicebookpage">
+						<label>Axiality-Rhombicity</label>
+						<selected>0</selected>
+						<object class="wxPanel" name="AxRhomEditPanel">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxFlexGridSizer">
+								<rows>4</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText711">
+										<label>Axiality:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="ax">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText721">
+										<label>Rhombicity:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="rhom">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText731">
+										<label>Isotropic:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="axrhomiso">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText751">
+										<label>Orientation:</label>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object class="choicebookpage">
+						<label>Span-Skew</label>
+						<selected>0</selected>
+						<object class="wxPanel" name="SpanSkewEditPanel">
+							<style>wxTAB_TRAVERSAL</style>
+							<object class="wxFlexGridSizer">
+								<rows>4</rows>
+								<cols>2</cols>
+								<vgap>0</vgap>
+								<hgap>0</hgap>
+								<growablecols></growablecols>
+								<growablerows></growablerows>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText712">
+										<label>Span:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="span">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText722">
+										<label>Skew:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="skew">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText732">
+										<label>Isotropic:</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxTextCtrl" name="spanskewiso">
+										<value></value>
+										<maxlength>0</maxlength>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText752">
+										<label>Orientation:</label>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
 				</object>
 			</object>
 		</object>

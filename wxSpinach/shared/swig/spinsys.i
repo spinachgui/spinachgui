@@ -22,7 +22,6 @@ namespace std {
 } 
 
 
-
 %typemap(in,numinputs=0) Orientation* OrientOut(Orientation* OrientOut) {
   //SWIG_ConvertPtr($input, (void **) &$1, SWIGTYPE_p_Matrix3, SWIG_POINTER_EXCEPTION);
   $1=new Orientation();

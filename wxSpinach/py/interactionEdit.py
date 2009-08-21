@@ -105,60 +105,61 @@ class NumericValidator(wx.PyValidator):
         # gets to the text control
         return
 
-class RepEdit(wx.Panel):
-    def __init__(self,parent,inter,repType,id=-1):
+class InteractionEdit(wx.Panel):
+    def __init__(self,parent,inter,id=-1):
         self.inter=inter;
-        self.repType=repType;
-
+        print "hi"
         pre = wx.PrePanel();
-        wx.GetApp().res.LoadOnPanel(pre,parent,Types[self.repType][2]);
+        wx.GetApp().res.LoadOnPanel(pre,parent,'InterEditPanel');
         self.PostCreate(pre)
 
         self.editCtrls=[]
-        for ctrlName in Types[self.repType][3]:
+        for ctrlName in Types[self.inter.GetType()][3]:
             ctrl=xrc.XRCCTRL(self,ctrlName)
             ctrl.SetValidator(NumericValidator());
             self.editCtrls.append(ctrl);
             self.Bind(wx.EVT_TEXT,self.onTextChange)
 
-        if(self.repType==SCALAR):
-            self.scalar=xrc.XRCCTRL(self,'scalarCtrl');
-        elif(self.repType==MATRIX):
-            self.matxx=xrc.XRCCTRL(self,'matxx');
-            self.matxy=xrc.XRCCTRL(self,'matxy');
-            self.matxz=xrc.XRCCTRL(self,'matxz');
-                                        
-            self.matyx=xrc.XRCCTRL(self,'matyx');
-            self.matyy=xrc.XRCCTRL(self,'matyy');
-            self.matyz=xrc.XRCCTRL(self,'matyz');
-                 
-            self.matzx=xrc.XRCCTRL(self,'matzx');
-            self.matzy=xrc.XRCCTRL(self,'matzy');
-            self.matzz=xrc.XRCCTRL(self,'matzz');
-        elif(self.repType==EIGENVALUES):
-            self.eigenxx=xrc.XRCCTRL(self,'eigenxx');
-            self.eigenyy=xrc.XRCCTRL(self,'eigenyy');
-            self.eigenzz=xrc.XRCCTRL(self,'eigenzz');
-        elif(self.repType==AXRHOM):
-            self.ax=xrc.XRCCTRL(self,'ax');
-            self.rhom=xrc.XRCCTRL(self,'rhom');
-            self.axrhomiso=xrc.XRCCTRL(self,'axrhomiso');
-        elif(self.repType==SPANSKEW):
-            self.span=xrc.XRCCTRL(self,'span')
-            self.skew=xrc.XRCCTRL(self,'skew')
-            self.spanskewiso=xrc.XRCCTRL(self,'spanskewiso')
+        self.typeChoiceBook=xrc.XRCCTRL(self,"TypeChoiceBook");
+
+        self.scalar=xrc.XRCCTRL(self,'scalarCtrl');
+
+        self.matxx=xrc.XRCCTRL(self,'matxx');
+        self.matxy=xrc.XRCCTRL(self,'matxy');
+        self.matxz=xrc.XRCCTRL(self,'matxz');
+                                    
+        self.matyx=xrc.XRCCTRL(self,'matyx');
+        self.matyy=xrc.XRCCTRL(self,'matyy');
+        self.matyz=xrc.XRCCTRL(self,'matyz');
+             
+        self.matzx=xrc.XRCCTRL(self,'matzx');
+        self.matzy=xrc.XRCCTRL(self,'matzy');
+        self.matzz=xrc.XRCCTRL(self,'matzz');
+
+        self.eigenxx=xrc.XRCCTRL(self,'eigenxx');
+        self.eigenyy=xrc.XRCCTRL(self,'eigenyy');
+        self.eigenzz=xrc.XRCCTRL(self,'eigenzz');
+
+        self.ax=xrc.XRCCTRL(self,'ax');
+        self.rhom=xrc.XRCCTRL(self,'rhom');
+        self.axrhomiso=xrc.XRCCTRL(self,'axrhomiso');
+
+        self.span=xrc.XRCCTRL(self,'span')
+        self.skew=xrc.XRCCTRL(self,'skew')
+        self.spanskewiso=xrc.XRCCTRL(self,'spanskewiso')
 
         self.LoadFromInter()
 
+    def SetInter(self,inter):
+        self.inter=inter;
+        self.LoadFromInter();
+
 
     def LoadFromInter(self):
-        if(self.repType!=self.inter.GetType()):
-            #The interaction is of the wrong type, we don't have the GUI elements set up 
-            #to display it, so just ignore this request.
-            return;
-        if(self.repType==SCALAR):
+        self.typeChoiceBook.SetSelection(Types[self.inter.GetType()][0]);
+        if(self.inter.GetType()==SCALAR):
             self.scalar.SetValue(str(self.inter.GetScalar()));
-        elif(self.repType==MATRIX):
+        elif(self.inter.GetType()==MATRIX):
 
             mat=self.inter.GetMatrix()
             print mat
@@ -174,18 +175,20 @@ class RepEdit(wx.Panel):
             self.matzy.SetValue(str(mat.Get(2,1)));
             self.matzz.SetValue(str(mat.Get(2,2)));
 
-        elif(self.repType==EIGENVALUES):
-            xx,yy,zz,o=self.inter.GetEigenValues();
+        elif(self.inter.GetType()==EIGENVALUES):
+            xx,yy,zz,o=self.inter.GetEigenvalues();
+            print o;
             print xx,yy,zz
             self.eigenxx.SetValue(str(xx));
             self.eigenyy.SetValue(str(yy));
             self.eigenzz.SetValue(str(zz));
-        elif(self.repType==AXRHOM):
+        elif(self.inter.GetType()==AXRHOM):
             ax,rhom,iso,o=self.inter.GetAxRhom();
-        elif(self.repType==SPANSKEW):
+        elif(self.inter.GetType()==SPANSKEW):
             span,skew,iso,o=self.inter.GetSpanSkew();
 
     def onTextChange(self,e):
+        return;
         if(self.repType==SCALAR):
             self.inter.SetScalar(float(self.scalar.GetValue()));
         elif(self.repType==MATRIX):
@@ -273,25 +276,21 @@ class InterTextEditor(wx.TextCtrl):
 
 
 
-class interactionEdit(wx.Panel):
+class SpinInteractionsEdit(wx.Panel):
+    """"Edits all the interactios assocated with a spin"""
     def __init__(self,parent,spin,id=-1):
         wx.Panel.__init__(self,parent,id=-1)
         pre = wx.PrePanel();
-        wx.GetApp().res.LoadOnPanel(pre,parent,"InterEditPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,"SpinInterEditPanel");
         self.PostCreate(pre);
 
         self.spin=spin
 
-        self.typeChoiceBook=xrc.XRCCTRL(self,"TypeChoiceBook");
         self.interListBox=xrc.XRCCTRL(self,"interEditCtrl");
         self.interListBox.SetMinSize(wx.Size(-1,200));
 
-        self.pages=[]
-
-        for T in TypeOders:
-            page=RepEdit(self.typeChoiceBook,self.spin.GetInteraction(0),T)
-            self.pages.append(page)
-            self.typeChoiceBook.AddPage(page,Types[T][1]);
+        self.interEdit=InteractionEdit(self,self.spin.GetInteraction(0))
+        self.GetSizer().Add(self.interEdit,1.0,wx.EXPAND)
 
         self.interListBox.Bind(wx.EVT_LISTBOX,self.onInteractionChange);
 
@@ -306,5 +305,5 @@ class interactionEdit(wx.Panel):
        
     def onInteractionChange(self,e):
         inter=self.spin.GetInteraction(e.GetSelection());
-        self.typeChoiceBook.SetSelection(Types[inter.GetType()][0]);
+        self.interEdit.SetInter(inter);
 

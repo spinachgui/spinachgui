@@ -10,7 +10,7 @@ from nuclear_data import *
 
 #Local python imports
 from utils import *
-from interactionEdit import interactionEdit,InterTextEditor
+from interactionEdit import SpinInteractionsEdit,InterTextEditor
 
 #Column descriptions
 

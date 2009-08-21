@@ -9,7 +9,7 @@ import spinsys
 from nuclear_data import *
 
 #Local Imports
-from interactionEdit import interactionEdit
+from interactionEdit import SpinInteractionsEdit
 
 
 class SpinDialog(wx.Frame):
@@ -23,7 +23,7 @@ class SpinDialog(wx.Frame):
 
         self.spinDialogPanel=xrc.XRCCTRL(self,'spinDialogPanel');
         self.interSizer=self.spinDialogPanel.GetSizer().GetItem(2).GetSizer();
-        self.interEdit=interactionEdit(self.spinDialogPanel,spin=spin)
+        self.interEdit=SpinInteractionsEdit(self.spinDialogPanel,spin=spin)
         self.interSizer.Add(self.interEdit,1.0,wx.EXPAND | wx.ALL);
 
         #Find all the controls that need to be referenced

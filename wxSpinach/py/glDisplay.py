@@ -154,6 +154,25 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         self.genBondList()
 
+        self.tex=glGenTextures(1);
+        glBindTexture(GL_TEXTURE_2D,self.tex);
+        
+        image=array((66,66),long); 
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+
+
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,
+                     66,66,
+                     0,GL_RGBA,GL_UNSIGNED_BYTE,
+                     image);
+        if glGetError() != GL_NO_ERROR:
+            print "GLError!" + str(glGetError());
+            exit(1);
+
+
     def onWheel(self,e):
         self.zoom=self.zoom-0.001*e.GetWheelRotation()/e.GetWheelDelta();
         if(self.zoom<0.001):
@@ -220,6 +239,29 @@ class glDisplay(wx.glcanvas.GLCanvas):
         norm=sqrt(dotProduct);
         glLoadIdentity();
 
+        
+        glDisable(GL_LIGHTING);
+        glEnable(GL_TEXTURE_2D);
+        glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+        glBindTexture(GL_TEXTURE_2D,self.tex);
+
+        glBegin(GL_QUADS);
+        glTexCoord2f(0,0);
+        glVertex(0  ,0,  1);
+
+        glTexCoord2f(1.0,0);
+        glVertex(3.0,0,  1);
+
+        glTexCoord2f(1.0,1.0);
+        glVertex(3.0,3.0,1);
+
+        glTexCoord2f(0,1.0);
+        glVertex(0,  3.0,1);
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_LIGHTING);   
+
+
         if norm != 0: #Prevent division by zero errors
             glRotatef(dotProduct,self.yRotate/norm,self.xRotate/norm,0);
         glTranslatef(self.xTranslate*self.zoom,self.yTranslate*self.zoom,0);
@@ -237,6 +279,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         if self.ss==None:
             self.SwapBuffers()
             return
+
 
         spinCount=self.ss.GetSpinCount()
 

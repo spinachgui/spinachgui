@@ -146,6 +146,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL,self.onWheel)
         self.Bind(wx.EVT_RIGHT_UP,self.onRightClick)
         self.Bind(wx.EVT_LEFT_UP,self.onLeftClick)
+        self.Bind(wx.EVT_SIZE,self.onResize)
 
         #Create a dictionary of colours
         self.colourDict={}
@@ -154,10 +155,20 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
         self.genBondList()
 
+
         self.tex=glGenTextures(1);
+        self.ChangeViewport();
+
+    def ChangeViewport(self):
+        width,height = self.GetClientSizeTuple()
+        glViewport(0,0,width,height);
+
+        #From the documentation:
+        #lDeleteTextures silently ignores 0's and names that do not correspond to existing textures.
+        #so it's okay that self.tex will not exist at first
+        glDeleteTextures(self.tex);
+
         glBindTexture(GL_TEXTURE_2D,self.tex);
-        
-        image=array((66,66),long); 
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
@@ -165,12 +176,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
 
         glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,
-                     66,66,
+                     height,width,
                      0,GL_RGBA,GL_UNSIGNED_BYTE,
-                     image);
-        if glGetError() != GL_NO_ERROR:
-            print "GLError!" + str(glGetError());
-            exit(1);
+                     array((height,width),long));        
+
+    def onResize(self,e):
+        self.ChangeViewport();
 
 
     def onWheel(self,e):
@@ -186,7 +197,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         qobj = gluNewQuadric();
         if self.mode=="wireframe":
             gluQuadricDrawStyle(qobj,GLU_LINE);
-        else:
+        else: 
             gluQuadricDrawStyle(qobj,GLU_FILL);
         gluQuadricNormals(qobj,GLU_SMOOTH);
 
@@ -222,8 +233,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glClear(GL_DEPTH_BUFFER_BIT)
 	glClearDepth(1.0);
 
+        glEnable(GL_DEPTH_TEST)  
+        glEnable(GL_LIGHTING);   
+        glEnable(GL_LIGHT0);     
+        glEnable(GL_LIGHT1);     
+
         width,height = self.GetClientSizeTuple()
-        glViewport(0,0,width,height);
 
         glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -240,26 +255,6 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glLoadIdentity();
 
         
-        glDisable(GL_LIGHTING);
-        glEnable(GL_TEXTURE_2D);
-        glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-        glBindTexture(GL_TEXTURE_2D,self.tex);
-
-        glBegin(GL_QUADS);
-        glTexCoord2f(0,0);
-        glVertex(0  ,0,  1);
-
-        glTexCoord2f(1.0,0);
-        glVertex(3.0,0,  1);
-
-        glTexCoord2f(1.0,1.0);
-        glVertex(3.0,3.0,1);
-
-        glTexCoord2f(0,1.0);
-        glVertex(0,  3.0,1);
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
-        glEnable(GL_LIGHTING);   
 
 
         if norm != 0: #Prevent division by zero errors
@@ -406,7 +401,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glCallList(self.bondDispList);
 
         tbonds=time.time()
-
+ 
         glDisable(GL_LIGHTING);   
         glDisable(GL_LIGHT0);     
         glDisable(GL_LIGHT1);     
@@ -419,29 +414,52 @@ class glDisplay(wx.glcanvas.GLCanvas):
             x1,y1,z1=thisSpin.GetCoordinates()            
             for j in range(i+1,spinCount):
                 jSpin=self.ss.GetSpin(j)
-                x2,y2,z2=jSpin.GetCoordinates()
                 scalar=abs(thisSpin.GetBilinearInteractionAsScalar(jSpin))/300;
+                if scalar < 20:
+                    continue;
+                x2,y2,z2=jSpin.GetCoordinates()
                 glColor4f(scalar,0,0,scalar);
                 glBegin(GL_LINES);
                 glVertex3f(x1,y1,z1);
                 glVertex3f(x2,y2,z2);
                 glEnd();
         glDisable(GL_BLEND);
-        glEnable(GL_LIGHTING);   
-        glEnable(GL_LIGHT0);     
-        glEnable(GL_LIGHT1);     
-                
-                
 
-        glColor3f(0.0, 0.0, 1.0);
+        glEnable(GL_TEXTURE_2D);
+        glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+        glBindTexture(GL_TEXTURE_2D,self.tex);
+
+        glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
+
+        glMatrixMode (GL_PROJECTION)
+        glLoadIdentity();
+        gluOrtho2D(0,width,height,0);
+        glMatrixMode (GL_MODELVIEW)
+        glLoadIdentity();
+
+        littleWidth=120;
+        littleHeight=round(littleWidth*height/float(width))
+
+        glBegin(GL_QUADS);
+        glTexCoord2f(0,0);
+        glVertex2f(0,0);
+
+        glTexCoord2f(1.0,0);
+        glVertex2f(littleWidth,0);
+
+        glTexCoord2f(1.0,1.0);
+        glVertex2f(littleWidth,littleHeight);
+
+        glTexCoord2f(0,1.0);
+        glVertex2f(0,littleHeight);
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
 
         tj=time.time()
-
         self.SwapBuffers()
-        t2=time.time()
-        print ("Render time=" +str(t2-t1) + "ms , approx fps=" +str(1/(t2-t1)) + 
+        print ("Render time=" +str(tj-t1) + "ms , approx fps=" +str(1/(tj-t1)) + 
                "s^-1 (setup=" + str(tsetup-t1) + ", spins=" + str(tspins-tsetup) + ", bonds="+
-               str(tbonds-tspins)+", j="+str(tj-tbonds)+", tswap="+str(t2-tj)+")")
+               str(tbonds-tspins)+", j="+str(tj-tbonds)+")")
         
     def onMouseMove(self,e):
         if(e.Dragging() and e.RightIsDown()):

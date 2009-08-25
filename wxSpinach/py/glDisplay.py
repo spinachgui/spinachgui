@@ -227,55 +227,12 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glEndList();
 
 
-    def onPaint(self,e):
-        t1=time.time()
-	glColor3f(0.0, 0.0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT)
-        glClear(GL_DEPTH_BUFFER_BIT)
-	glClearDepth(1.0);
-
-        glEnable(GL_DEPTH_TEST)  
-        glEnable(GL_LIGHTING);   
-        glEnable(GL_LIGHT0);     
-        glEnable(GL_LIGHT1);     
-
+    def geometary(self):
         width,height = self.GetClientSizeTuple()
 
-        glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-        glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -40.0, 40.0);
-        #gluPerspective(45.0,float(width)/float(height),0.1, 200.0);
-        glMatrixMode(GL_MODELVIEW);
-
-
-        #Take the opertunity to calculate the rotation matrix for the scene
-        #TODO: This would be better handled on the CPU, it's only one
-        #      matrix. Change when matrix classes have been written
-        dotProduct=(self.xRotate*self.xRotate+self.yRotate*self.yRotate);
-        norm=sqrt(dotProduct);
-        glLoadIdentity();
-
-        
-
-
-        if norm != 0: #Prevent division by zero errors
-            glRotatef(dotProduct,self.yRotate/norm,self.xRotate/norm,0);
-        glTranslatef(self.xTranslate*self.zoom,self.yTranslate*self.zoom,0);
-        self.xRotate=0
-        self.yRotate=0
-        self.xTranslate=0
-        self.yTranslate=0
-        glMultMatrixf(self.rotationMatrix);
-        self.rotationMatrix=glGetFloatv(GL_MODELVIEW_MATRIX);
-
-        glLoadIdentity();
-        gluLookAt(self.camX,self.camY,self.camZ,0,0,-1,0,1,0);
-        glMultMatrixf(self.rotationMatrix);
 
         if self.ss==None:
-            self.SwapBuffers()
             return
-
 
         spinCount=self.ss.GetSpinCount()
 
@@ -407,7 +364,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glDisable(GL_LIGHT0);     
         glDisable(GL_LIGHT1);     
         glEnable(GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         for i in range(spinCount):  #Draw the J couplings
             #Do the two spin couplings
@@ -426,11 +383,89 @@ class glDisplay(wx.glcanvas.GLCanvas):
                 glEnd();
         glDisable(GL_BLEND);
 
+
+
+
+    def onPaint(self,e):
+        t1=time.time()
+	glColor3f(0.0, 0.0, 1.0);
+
+        width,height = self.GetClientSizeTuple()
+
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(-width*self.zoom, width*self.zoom, -height*self.zoom, height*self.zoom, -40.0, 40.0);
+        #gluPerspective(45.0,float(width)/float(height),0.1, 200.0);
+        glMatrixMode(GL_MODELVIEW);
+
+
+        #Take the opertunity to calculate the rotation matrix for the scene
+        #TODO: This would be better handled on the CPU, it's only one
+        #      matrix. Change when matrix classes have been written
+        dotProduct=(self.xRotate*self.xRotate+self.yRotate*self.yRotate);
+        norm=sqrt(dotProduct);
+        glLoadIdentity();
+
+        
+
+
+        if norm != 0: #Prevent division by zero errors
+            glRotatef(dotProduct,self.yRotate/norm,self.xRotate/norm,0);
+        glTranslatef(self.xTranslate*self.zoom,self.yTranslate*self.zoom,0);
+        self.xRotate=0
+        self.yRotate=0
+        self.xTranslate=0
+        self.yTranslate=0
+        glMultMatrixf(self.rotationMatrix);
+        self.rotationMatrix=glGetFloatv(GL_MODELVIEW_MATRIX);
+
+        glLoadIdentity();
+        gluLookAt(self.camX,self.camY,self.camZ,0,0,-1,0,1,0);
+        glMultMatrixf(self.rotationMatrix);
+
+        if self.ss==None:
+            self.SwapBuffers()
+            return
+
+        glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_DEPTH_BUFFER_BIT)
+	glClearDepth(1.0);
+
+        glEnable(GL_DEPTH_TEST);
+
+        self.geometary();
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,self.tex);
+        glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
+        glDisable(GL_TEXTURE_2D);
+
+        #glEnable(GL_TEXTURE_2D);
+        #glBindTexture(GL_TEXTURE_2D,self.tex);
+        #glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+        #glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+        #glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+
+
+        #glAlphaFunc(GL_GEQUAL, 0.99);
+        #glEnable(GL_ALPHA_TEST);
+
+        glEnable(GL_LIGHTING);   
+        glEnable(GL_LIGHT0);     
+        glEnable(GL_LIGHT1);     
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        self.geometary();
+        glDisable(GL_TEXTURE_2D);
+
         glEnable(GL_TEXTURE_2D);
         glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
         glBindTexture(GL_TEXTURE_2D,self.tex);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 
-        glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
 
         glMatrixMode (GL_PROJECTION)
         glLoadIdentity();
@@ -456,11 +491,10 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glEnd();
         glDisable(GL_TEXTURE_2D);
 
-        tj=time.time()
+        t2=time.time()
         self.SwapBuffers()
-        print ("Render time=" +str(tj-t1) + "ms , approx fps=" +str(1/(tj-t1)) + 
-               "s^-1 (setup=" + str(tsetup-t1) + ", spins=" + str(tspins-tsetup) + ", bonds="+
-               str(tbonds-tspins)+", j="+str(tj-tbonds)+")")
+        print "Render time=" +str(t2-t1) + "ms , approx fps=" +str(1/(t2-t1))
+
         
     def onMouseMove(self,e):
         if(e.Dragging() and e.RightIsDown()):

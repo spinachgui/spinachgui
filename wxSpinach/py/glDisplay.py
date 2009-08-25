@@ -167,6 +167,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
         #lDeleteTextures silently ignores 0's and names that do not correspond to existing textures.
         #so it's okay that self.tex will not exist at first
         glDeleteTextures(self.tex);
+        self.tex=glGenTextures(1);
 
         glBindTexture(GL_TEXTURE_2D,self.tex);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
@@ -174,11 +175,11 @@ class glDisplay(wx.glcanvas.GLCanvas):
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 
+        print GL_MAX_TEXTURE_SIZE 
 
-        glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,
+        glTexImage2D(GL_PROXY_TEXTURE_2D,0,GL_RGBA,
                      height,width,
-                     0,GL_RGBA,GL_UNSIGNED_BYTE,
-                     array((height,width),long));        
+                     0,GL_RGBA,GL_UNSIGNED_BYTE,None);
 
     def onResize(self,e):
         self.ChangeViewport();
@@ -436,20 +437,20 @@ class glDisplay(wx.glcanvas.GLCanvas):
         gluOrtho2D(0,width,height,0);
         glMatrixMode (GL_MODELVIEW)
         glLoadIdentity();
-
+        
         littleWidth=120;
         littleHeight=round(littleWidth*height/float(width))
-
+        
         glBegin(GL_QUADS);
         glTexCoord2f(0,0);
         glVertex2f(0,0);
-
+        
         glTexCoord2f(1.0,0);
         glVertex2f(littleWidth,0);
-
+        
         glTexCoord2f(1.0,1.0);
         glVertex2f(littleWidth,littleHeight);
-
+        
         glTexCoord2f(0,1.0);
         glVertex2f(0,littleHeight);
         glEnd();

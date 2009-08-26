@@ -5,6 +5,9 @@
 %}
 
 %include "std_vector.i"
+%include "stl.i"
+
+
 // STD Vector handling
 namespace std {
    %template(SpinVector) vector<Spin*>;
@@ -22,12 +25,16 @@ namespace std {
 } 
 
 
+
 %typemap(in,numinputs=0) Orientation* OrientOut(Orientation* OrientOut) {
   //SWIG_ConvertPtr($input, (void **) &$1, SWIGTYPE_p_Matrix3, SWIG_POINTER_EXCEPTION);
   $1=new Orientation();
 }
 %typemap(argout) Orientation* OrientOut {
-  $result = SWIG_NewPointerObj($1, SWIGTYPE_p_Orientation, SWIG_POINTER_OWN);
+  PyObject* orient=SWIG_NewPointerObj($1, SWIGTYPE_p_Orientation, SWIG_POINTER_OWN);
+  PyObject* orientList = PyList_New(1);
+  PyList_SetItem(orientList,0,orient);
+  PySequence_InPlaceConcat($result,orientList);
 } 
 
 

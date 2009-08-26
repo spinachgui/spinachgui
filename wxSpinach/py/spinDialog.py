@@ -12,18 +12,18 @@ from nuclear_data import *
 from interactionEdit import SpinInteractionsEdit
 
 
-class SpinDialog(wx.Frame):
+class SpinDialog(wx.Dialog):
     def __init__(self,parent,spin):
         self.spin=spin;
-        pre = wx.PreFrame();
-        wx.GetApp().res.LoadOnFrame(pre,parent,"SpinDialog")
+        pre = wx.PreDialog();
+        wx.GetApp().res.LoadOnDialog(pre,parent,"SpinDialog")
         self.PostCreate(pre)
 
         self.SetMinSize((600,600));
 
         self.spinDialogPanel=xrc.XRCCTRL(self,'spinDialogPanel');
         self.interSizer=self.spinDialogPanel.GetSizer().GetItem(2).GetSizer();
-        self.interEdit=SpinInteractionsEdit(self.spinDialogPanel,spin=spin)
+        self.interEdit=SpinInteractionsEdit(self.spinDialogPanel,spin=spin);
         self.interSizer.Add(self.interEdit,1.0,wx.EXPAND | wx.ALL);
 
         #Find all the controls that need to be referenced
@@ -41,12 +41,38 @@ class SpinDialog(wx.Frame):
         self.elementCombo=xrc.XRCCTRL(self,'elementCombo');
         self.isotopeCombo=xrc.XRCCTRL(self,'isotopeCombo');
 
+        self.okayCancel=xrc.XRCCTRL(self,"okayCancel");
+
+        self.Bind(wx.EVT_BUTTON,self.onApply,id=wx.ID_APPLY);
+
+
         #self.Fit()
         self.LoadFromSpin();
 
+    def onApply(self,e):
+        self.SaveToSpin();
 
-    def Show(self):
-        wx.Frame.Show(self);
+
+    def ShowModal(self):
+        result=wx.Dialog.ShowModal(self);
+        if(result==wx.ID_OK):
+            print "Okay"
+            self.SaveToSpin();
+        elif(result==wx.ID_CANCEL):
+            print "Cancled."
+
+    def SaveToSpin(self):
+        x=float(self.xPosCtrl.GetValue());
+        y=float(self.yPosCtrl.GetValue());
+        z=float(self.zPosCtrl.GetValue());
+        self.spin.SetCoordinates(x,y,z);
+        print self.spin.GetPosition();
+
+        label=self.spinTitle.GetValue();
+        self.spin.SetLabel(label.encode('latin-1'))
+
+        self.interEdit.SaveToSpin();
+        
 
 
     def LoadFromSpin(self):

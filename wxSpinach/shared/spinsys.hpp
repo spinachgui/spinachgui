@@ -21,7 +21,8 @@ class Vector3 {
     Vector3();
     Vector3(double _x,double _y,double _z);
 
-    void GetCoordinates(double* _x,double* _y, double* _z);
+    void GetCoordinates(double* _x,double* _y, double* _z) const;
+    void SetCoordinates(double _x,double _y, double _z);
 
     double GetX() const;
     double GetY() const;
@@ -141,6 +142,7 @@ class ReferenceFrame {
 class Interaction {
   public:
     Interaction();
+    Interaction(const Interaction& inter);
     ~Interaction();
     
      void Dump() const;
@@ -238,6 +240,7 @@ class Spin {
     Vector3* GetPosition() const;
     void SetPosition(Vector3* Position);
     void GetCoordinates(double* _x,double* _y, double* _z) const;
+    void SetCoordinates(double _x,double _y, double _z);
 
     void SetLabel(string Label);
     const char* GetLabel() const;

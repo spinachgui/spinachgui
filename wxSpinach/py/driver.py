@@ -10,6 +10,9 @@ spin=ss.GetSpin(0);
 print spin;
 inter=spin.GetInteraction(0);
 print inter.GetType()
+inter=spin.GetInteraction(1);
+print inter.GetType()
+print inter.GetEigenvalues();
 
 inter.SetScalar(4);
 print inter.GetScalar();

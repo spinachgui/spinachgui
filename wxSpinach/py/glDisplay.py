@@ -263,6 +263,7 @@ class glDisplay(wx.glcanvas.GLCanvas):
             x,y,z=thisSpin.GetCoordinates()
 
             #The distance from the near clipping plane is reused in the colision detection
+            #print x,y,z
             clipDist2=(worldNearX-x)**2 +    (worldNearY-y)**2 + (worldNearZ-z)**2
             if clipDist2 > self.hoverDist and self.hover!=-1:
                 continue; #We already found a closer spin, so there isn't any point in checking this one
@@ -533,4 +534,4 @@ class glDisplay(wx.glcanvas.GLCanvas):
         """Display the spin property dialog for the selected spin"""
         if (self.hover>=0):
             dialog=SpinDialog(self,self.ss.GetSpin(self.hover))
-            dialog.Show()
+            dialog.ShowModal()

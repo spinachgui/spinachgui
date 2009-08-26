@@ -10,3 +10,11 @@ def splitSymbol(symbol):
         else:
             num=num+c
     return (str,num)
+
+
+
+def lazyFloat(str):
+    if(str==""):
+        return 0.0
+    else:
+        return float(str);

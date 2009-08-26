@@ -23,13 +23,14 @@ EIGENVALUES=spinsys.Interaction.EIGENVALUES;
 AXRHOM=spinsys.Interaction.AXRHOM;     
 SPANSKEW=spinsys.Interaction.SPANSKEW;   
 
-TypeOders=[SCALAR,MATRIX,EIGENVALUES,AXRHOM,SPANSKEW];
+TypeOrders=[SCALAR,MATRIX,EIGENVALUES,AXRHOM,SPANSKEW];
 
 #Choice book page,Humand readable name,panel name,list of textctrl names
 
 matrixEdits=['matxx','matxy','matxz',
              'matyx','matyy','matyz',
              'matzx','matzy','matzz'];
+
 
 Types={
     UNDEFINED:  (-1,"Undefined",""     ,""                ,[]                             ),
@@ -113,14 +114,10 @@ class InteractionEdit(wx.Panel):
         wx.GetApp().res.LoadOnPanel(pre,parent,'InterEditPanel');
         self.PostCreate(pre)
 
-        self.editCtrls=[]
-        for ctrlName in Types[self.inter.GetType()][3]:
-            ctrl=xrc.XRCCTRL(self,ctrlName)
-            ctrl.SetValidator(NumericValidator());
-            self.editCtrls.append(ctrl);
-            self.Bind(wx.EVT_TEXT,self.onTextChange)
+        self.loading=False;
 
         self.typeChoiceBook=xrc.XRCCTRL(self,"TypeChoiceBook");
+        self.Bind(wx.EVT_CHOICEBOOK_PAGE_CHANGED,self.OnPageChange);
 
         self.scalar=xrc.XRCCTRL(self,'scalarCtrl');
 
@@ -150,12 +147,56 @@ class InteractionEdit(wx.Panel):
 
         self.LoadFromInter()
 
+        self.editCtrls=[]
+        for ctrlName in Types[self.inter.GetType()][3]:
+            ctrl=xrc.XRCCTRL(self,ctrlName)
+            ctrl.SetValidator(NumericValidator());
+            self.editCtrls.append(ctrl);
+            self.Bind(wx.EVT_TEXT,self.onTextChange)
+
     def SetInter(self,inter):
         self.inter=inter;
         self.LoadFromInter();
 
+    def OnPageChange(self,e):
+        if self.Loading:
+            print "Skipping"
+            return;
+        print "Changing the type of this interaction"
+        type=TypeOrders[e.GetSelection()]
+        if(type==SCALAR):
+            self.scalar.SetValue("0.0");
+        elif(type==MATRIX):
+            self.matxx.SetValue("0.0");
+            self.matxy.SetValue("0.0");
+            self.matxz.SetValue("0.0");
+                                
+            self.matyx.SetValue("0.0");
+            self.matyy.SetValue("0.0");
+            self.matyz.SetValue("0.0");
+                                
+            self.matzx.SetValue("0.0");
+            self.matzy.SetValue("0.0");
+            self.matzz.SetValue("0.0");
+        elif(type==EIGENVALUES):
+            self.eigenxx.SetValue("0.0");
+            self.eigenyy.SetValue("0.0");
+            self.eigenzz.SetValue("0.0");
+        elif(type==AXRHOM):
+            self.ax.SetValue("0.0");
+            self.rhom.SetValue("0.0");
+            self.axrhomiso.SetValue("0.0");
+        elif(type==SPANSKEW):
+            self.span.SetValue("0.0");
+            self.skew.SetValue("0.0");
+            self.spanskewiso.SetValue("0.0");
+        self.SaveToInter();        
+        e.Skip()
+
+
 
     def LoadFromInter(self):
+        self.Loading=True
         self.typeChoiceBook.SetSelection(Types[self.inter.GetType()][0]);
         if(self.inter.GetType()==SCALAR):
             self.scalar.SetValue(str(self.inter.GetScalar()));
@@ -177,50 +218,65 @@ class InteractionEdit(wx.Panel):
 
         elif(self.inter.GetType()==EIGENVALUES):
             xx,yy,zz,o=self.inter.GetEigenvalues();
-            print o;
             print xx,yy,zz
             self.eigenxx.SetValue(str(xx));
             self.eigenyy.SetValue(str(yy));
             self.eigenzz.SetValue(str(zz));
         elif(self.inter.GetType()==AXRHOM):
             ax,rhom,iso,o=self.inter.GetAxRhom();
+            self.ax.SetValue(str(ax));
+            self.rhom.SetValue(str(rhom));
+            self.axrhomiso.SetValue(str(iso));
         elif(self.inter.GetType()==SPANSKEW):
             span,skew,iso,o=self.inter.GetSpanSkew();
+            self.span.SetValue(str(span));
+            self.skew.SetValue(str(skew));
+            self.spanskewiso.SetValue(str(iso));
+        self.Loading=False;
+
+    def SaveToInter(self):
+        Type=TypeOrders[self.typeChoiceBook.GetSelection()];
+        if(Type==SCALAR):
+            self.inter.SetScalar(lazyFloat(self.scalar.GetValue()));
+        elif(Type==MATRIX):
+            self.inter.SetMatrix(spinsys.Matrix3(lazyFloat(self.matxx.GetValue()),
+                                                 lazyFloat(self.matxy.GetValue()),
+                                                 lazyFloat(self.matxz.GetValue()),
+                                                      
+                                                 lazyFloat(self.matyx.GetValue()),
+                                                 lazyFloat(self.matyy.GetValue()),
+                                                 lazyFloat(self.matyz.GetValue()),
+                                                      
+                                                 lazyFloat(self.matzx.GetValue()),
+                                                 lazyFloat(self.matzy.GetValue()),
+                                                 lazyFloat(self.matzz.GetValue())));
+
+
+        elif(Type==EIGENVALUES):
+            xx=lazyFloat(self.eigenxx.GetValue());
+            yy=lazyFloat(self.eigenyy.GetValue());
+            zz=lazyFloat(self.eigenzz.GetValue());
+            self.inter.SetEigenvalues(xx,yy,zz,spinsys.Orientation())
+        elif(Type==AXRHOM):
+            ax=lazyFloat(self.ax.GetValue());
+            rhom=lazyFloat(self.rhom.GetValue());
+            axrhomiso=lazyFloat(self.axrhomiso.GetValue());
+            self.inter.SetAxRhom(ax,rhom,axrhomiso,spinsys.Orientation());
+        elif(Type==SPANSKEW):
+            span=lazyFloat(self.span.GetValue());
+            skew=lazyFloat(self.skew.GetValue());
+            spanskewiso=lazyFloat(self.spanskewiso.GetValue());
+            self.inter.SetSpanSkew(span,skew,spanskewiso,spinsys.Orientation());
 
     def onTextChange(self,e):
-        return;
-        if(self.repType==SCALAR):
-            self.inter.SetScalar(float(self.scalar.GetValue()));
-        elif(self.repType==MATRIX):
-            self.inter.SetMatrix(spinsys.Matrix3(float(self.matxx.GetValue()),
-                                                 float(self.matxy.GetValue()),
-                                                 float(self.matxz.GetValue()),
-                                                      
-                                                 float(self.matyx.GetValue()),
-                                                 float(self.matyy.GetValue()),
-                                                 float(self.matyz.GetValue()),
-                                                      
-                                                 float(self.matzx.GetValue()),
-                                                 float(self.matzy.GetValue()),
-                                                 float(self.matzz.GetValue())));
-        elif(self.repType==EIGENVALUES):
-            self.inter.SetEigenValues(float(self.eigenxx.GetValue()),
-                                      float(self.eigenyy.GetValue()),
-                                      float(self.eigenzz.GetValue()),
-                                      spinsys.Orientation());
-        elif(self.repType==AXRHOM):
-            self.inter.SetAxRhom(float(self.ax.GetValue()),
-                                 float(self.rhom.GetValue()),
-                                 float(self.axrhomiso.GetValue()),
-                                 spinsys.Orientation());
-        elif(self.repType==SPANSKEW):
-            self.inter.SetSpanSkew(float(self.span.GetValue()),
-                                   float(self.skew.GetValue()),
-                                   float(self.spanskewiso.GetValue()),
-                                   spinsys.Orientation());
-            
-        
+        if self.Loading: #If we are loading from a spin we should ignore this event
+            return
+        self.SaveToInter();
+        self.inter.kind="modifed"
+        self.GetParent().UpdateListBox();
+        self.GetParent().interListBox.SetSelection(self.inter.index);
 
+        return;
 
 class InterPopup(wx.Frame):
     """Adds a bit of text and mouse movement to the wx.PopupWindow"""
@@ -286,6 +342,8 @@ class SpinInteractionsEdit(wx.Panel):
 
         self.spin=spin
 
+        self.Updateing=False
+
         self.interListBox=xrc.XRCCTRL(self,"interEditCtrl");
         self.interListBox.SetMinSize(wx.Size(-1,200));
 
@@ -293,17 +351,77 @@ class SpinInteractionsEdit(wx.Panel):
         self.GetSizer().Add(self.interEdit,1.0,wx.EXPAND)
 
         self.interListBox.Bind(wx.EVT_LISTBOX,self.onInteractionChange);
+        self.Bind(wx.EVT_BUTTON,self.onNewButton,id=xrc.XRCCTRL(self,"addButton").GetId());
+        self.Bind(wx.EVT_BUTTON,self.onDeleteButton,id=xrc.XRCCTRL(self,"deleteButton").GetId());
 
         self.LoadFromSpin();
 
-    def LoadFromSpin(self):
-        self.interListBox.Clear();
+    def onNewButton(self,e):
+        self.CreateNew();
 
-        interactions=self.spin.GetInteractions();
-        for inter in interactions:
-            self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+Types[inter.GetType()][1]+")")
+    def onDeleteButton(self,e):
+        self.MarkDeleted(self.interListBox.GetSelection());
+
+    def LoadFromSpin(self):
+        self.oldInteractions=self.spin.GetInteractions();  #Unmodified reference copy
+        self.interactions=[];                              #Working copy
+        for oldInter in self.oldInteractions:              #Make sure all the interactions here are copies
+            self.interactions.append(spinsys.Interaction(oldInter));
+        for inter in self.interactions:
+            inter.kind="original";
+        self.UpdateListBox();
+        self.interListBox.SetSelection(0);
+        self.interactionChange()
+
+    def UpdateListBox(self):
+        self.Updating=True;
+        self.interListBox.Clear();
+        i=0;
+        for inter in self.interactions:
+            inter.index=i
+            if inter.kind == "original":
+                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+Types[inter.GetType()][1]+")")
+            elif inter.kind == "modifed":
+                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+Types[inter.GetType()][1]+")*")                
+            elif inter.kind == "new":
+                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+Types[inter.GetType()][1]+")*")
+            i=i+1
+        self.Updating=False;
+
+
+    def MarkDeleted(self,n):
+        del self.interactions[n]
+        self.UpdateListBox();
+        self.interListBox.SetSelection(0);
+        self.interactionChange()
+
+    def CreateNew(self):
+        inter=spinsys.Interaction();
+        inter.SetScalar(0.0);
+        inter.SetSpin1(self.spin);
+        inter.kind="new"
+        self.interactions+=(inter,);
+        self.UpdateListBox();
+        self.interListBox.SetSelection(self.interListBox.Count-1);
+        self.interactionChange()
+
+    def SaveToSpin(self):
+        for inter in self.oldInteractions: #Remove deleated interactions
+            self.spin.RemoveInteraction(inter);
+
+        for inter in self.interactions:
+            self.spin.InsertInteraction(inter);
+            print "adding and interaction"
+            
        
     def onInteractionChange(self,e):
-        inter=self.spin.GetInteraction(e.GetSelection());
+        if self.Updating:
+            print "Sking the update";
+            return;
+        print "Updating...."
+        self.interactionChange();
+
+    def interactionChange(self):
+        inter=self.interactions[self.interListBox.GetSelection()];
         self.interEdit.SetInter(inter);
 

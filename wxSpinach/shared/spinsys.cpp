@@ -43,10 +43,17 @@ void Vector3::SetZ(double _z) {
   return;
 }
 
-void Vector3::GetCoordinates(double* _x,double* _y, double* _z) {
+void Vector3::GetCoordinates(double* _x,double* _y, double* _z) const {
   *_x=x;
   *_y=y;
   *_z=z;
+  return;
+}
+
+void Vector3::SetCoordinates(double _x,double _y, double _z) {
+  x=_x;
+  y=_y;
+  z=_z;
   return;
 }
 
@@ -460,6 +467,11 @@ void Spin::GetCoordinates(double* _x,double* _y, double* _z) const {
   mPosition->GetCoordinates(_x,_y,_z);
 }
 
+
+void Spin::SetCoordinates(double _x,double _y, double _z) {
+  mPosition->SetCoordinates(_x,_y,_z);
+}
+
 void Spin::SetLabel(string Label) {
   mLabel=Label;
 }
@@ -523,6 +535,7 @@ void Spin::RemoveInteraction(long Position) {
   for(long i=0;i<mParent->mInteractions.size();i++) {
     if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
       if(count==Position) {
+	cout << "Errasing an interaction" << endl;
 	mParent->mInteractions.erase(mParent->mInteractions.begin()+i);
       }
       count++;
@@ -783,6 +796,29 @@ void Orientation::SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) 
 
 Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY),mSpin1(NULL),mSpin2(NULL) {
   
+}
+
+Interaction::Interaction(const Interaction& inter) : mType(inter.mType),mSubType(inter.mSubType),mSpin1(inter.mSpin1),mSpin2(inter.mSpin2) {
+  if(mType==SCALAR) {
+    mData.mScalar=inter.mData.mScalar;
+  } else if(mType==MATRIX) {
+    mData.mMatrix=new Matrix3(*inter.mData.mMatrix);
+  } else if(mType==EIGENVALUES) {
+    mData.mEigenvalues.XX=inter.mData.mEigenvalues.XX;
+    mData.mEigenvalues.YY=inter.mData.mEigenvalues.YY;
+    mData.mEigenvalues.ZZ=inter.mData.mEigenvalues.ZZ;
+    mData.mEigenvalues.Orient=new Orientation();
+  } else if(mType==AXRHOM) {
+    mData.mAxRhom.ax=inter.mData.mAxRhom.ax;
+    mData.mAxRhom.rh=inter.mData.mAxRhom.rh;
+    mData.mAxRhom.iso=inter.mData.mAxRhom.iso;
+    mData.mAxRhom.Orient=new Orientation();
+  } else if(mType==SPANSKEW) {
+    mData.mSpanSkew.span=inter.mData.mSpanSkew.span;
+    mData.mSpanSkew.skew=inter.mData.mSpanSkew.skew;
+    mData.mSpanSkew.iso=inter.mData.mSpanSkew.iso;
+    mData.mSpanSkew.Orient=new Orientation();
+  }
 }
 
 Interaction::~Interaction() {

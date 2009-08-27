@@ -191,7 +191,7 @@ class RootFrame(wx.Frame):
         elif type=="g03":
             try:
                 wx.GetApp().ss.LoadFromG03File(filename)
-            except RuntimeError as error:
+            except RuntimeError, error:
                 wx.LogError("Error reading log file, file may be corrupt. Message was: \""+error.message+"\"");
                 return
         elif type=="xyz":

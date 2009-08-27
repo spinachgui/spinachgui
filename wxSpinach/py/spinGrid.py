@@ -10,7 +10,7 @@ from nuclear_data import *
 
 #Local python imports
 from utils import *
-from interactionEdit import SpinInteractionsEdit,InterTextEditor
+from interactionEdit import SpinInteractionsEdit,InterTextEditor,InterPopup
 
 #Column descriptions
 
@@ -61,20 +61,22 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
     This is a custem cell editor for editing interactions. It's based off the exmaple code in
     GridCustEditor.py in the wxPython samples
     """
-    def __init__(self):
+    def __init__(self,spin):
+        self.spin=spin
         wx.grid.PyGridCellEditor.__init__(self)
+        self.keycode=0;
 
     def Create(self, parent, id, evtHandler):
         """
         Called to create the control, which must derive from wx.Control.
         *Must Override*
         """
-        self._tc = InterTextEditor(parent,id)
-        #self._tc.SetInsertionPoint(0)
-        self.SetControl(self._tc)
+        self.tc = InterTextEditor(parent,self.spin,id)
+        self.tc.SetInsertionPoint(0)
+        self.SetControl(self.tc)
 
         if evtHandler:
-            self._tc.PushEventHandler(evtHandler)
+            self.tc.PushEventHandler(evtHandler)
 
 
     def SetSize(self, rect):
@@ -83,9 +85,9 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         If you don't fill the cell (the rect) then be sure to override
         PaintBackground and do something meaningful there.
         """
-        #self._tc.SetDimensions(rect.x, rect.y, rect.width+2, rect.height+2,
-        #                       wx.SIZE_ALLOW_MINUS_ONE)
-        pass
+        self.tc.SetDimensions(rect.x, rect.y, rect.width+2, rect.height+2,
+                               wx.SIZE_ALLOW_MINUS_ONE)
+
 
     def Show(self, show, attr):
         """
@@ -101,13 +103,12 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         to begin editing.  Set the focus to the edit control.
         *Must Override*
         """
-        self.startValue = grid.GetTable().GetValue(row, col)
-        #self._tc.SetValue(self.startValue)
-        #self._tc.SetInsertionPointEnd()
-        #self._tc.SetFocus()
 
-        # For this example, select the text
-        #self._tc.SetSelection(0, self._tc.GetLastPosition())
+        self.startValue = grid.GetTable().GetValue(row, col)
+        self.tc.SetValue(self.startValue)
+        self.tc.SetInsertionPointEnd()
+        self.tc.SetFocus()
+
 
 
     def EndEdit(self, row, col, grid):
@@ -118,14 +119,14 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         """
         changed = False
 
-        #val = self._tc.GetValue()
+        val = self.tc.GetValue()
         
-        #if val != self.startValue:
-        #    changed = True
-        #    grid.GetTable().SetValue(row, col, val) # update the table
+        if val != self.startValue:
+            changed = True
+            grid.GetTable().SetValue(row, col, val) # update the table
 
-        #self.startValue = ''
-        #self._tc.SetValue('')
+        self.startValue = ''
+        self.tc.SetValue('')
         return changed
 
 
@@ -134,8 +135,8 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         Reset the value in the control back to its starting value.
         *Must Override*
         """
-        #self._tc.SetValue(self.startValue)
-        #self._tc.SetInsertionPointEnd()
+        self._tc.SetValue(self.startValue)
+        self._tc.SetInsertionPointEnd()
         pass
 
     def IsAcceptedKey(self, evt):
@@ -146,11 +147,11 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         """
 
         ## We can ask the base class to do it
-        #return super(MyCellEditor, self).IsAcceptedKey(evt)
+        if  wx.grid.PyGridCellEditor.IsAcceptedKey(self,evt):
+            return True;
 
-        # or do it ourselves
-        return (not (evt.ControlDown() or evt.AltDown()) and
-                evt.GetKeyCode() != wx.WXK_SHIFT)
+        return False;    
+
 
 
     def StartingKey(self, e):
@@ -158,7 +159,25 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         If the editor is enabled by pressing keys on the grid, this will be
         called to let the editor do something about that first key if desired.
         """
-        e.Skip()
+        key = evt.GetKeyCode()
+        ch = None
+        if key in [ wx.WXK_NUMPAD0, wx.WXK_NUMPAD1, wx.WXK_NUMPAD2, wx.WXK_NUMPAD3, 
+                    wx.WXK_NUMPAD4, wx.WXK_NUMPAD5, wx.WXK_NUMPAD6, wx.WXK_NUMPAD7, 
+                    wx.WXK_NUMPAD8, wx.WXK_NUMPAD9
+                    ]:
+
+            ch = ch = chr(ord('0') + key - wx.WXK_NUMPAD0)
+
+        elif key < 256 and key >= 0 and chr(key) in string.printable:
+            ch = chr(key)
+
+        if ch is not None:
+            # For this example, replace the text.  Normally we would append it.
+            self_tc.AppendText(ch)
+            self.tc.SetInsertionPointEnd()
+        else:
+            evt.Skip()
+
 
 
     def StartingClick(self):
@@ -167,7 +186,7 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         called to allow the editor to simulate the click on the control if
         needed.
         """
-        pass
+        self.keycode=0;
 
     def Destroy(self):
         """final cleanup"""
@@ -179,11 +198,12 @@ class InterCellEditor(wx.grid.PyGridCellEditor):
         Create a new object which is the copy of this one
         *Must Override*
         """
-        return InterCellEditor()
+        return InterCellEditor(self.spin)
 
 
 class SpinGrid(wx.grid.Grid):
     def __init__(self,parent,id=-1):
+
         wx.grid.Grid.__init__(self,parent,id=-1)
         self.ss=wx.GetApp().ss;
 
@@ -211,8 +231,31 @@ class SpinGrid(wx.grid.Grid):
         self.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE );
 
 	#Event Handling
-        #self.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onCellSelect,id=self.GetId());
+        self.Bind(wx.grid.EVT_GRID_SELECT_CELL,self.onCellSelect,id=self.GetId());
         self.Bind(wx.grid.EVT_GRID_CMD_CELL_CHANGE,self.onCellChange,id=self.GetId());
+        self.Bind(wx.grid.EVT_GRID_EDITOR_HIDDEN,self.onEndEdit,id=self.GetId());
+        self.Bind(wx.grid.EVT_GRID_EDITOR_SHOWN,self.onEdit,id=self.GetId());
+
+
+    
+    def onEdit(self,e):
+        if e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR:
+            self.hidePopup();
+
+    def onEndEdit(self,e):
+        if e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR:
+            self.showPopup();
+
+    def showPopup(self):
+        pos = self.ClientToScreen((10,10))
+        self.win.SetPosition(pos)
+        self.win.Show(True);
+        wx.GetTopLevelParent(self).Raise(); #The window's appearence on the screen should be passive. It should not grab the focus away from the grid.
+
+    def hidePopup(self):
+        self.win.Show(False);
+
+
     def refreshFromSpinSystem(self):
         self.ClearGrid();
         self.AppendRows(self.ss.GetSpinCount());
@@ -237,9 +280,12 @@ class SpinGrid(wx.grid.Grid):
             self.SetCellEditor(i,COL_Z,wx.grid.GridCellFloatEditor());
             
             #Set up the special interaction editors
-            self.SetCellEditor(i,COL_LINEAR,InterCellEditor())
-            self.SetCellEditor(i,COL_BILINEAR,InterCellEditor())
-            self.SetCellEditor(i,COL_QUADRAPOLAR,InterCellEditor())
+            self.SetCellEditor(i,COL_LINEAR,InterCellEditor(self.ss.GetSpin(i)))
+            #self.SetCellEditor(i,COL_BILINEAR,InterCellEditor())
+            self.SetCellEditor(i,COL_QUADRAPOLAR,InterCellEditor(self.ss.GetSpin(i)))
+
+        self.win = InterPopup(self,self.ss.GetSpin(0))
+
 
     def onCellChange(self,e):
         print "Cell change"
@@ -253,9 +299,9 @@ class SpinGrid(wx.grid.Grid):
         wx.GetApp().em.Trigger();
 
     def onCellSelect(self,e):
-        col=e.GetCol()
-        if(col==COL_LINEAR or col==COL_BILINEAR or col==COL_QUADRAPOLAR):
-            print col
-            print e.GetPosition()
+        if e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR:
+            self.showPopup();
+        else:
+            self.hidePopup();
         e.Skip()
 

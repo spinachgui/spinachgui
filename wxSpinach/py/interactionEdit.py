@@ -293,11 +293,13 @@ class InteractionEdit(wx.Panel):
 
 class InterPopup(wx.Frame):
     """Adds a bit of text and mouse movement to the wx.PopupWindow"""
-    def __init__(self, parent):
+    def __init__(self, parent,spin):
+        self.spin=spin
+
         wx.Frame.__init__(self, parent,style=wx.FRAME_FLOAT_ON_PARENT|wx.FRAME_NO_TASKBAR)
 
         self.sizer=wx.BoxSizer()
-        self.interPanel=interactionEdit(self)
+        self.interPanel=SpinInteractionsEdit(self,self.spin)
         self.sizer.Add(self.interPanel,1.0,wx.EXPAND);
         self.SetSizer(self.sizer)
         
@@ -319,29 +321,30 @@ class InterPopup(wx.Frame):
 
 
 class InterTextEditor(wx.TextCtrl):
-    def __init__(self,parent,id=-1):
+    def __init__(self,parent,spin,id=-1):
         wx.TextCtrl.__init__(self,parent,id)
+        self.spin=spin
 
-        self.win = InterPopup(self)
+#        self.win = InterPopup(self,self.spin)
 
-        self.Bind(wx.EVT_KILL_FOCUS, self.onUnFocus, self)
-        self.Bind(wx.EVT_SET_FOCUS, self.onFocus, self)
+       # self.Bind(wx.EVT_KILL_FOCUS, self.onUnFocus, self)
+       # self.Bind(wx.EVT_SET_FOCUS, self.onFocus, self)
 
-    def onUnFocus(self,e):
-        print e.GetWindow();
+    #def onUnFocus(self,e):
+    #    print e.GetWindow();
         #self.win.Show(False);
-        e.Skip()
+    #    e.Skip()
 
-    def onFocus(self, e):
+    #def onFocus(self, e):
 
         # Show the popup right below or above the button
         # depending on available screen space...
-        pos = self.ClientToScreen(self.GetPosition())
-        size =  self.GetSize()
-        self.win.SetPosition((pos[0], pos[1]+size[1]))
+   #     pos = self.ClientToScreen(self.GetPosition())
+   #     size =  self.GetSize()
+   #     self.win.SetPosition((pos[0], pos[1]+size[1]))
 
-        self.win.Show(True);
-        e.Skip()
+   #     self.win.Show(True);
+        #e.Skip()
 
 
 
@@ -441,4 +444,5 @@ class SpinInteractionsEdit(wx.Panel):
     def interactionChange(self):
         inter=self.interactions[self.interListBox.GetSelection()];
         self.interEdit.SetInter(inter);
+
 

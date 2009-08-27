@@ -1010,6 +1010,18 @@ Matrix3 Interaction::GetAsMatrix() const throw(logic_error) {
   return zero;
 }
 
+void Interaction::SetQuadratic() {
+  mSpin2=mSpin1;
+}
+
+void Interaction::SetLinear() {
+  mSpin2=NULL;
+}
+
+bool Interaction::GetIsQuadratic() const {
+  return mSpin2==mSpin1;
+}
+
 
 //==============================================================================//
 // Reference Frame

@@ -145,6 +145,9 @@ class InteractionEdit(wx.Panel):
         self.skew=xrc.XRCCTRL(self,'skew')
         self.spanskewiso=xrc.XRCCTRL(self,'spanskewiso')
 
+        self.quadCheckbox=xrc.XRCCTRL(self,"quadCheckbox");
+        self.Bind(wx.EVT_CHECKBOX,self.onQuadChecked,id=self.quadCheckbox.GetId());
+
         self.LoadFromInter()
 
         self.editCtrls=[]
@@ -157,6 +160,13 @@ class InteractionEdit(wx.Panel):
     def SetInter(self,inter):
         self.inter=inter;
         self.LoadFromInter();
+
+    def onQuadChecked(self,e):
+        if e.IsChecked():
+            self.inter.SetQuadratic();
+        else:
+            self.inter.SetLinear();
+        self.GetParent().UpdateListBox();
 
     def OnPageChange(self,e):
         if self.Loading:
@@ -232,6 +242,9 @@ class InteractionEdit(wx.Panel):
             self.span.SetValue(str(span));
             self.skew.SetValue(str(skew));
             self.spanskewiso.SetValue(str(iso));
+
+        self.quadCheckbox.SetValue(self.inter.GetIsQuadratic());
+
         self.Loading=False;
 
     def SaveToInter(self):
@@ -379,12 +392,16 @@ class SpinInteractionsEdit(wx.Panel):
         i=0;
         for inter in self.interactions:
             inter.index=i
+            if inter.GetIsQuadratic():
+                quadstr="Quadratic"
+            else:
+                quadstr="Linear"
             if inter.kind == "original":
-                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+Types[inter.GetType()][1]+")")
+                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+quadstr+", "+Types[inter.GetType()][1]+")")
             elif inter.kind == "modifed":
-                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+Types[inter.GetType()][1]+")*")                
+                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+quadstr+", "+Types[inter.GetType()][1]+")*")                
             elif inter.kind == "new":
-                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+Types[inter.GetType()][1]+")*")
+                self.interListBox.Append(SubTypes[inter.GetSubType()][1] + " ("+quadstr+", "+Types[inter.GetType()][1]+")*")
             i=i+1
         self.Updating=False;
 

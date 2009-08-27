@@ -198,8 +198,12 @@ class Interaction {
     Spin* GetSpin2() const;
     void SetSpin2(Spin* Spin2);
 
+    void SetQuadratic();
+    void SetLinear();
+    bool GetIsQuadratic() const;
+
     double GetAsScalar() const;
-  Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
+    Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
 
   private:
     union  {

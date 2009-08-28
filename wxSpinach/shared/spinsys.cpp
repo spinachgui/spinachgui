@@ -5,6 +5,8 @@
 #include <iostream>
 #include <shared/nuclear_data.hpp>
 
+using namespace std;
+using namespace SpinXML;
 
 //==============================================================================//
 // Vector3
@@ -148,6 +150,10 @@ SpinSystem::SpinSystem() : mLabFrame(new ReferenceFrame(NULL,new Vector3(0,0,0),
 }
 
 SpinSystem::~SpinSystem() {
+  Clear();
+}
+
+void SpinSystem::Clear() {
   for(long i=0;i<mSpins.size();i++) {
     delete mSpins[i];
   }
@@ -174,6 +180,15 @@ long SpinSystem::GetSpinCount() const {
 
 Spin* SpinSystem::GetSpin(long n) const {
   return mSpins[n];
+}
+
+long SpinSystem::GetSpinNumber(Spin* spin) const {
+  for(long i=0;i<mSpins.size();i++) {
+    if(mSpins[i]==spin) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 vector<Spin*> SpinSystem::GetSpins() const {
@@ -364,6 +379,7 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 	    stream >> JCoupling;
 	    Interaction* inter=new Interaction();
             inter->SetScalar(JCoupling);
+	    inter->SetSubType(Interaction::ST_SCALAR);
 	    inter->SetSpin1(GetSpin(j+1));
             inter->SetSpin2(GetSpin(i*5+k+1));
 	    mInteractions.push_back(new Interaction());
@@ -385,6 +401,7 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
         
         Interaction* inter=new Interaction();
         inter->SetScalar(isoCoupling);
+	inter->SetSubType(Interaction::ST_HFC);
 	inter->SetSpin1(GetSpin(i));
 	mInteractions.push_back(inter);
       }          
@@ -418,6 +435,7 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 
 	Interaction* inter=new Interaction(); //Last paramiter is reference frame, which is always lab
 	inter->SetEigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05,o);
+	inter->SetSubType(Interaction::ST_HFC);
 	inter->SetSpin1(GetSpin(i));
 	
 	mInteractions.push_back(inter);
@@ -427,9 +445,6 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
   cout << "Finished loading the g03 file, saving mSpins.size()=" << mSpins.size() << endl;
 }
 
-void SpinSystem::LoadFromXMLFile(const char* filename) {
-
-}
 
 
 //==============================================================================//
@@ -611,6 +626,10 @@ Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
 
 Interaction::SubType Interaction::GetSubType() const {
   return mSubType;
+}
+
+void Interaction::SetSubType(SubType st) {
+  mSubType=st;
 }
 
 bool Interaction::IsSubType(SubType t) const {
@@ -884,27 +903,27 @@ void Interaction::GetMatrix(Matrix3* OutMatrix) const {
   return;
 }
 
-void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const {
+void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation** OrientOut) const {
   *XX=mData.mEigenvalues.XX;
   *YY=mData.mEigenvalues.YY;
   *ZZ=mData.mEigenvalues.ZZ;
-  *OrientOut=*mData.mEigenvalues.Orient;
+  *OrientOut=mData.mEigenvalues.Orient;
   return;
 }
 
-void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const {
+void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation** OrientOut) const {
   *iso=mData.mAxRhom.iso;
   *ax=mData.mAxRhom.ax;
   *rh=mData.mAxRhom.rh;
-  *OrientOut=*mData.mAxRhom.Orient;
+  *OrientOut=mData.mAxRhom.Orient;
   return;
 }
 
-void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const {
+void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation** OrientOut) const {
   *iso=mData.mSpanSkew.iso;
   *Span=mData.mSpanSkew.span;
   *Skew=mData.mSpanSkew.skew;
-  *OrientOut=*mData.mSpanSkew.Orient;
+  *OrientOut=mData.mSpanSkew.Orient;
   return;
 }
 

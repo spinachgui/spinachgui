@@ -4,6 +4,11 @@ import spinsys
 
 ss=spinsys.SpinSystem();
 ss.LoadFromG03File('data/tyrosine.log')
+
+ss.SaveToXMLFile('../tyrotmp.xml');
+ss.LoadFromXMLFile('../tyrotmp.xml');
+ss.SaveToXMLFile('../tyrotmp2.xml');
+
 #ss.Dump()
 
 spin=ss.GetSpin(0);
@@ -13,6 +18,9 @@ print inter.GetType()
 inter=spin.GetInteraction(1);
 print inter.GetType()
 print inter.GetEigenvalues();
+
+xx,yy,zz,o=inter.GetEigenvalues();
+print o.GetType();
 
 inter.SetScalar(4);
 print inter.GetScalar();

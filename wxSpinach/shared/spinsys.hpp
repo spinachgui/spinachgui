@@ -4,7 +4,8 @@
 #include <string.h>
 #include <stdexcept>
 
-using namespace std;
+namespace SpinXML {
+
 
 const long END=-1;
 
@@ -13,8 +14,6 @@ class Spin;
 class Orientation;
 class Interaction;
 class ReferenceFrame;
-
-class SpinSystemElement {};
 
 class Vector3 {
   public:
@@ -122,7 +121,7 @@ class ReferenceFrame {
     
     long GetChildCount() const;
     ReferenceFrame* GetChildFrame(long n) const;
-    vector<ReferenceFrame*> GetChildFrames() const;
+    std::vector<ReferenceFrame*> GetChildFrames() const;
     void InsertChild(ReferenceFrame* Frame,long Position=END);
     void RemoveChild(long Position);
     void RemoveChild(ReferenceFrame* Child);
@@ -133,7 +132,7 @@ class ReferenceFrame {
     
   private:
     ReferenceFrame* mParent;
-    vector<ReferenceFrame*> mChildren;
+    std::vector<ReferenceFrame*> mChildren;
     
     Vector3* mPosition;
     Orientation* mOrient;
@@ -179,13 +178,14 @@ class Interaction {
     
     Type GetType() const;
     SubType GetSubType() const;
+    void SetSubType(SubType st);
     bool IsSubType(SubType t) const;
     
     void GetScalar(double* Scalar) const;
     void GetMatrix(Matrix3* OutMatrix) const;
-    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const;
-    void GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const;
-    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const;
+    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation** OrientOut) const;
+    void GetAxRhom(double* iso,double* ax, double* rh, Orientation** OrientOut) const;
+    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation** OrientOut) const;
 
     void SetScalar(double Scalar);
     void SetMatrix(Matrix3* InMatrix);
@@ -236,7 +236,7 @@ class Interaction {
 
 class Spin {
   public:
-    Spin(SpinSystem* Parent,Vector3* mPosition,string mLabel,ReferenceFrame* mFrame);
+    Spin(SpinSystem* Parent,Vector3* mPosition,std::string mLabel,ReferenceFrame* mFrame);
     ~Spin();
   
     void Dump() const;
@@ -246,12 +246,12 @@ class Spin {
     void GetCoordinates(double* _x,double* _y, double* _z) const;
     void SetCoordinates(double _x,double _y, double _z);
 
-    void SetLabel(string Label);
+    void SetLabel(std::string Label);
     const char* GetLabel() const;
 
     long GetInteractionCount() const;
     Interaction* GetInteraction(long n) const;
-    vector<Interaction*> GetInteractions() const;
+    std::vector<Interaction*> GetInteractions() const;
     void InsertInteraction(Interaction* _Interaction,long Position=END);
     void RemoveInteraction(long Position);
     void RemoveInteraction(Interaction* _Interaction);
@@ -273,7 +273,7 @@ class Spin {
   private:
     SpinSystem* mParent;
     Vector3* mPosition;
-    string mLabel;
+    std::string mLabel;
     ReferenceFrame* mFrame;
 };
 
@@ -284,12 +284,16 @@ class SpinSystem {
   public:
     SpinSystem();
     ~SpinSystem();
+
+    void Clear();
     
     void Dump() const;
 
     long GetSpinCount() const;
     Spin* GetSpin(long n) const;
-    vector<Spin*> GetSpins() const;
+    long GetSpinNumber(Spin* spin) const;
+
+    std::vector<Spin*> GetSpins() const;
     void InsertSpin(Spin* _Spin,long Position=END);
     void RemoveSpin(long Position);
     void RemoveSpin(Spin* _Spin);
@@ -297,13 +301,18 @@ class SpinSystem {
     ReferenceFrame* GetRootFrame() const;
     
     void LoadFromGamesFile(const char* filename);
-    void LoadFromG03File(const char* filename) throw(runtime_error);
+
+    void LoadFromG03File(const char* filename) throw(std::runtime_error);
+
     void LoadFromXMLFile(const char* filename);
+    void SaveToXMLFile(const char* filename) const;
+  
   private:
     friend class Spin;
     
-     vector<Spin*> mSpins;
-     vector<Interaction*> mInteractions;
+     std::vector<Spin*> mSpins;
+     std::vector<Interaction*> mInteractions;
      ReferenceFrame* mLabFrame; 
 };
 
+}; //End Namespace

@@ -68,6 +68,7 @@ set(sharedSources ${sharedSources} "shared/spin_system.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
 
 set(pySources              "shared/spinsys.cpp")
+set(pySources ${pySources} "shared/xmlFileOpps.cpp")
 set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
 set(pySources ${pySources} "shared/spinsys_spec.cpp")
 

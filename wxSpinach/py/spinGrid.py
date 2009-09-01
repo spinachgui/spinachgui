@@ -238,6 +238,7 @@ class SpinGrid(wx.grid.Grid):
 
         self.winExists=False;
     
+    
 
     def onEdit(self,e):
         if e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR:

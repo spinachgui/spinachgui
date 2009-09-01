@@ -37,7 +37,7 @@ Types={
     SCALAR:     (0,"Scalar"            ,"ScalarIntPanel"  ,['scalarCtrl']                 ),               
     MATRIX:     (1,"Matrix"            ,"MatrixIntPanel"  ,matrixEdits                    ),
     EIGENVALUES:(2,"Eigenvalues"       ,"EigenIntPanel"   ,['eigenxx','eigenyy','eigenzz']),
-    AXRHOM:     (3,"Axiality-Rhombicty","AxRhomIntPanel"  ,['ax','rhom','axrhomiso']       ),     
+    AXRHOM:     (3,"Axiality-Rhombicty","AxRhomIntPanel"  ,['ax','rhom','axrhomiso']      ),     
     SPANSKEW:   (4,"Span-Skew"         ,"SpanSkewIntPanel",['span','skew','spanskewiso']  )
 }
 
@@ -70,41 +70,6 @@ SubTypes={
     ST_CUSTOM:    (8,"Custem")
 }
 
-class NumericValidator(wx.PyValidator):
-    def __init__(self):
-        wx.PyValidator.__init__(self)
-        self.Bind(wx.EVT_CHAR, self.OnChar)
-
-    def Clone(self):
-        return NumericValidator()
-
-    def Validate(self, win):
-        tc = self.GetWindow()
-        val = tc.GetValue()
-        
-        for x in val:
-             if x not in '0123456789.':
-                 return False
-
-        return True
-
-
-    def OnChar(self, event):
-        key = event.GetKeyCode()
-
-        if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
-            event.Skip()
-            return
-
-        if chr(key) in '0123456789.':
-            val=self.GetWindow().GetValue();
-            if (not '.' in val) or chr(key)!='.':
-                event.Skip()
-                return
-
-        # Returning without calling even.Skip eats the event before it
-        # gets to the text control
-        return
 
 class InteractionEdit(wx.Panel):
     def __init__(self,parent,inter,id=-1):
@@ -145,10 +110,26 @@ class InteractionEdit(wx.Panel):
         self.skew=xrc.XRCCTRL(self,'skew')
         self.spanskewiso=xrc.XRCCTRL(self,'spanskewiso')
 
+        self.eigenEditPanel=xrc.XRCCTRL(self,'EigenEditPanel');
+        self.AxRhomEditPanel=xrc.XRCCTRL(self,'AxRhomEditPanel');
+        self.SpanSkewEditPanel=xrc.XRCCTRL(self,'SpanSkewEditPanel');
+
+        #Manulally add the orientation edit text box
+        self.eigenOrientEdit=OrientTextEditor(self.eigenEditPanel);
+        self.AxRhomOrientEdit=OrientTextEditor(self.AxRhomEditPanel);
+        self.SpanSkewOrientEdit=OrientTextEditor(self.SpanSkewEditPanel);
+
+        self.eigenEditPanel.GetSizer().Add(self.eigenOrientEdit,1);
+        self.AxRhomEditPanel.GetSizer().Add(self.AxRhomOrientEdit,1);
+        self.SpanSkewEditPanel.GetSizer().Add(self.SpanSkewOrientEdit,1);
+
+
         self.quadCheckbox=xrc.XRCCTRL(self,"quadCheckbox");
         self.Bind(wx.EVT_CHECKBOX,self.onQuadChecked,id=self.quadCheckbox.GetId());
 
         self.LoadFromInter()
+
+        self.Layout();
 
         self.editCtrls=[]
         for ctrlName in Types[self.inter.GetType()][3]:
@@ -156,6 +137,8 @@ class InteractionEdit(wx.Panel):
             ctrl.SetValidator(NumericValidator());
             self.editCtrls.append(ctrl);
             self.Bind(wx.EVT_TEXT,self.onTextChange)
+
+
 
     def SetInter(self,inter):
         self.inter=inter;

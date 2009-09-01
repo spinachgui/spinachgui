@@ -5,107 +5,262 @@
 import wx
 from wx import xrc 
 import wx.grid
+import wx.combo
 
 import spinsys
 
 #Local python imports
 from utils import *
 
-INTERTYPE_EULER=0;
-INTERTYPE_ANGLEAXIS=1;
-INTERTYPE_QUATERNION=2;
-INTERTYPE_EIGENSYSTEM=3;
 
-class EulerEdit(wx.Panel):
+UNDEFINED=spinsys.Orientation.UNDEFINED;  
+EULER=spinsys.Orientation.EULER;     
+ANGLE_AXIS=spinsys.Orientation.ANGLE_AXIS;     
+QUATERNION=spinsys.Orientation.QUATERNION;
+EIGENSYSTEM=spinsys.Orientation.EIGENSYSTEM;     
+
+OrientTypeOrders=[EULER,ANGLE_AXIS,QUATERNION,EIGENSYSTEM];
+
+
+
+#Choice book page,Humand readable name,panel name,list of textctrl names
+
+eigenEdits=['eigsysXX','eigsysXY','eigsysXZ',
+            'eigsysYX','eigsysYY','eigsysYZ',
+            'eigsysZX','eigsysZY','eigsysZZ'];
+
+
+OrientTypes={
+    UNDEFINED:  (-1,"Undefined",""     ,""                ,[]                                ),
+    EULER:      (0,"Euler Angles"            ,"ScalarIntPanel"  ,['alphaA','betaA','gammaA']       ),               
+    ANGLE_AXIS: (1,"Angle Axis","AxRhomIntPanel"  ,['angleAxisAngle','angleAxisX','angleAxisY','angleAxisZ']),     
+    QUATERNION: (2,"Quaternion"       ,"EigenIntPanel"   ,['quatRe','quatI','quatJ','quatK']),
+    EIGENSYSTEM:(3,"Eigensystem"            ,"MatrixIntPanel"  ,eigenEdits                        ),
+}
+
+
+class OrientEditPanel(wx.Panel):
     def __init__(self,parent,id=-1):
+        self.orient=None;
         pre = wx.PrePanel();
-        wx.GetApp().res.LoadOnPanel(pre,parent,"EulerPanel");
-        self.PostCreate(pre);
-
-
-class AngleAxisEdit(wx.Panel):
-    def __init__(self,parent,id=-1):
-        pre = wx.PrePanel();
-        wx.GetApp().res.LoadOnPanel(pre,parent,"AngleAxisPanel");
-        self.PostCreate(pre);
-
-
-class QuaternionEdit(wx.Panel):
-    def __init__(self,parent,id=-1):
-        pre = wx.PrePanel();
-        wx.GetApp().res.LoadOnPanel(pre,parent,"QuaternionPanel");
-        self.PostCreate(pre);
-
-
-class EigensystemEdit(wx.Panel):
-    def __init__(self,parent,id=-1):
-        pre = wx.PrePanel();
-        wx.GetApp().res.LoadOnPanel(pre,parent,"EigensystemPanel");
-        self.PostCreate(pre);
-
-
-
-class OrientTransientPopup(wx.PopupTransientWindow):
-    """Adds a bit of text and mouse movement to the wx.PopupWindow"""
-    def __init__(self, parent, style):
-        wx.PopupTransientWindow.__init__(self, parent, style)
-
-        self.sizer=wx.BoxSizer()
-        self.orientPanel=OrientEdit(self)
-        self.sizer.Add(self.orientPanel,1.0,wx.EXPAND);
-        self.SetSizer(self.sizer)
-        
-
-        size = self.orientPanel.GetSize()
-        print size
-        self.SetSize((size.width, size.height));
-
-    def ProcessLeftDown(self, e):
-        e.Skip()
-        return False
-
-    def OnDismiss(self):
-        pass
-
-
-class OrientTextEditor(wx.TextCtrl):
-    def __init__(self,parent,id=-1):
-        wx.TextCtrl.__init__(self,parent,id)
-        self.Bind(wx.EVT_SET_FOCUS, self.OnShowPopupTransient, self)
-
-
-    def OnShowPopupTransient(self, e):
-        win = OrientTransientPopup(self,wx.SIMPLE_BORDER)
-
-        # Show the popup right below or above the button
-        # depending on available screen space...
-        pos = self.ClientToScreen((0,0))
-        size =  self.GetSize()
-        win.Position(pos, (0, size[1]))
-
-        win.Popup()
-
-
-class OrientEdit(wx.Panel):
-    def __init__(self,parent,id=-1):
-
-        pre = wx.PrePanel();
-        wx.GetApp().res.LoadOnPanel(pre,parent,"OrientEditPanel");
+        wx.GetApp().res.LoadOnPanel(pre,parent,'OrientEditPanel');
         self.PostCreate(pre)
 
-        self.typeChoiceBook=xrc.XRCCTRL(self,"OrientChoiceBook");
+        self.loading=False;
 
-        self.eulerPage=      wx.GetApp().res.LoadPanel(self.typeChoiceBook,"EulerPanel")
-        self.angleAxisPage=  wx.GetApp().res.LoadPanel(self.typeChoiceBook,"AngleAxisPanel")
-        self.quaternionPage= wx.GetApp().res.LoadPanel(self.typeChoiceBook,"QuaternionPanel")
-        self.eigensystemPage=wx.GetApp().res.LoadPanel(self.typeChoiceBook,"EigensystemPanel")
+        self.typeChoiceBook=xrc.XRCCTRL(self,"OrientTypeChoiceBook");
+        self.Bind(wx.EVT_CHOICEBOOK_PAGE_CHANGED,self.OnPageChange);
 
-        self.typeChoiceBook.AddPage(self.eulerPage,"Euler")
-        self.typeChoiceBook.AddPage(self.angleAxisPage,"Angle Axis")
-        self.typeChoiceBook.AddPage(self.quaternionPage,"Quaternion")
-        self.typeChoiceBook.AddPage(self.eigensystemPage,"Eigensystem")
+        self.alphaA=xrc.XRCCTRL(self,'alphaA');
+        self.betaA=xrc.XRCCTRL(self,'betaA');
+        self.gammaA=xrc.XRCCTRL(self,'gammaA');
+
+        self.AngleAxisAngle=xrc.XRCCTRL(self,'AngleAxisAngle');
+        self.AngleAxisX=xrc.XRCCTRL(self,'AngleAxisX');
+        self.AngleAxisY=xrc.XRCCTRL(self,'AngleAxisY');
+        self.AngleAxisZ=xrc.XRCCTRL(self,'AngleAxisZ');
+
+        self.quatRe=xrc.XRCCTRL(self,'quatRe');
+        self.quatI=xrc.XRCCTRL(self,'quatI');
+        self.quatJ=xrc.XRCCTRL(self,'quatJ');
+        self.quatK=xrc.XRCCTRL(self,'quatK');
+
+        self.eigsysXX=xrc.XRCCTRL(self,'eigsysXX');
+        self.eigsysXY=xrc.XRCCTRL(self,'eigsysXY');
+        self.eigsysXZ=xrc.XRCCTRL(self,'eigsysXZ');
+                                                
+        self.eigsysYX=xrc.XRCCTRL(self,'eigsysYX');
+        self.eigsysYY=xrc.XRCCTRL(self,'eigsysYY');
+        self.eigsysYZ=xrc.XRCCTRL(self,'eigsysYZ');
+                                                
+        self.eigsysZX=xrc.XRCCTRL(self,'eigsysZX');
+        self.eigsysZY=xrc.XRCCTRL(self,'eigsysZY');
+        self.eigsysZZ=xrc.XRCCTRL(self,'eigsysZZ');
+
+        self.editCtrls=[]
+        print OrientTypes
+        for key,OrientType in OrientTypes.items():
+            for ctrlName in OrientType[3]:
+                print ctrlName
+                ctrl=xrc.XRCCTRL(self,ctrlName)
+                ctrl.SetValidator(NumericValidator());
+                self.editCtrls.append(ctrl);
+                self.Bind(wx.EVT_TEXT,self.onTextChange)
+
+    def SetOrient(self,orient):
+        self.orient=orient;
+        self.LoadFromOrient();
+
+    def onQuadChecked(self,e):
+        if e.IsChecked():
+            self.inter.SetQuadratic();
+        else:
+            self.inter.SetLinear();
+        self.GetParent().UpdateListBox();
+
+    def OnPageChange(self,e):
+        if self.Loading:
+            print "Skipping"
+            return;
+        print "Changing the type of this interaction"
+        type=TypeOrders[e.GetSelection()]
+
+        self.AngleAxisAngle=xrc.XRCCTRL(self,'AngleAxisAngle');
+        self.AngleAxisX=xrc.XRCCTRL(self,'AngleAxisX');
+        self.AngleAxisY=xrc.XRCCTRL(self,'AngleAxisY');
+        self.AngleAxisZ=xrc.XRCCTRL(self,'AngleAxisZ');
+
+        self.quatRe=xrc.XRCCTRL(self,'quatRe');
+        self.quatI=xrc.XRCCTRL(self,'quatI');
+        self.quatJ=xrc.XRCCTRL(self,'quatJ');
+        self.quatK=xrc.XRCCTRL(self,'quatK');
+
+        if(type==EULER):
+
+            self.alphaA.SetValue("0.0");
+            self.betaA.SetValue("0.0");
+            self.gammaA.SetValue("0.0");
+
+        elif(type==ANGLE_AXIS):
+            self.AngleAxisAngle.SetValue("0.0");
+            self.AngleAxisX.SetValue("0.0");
+            self.AngleAxisY.SetValue("0.0");
+            self.AngleAxisZ.SetValue("0.0");
+        elif(type==QUATERNION):
+            self.quatRe.SetValue("0.0");
+            self.quatI.SetValue("0.0");
+            self.quatJ.SetValue("0.0");
+            self.quatK.SetValue("0.0");
+        elif(type==EIGENSYSTEM):
+            self.eigsysXX.SetValue("0.0");
+            self.eigsysXY.SetValue("0.0");
+            self.eigsysXZ.SetValue("0.0");
+                                   
+            self.eigsysYX.SetValue("0.0");
+            self.eigsysYY.SetValue("0.0");
+            self.eigsysYZ.SetValue("0.0");
+                                   
+            self.eigsysZX.SetValue("0.0");
+            self.eigsysZY.SetValue("0.0");
+            self.eigsysZZ.SetValue("0.0");
+
+
+        self.SaveToInter();        
+        e.Skip()
+
+
+
+    def LoadFromOrient(self):
+        self.Loading=True
+        print self.orient
+        self.typeChoiceBook.SetSelection(OrientTypes[self.orient.GetType()][0]);
+        self.Loading=False;
+
+    def SaveToOrient(self):
+        Type=TypeOrders[self.typeChoiceBook.GetSelection()];
+        if(Type==EULER):
+            alpha=lazyFloat(self.alphaA.GetValue());
+            beta=lazyFloat(self.betaA.GetValue())
+            gamma=lazyFloat(self.gammaA.GetValue())
+            self.orient.SetScalar(alpha,beta,gamma);
+        elif(Type==ANGLE_AXIS):
+            angle=lazyFloat(self.angleAxisAngle.GetValue());
+            x=lazyFloat(self.angleAxisX.GetValue());
+            y=lazyFloat(self.angleAxisY.GetValue());
+            z=lazyFloat(self.angleAxisZ.GetValue());
+        elif(Type==QUATERNION):
+            re=lazyFloat(self.quatRe.GetValue());
+            i=lazyFloat(self.quatI.GetValue());
+            j=lazyFloat(self.quatJ.GetValue());
+            k=lazyFloat(self.quatK.GetValue());
+            self.orient.SetQuaternion(re,i,j,k);
+        elif(Type==EIGENSYSTEM):
+            vx=Vector3(lazyFloat(self.eigsysXX.GetValue()),lazyFloat(self.eigsysXY.GetValue()),lazyFloat(self.eigsysXZ.GetValue()));
+            vy=Vector3(lazyFloat(self.eigsysYX.GetValue()),lazyFloat(self.eigsysYY.GetValue()),lazyFloat(self.eigsysYZ.GetValue()));
+            vz=Vector3(lazyFloat(self.eigsysZX.GetValue()),lazyFloat(self.eigsysZY.GetValue()),lazyFloat(self.eigsysZZ.GetValue()));
+            self.orient.SetEigensystem(vx,vy,vz);
 
         
-        #Build the five "plug in" panels for the five different types of interaction
+
+    def onTextChange(self,e):
+        if self.Loading: #If we are loading from a spin we should ignore this event
+            return
+        self.SaveToOrient();
+
+
+
+
+class OrientPopup(wx.combo.ComboPopup):
+    def __init__(self, parent,panel):
+
+        wx.Frame.__init__(self, parent,style=wx.FRAME_FLOAT_ON_PARENT|wx.FRAME_NO_TASKBAR)
+
+        self.sizer=wx.BoxSizer();
+        self.panel=panel(self);
+        self.sizer.Add(self.panel,1.0,wx.EXPAND);
+        self.SetSizer(self.sizer);
+
+        size = self.panel.GetSize()
+        self.SetSize((size.width, size.height));
+
+        self.HaveFocus=False;
+
+        self.Bind(wx.EVT_KILL_FOCUS, self.onUnFocus, self);
+        self.Bind(wx.EVT_SET_FOCUS, self.onFocus, self);
+
+    def GetPanel(self):
+        return self.panel;
+
+    def onUnFocus(self,e):
+        print "Window unfocus"
+        self.HaveFocus=False;
+        self.tryHide();
+
+    def tryHide(self):
+        if (not self.HaveFocus) and (not self.GetParent().HaveFocus):
+            print "I would hide myself now"
+            #self.Hide();
+
+    def onFocus(self,e):
+        print "Window focus"
+        self.HaveFocus=True;
+
+
+
+class OrientTextEditor(wx.combo.ComboCtrl):
+    def __init__(self,parent,id=-1):
+        wx.combo.ComboCtrl.__init__(self,parent,id);
+
+        self.win = None;
+        self.popupBuilt = False;
+
+
+    def onFocus(self,e):
+        print "Edit focus"
+        self.HaveFocus=True;
+        self.ShowPopup();
+
+    def onUnFocus(self,e):
+        print "Edit Unfocus"
+        self.HaveFocus=False;
+        self.win.tryHide();
+
+    def ShowPopup(self):
+        if not self.popupBuilt:
+            self.win=OrientPopup(self,OrientEditPanel);
+            o=spinsys.Orientation();
+            o.SetQuaternion(1,0,0,0);
+            print o.GetQuaternion();
+            self.win.GetPanel().SetOrient(o);
+            self.popupBuilt = True;
+        self.win.Show(True);
+
+    def HidePopup(self):
+        if self.popupBuilt:
+            self.win.Hide()
+
+
+
+        
         
 

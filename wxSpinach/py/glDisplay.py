@@ -51,6 +51,8 @@ class glDisplay(wx.glcanvas.GLCanvas):
         self.selected=[]  #List containing all spins which are currently selected
         self.hover=-1   #The closest spin currently sitting under the mouse
         wx.GetApp().em.RegisterHandler(self.onSystemChange);
+        
+        self.glEnabled=False;
 
     def onSystemChange(self):
         self.Refresh()
@@ -388,6 +390,9 @@ class glDisplay(wx.glcanvas.GLCanvas):
 
 
     def onPaint(self,e):
+        if self.glEnabled==False:
+            self.glEnabled=True;
+            self.enableGL();
         t1=time.time()
 	glColor3f(0.0, 0.0, 1.0);
 

@@ -124,8 +124,8 @@ class RootFrame(wx.Frame):
 
 
         # add the panes to the manager
-        self.notebook.AddPage(self.glc, '3D View')
         self.notebook.AddPage(self.spinGrid, 'Grid View')
+        self.notebook.AddPage(self.glc, '3D View')
 
         self.auiPanel.GetSizer().Add(self.notebook,1,wx.EXPAND);
 
@@ -142,7 +142,6 @@ class RootFrame(wx.Frame):
 
     def Show(self):
         wx.Frame.Show(self);
-        self.glc.enableGL()   
 
  
     def updateSpinTree(self):

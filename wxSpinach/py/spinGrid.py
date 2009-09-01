@@ -236,8 +236,9 @@ class SpinGrid(wx.grid.Grid):
         self.Bind(wx.grid.EVT_GRID_EDITOR_HIDDEN,self.onEndEdit,id=self.GetId());
         self.Bind(wx.grid.EVT_GRID_EDITOR_SHOWN,self.onEdit,id=self.GetId());
 
-
+        self.winExists=False;
     
+
     def onEdit(self,e):
         if e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR:
             self.hidePopup();
@@ -246,14 +247,17 @@ class SpinGrid(wx.grid.Grid):
         if e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR:
             self.showPopup();
 
-    def showPopup(self):
+    def showPopup(self,spin):
+        self.win = InterPopup(self,spin);
+        self.winExists=True;
         pos = self.ClientToScreen((10,10))
         self.win.SetPosition(pos)
         self.win.Show(True);
         wx.GetTopLevelParent(self).Raise(); #The window's appearence on the screen should be passive. It should not grab the focus away from the grid.
 
     def hidePopup(self):
-        self.win.Show(False);
+        if self.winExists:
+            self.win.Show(False);
 
 
     def refreshFromSpinSystem(self):
@@ -283,14 +287,13 @@ class SpinGrid(wx.grid.Grid):
             self.SetCellEditor(i,COL_LINEAR,InterCellEditor(self.ss.GetSpin(i)))
             #self.SetCellEditor(i,COL_BILINEAR,InterCellEditor())
             self.SetCellEditor(i,COL_QUADRAPOLAR,InterCellEditor(self.ss.GetSpin(i)))
+        print "Finished loop"
 
-        self.win = InterPopup(self,self.ss.GetSpin(0))
 
 
     def onCellChange(self,e):
         print "Cell change"
         if(e.GetCol()==COL_X):
-            print "X Change"
             self.ss.GetSpin(e.GetRow()).GetPosition().SetX(float(self.GetCellValue(e.GetRow(),e.GetCol())));
         elif(e.GetCol()==COL_Y):
             self.ss.GetSpin(e.GetRow()).GetPosition().SetY(float(self.GetCellValue(e.GetRow(),e.GetCol())));
@@ -300,7 +303,7 @@ class SpinGrid(wx.grid.Grid):
 
     def onCellSelect(self,e):
         if e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR:
-            self.showPopup();
+            self.showPopup(self.ss.GetSpin(e.GetRow()));
         else:
             self.hidePopup();
         e.Skip()

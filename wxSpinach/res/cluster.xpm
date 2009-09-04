@@ -1,5 +1,5 @@
 /* XPM */
-static char *cluster[] = {
+static char *cluster_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "15 15 80 1",
 "  c black",

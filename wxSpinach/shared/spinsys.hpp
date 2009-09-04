@@ -1,4 +1,7 @@
 
+#ifndef SPINSYS_H;
+#define SPINSYS_H;
+
 #include <vector>
 #include <string>
 #include <string.h>
@@ -316,3 +319,6 @@ class SpinSystem {
 };
 
 }; //End Namespace
+
+
+#endif

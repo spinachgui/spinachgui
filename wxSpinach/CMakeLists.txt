@@ -8,7 +8,7 @@ project(cspinach)
 
 #Enclose this in some sort of "if" if more than one 
 #compiler is ever supported
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb") #Make gcc output all the debug information it can!
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wno-write-strings") #Make gcc output all the debug information it can!
 
 #Choose a build type
 
@@ -39,8 +39,7 @@ if(WIN32)
   include("windows-config.cmake")
 else()
   #find_package(wxWidgets COMPONENTS net xml adv aui core gl html propgrid qa richtext stc xrc REQUIRED)
-  #Don't need this, using wxPython now
-  #find_package(wxWidgets COMPONENTS gl REQUIRED)
+  find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
 
   #Work out where python is installed.
   find_package(PythonLibs)
@@ -54,17 +53,15 @@ endif()
 
 #List of source files for all the targets
 set(guiSources "gui/SpinachApp.cpp")
-set(guiSources ${guiSources} "gui/calcFrame.cpp")
-set(guiSources ${guiSources} "gui/glMolDisplay.cpp")
-set(guiSources ${guiSources} "gui/optionFrame.cpp")
-set(guiSources ${guiSources} "gui/rootFrame.cpp")
-set(guiSources ${guiSources} "gui/rotationDialog.cpp")
-set(guiSources ${guiSources} "gui/spinpgbind.cpp")
-set(guiSources ${guiSources} "gui/spinachGUI.cpp")
+set(guiSources ${guiSources} "gui/glDisplay.cpp")
+set(guiSources ${guiSources} "gui/InteractionEdit.cpp")
+set(guiSources ${guiSources} "gui/OrientationEdit.cpp")
+set(guiSources ${guiSources} "gui/SpinDialog.cpp")
+set(guiSources ${guiSources} "gui/SpinGrid.cpp")
+set(guiSources ${guiSources} "res/SpinachGUI.cpp")
 
 set(sharedSources "shared/nuclear_data.cpp")
-set(sharedSources ${sharedSources} "shared/spin.cpp")
-set(sharedSources ${sharedSources} "shared/spin_system.cpp")
+set(sharedSources ${sharedSources} "shared/spinsys.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
 
 set(pySources              "shared/spinsys.cpp")
@@ -161,12 +158,13 @@ target_link_libraries (_spinsys _nuclear_data xerces-c ${PYTHON_LIBRARIES})
 
 
 #C++ GUI
-#set(wxSpinachSources ${guiSources} ${sharedSources})
-#add_executable (wxSpinach ${wxSpinachSources})
-#target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
-#target_link_libraries (wxSpinach atlas) 
-#target_link_libraries (wxSpinach GL GLEW) 
-#target_link_libraries (wxSpinach xerces-c)
+set(wxSpinachSources ${guiSources} ${sharedSources})
+add_executable (wxSpinach ${wxSpinachSources})
+add_definitions(${wxWidgets_DEFINITIONS})
+target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
+target_link_libraries (wxSpinach atlas) 
+target_link_libraries (wxSpinach GL GLEW) 
+target_link_libraries (wxSpinach xerces-c)
 
 
 #command line exe

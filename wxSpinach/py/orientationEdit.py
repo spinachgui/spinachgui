@@ -191,39 +191,33 @@ class OrientEditPanel(wx.Panel):
 
 
 class OrientPopup(wx.combo.ComboPopup):
-    def __init__(self, parent,panel):
+    def __init__(self):
 
-        wx.Frame.__init__(self, parent,style=wx.FRAME_FLOAT_ON_PARENT|wx.FRAME_NO_TASKBAR)
+        wx.combo.ComboPopup.__init__(self)
 
+    def Create(self,parent):
+
+        self.panel=wx.Panel(parent);
         self.sizer=wx.BoxSizer();
-        self.panel=panel(self);
-        self.sizer.Add(self.panel,1.0,wx.EXPAND);
-        self.SetSizer(self.sizer);
+        self.sizer.Add(self.panel);
+        self.panel.SetSizer(self.sizer);
 
-        size = self.panel.GetSize()
-        self.SetSize((size.width, size.height));
+    def Init(self):
+        print "init()ing"
 
-        self.HaveFocus=False;
+    def GetStringValue(self):
+        return "The Quick brown fox jumps over the lazy dog";
 
-        self.Bind(wx.EVT_KILL_FOCUS, self.onUnFocus, self);
-        self.Bind(wx.EVT_SET_FOCUS, self.onFocus, self);
+    def SetStringValue(self,value):
+        print "User says ",value;
 
-    def GetPanel(self):
+
+
+    def GetControl(self):
         return self.panel;
 
-    def onUnFocus(self,e):
-        print "Window unfocus"
-        self.HaveFocus=False;
-        self.tryHide();
 
-    def tryHide(self):
-        if (not self.HaveFocus) and (not self.GetParent().HaveFocus):
-            print "I would hide myself now"
-            #self.Hide();
 
-    def onFocus(self,e):
-        print "Window focus"
-        self.HaveFocus=True;
 
 
 
@@ -231,33 +225,9 @@ class OrientTextEditor(wx.combo.ComboCtrl):
     def __init__(self,parent,id=-1):
         wx.combo.ComboCtrl.__init__(self,parent,id);
 
-        self.win = None;
-        self.popupBuilt = False;
+        self.popup=OrientPopup();
+        self.SetPopupControl(self.popup);
 
-
-    def onFocus(self,e):
-        print "Edit focus"
-        self.HaveFocus=True;
-        self.ShowPopup();
-
-    def onUnFocus(self,e):
-        print "Edit Unfocus"
-        self.HaveFocus=False;
-        self.win.tryHide();
-
-    def ShowPopup(self):
-        if not self.popupBuilt:
-            self.win=OrientPopup(self,OrientEditPanel);
-            o=spinsys.Orientation();
-            o.SetQuaternion(1,0,0,0);
-            print o.GetQuaternion();
-            self.win.GetPanel().SetOrient(o);
-            self.popupBuilt = True;
-        self.win.Show(True);
-
-    def HidePopup(self):
-        if self.popupBuilt:
-            self.win.Hide()
 
 
 

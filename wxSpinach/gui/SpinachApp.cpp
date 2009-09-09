@@ -1,6 +1,8 @@
 
 #include <gui/SpinachApp.hpp>
 
+#include <gui/SpinDialog.hpp>
+
 IMPLEMENT_APP(SpinachApp);
 
 bool SpinachApp::OnInit() {
@@ -8,6 +10,10 @@ bool SpinachApp::OnInit() {
   mSS->LoadFromG03File("install/data/tryosine.log");
 
   RootFrame* frame = new RootFrame(NULL);
+
+  SpinDialog* dialog = new SpinDialog(frame,mSS->GetSpin(0));
+  dialog->ShowModal();
+
   frame->Show();
   return true;
 }

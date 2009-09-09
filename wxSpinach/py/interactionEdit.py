@@ -59,15 +59,15 @@ SubTypes={
     ST_ANY:       (-3,"Any"),
     ST_NMR:       (-2,"NMR"),
     ST_EPR:       (-1,"EPR"),
-    ST_HFC:       (0,"Hyperfine"),
-    ST_G_TENSER:  (1,"G Tensor"),
-    ST_ZFS:       (2,"Zero Field Splitting"),
-    ST_EXCHANGE:  (3,"Exchange Coupling"),
-    ST_SHIELDING: (4,"Chemical Shilding"),
-    ST_SCALAR:    (5,"Scalar"),
+    ST_HFC:       (0 ,"Hyperfine"),
+    ST_G_TENSER:  (1 ,"G Tensor"),
+    ST_ZFS:       (2 ,"Zero Field Splitting"),
+    ST_EXCHANGE:  (3 ,"Exchange Coupling"),
+    ST_SHIELDING: (4 ,"Chemical Shilding"),
+    ST_SCALAR:    (5 ,"Scalar"),
     ST_QUADRUPOLAR:(6,"Quadrupolar"),
-    ST_DIPOLAR:   (7,"Dipolar"),
-    ST_CUSTOM:    (8,"Custem")
+    ST_DIPOLAR:   (7 ,"Dipolar"),
+    ST_CUSTOM:    (8 ,"Custem")
 }
 
 
@@ -427,5 +427,3 @@ class SpinInteractionsEdit(wx.Panel):
     def interactionChange(self):
         inter=self.interactions[self.interListBox.GetSelection()];
         self.interEdit.SetInter(inter);
-
-

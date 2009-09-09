@@ -178,6 +178,9 @@ class Interaction {
       ST_DIPOLAR,
       ST_CUSTOM
     };
+
+    static const char* GetTypeName(Type t);
+    static const char* GetSubTypeName(SubType st);
     
     Type GetType() const;
     SubType GetSubType() const;

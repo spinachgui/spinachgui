@@ -162,7 +162,7 @@ set(wxSpinachSources ${guiSources} ${sharedSources})
 add_executable (wxSpinach ${wxSpinachSources})
 add_definitions(${wxWidgets_DEFINITIONS})
 target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
-target_link_libraries (wxSpinach atlas) 
+#target_link_libraries (wxSpinach atlas) 
 target_link_libraries (wxSpinach GL GLEW) 
 target_link_libraries (wxSpinach xerces-c)
 
@@ -177,33 +177,35 @@ target_link_libraries (wxSpinach xerces-c)
 #Create an "install" target (copy everything to a test directory)
 #This is probaly not how to do it in a production build, but it works and will
 #do for now
-add_custom_target(install-res ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/res/* ${CMAKE_CURRENT_BINARY_DIR}/install/res
-                          DEPENDS _spinsys  
-                          COMMENT "Copying files to /install")
+#add_custom_target(install-res ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/res/* ${CMAKE_CURRENT_BINARY_DIR}/install/res
+#                          DEPENDS _spinsys  
+#                          COMMENT "Copying files to /install")
+#
+#
+#add_custom_target(install-py ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/py/* ${CMAKE_CURRENT_BINARY_DIR}/install
+#                          DEPENDS _spinsys  
+#                          COMMENT "Copying files to /install")
+#
+#
 
+#add_custom_target(install ALL cp ${CMAKE_CURRENT_BINARY_DIR}/*.py  ${CMAKE_CURRENT_BINARY_DIR}/install/
+#                          DEPENDS _spinsys  
+#                          COMMENT "Copying files to /install")
+#
+#
 
-add_custom_target(install-py ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/py/* ${CMAKE_CURRENT_BINARY_DIR}/install
-                          DEPENDS _spinsys  
-                          COMMENT "Copying files to /install")
-
-
-
-add_custom_target(install ALL cp ${CMAKE_CURRENT_BINARY_DIR}/*.py  ${CMAKE_CURRENT_BINARY_DIR}/install/
-                          DEPENDS _spinsys  
-                          COMMENT "Copying files to /install")
-
-
-
-add_custom_target(install-so ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_spinsys.so ${CMAKE_CURRENT_BINARY_DIR}/install/_spinsys.so
-                          DEPENDS _spinsys  
-                          COMMENT "Copying files to /install")
-
-add_custom_target(install-so2 ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_nuclear_data.so ${CMAKE_CURRENT_BINARY_DIR}/install/_nuclear_data.so
-                          DEPENDS _spinsys  
-                          COMMENT "Copying files to /install")
-
-
-add_custom_target(install-data ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/data/* ${CMAKE_CURRENT_BINARY_DIR}/install/data
-                          DEPENDS _spinsys  
-                          COMMENT "Copying files to /install")
-
+#add_custom_target(install-so ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_spinsys.so ${CMAKE_CURRENT_BINARY_DIR}/install/_spinsys.so
+#                          DEPENDS _spinsys  
+#                          COMMENT "Copying files to /install")
+#
+#add_custom_target(install-so2 ALL cp ${CMAKE_CURRENT_BINARY_DIR}/lib_nuclear_data.so ${CMAKE_CURRENT_BINARY_DIR}/install/_nuclear_data.so
+#                          DEPENDS _spinsys  
+#                          COMMENT "Copying files to /install")
+#
+#
+#add_custom_target(install-data ALL cp ${CMAKE_CURRENT_SOURCE_DIR}/data/* ${CMAKE_CURRENT_BINARY_DIR}/install/data
+#                          DEPENDS _spinsys  
+#                          COMMENT "Copying files to /install")
+#
+#
+#

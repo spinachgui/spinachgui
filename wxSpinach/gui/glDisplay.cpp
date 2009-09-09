@@ -6,6 +6,7 @@
 #include <wx/dcclient.h>
 
 #include <gui/SpinachApp.hpp>
+#include <gui/SpinDialog.hpp>
 
 const double pi=3.141592654;
 

@@ -8,6 +8,8 @@
 using namespace std;
 using namespace SpinXML;
 
+
+
 //==============================================================================//
 // Vector3
 
@@ -870,6 +872,47 @@ void Interaction::Dump() const {
   case SPANSKEW:
     cout << "    Type=Span-Skew" <<  endl;
     cout << "    Value=" << endl;
+  }
+}
+
+const char* Interaction::GetTypeName(Type t) {
+  switch(t) {
+  case UNDEFINED:
+    return "Undefined";
+  case SCALAR:
+    return "Scalar";      
+  case MATRIX:
+    return "Matrix";     
+  case EIGENVALUES:
+    return "Eigenvalues";
+  case AXRHOM:
+    return "Axiality-Rhombicty";
+  case SPANSKEW:
+    return "Span-Skew";
+  default:
+    throw std::runtime_error("Unknow subtype submited to Interaction::GetTypeName()");
+    return "Error in Interaction::GetTypeName()";
+  };         
+};
+
+
+const char* Interaction::GetSubTypeName(SubType st) {
+  switch(st) {
+  case ST_ANY:         return "Any";
+  case ST_EPR:         return "EPR";
+  case ST_NMR:         return "NMR";
+  case ST_HFC:         return "HFC";
+  case ST_G_TENSER:    return "G Tensor";
+  case ST_ZFS: 	       return "Zero Field Splitting";
+  case ST_EXCHANGE:    return "Exchange";
+  case ST_QUADRUPOLAR: return "Quadrupolar";
+  case ST_DIPOLAR:     return "Dipolar";
+  case ST_SHIELDING:   return "Shielding";
+  case ST_SCALAR:      return "Scalar";
+  case ST_CUSTOM:      return "Custom";
+  default:
+    throw std::runtime_error("Unknow subtype submited to Interaction::GetSubTypeName()");
+    return "Error in Interaction::GetSubTypeName()";
   }
 }
   

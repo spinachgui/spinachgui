@@ -11,6 +11,11 @@ const double pi=3.141592654;
 
 using namespace std;
 
+enum MENU_EVENTS {
+  MENU_SPIN_DIALOG,
+  MENU_COUPLING_DIALOG
+};
+
 GLfloat whiteMaterial[] = {0.5, 0.5,  0.5}; 
 GLfloat blueMaterial[]  = {0.06,0.06, 0.4}; 
 GLfloat redMaterial[]   = {0.9, 0.00, 0.0}; 
@@ -381,117 +386,183 @@ void glDisplay::OnPaint(wxPaintEvent& e) {
   SwapBuffers();
 }
 
-  void glDisplay::ChangeViewport() {
-    int width,height;
-    GetClientSize(&width,&height);
-    glViewport(0,0,width,height);
+void glDisplay::ChangeViewport() {
+  int width,height;
+  GetClientSize(&width,&height);
+  glViewport(0,0,width,height);
 
-    //From the documentation:
-    //glDeleteTextures silently ignores 0's and names that do not correspond to existing textures.
-    //so it's okay that self.tex will not exist at first
-    glDeleteTextures(1,&mTexDepth);
-    glGenTextures(1,&mTexDepth);
+  //From the documentation:
+  //glDeleteTextures silently ignores 0's and names that do not correspond to existing textures.
+  //so it's okay that self.tex will not exist at first
+  glDeleteTextures(1,&mTexDepth);
+  glGenTextures(1,&mTexDepth);
 
-    glBindTexture(GL_TEXTURE_2D,mTexDepth);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  glBindTexture(GL_TEXTURE_2D,mTexDepth);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 
-    glTexImage2D(GL_PROXY_TEXTURE_2D,0,GL_RGBA,
-		 height,width,
-		 0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
+  glTexImage2D(GL_PROXY_TEXTURE_2D,0,GL_RGBA,
+	       height,width,
+	       0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
 
+}
+
+
+void glDisplay::EnableGL() {
+  if(mGLContext == NULL) {
+    mGLContext = new wxGLContext(this);
   }
+  this->SetCurrent(*mGLContext);
 
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glClearDepth(1.0);
 
-  void glDisplay::EnableGL() {
-    if(mGLContext == NULL) {
-      mGLContext = new wxGLContext(this);
-    }
-    this->SetCurrent(*mGLContext);
-
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClearDepth(1.0);
-
-    mDLSphereWire = glGenLists(1);
+  mDLSphereWire = glGenLists(1);
        
-    GLUquadric* qobj = gluNewQuadric();
+  GLUquadric* qobj = gluNewQuadric();
 
-    gluQuadricDrawStyle(qobj,GLU_LINE);
-    gluQuadricNormals(qobj,GLU_SMOOTH);
+  gluQuadricDrawStyle(qobj,GLU_LINE);
+  gluQuadricNormals(qobj,GLU_SMOOTH);
 
-    glNewList(mDLSphereWire,GL_COMPILE);
-    gluSphere(qobj,1.0,14,14);
-    glEndList();
-    gluDeleteQuadric(qobj);
+  glNewList(mDLSphereWire,GL_COMPILE);
+  gluSphere(qobj,1.0,14,14);
+  glEndList();
+  gluDeleteQuadric(qobj);
 
-    mDLSphereSolid = glGenLists(1);
+  mDLSphereSolid = glGenLists(1);
 
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj,GLU_FILL);
-    gluQuadricNormals(qobj,GLU_SMOOTH);
+  qobj = gluNewQuadric();
+  gluQuadricDrawStyle(qobj,GLU_FILL);
+  gluQuadricNormals(qobj,GLU_SMOOTH);
 
-    glNewList(mDLSphereSolid,GL_COMPILE);
-    gluSphere(qobj,1.0,12,12);
-    glEndList();
-    gluDeleteQuadric(qobj);
-
-
-
-    glDepthFunc(GL_LEQUAL);
-
-    //Reserve Space for the display lists
-    mDLBonds=glGenLists(1);
-
-    //glShadeModel(GL_SMOOTH);
-    //Adpated from a detailed tutorail on opengl lighting located at
-    //http://www.falloutsoftware.com/tutorials/gl/gl8.htm
+  glNewList(mDLSphereSolid,GL_COMPILE);
+  gluSphere(qobj,1.0,12,12);
+  glEndList();
+  gluDeleteQuadric(qobj);
 
 
-    // We're setting up two light sources. One of them is located
-    // on the left side of the model (x = -1.5f) and emits white light. The
-    // second light source is located on the right side of the model (x = 1.5f)
-    // emitting red light.
 
-    // GL_LIGHT0: the white light emitting light source
-    // Create light components for GL_LIGHT0
-    GLfloat ambientLight0[] =  {0.0, 0.0, 0.0, 1.0};
-    GLfloat diffuseLight0[] =  {0.5, 0.5, 0.5, 1.0};
-    GLfloat specularLight0[] = {0.6, 0.6, 0.6, 1.0};
-    GLfloat position0[] =      {-1.5, 1.0,-4.0, 1.0};	
-    // Assign created components to GL_LIGHT0
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
-    glLightfv(GL_LIGHT0, GL_POSITION, position0);
+  glDepthFunc(GL_LEQUAL);
 
-    // GL_LIGHT1: the red light emitting light source
-    // Create light components for GL_LIGHT1
-    GLfloat ambientLight1[] =  {0.1, 0.1, 0.1, 1.0};
-    GLfloat diffuseLight1[] =  {0.1, 0.1, 0.1, 1.0};
-    GLfloat specularLight1[] = {0.3, 0.3, 0.3, 1.0};
-    GLfloat position1[] =      {1.5, 1.0, 4.0, 1.0};	
-    // Assign created components to GL_LIGHT1
-    glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
-    glLightfv(GL_LIGHT1, GL_POSITION, position1);
+  //Reserve Space for the display lists
+  mDLBonds=glGenLists(1);
 
-    //glEnable(GL_COLOR_MATERIAL);
-    //glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+  //glShadeModel(GL_SMOOTH);
+  //Adpated from a detailed tutorail on opengl lighting located at
+  //http://www.falloutsoftware.com/tutorials/gl/gl8.htm
 
-    //Create a dictionary of colours
 
-    glGenTextures(1,&mTexDepth);
-    CreateBondList();
+  // We're setting up two light sources. One of them is located
+  // on the left side of the model (x = -1.5f) and emits white light. The
+  // second light source is located on the right side of the model (x = 1.5f)
+  // emitting red light.
 
-    ChangeViewport();
+  // GL_LIGHT0: the white light emitting light source
+  // Create light components for GL_LIGHT0
+  GLfloat ambientLight0[] =  {0.0, 0.0, 0.0, 1.0};
+  GLfloat diffuseLight0[] =  {0.5, 0.5, 0.5, 1.0};
+  GLfloat specularLight0[] = {0.6, 0.6, 0.6, 1.0};
+  GLfloat position0[] =      {-1.5, 1.0,-4.0, 1.0};	
+  // Assign created components to GL_LIGHT0
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
+  glLightfv(GL_LIGHT0, GL_POSITION, position0);
+
+  // GL_LIGHT1: the red light emitting light source
+  // Create light components for GL_LIGHT1
+  GLfloat ambientLight1[] =  {0.1, 0.1, 0.1, 1.0};
+  GLfloat diffuseLight1[] =  {0.1, 0.1, 0.1, 1.0};
+  GLfloat specularLight1[] = {0.3, 0.3, 0.3, 1.0};
+  GLfloat position1[] =      {1.5, 1.0, 4.0, 1.0};	
+  // Assign created components to GL_LIGHT1
+  glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
+  glLightfv(GL_LIGHT1, GL_POSITION, position1);
+
+  //glEnable(GL_COLOR_MATERIAL);
+  //glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+  //Create a dictionary of colours
+
+  glGenTextures(1,&mTexDepth);
+  CreateBondList();
+
+  ChangeViewport();
+}
+
+
+void glDisplay::OnMouseMove(wxMouseEvent& e) {
+  if(e.Dragging() && e.RightIsDown()) {
+    mXTranslate=mXTranslate+(e.GetX()-mMouseX);
+    mYTranslate=mYTranslate-(e.GetY()-mMouseY);
+  }  else if(e.Dragging() && e.LeftIsDown()) {
+    mXRotate=mXRotate+(e.GetX()-mMouseX);
+    mYRotate=mYRotate+(e.GetY()-mMouseY);
+  }
+  mMouseX=e.GetX();
+  mMouseY=e.GetY();
+  Refresh();
+}
+
+
+void glDisplay::OnWheel(wxMouseEvent& e) {
+  mZoom=mZoom-0.001*e.GetWheelRotation()/e.GetWheelDelta();
+  if(mZoom<0.001) {
+    mZoom=0.001;
+  }
+  Refresh();
+}
+
+void glDisplay::OnRightClick(wxMouseEvent& e) {
+  if(not e.Dragging()) {
+    wxMenu* menu = new wxMenu();
+    menu->Append(-1, wxT("Test Menu Item"));
+
+    if(mHover>=0) {
+      menu->Append(MENU_SPIN_DIALOG, wxT("Spin Properties..."));
+     }
+    //  if(len(self.selected)==2) {
+    //  menu->Append(-1, wxT("Coupling Properties"));
+    // }
+    PopupMenu(menu);
+    delete menu;
+  }
+}
+
+void glDisplay::OnLeftClick(wxMouseEvent& e) {
+  if(! e.ShiftDown()) {
+    //selected=[];
+  }
+  if (mHover != -1) {
+    //selected.append(self.hover);
+    Refresh();
   }
 
+}
 
-  BEGIN_EVENT_TABLE(glDisplay,wxGLCanvas)
+void glDisplay::OnResize(wxSizeEvent& e) {
+  ChangeViewport();
+}
 
-    EVT_PAINT(glDisplay::OnPaint)
+void glDisplay::OnDisplaySpinDialog(wxCommandEvent& e) {
+  
+}
 
-    END_EVENT_TABLE()
+BEGIN_EVENT_TABLE(glDisplay,wxGLCanvas)
+
+EVT_PAINT     (                 glDisplay::OnPaint)
+EVT_MOTION    (                 glDisplay::OnMouseMove)
+EVT_MOUSEWHEEL(                 glDisplay::OnWheel)
+EVT_RIGHT_UP  (                 glDisplay::OnRightClick)
+EVT_LEFT_UP   (                 glDisplay::OnLeftClick)
+EVT_MENU      (MENU_SPIN_DIALOG,glDisplay::OnDisplaySpinDialog)
+
+END_EVENT_TABLE()
+
+
+
+

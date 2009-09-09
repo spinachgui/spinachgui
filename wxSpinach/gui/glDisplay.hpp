@@ -18,6 +18,13 @@ public:
   glDisplay(wxWindow* parent,wxWindowID id= -1);
 
   void OnPaint(wxPaintEvent& e);
+  void OnMouseMove(wxMouseEvent& e);
+  void OnWheel(wxMouseEvent& e);
+  void OnRightClick(wxMouseEvent& e);
+  void OnLeftClick(wxMouseEvent& e);
+  void OnResize(wxSizeEvent& e);
+
+  void OnDisplaySpinDialog(wxCommandEvent& e);
 
 protected:
   void ChangeViewport();

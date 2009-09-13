@@ -8,6 +8,14 @@ using namespace SpinXML;
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   : InterEditPanelBase(parent,id),mInter(NULL) {
+
+  mOrientEigenvalueCtrl = new OrientTextCtrl(mEigenEditPanel);
+  mOrientAxRhomCtrl     = new OrientTextCtrl(mAxRhomEditPanel);
+  mOrientSpanSkewCtrl   = new OrientTextCtrl(mSpanSkewEditPanel);
+
+  mEigenEditPanel->GetSizer()->Add(   mOrientEigenvalueCtrl,1.0,wxALL);
+  mAxRhomEditPanel->GetSizer()->Add(  mOrientAxRhomCtrl,1.0,wxALL);
+  mSpanSkewEditPanel->GetSizer()->Add(mOrientSpanSkewCtrl,1.0,wxALL);
 }
 
 //============================================================//
@@ -17,6 +25,8 @@ SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,SpinXML::Spin* spin,wxWi
   : SpinInterEditPanelBase(parent,id),mSpin(spin),mUpdatingListBox(false) {
   mInterEdit=new InterEditPanel(this);
   GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
+
+
   LoadFromSpin();
 };
 

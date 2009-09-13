@@ -2,6 +2,8 @@
 #ifndef INTEREDIT_H
 #define INTEREDIT_H
 
+#include <gui/OrientationEdit.hpp>
+
 #include <res/SpinachGUI.h>
 #include <shared/spinsys.hpp>
 
@@ -9,6 +11,11 @@ class InterEditPanel : public InterEditPanelBase {
 public:
   InterEditPanel(wxWindow* parent,wxWindowID id=-1);
 private:
+  //GUI Stuff
+  OrientTextCtrl* mOrientEigenvalueCtrl;
+  OrientTextCtrl* mOrientAxRhomCtrl;
+  OrientTextCtrl* mOrientSpanSkewCtrl;
+
   SpinXML::Interaction* mInter;
 };
 

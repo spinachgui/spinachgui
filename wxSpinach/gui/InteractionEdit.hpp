@@ -7,9 +7,28 @@
 #include <res/SpinachGUI.h>
 #include <shared/spinsys.hpp>
 
+class TextCtrlWithPopup : public wxTextCtrl {
+public:
+
+private:
+  //  wxPanel mPanel;
+  //  wxFrame
+};
+
+
+
+
 class InterEditPanel : public InterEditPanelBase {
 public:
-  InterEditPanel(wxWindow* parent,wxWindowID id=-1);
+  InterEditPanel(wxWindow* parent,SpinXML::Interaction* inter, wxWindowID id=-1);
+
+  void SetInter(SpinXML::Interaction* inter);
+  void OnQuadChecked(wxCommandEvent& e);
+  void OnPageChange(wxCommandEvent& e);
+  void LoadFromInter();
+  void SaveToInter();
+  void onTextChange(wxCommandEvent& e);
+  
 private:
   //GUI Stuff
   OrientTextCtrl* mOrientEigenvalueCtrl;
@@ -17,7 +36,10 @@ private:
   OrientTextCtrl* mOrientSpanSkewCtrl;
 
   SpinXML::Interaction* mInter;
+
+  bool mLoading;
 };
+
 
 
 class SpinInterEditPanel : public SpinInterEditPanelBase {
@@ -65,5 +87,13 @@ private:
   bool mUpdatingListBox;
   std::vector<ListBoxInteraction> mTempInteractions;
 };
+
+class InterPopup : public wxFrame {
+public:
+  InterPopup(wxWindow* Parent,SpinXML::Spin* spin,wxWindowID id=-1);
+private:
+  SpinInterEditPanel* mPanel;
+};
+
 
 #endif

@@ -2086,7 +2086,7 @@
                         <property name="id">wxID_ANY</property>
                         <property name="maximum_size"></property>
                         <property name="minimum_size"></property>
-                        <property name="name">OrientTypeChoiceBook</property>
+                        <property name="name">mOrientTypeChoiceBook</property>
                         <property name="permission">protected</property>
                         <property name="pos"></property>
                         <property name="size"></property>
@@ -2526,7 +2526,7 @@
                                                     <property name="maximum_size"></property>
                                                     <property name="maxlength">0</property>
                                                     <property name="minimum_size"></property>
-                                                    <property name="name">mGamma#Ctrl</property>
+                                                    <property name="name">mGammaCtrl</property>
                                                     <property name="permission">protected</property>
                                                     <property name="pos"></property>
                                                     <property name="size"></property>
@@ -3012,7 +3012,7 @@
                                             <property name="maximum_size"></property>
                                             <property name="maxlength">0</property>
                                             <property name="minimum_size"></property>
-                                            <property name="name">mXCtrl</property>
+                                            <property name="name">mZCtrl</property>
                                             <property name="permission">protected</property>
                                             <property name="pos"></property>
                                             <property name="size"></property>
@@ -4455,7 +4455,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="1">
+        <object class="Panel" expanded="0">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="enabled">1</property>

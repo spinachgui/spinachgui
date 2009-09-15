@@ -70,11 +70,11 @@ class Orientation {
     ~Orientation();
     
     enum Type {
-        UNDEFINED,
-        EULER,
-        ANGLE_AXIS,
-        QUATERNION,
-        EIGENSYSTEM
+      UNDEFINED,
+      EULER,
+      ANGLE_AXIS,
+      QUATERNION,
+      EIGENSYSTEM
     };
     
     Type GetType() const;

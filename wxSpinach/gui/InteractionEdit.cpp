@@ -17,9 +17,9 @@ Interaction::Type TypeOrders[]={
 InterEditPanel::InterEditPanel(wxWindow* parent,Interaction* inter,wxWindowID id)
   : InterEditPanelBase(parent,id),mInter(inter),mLoading(false) {
 
-  mOrientEigenvalueCtrl = new OrientTextCtrl(mEigenEditPanel);
-  mOrientAxRhomCtrl     = new OrientTextCtrl(mAxRhomEditPanel);
-  mOrientSpanSkewCtrl   = new OrientTextCtrl(mSpanSkewEditPanel);
+  mOrientEigenvalueCtrl = new DialogCombo(mEigenEditPanel);
+  mOrientAxRhomCtrl     = new DialogCombo(mAxRhomEditPanel);
+  mOrientSpanSkewCtrl   = new DialogCombo(mSpanSkewEditPanel);
 
   mEigenEditPanel->GetSizer()->Add(   mOrientEigenvalueCtrl,1.0,wxALL);
   mAxRhomEditPanel->GetSizer()->Add(  mOrientAxRhomCtrl,1.0,wxALL);

@@ -1,6 +1,10 @@
 
 #include <gui/InteractionEdit.hpp>
+#include <gui/CustomEvents.hpp>
 
+#include <iostream>
+
+using namespace std;
 using namespace SpinXML;
 
 //============================================================//
@@ -14,12 +18,14 @@ Interaction::Type TypeOrders[]={
   Interaction::SPANSKEW
 };
 
-InterEditPanel::InterEditPanel(wxWindow* parent,Interaction* inter,wxWindowID id)
-  : InterEditPanelBase(parent,id),mInter(inter),mLoading(false) {
+InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
+  : InterEditPanelBase(parent,id),mInter(NULL),mLoading(false) {
 
-  mOrientEigenvalueCtrl = new DialogCombo(mEigenEditPanel);
-  mOrientAxRhomCtrl     = new DialogCombo(mAxRhomEditPanel);
-  mOrientSpanSkewCtrl   = new DialogCombo(mSpanSkewEditPanel);
+  Enable(false);
+
+  mOrientEigenvalueCtrl = new OrientDialogCombo(mEigenEditPanel);
+  mOrientAxRhomCtrl     = new OrientDialogCombo(mAxRhomEditPanel);
+  mOrientSpanSkewCtrl   = new OrientDialogCombo(mSpanSkewEditPanel);
 
   mEigenEditPanel->GetSizer()->Add(   mOrientEigenvalueCtrl,1.0,wxALL);
   mAxRhomEditPanel->GetSizer()->Add(  mOrientAxRhomCtrl,1.0,wxALL);
@@ -29,7 +35,10 @@ InterEditPanel::InterEditPanel(wxWindow* parent,Interaction* inter,wxWindowID id
 
 void InterEditPanel::SetInter(Interaction* inter) {
   mInter=inter;
-  LoadFromInter();
+  Enable(inter != NULL);
+  if(inter != NULL) {
+    LoadFromInter();
+  }
 }
 
 void InterEditPanel::OnQuadChecked(wxCommandEvent& e) {
@@ -37,12 +46,13 @@ void InterEditPanel::OnQuadChecked(wxCommandEvent& e) {
     mInter->SetQuadratic();
   } else {
     mInter->SetLinear();
-    //Following needs to be handled by an event system
-    /*GetParent().UpdateListBox();*/
   }
+  wxCommandEvent event(EVT_SS_UPDATE,GetId());
+  event.SetEventObject(this);
+  GetEventHandler()->ProcessEvent(event);
 }
  
-void InterEditPanel::OnPageChange(wxCommandEvent& e) {
+void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
   if (mLoading) {
     return;
   }
@@ -80,11 +90,12 @@ void InterEditPanel::OnPageChange(wxCommandEvent& e) {
 
 void InterEditPanel::LoadFromInter() {
   mLoading=true;
-  //mTypeChoiceBook->SetSelection(Types[self.inter.GetType()][0]);
+
   if(mInter->GetType()==Interaction::SCALAR) {
     double scalar;
     mInter->GetScalar(&scalar);
     mScalarCtrl->SetValue(wxString() << scalar);
+    mTypeChoiceBook->SetSelection(0);
   } else if(mInter->GetType()==Interaction::MATRIX) {
     Matrix3 mat;
     mInter->GetMatrix(&mat);
@@ -101,6 +112,7 @@ void InterEditPanel::LoadFromInter() {
     mMatZYCtrl->SetValue(wxString() << mat.Get(2,1));
     mMatZZCtrl->SetValue(wxString() << mat.Get(2,2));
 
+    mTypeChoiceBook->SetSelection(1);
   } else if(mInter->GetType()==Interaction::EIGENVALUES) {
     double xx,yy,zz;
     Orientation* o;
@@ -109,6 +121,8 @@ void InterEditPanel::LoadFromInter() {
     mEigenXXCtrl->SetValue(wxString() << xx);
     mEigenYYCtrl->SetValue(wxString() << yy);
     mEigenZZCtrl->SetValue(wxString() << zz);
+
+    mTypeChoiceBook->SetSelection(2);
   } else if(mInter->GetType()==Interaction::AXRHOM) {
     double ax,rhom,iso;
     Orientation* o;
@@ -116,6 +130,8 @@ void InterEditPanel::LoadFromInter() {
     mAxCtrl->       SetValue(wxString() <<ax);
     mRhomCtrl->     SetValue(wxString() << rhom);
     mAxRhomIsoCtrl->SetValue(wxString() << iso);
+
+    mTypeChoiceBook->SetSelection(3);
   } else if(mInter->GetType()==Interaction::SPANSKEW) {
     double span,skew,iso;
     Orientation* o;
@@ -123,6 +139,8 @@ void InterEditPanel::LoadFromInter() {
     mSpanCtrl->       SetValue(wxString() << span);
     mSkewCtrl->       SetValue(wxString() << skew);
     mSpanSkewIsoCtrl->SetValue(wxString() << iso);
+
+    mTypeChoiceBook->SetSelection(4);
   }
   mQuadCheckbox->SetValue(mInter->GetIsQuadratic());
 
@@ -130,8 +148,7 @@ void InterEditPanel::LoadFromInter() {
 }
 
 void InterEditPanel::SaveToInter() {
-  //Type=TypeOrders[self.typeChoiceBook.GetSelection()];
-  Interaction::Type type=Interaction::SCALAR;
+  Interaction::Type type = TypeOrders[mTypeChoiceBook->GetSelection()];
   if(type==Interaction::SCALAR) {
     double scalar;
     mScalarCtrl->GetValue().ToDouble(&scalar);
@@ -191,12 +208,20 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
   }
   SaveToInter();
 
-  //Should be handled by some sort of event system
-  /*GetParent().UpdateListBox();
-    GetParent().interListBox.SetSelection(self.inter.index);*/
+  wxCommandEvent event(EVT_SS_UPDATE,GetId());
+  event.SetEventObject(this);
+  GetEventHandler()->ProcessEvent(event);
 
   return;
 }
+
+BEGIN_EVENT_TABLE(InterEditPanel,wxPanel)
+
+EVT_CHECKBOX               (wxID_ANY,InterEditPanel::OnQuadChecked)
+EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,InterEditPanel::OnPageChange)
+EVT_TEXT                   (wxID_ANY,InterEditPanel::onTextChange)
+
+END_EVENT_TABLE()
 
 
 //============================================================//
@@ -220,7 +245,7 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,SpinXML::Spin* spin,wxWindowID id) 
   : SpinInterEditPanelBase(parent,id),mSpin(spin),mUpdatingListBox(false) {
-  mInterEdit=new InterEditPanel(this,spin->GetInteraction(0)); //What if there are no interactions?
+  mInterEdit=new InterEditPanel(this);
   GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
 
 
@@ -257,7 +282,6 @@ void SpinInterEditPanel::LoadFromSpin() {
   }
 
   UpdateListBox();
-  mInterListBox->SetSelection(0);
   InteractionChange();
 }
 
@@ -289,7 +313,7 @@ void SpinInterEditPanel::UpdateListBox() {
 void SpinInterEditPanel::MarkDeleted(long n) {
   mTempInteractions.erase(mTempInteractions.begin() + n);
   UpdateListBox();
-  mInterListBox->SetSelection(0);
+  mInterEdit->SetInter(NULL);
   InteractionChange();
 }
 
@@ -306,6 +330,7 @@ void SpinInterEditPanel::CreateNew() {
 
   UpdateListBox();
   mInterListBox->SetSelection(mInterListBox->GetCount()-1);
+  mInterEdit->SetInter(inter);
   InteractionChange();
 }
 
@@ -332,14 +357,34 @@ void SpinInterEditPanel::OnInteractionChange(wxCommandEvent& e) {
 }
 
 void SpinInterEditPanel::InteractionChange() {
-  Interaction* inter=mTempInteractions[mInterListBox->GetSelection()].inter;
-  //self.interEdit.SetInter(inter);
+  long selected=mInterListBox->GetSelection();
+  if(selected >-1) {
+    Interaction* inter=mTempInteractions[selected].inter;
+    cout << "Interaction " << selected << " Selected" << endl;
+    mInterEdit->SetInter(inter);
+  } else {
+    cout << "Nothing selected" << endl;
+    mInterEdit->SetInter(NULL);
+  }
+}
+
+void SpinInterEditPanel::OnSSChange(wxCommandEvent& e) {
+  //If one of the interactions we're interested in just changed, it must
+  //be the one currently being displayed, thus that is the one we mark as modifed
+  long selected=mInterListBox->GetSelection();
+  if(selected >-1) {
+    mTempInteractions[selected].modified=true;
+  } 
+  UpdateListBox();
+  e.Skip();
 }
 
 
 BEGIN_EVENT_TABLE(SpinInterEditPanel,wxPanel)
 
-EVT_BUTTON(INTER_ADD   ,SpinInterEditPanel::OnNewButton)
-EVT_BUTTON(INTER_DELETE,SpinInterEditPanel::OnDeleteButton)
+EVT_BUTTON     (INTER_ADD   ,SpinInterEditPanel::OnNewButton)
+EVT_BUTTON     (INTER_DELETE,SpinInterEditPanel::OnDeleteButton)
+EVT_LISTBOX    (wxID_ANY,SpinInterEditPanel::OnInteractionChange)
+EVT_COMMAND    (wxID_ANY,EVT_SS_UPDATE,SpinInterEditPanel::OnSSChange)
 
 END_EVENT_TABLE()

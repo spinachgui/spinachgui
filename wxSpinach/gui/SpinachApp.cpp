@@ -14,6 +14,6 @@ bool SpinachApp::OnInit() {
   SpinDialog* dialog = new SpinDialog(frame,mSS->GetSpin(0));
   dialog->ShowModal();
 
-  frame->Show();
-  return true;
+  //frame->Show();
+  return false;
 }

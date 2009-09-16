@@ -41,7 +41,7 @@ private:
 class OrientDialogCombo : public DialogCombo<OrientEditDialog> {
 public:
   OrientDialogCombo(wxWindow* parent,wxWindowID id=-1);
-  SetOrient(SpinXML::Orientation* orient);
+  void SetOrient(SpinXML::Orientation* orient);
 protected:
   virtual OrientEditDialog* CreateDialog();
   virtual wxString GetStringFromDialog(OrientEditDialog* dlg);

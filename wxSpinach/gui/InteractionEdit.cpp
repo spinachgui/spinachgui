@@ -75,14 +75,20 @@ void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
     mEigenXXCtrl->SetValue(wxT("0.0"));
     mEigenYYCtrl->SetValue(wxT("0.0"));
     mEigenZZCtrl->SetValue(wxT("0.0"));
+
+    mOrientEigenvalueCtrl->SetOrient(new Orientation());
   } else if(type==Interaction::AXRHOM) {
     mAxCtrl->       SetValue(wxT("0.0"));
     mRhomCtrl->     SetValue(wxT("0.0"));
     mAxRhomIsoCtrl->SetValue(wxT("0.0"));
+
+    mOrientAxRhomCtrl->SetOrient(new Orientation());
   } else if(type==Interaction::SPANSKEW) {
     mSpanCtrl->       SetValue(wxT("0.0"));
     mSkewCtrl->       SetValue(wxT("0.0"));
     mSpanSkewIsoCtrl->SetValue(wxT("0.0"));
+
+    mOrientSpanSkewCtrl->SetOrient(new Orientation());
   }
   SaveToInter();        
   e.Skip();
@@ -121,8 +127,11 @@ void InterEditPanel::LoadFromInter() {
     mEigenXXCtrl->SetValue(wxString() << xx);
     mEigenYYCtrl->SetValue(wxString() << yy);
     mEigenZZCtrl->SetValue(wxString() << zz);
+    
+    mOrientEigenvalueCtrl->SetOrient(o);
 
     mTypeChoiceBook->SetSelection(2);
+
   } else if(mInter->GetType()==Interaction::AXRHOM) {
     double ax,rhom,iso;
     Orientation* o;
@@ -130,6 +139,8 @@ void InterEditPanel::LoadFromInter() {
     mAxCtrl->       SetValue(wxString() <<ax);
     mRhomCtrl->     SetValue(wxString() << rhom);
     mAxRhomIsoCtrl->SetValue(wxString() << iso);
+
+    mOrientAxRhomCtrl->SetOrient(o);
 
     mTypeChoiceBook->SetSelection(3);
   } else if(mInter->GetType()==Interaction::SPANSKEW) {
@@ -139,6 +150,8 @@ void InterEditPanel::LoadFromInter() {
     mSpanCtrl->       SetValue(wxString() << span);
     mSkewCtrl->       SetValue(wxString() << skew);
     mSpanSkewIsoCtrl->SetValue(wxString() << iso);
+
+    mOrientSpanSkewCtrl->SetOrient(o);
 
     mTypeChoiceBook->SetSelection(4);
   }
@@ -179,7 +192,7 @@ void InterEditPanel::SaveToInter() {
     mEigenXXCtrl->GetValue().ToDouble(&xx);
     mEigenYYCtrl->GetValue().ToDouble(&yy);
     mEigenZZCtrl->GetValue().ToDouble(&zz);
-
+ 
     mInter->SetEigenvalues(xx,yy,zz,new Orientation());
 
   } else if(type==Interaction::AXRHOM) {

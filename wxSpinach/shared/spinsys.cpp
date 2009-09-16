@@ -811,6 +811,42 @@ void Orientation::SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) 
   return;
 }
 
+string Orientation::ToString() const {
+  ostringstream oss;
+  switch(mType) {
+  case EULER:
+    oss << "eu:" << mData.mEuler.alpha << "," << mData.mEuler.beta << "," << mData.mEuler.gamma;
+    break;
+  case ANGLE_AXIS:
+    oss << "aa:"
+	<< mData.mAngleAxis.angle << ","
+	<< mData.mAngleAxis.axis->GetX() << ","
+	<< mData.mAngleAxis.axis->GetY() << ","
+	<< mData.mAngleAxis.axis->GetZ();
+    break;
+  case QUATERNION:
+    oss << "q:"
+	<< mData.mQuaternion.real << ","
+	<< mData.mQuaternion.i    << ","
+	<< mData.mQuaternion.j    << ","
+	<< mData.mQuaternion.k;
+    break;
+  case EIGENSYSTEM:
+    oss << "es:"
+	<< mData.mEigenSystem.XAxis->GetX() << "," << mData.mEigenSystem.XAxis->GetY() << "," <<  mData.mEigenSystem.XAxis->GetZ() 
+	<< mData.mEigenSystem.YAxis->GetX() << "," << mData.mEigenSystem.YAxis->GetY() << "," <<  mData.mEigenSystem.YAxis->GetZ() 
+	<< mData.mEigenSystem.ZAxis->GetX() << "," << mData.mEigenSystem.ZAxis->GetY() << "," <<  mData.mEigenSystem.ZAxis->GetZ();
+    break;
+  case UNDEFINED:
+    oss << "undefined";
+    break;
+  }
+  return oss.str();
+}
+
+void Orientation::FromString(std::string string) {
+  cerr << "Not Implimented" << endl;
+}
 
 //==============================================================================//
 // Interaction

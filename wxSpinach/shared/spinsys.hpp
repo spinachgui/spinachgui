@@ -90,6 +90,9 @@ class Orientation {
     void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
 
     Matrix3 GetAsMatrix() const;
+
+    std::string ToString() const;
+    void FromString(std::string string);
   private:
     union  {
         struct {

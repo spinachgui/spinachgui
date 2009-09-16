@@ -62,6 +62,7 @@ set(guiSources ${guiSources} "res/SpinachGUI.cpp")
 
 set(sharedSources "shared/nuclear_data.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys.cpp")
+set(sharedSources ${sharedSources} "shared/xmlFileOpps.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
 
 set(pySources              "shared/spinsys.cpp")

@@ -1,5 +1,8 @@
 #include <gui/OrientationEdit.hpp>
 
+#include <iostream>
+
+using namespace std;
 using namespace SpinXML;
 
 Orientation::Type TypeOrder[]={
@@ -14,7 +17,7 @@ OrientEditPanel::OrientEditPanel(wxWindow* parent,
 		  const wxPoint& pos,
 		  const wxSize& size,
 		  long style)
-  : OrientEditPanelBase(parent,id,pos,size,style),mOrient(NULL) {
+  : OrientEditPanelBase(parent,id,pos,size,style),mOrient(NULL),mLoading(false) {
   Enable(false);
 }
 
@@ -27,6 +30,7 @@ void OrientEditPanel::SetOrient(SpinXML::Orientation* orient) {
 }
 
 void OrientEditPanel::LoadFromOrient() {
+  mLoading=true;
   switch(mOrient->GetType()) {
   case Orientation::EULER: {
     double alpha,beta,gamma;
@@ -88,6 +92,7 @@ void OrientEditPanel::LoadFromOrient() {
 
   }  
   }
+  mLoading=false;
 }
 
 void OrientEditPanel::SaveToOrient() {
@@ -153,6 +158,9 @@ void OrientEditPanel::OnTextChange(wxCommandEvent& e) {
 }
 
 void OrientEditPanel::OnPageChange(wxChoicebookEvent& e) {
+  if(mLoading) {
+    return;
+  }
   switch(TypeOrder[e.GetSelection()]) {
   case Orientation::EULER:{
     mAlphaCtrl->SetValue(wxT("0.0"));
@@ -202,9 +210,27 @@ OrientEditDialog::OrientEditDialog(wxWindow* parent,wxWindowID id)
 
 }
 
+int OrientEditDialog::ShowModal() {
+  int result=OrientDialogBase::ShowModal();
+  if(result==wxID_OK) {
+    mOrientEditPanel->SaveToOrient();
+  } 
+  return result;
+}
+
 void OrientEditDialog::SetOrient(Orientation* orient) {
   mOrientEditPanel->SetOrient(orient);
 } 
+
+void OrientEditDialog::OnApply(wxCommandEvent& e) {
+  mOrientEditPanel->SaveToOrient(); 
+}
+
+BEGIN_EVENT_TABLE(OrientEditDialog,wxDialog)
+
+EVT_BUTTON(wxID_APPLY,OrientEditDialog::OnApply)
+
+END_EVENT_TABLE()
 
 
   //==========================================================//
@@ -215,6 +241,11 @@ OrientDialogCombo::OrientDialogCombo(wxWindow* parent,wxWindowID id)
 }
 
 void OrientDialogCombo::SetOrient(Orientation* orient) {
+  if(mOrient != NULL) {
+    SetText(wxString(mOrient->ToString().c_str(),wxConvUTF8));
+  } else {
+    SetText(wxT(""));
+  }
   mOrient=orient;
 }
 
@@ -224,6 +255,16 @@ OrientEditDialog* OrientDialogCombo::CreateDialog() {
   return dlg;
 }
 
+void OrientDialogCombo::SetStringValue(const wxString& s) {
+  
+  return;
+}
+
 wxString OrientDialogCombo::GetStringFromDialog(OrientEditDialog* dlg) {
-  return wxString(wxT("Orientation"));
+  if(mOrient != NULL) {
+    cout << "Getting the string " << mOrient->ToString() << endl;
+    return wxString(mOrient->ToString().c_str(),wxConvUTF8);
+  } else {
+    return wxString(wxT("Error"));
+  }
 }

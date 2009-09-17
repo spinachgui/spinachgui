@@ -16,6 +16,7 @@ using namespace SpinXML;
 class glDisplay : public wxGLCanvas {
 public:
   glDisplay(wxWindow* parent,wxWindowID id= -1);
+  ~glDisplay();
 
   void OnPaint(wxPaintEvent& e);
   void OnMouseMove(wxMouseEvent& e);
@@ -27,13 +28,27 @@ public:
   void OnDisplaySpinDialog(wxCommandEvent& e);
 
 protected:
-  void ChangeViewport();
+
   void EnableGL();
+
+  //Display lists
   void CreateBondList();
-  void Geometary();
+  
+  //State Changing functions
+  void ChangeViewport();
+  void FindHover();
+
+  //Drawing functions
+  void Geometary(bool depthOnly=false);
+
+  void DrawAtoms(bool depthOnly=false);
+  void DrawBonds();
+  void DrawLinear(long atom);
+  void DrawBilinear();
+  void DrawQuadratic(long atom);
+
 
   DECLARE_EVENT_TABLE();
-
 private:
   bool mGLEnabled;
   wxGLContext* mGLContext;
@@ -53,6 +68,10 @@ private:
   double mHoverDist;
   long mMouseX,mMouseY;
   double mZoom;
+
+  //Quadrics
+  GLUquadric* mQFilled;
+  GLUquadric* mQWireframe;
 
   //3D Variables
   double mCamX,mCamY,mCamZ;

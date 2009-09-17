@@ -12,9 +12,9 @@ bool SpinachApp::OnInit() {
 
   RootFrame* frame = new RootFrame(NULL);
 
-  SpinDialog* dialog = new SpinDialog(frame,mSS->GetSpin(0));
-  dialog->ShowModal();
+  //SpinDialog* dialog = new SpinDialog(frame,mSS->GetSpin(0));
+  //dialog->ShowModal();
 
-  //frame->Show();
-  return false;
+  frame->Show();
+  return true;
 }

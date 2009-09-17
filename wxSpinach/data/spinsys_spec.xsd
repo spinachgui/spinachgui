@@ -153,6 +153,25 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element minOccurs="1" maxOccurs="1" name="coordinates" type="vector" />
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="isotope">
+                <xs:complexType>
+                  <xs:attribute name="abundance">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:double">
+                        <xs:minInclusive value="0" />
+                        <xs:maxInclusive value="1.0" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="mass_number">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:integer">
+                        <xs:minInclusive value="0" />
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
             </xs:sequence>
             <xs:attribute name="number" use="required">
               <xs:simpleType>
@@ -161,12 +180,18 @@
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>
-            <xs:attribute name="isotope" type="xs:string" use="required" />
             <xs:attribute name="label" type="xs:string" />
             <xs:attribute name="reference_frame" use="required">
               <xs:simpleType>
                 <xs:restriction base="xs:integer">
                   <xs:minInclusive value="0" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute default="H" name="element" use="optional">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:pattern value="[A-Z]|\?[a-z]*" />
                 </xs:restriction>
               </xs:simpleType>
             </xs:attribute>

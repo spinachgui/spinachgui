@@ -1,12 +1,16 @@
 
 #include <cmath>
 
+#include <wx/log.h>
+
 #include <gui/glDisplay.hpp>
 
 #include <wx/dcclient.h>
 
 #include <gui/SpinachApp.hpp>
 #include <gui/SpinDialog.hpp>
+#include <shared/nuclear_data.hpp>
+
 
 /*
 Okay, this is going to be quite a big source file. The general layout should be as follows:
@@ -278,8 +282,12 @@ void glDisplay::DrawAtoms(bool depthOnly) {
       glScalef(radius,radius,radius);
       if(!depthOnly) {
 	if(mHover!=i) {
+	  GLfloat material[3];
+	  material[0] = getElementR(thisSpin->GetElement());
+	  material[1] = getElementG(thisSpin->GetElement());
+	  material[2] = getElementB(thisSpin->GetElement());
 	  glMaterialfv(GL_FRONT, GL_SPECULAR, whiteMaterial);
-	  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
+	  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
 	} else {
 	  glMaterialfv(GL_FRONT, GL_SPECULAR, redMaterial);
 	  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
@@ -581,7 +589,7 @@ void glDisplay::OnRightClick(wxMouseEvent& e) {
 }
 
 void glDisplay::OnLeftClick(wxMouseEvent& e) {
-  if(! e.ShiftDown()) {
+  if(!e.ShiftDown()) {
     //selected=[];
   }
   if (mHover != -1) {
@@ -598,7 +606,12 @@ void glDisplay::OnResize(wxSizeEvent& e) {
 }
 
 void glDisplay::OnDisplaySpinDialog(wxCommandEvent& e) {
-  
+  if(mHover>-1) {
+    SpinDialog* dialog=new SpinDialog(this,mSS->GetSpin(mHover));
+    dialog->ShowModal();      
+  } else {
+    wxLogError(wxT("In glDisplay::OnDisplaySpinDialog(wxCommandEvent&) mHover < 0"));
+  }
 }
 
 BEGIN_EVENT_TABLE(glDisplay,wxGLCanvas)

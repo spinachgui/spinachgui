@@ -2,7 +2,7 @@
 #include "nuclear_data.hpp"
 #include <cstring>
 
-//A very simple struct like datatype for storing data about nuclei
+//A simple struct like datatype for storing data about nuclei
 struct Isotope {
   const char* symbol;
   const char* name;

@@ -245,7 +245,7 @@ class Interaction {
 
 class Spin {
   public:
-    Spin(SpinSystem* Parent,Vector3* mPosition,std::string mLabel,ReferenceFrame* mFrame);
+    Spin(SpinSystem* Parent,Vector3* mPosition,std::string mLabel,ReferenceFrame* mFrame,long atomicNumber=1);
     ~Spin();
   
     void Dump() const;
@@ -273,7 +273,12 @@ class Spin {
     Matrix3 GetBilinearInteractionAsMatrix(Spin* OtherSpin,Interaction::SubType t=Interaction::ST_ANY) const;
     Matrix3 GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
 
-    
+    long GetElement() const;
+    void SetElement(long element);
+    std::vector<long> GetIsotopes() const;
+    void SetIsotopes(std::vector<long> isotopes) const;
+
+
     ReferenceFrame* GetFrame() const;
     void SetFrame(ReferenceFrame* Frame);
 
@@ -284,6 +289,8 @@ class Spin {
     Vector3* mPosition;
     std::string mLabel;
     ReferenceFrame* mFrame;
+    long mElement;
+    std::vector<long> mIsotopes;
 };
 
 

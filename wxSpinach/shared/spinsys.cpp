@@ -275,8 +275,8 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 	} else {
 	  //Create a new spin
 	  string isotopeSymbol(getElementSymbol(atomicNumber));
-	  isotopeSymbol=isotopeSymbol+"1"; //We have no clue what the mass number is yet
-	  Spin* s=new Spin(this,new Vector3(x,y,z),string("A Spin")+isotopeSymbol,GetRootFrame());
+	  isotopeSymbol=isotopeSymbol; //We have no clue what the mass number is yet
+	  Spin* s=new Spin(this,new Vector3(x,y,z),string("A Spin")+isotopeSymbol,GetRootFrame(),atomicNumber);
 	  mSpins.push_back(s);
 	}
 	nAtoms++;
@@ -452,7 +452,8 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 //==============================================================================//
 // Spin
 
-Spin::Spin(SpinSystem* Parent,Vector3* Position,string Label,ReferenceFrame* mFrame) : mParent(Parent),mPosition(Position),mLabel(Label) {
+Spin::Spin(SpinSystem* Parent,Vector3* Position,string Label,ReferenceFrame* mFrame,long atomicNumber) 
+  : mParent(Parent),mPosition(Position),mLabel(Label),mElement(atomicNumber) {
   
 }
 
@@ -704,6 +705,24 @@ std::vector<Spin*> Spin::GetNearbySpins(double distance) {
     }
   }
   return result;
+}
+
+long Spin::GetElement() const {
+  return mElement;
+}
+
+void Spin::SetElement(long element) {
+  mElement=element;
+}
+
+void Spin::SetIsotopes(std::vector<long> isotopes) const {
+
+}
+ 
+vector<long> Spin::GetIsotopes() const {
+  vector<long> retVal;
+  retVal.push_back(1);
+  return retVal;
 }
 
 

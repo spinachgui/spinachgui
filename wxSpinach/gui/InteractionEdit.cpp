@@ -3,12 +3,62 @@
 #include <gui/CustomEvents.hpp>
 
 #include <iostream>
+#include <map>
 
 using namespace std;
 using namespace SpinXML;
 
+
 //============================================================//
 // InterEditPanel
+
+//Static constructory stuff
+
+static bool DropDownSetup = false;
+
+const static Interaction::SubType LinearSTLookup[] = {Interaction::ST_HFC,    	    
+						      Interaction::ST_EXCHANGE, 
+						      Interaction::ST_SHIELDING,
+						      Interaction::ST_CUSTOM};
+const static long LinearSTLookupLen = 4;
+
+const static Interaction::SubType LinearSTLookupE[] = {Interaction::ST_G_TENSER,
+						       Interaction::ST_EXCHANGE,
+						       Interaction::ST_SHIELDING,
+						       Interaction::ST_CUSTOM};
+const static long LinearSTLookupELen = 4;
+
+const static Interaction::SubType BilinearSTLookup[] = {Interaction::ST_SCALAR,
+							Interaction::ST_DIPOLAR,
+							Interaction::ST_CUSTOM}; 
+const static long BilinearSTLookupLen = 3;
+
+const static Interaction::SubType BilinearSTLookupE[] = {Interaction::ST_SCALAR,
+							 Interaction::ST_DIPOLAR,
+							 Interaction::ST_CUSTOM}; 
+const static long BilinearSTLookupELen = 3;
+
+const static Interaction::SubType QuadSTLookup[]  = {Interaction::ST_QUADRUPOLAR,
+						     Interaction::ST_ZFS,
+						     Interaction::ST_CUSTOM};     
+const static long QuadSTLookupLen = 3;
+
+const static Interaction::SubType QuadSTLookupE[]  = {Interaction::ST_QUADRUPOLAR,
+						      Interaction::ST_ZFS,
+						      Interaction::ST_CUSTOM};     
+const static long QuadSTLookupELen = 3;
+
+
+typedef std::map<Interaction::SubType,long> ReverseLookupMap;
+
+static ReverseLookupMap LinearSTRevLookup;   
+static ReverseLookupMap LinearSTRevLookupE;    
+static ReverseLookupMap BilinearSTRevLookup;  
+static ReverseLookupMap BilinearSTRevLookupE;
+static ReverseLookupMap QuadSTRevLookup;        
+static ReverseLookupMap QuadSTRevLookupE;    
+
+static bool mDropDownsSetup;
 
 Interaction::Type TypeOrders[]={
   Interaction::SCALAR,
@@ -17,6 +67,38 @@ Interaction::Type TypeOrders[]={
   Interaction::AXRHOM,
   Interaction::SPANSKEW
 };
+
+///Private function called once the first time an interaction edit
+///panel is created. Initalises the static variables assocated with
+///the class and does any other global set up that is required.
+
+void InterEditPanel_StaticConstructor() {
+  ReverseLookupMap* maps[] = {&LinearSTRevLookup,   
+			      &LinearSTRevLookupE,  
+			      &BilinearSTRevLookup, 
+			      &BilinearSTRevLookupE,
+			      &QuadSTRevLookup,	    
+			      &QuadSTRevLookupE};   
+  
+  const Interaction::SubType* lookups[] = {LinearSTLookup,   
+					   LinearSTLookupE,  
+					   BilinearSTLookup, 
+					   BilinearSTLookupE,
+					   QuadSTLookup,	    
+					   QuadSTLookupE};
+
+  long lengths[] = {LinearSTLookupLen,
+		    LinearSTLookupELen,
+		    BilinearSTLookupLen,
+		    BilinearSTLookupELen,
+		    QuadSTLookupLen,
+		    QuadSTLookupELen};
+  for(long i=0;i<6;i++) {
+    for(long j=0;j<lengths[i];j++) {
+      (*maps[j])[lookups[i][j]]=j;
+    }
+  }
+}
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   : InterEditPanelBase(parent,id),mInter(NULL),mLoading(false) {
@@ -27,9 +109,15 @@ InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   mOrientAxRhomCtrl     = new OrientDialogCombo(mAxRhomEditPanel);
   mOrientSpanSkewCtrl   = new OrientDialogCombo(mSpanSkewEditPanel);
 
-  mEigenEditPanel->GetSizer()->Add(   mOrientEigenvalueCtrl,1.0,wxALL);
-  mAxRhomEditPanel->GetSizer()->Add(  mOrientAxRhomCtrl,1.0,wxALL);
+  mEigenEditPanel->   GetSizer()->Add(mOrientEigenvalueCtrl,1.0,wxALL);
+  mAxRhomEditPanel->  GetSizer()->Add(mOrientAxRhomCtrl,1.0,wxALL);
   mSpanSkewEditPanel->GetSizer()->Add(mOrientSpanSkewCtrl,1.0,wxALL);
+
+  if(DropDownSetup) { //Fakes a static constructor
+    DropDownSetup=true;
+    InterEditPanel_StaticConstructor();
+  }
+
 }
 
 
@@ -94,8 +182,41 @@ void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
   e.Skip();
 }
 
+void InterEditPanel::UpdateSubTypeCombo() {
+  //TODO: We need to test if the spin is an election, because then
+  //slightly different options should become avaliable
+  long len;
+  const Interaction::SubType* dropdownLookup;
+
+  if(mInter->GetIsLinear()) {
+    len=LinearSTLookupLen;
+    dropdownLookup = LinearSTLookup;
+  } else if(mInter->GetIsBilinear()) {
+    len=BilinearSTLookupLen;
+    dropdownLookup = BilinearSTLookup;
+  } else {
+    len=LinearSTLookupLen;
+    dropdownLookup = QuadSTLookup;
+  }
+  for(long i=0;i<len;i++) {
+    mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(dropdownLookup[i]),wxConvUTF8));
+  }
+}
+
 void InterEditPanel::LoadFromInter() {
   mLoading=true;
+
+  mSubTypeCombo->Clear();
+  mSpin2Combo->Clear();
+
+  UpdateSubTypeCombo();
+  if(mInter->GetIsLinear()) {
+    mSpin2Combo->Enable(false);
+  } else if(mInter->GetIsBilinear()) {
+    mSpin2Combo->Enable(true);
+  } else {
+    mSpin2Combo->Enable(false);
+  }
 
   if(mInter->GetType()==Interaction::SCALAR) {
     double scalar;
@@ -256,8 +377,9 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 //============================================================//
 // SpinInterEditPanel
 
+
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,SpinXML::Spin* spin,wxWindowID id) 
-  : SpinInterEditPanelBase(parent,id),mSpin(spin),mUpdatingListBox(false) {
+  : SpinInterEditPanelBase(parent,id),mSpin(spin),mUpdatingListBox(false),mEditMode(EDIT_ALL) {
   mInterEdit=new InterEditPanel(this);
   GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
 
@@ -281,7 +403,7 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 }
 
 void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
-  MarkDeleted(mInterListBox->GetSelection());
+  MarkDeleted(GetSelectedInterIndex());
 }
 
 void SpinInterEditPanel::LoadFromSpin() {
@@ -302,12 +424,26 @@ void SpinInterEditPanel::UpdateListBox() {
   mUpdatingListBox=true;
   mInterListBox->Clear();
   long len=mTempInteractions.size();
+
+  mLBIndex2SpinIndex.resize(0);
+
   for (long i=0;i<len;i++) {
     Interaction* inter=mTempInteractions[i].inter;
     wxString quadStr;
     if(inter->GetIsQuadratic()) {
+      if(mEditMode!=EDIT_QUAD && mEditMode!=EDIT_ALL) {
+	continue;
+      }
       quadStr=wxT("Quadratic");
+    } else if (inter->GetIsBilinear()) {
+      if(mEditMode!=EDIT_BILINEAR && mEditMode!=EDIT_ALL) {
+	continue;
+      }
+      quadStr=wxT("Bilinear");
     } else {
+      if(mEditMode!=EDIT_LINEAR && mEditMode!=EDIT_ALL) {
+	continue;
+      }
       quadStr=wxT("Linear");
     }
     wxString interTitle;
@@ -318,6 +454,7 @@ void SpinInterEditPanel::UpdateListBox() {
     if(mTempInteractions[i].modified) {
       interTitle << wxT("*");
     } 
+    mLBIndex2SpinIndex.push_back(i);
     mInterListBox->Append(interTitle);
   }
   mUpdatingListBox=false;
@@ -370,13 +507,11 @@ void SpinInterEditPanel::OnInteractionChange(wxCommandEvent& e) {
 }
 
 void SpinInterEditPanel::InteractionChange() {
-  long selected=mInterListBox->GetSelection();
+  long selected=GetSelectedInterIndex();
   if(selected >-1) {
     Interaction* inter=mTempInteractions[selected].inter;
-    cout << "Interaction " << selected << " Selected" << endl;
     mInterEdit->SetInter(inter);
   } else {
-    cout << "Nothing selected" << endl;
     mInterEdit->SetInter(NULL);
   }
 }
@@ -384,12 +519,20 @@ void SpinInterEditPanel::InteractionChange() {
 void SpinInterEditPanel::OnSSChange(wxCommandEvent& e) {
   //If one of the interactions we're interested in just changed, it must
   //be the one currently being displayed, thus that is the one we mark as modifed
-  long selected=mInterListBox->GetSelection();
+  long selected=GetSelectedInterIndex();
   if(selected >-1) {
     mTempInteractions[selected].modified=true;
   } 
   UpdateListBox();
   e.Skip();
+}
+
+long SpinInterEditPanel::GetSelectedInterIndex() const {
+  long selected = mInterListBox->GetSelection();
+  if(selected < 0) {
+    return -1;
+  } 
+  return mLBIndex2SpinIndex[selected];
 }
 
 

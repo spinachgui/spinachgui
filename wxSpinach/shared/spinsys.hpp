@@ -209,7 +209,11 @@ class Interaction {
 
     void SetQuadratic();
     void SetLinear();
+
+    bool GetIsLinear() const;
+    bool GetIsBilinear() const;
     bool GetIsQuadratic() const;
+
 
     double GetAsScalar() const;
     Matrix3 GetAsMatrix() const /*throw(logic_error)*/;

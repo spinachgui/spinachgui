@@ -1135,6 +1135,16 @@ void Interaction::SetLinear() {
   mSpin2=NULL;
 }
 
+
+
+bool Interaction::GetIsLinear() const {
+  return mSpin2==NULL;
+}
+
+bool Interaction::GetIsBilinear() const {
+  return mSpin2!=NULL && mSpin1 != mSpin2;
+} 
+
 bool Interaction::GetIsQuadratic() const {
   return mSpin2==mSpin1;
 }

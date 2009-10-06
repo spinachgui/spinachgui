@@ -63,19 +63,19 @@ set(guiSources ${guiSources} "res/SpinachGUI.cpp")
 set(sharedSources "shared/nuclear_data.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys.cpp")
 set(sharedSources ${sharedSources} "shared/xmlFileOpps.cpp")
-set(sharedSources ${sharedSources} "shared/spinsys_spec.cpp")
+set(sharedSources ${sharedSources} "shared/spinxml_schema.cpp")
 
 set(pySources              "shared/spinsys.cpp")
 set(pySources ${pySources} "shared/xmlFileOpps.cpp")
 set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
-set(pySources ${pySources} "shared/spinsys_spec.cpp")
+set(pySources ${pySources} "shared/spinxml_schema.cpp")
 
 set(nuclearSources  "shared/nuclear_data.cpp")
 set(nuclearSources ${nuclearSources} "shared/swig/nuclear_data_wrap.cpp")
 
 set(cmdSources "commandln/main.cpp")
 
-#Use the Spin System XSD spec. to generate parsing classes
+#Use the Spin System XSD schema. to generate parsing classes
 #There's a bit of a hack here. We're assuming that we're building
 #in a subdirectory such as build/ so this build process would fail
 #if it were ever tried elsewhere. I'm not sure how to fix this yet.
@@ -90,10 +90,10 @@ set(xsd_args ${xsd_args} --cxx-suffix .cpp --hxx-suffix .hpp)
 set(xsd_args ${xsd_args} --output-dir ${CMAKE_CURRENT_BINARY_DIR}/shared)
 set(xsd_args ${xsd_args} --generate-doxygen)
 
-add_custom_command(OUTPUT shared/spinsys_spec.cpp
-                   MAIN_DEPENDENCY data/spinsys_spec.xsd
+add_custom_command(OUTPUT shared/spinxml_schema.cpp
+                   MAIN_DEPENDENCY data/spinxml_schema.xsd
                    COMMAND COMMAND ${xsd} ${xsd_args}
-                   ${CMAKE_CURRENT_SOURCE_DIR}/data/spinsys_spec.xsd
+                   ${CMAKE_CURRENT_SOURCE_DIR}/data/spinxml_schema.xsd
                    COMMENT "Automatically generating XML parsing classes")
 
 #Use swig to generate the python bindings for the C++ code.
@@ -120,7 +120,7 @@ set(swig_file -o ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/shared/swig/spinsys.i) 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/spinsys_wrap.cpp
                    MAIN_DEPENDENCY shared/swig/spinsys.i
-		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinsys_spec.cpp shared/spinsys.cpp
+		   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/shared/spinxml_schema.cpp sxohared/spinsys.cpp
                    COMMAND COMMAND swig ${swig_args} ${swig_file}
                    COMMENT "Automatically generating  python bindings")
 
@@ -150,11 +150,11 @@ link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
 
 #python bindings
 
-add_library(_nuclear_data SHARED  ${nuclearSources})
-target_link_libraries (_nuclear_data  ${PYTHON_LIBRARIES})
+#add_library(_nuclear_data SHARED  ${nuclearSources})
+#target_link_libraries (_nuclear_data  ${PYTHON_LIBRARIES})
 
-add_library(_spinsys SHARED  ${pySources})
-target_link_libraries (_spinsys _nuclear_data xerces-c ${PYTHON_LIBRARIES})
+#add_library(_spinsys SHARED  ${pySources})
+#target_link_libraries (_spinsys _nuclear_data xerces-c ${PYTHON_LIBRARIES})
 
 
 

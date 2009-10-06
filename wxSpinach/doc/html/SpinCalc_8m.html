@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-<title>cspinach: /home/gareth/svn/cspinach/wxSpinach/shared/matlab_dlls/SpinCalc.m File Reference</title>
+<title>cspinach: /home/gareth/cspinach-git/wxSpinach/shared/matlab_dlls/SpinCalc.m File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css">
 <link href="doxygen.css" rel="stylesheet" type="text/css">
 </head><body>
@@ -22,7 +22,7 @@
   </div>
 </div>
 <div class="contents">
-<h1>/home/gareth/svn/cspinach/wxSpinach/shared/matlab_dlls/SpinCalc.m File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
+<h1>/home/gareth/cspinach-git/wxSpinach/shared/matlab_dlls/SpinCalc.m File Reference</h1><table border="0" cellpadding="0" cellspacing="0">
 <tr><td></td></tr>
 <tr><td colspan="2"><br><h2>Functions</h2></td></tr>
 <tr><td class="memItemLeft" nowrap align="right" valign="top">id&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#fb0c4e523f27f4e01f15b918e24c1a56">follows:NOTE:Output:follows:</a> (near singularities flags,[NOTE] id orientations,[Output] id as,[follows] lower(CONVERSION to)</td></tr>
@@ -71,7 +71,7 @@ constitute unit <a class="el" href="classvector.html">vector</a>&nbsp;</td><td c
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">assign mu name for clarity if <br class="typebreak">
 <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *check that input m s <br class="typebreak">
-constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *pi <br class="typebreak">
+constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a> <br class="typebreak">
 *check if rotation about euler <br class="typebreak">
 <a class="el" href="classvector.html">vector</a> is between and&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#69f5ecef6ec83bdfd5a4f986a96a3b7a">error</a> ('Input euler rotation <a class="el" href="classangle.html">angle</a>(s) not between 0 and 360 degrees') end Q</td></tr>
 
@@ -253,14 +253,14 @@ be 1x3x1 if size(INPUT, 2)~=3||size(INPUT, 3)~=1 error('Error:Input euler angle 
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">end end&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#6a376f3700939431a3e2ff6782e20411">Q</a> = Q'</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> = INPUT(:,4)*pi/180</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> = INPUT(:,4)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top"><a class="el" href="classquaternion.html">quaternion</a> clear m1 m2 m3 <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> <br class="typebreak">
-case EA&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#7f5635b58d789ed876db4b1b73bf1384">psi</a> = INPUT(:,1)*pi/180</td></tr>
+case EA&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#7f5635b58d789ed876db4b1b73bf1384">psi</a> = INPUT(:,1)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#ebf487f5d315cb61f0bd86455edff1fd">theta</a> = INPUT(:,2)*pi/180</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#ebf487f5d315cb61f0bd86455edff1fd">theta</a> = INPUT(:,2)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180</td></tr>
 
-<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#af40c223796354fb6b79c9ed047c513a">phi</a> = INPUT(:,3)*pi/180</td></tr>
+<tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#af40c223796354fb6b79c9ed047c513a">phi</a> = INPUT(:,3)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180</td></tr>
 
 <tr><td class="memItemLeft" nowrap align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a> = size(INPUT,1)</td></tr>
 
@@ -507,7 +507,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>* check that input m s constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a>* pi* check if rotation about euler <a class="el" href="classvector.html">vector</a> is between and error           </td>
+          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>* check that input m s constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a>* <a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>* check if rotation about euler <a class="el" href="classvector.html">vector</a> is between and error           </td>
           <td>(</td>
           <td class="paramtype">'Input euler rotation <a class="el" href="classangle.html">angle</a>(s) not between 0 and 360 degrees'&nbsp;</td>
           <td class="paramname">          </td>
@@ -733,7 +733,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *check that input m s constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *pi * ones           </td>
+          <td class="memname">assign mu name for clarity if <a class="el" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a> *check that input m s constitute unit <a class="el" href="classvector.html">vector</a> <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> *<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a> * ones           </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="SpinCalc_8m.html#1b1681fc73a9b5a3437ddd8100ba4299">N</a>&nbsp;</td>
           <td class="paramname">, </td>
@@ -1507,7 +1507,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">case EV <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> = INPUT(:,4)*pi/180          </td>
+          <td class="memname">case EV <a class="el" href="SpinCalc_8m.html#c81448d5c73a3cc9a41c90bc8415483e">MU</a> = INPUT(:,4)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180          </td>
         </tr>
       </table>
 </div>
@@ -1546,7 +1546,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>
 <b>Initial value:</b><div class="fragment"><pre class="fragment">SpinCalc(CONVERSION,<a class="code" href="SpinCalc_8m.html#15ed543820920ab86d1ddff006bdc6ce">INPUT</a>,<a class="code" href="SpinCalc_8m.html#ea3396f27de08dd170b9f4a9c430bbcf">tol</a>,<a class="code" href="SpinCalc_8m.html#04d7174125b069e3d35c922196718668">ichk</a>)
 %Function <span class="keywordflow">for</span> the conversion of one rotation input <a class="code" href="classtype.html" title="Enumeration class corresponding to the type schema type.">type</a> to desired output.
-%Supported conversion input/output types are <a class="code" href="namespaceswig.html#c9211ac7e952eb9fd9f9839889b3432f">as</a> follows:
+%Supported conversion input/output types are as follows:
 %   1: <a class="code" href="SpinCalc_8m.html#6a376f3700939431a3e2ff6782e20411">Q</a>        Rotation Quaternions
 %   2: EV       Euler Vector and rotation <a class="code" href="classangle.html" title="Class corresponding to the angle schema type.">angle</a> (degrees)
 %   3: DCM      Orthogonal DCM Rotation Matrix
@@ -1563,7 +1563,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="SpinCalc_8m.html#af40c223796354fb6b79c9ed047c513a">phi</a> = INPUT(:,3)*pi/180          </td>
+          <td class="memname"><a class="el" href="SpinCalc_8m.html#af40c223796354fb6b79c9ed047c513a">phi</a> = INPUT(:,3)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180          </td>
         </tr>
       </table>
 </div>
@@ -1578,7 +1578,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">case EA if <a class="el" href="SpinCalc_8m.html#7f5635b58d789ed876db4b1b73bf1384">psi</a> = INPUT(:,1)*pi/180          </td>
+          <td class="memname">case EA if <a class="el" href="SpinCalc_8m.html#7f5635b58d789ed876db4b1b73bf1384">psi</a> = INPUT(:,1)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180          </td>
         </tr>
       </table>
 </div>
@@ -1713,7 +1713,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="SpinCalc_8m.html#ebf487f5d315cb61f0bd86455edff1fd">theta</a> = INPUT(:,2)*pi/180          </td>
+          <td class="memname"><a class="el" href="SpinCalc_8m.html#ebf487f5d315cb61f0bd86455edff1fd">theta</a> = INPUT(:,2)*<a class="el" href="glDisplay_8cpp.html#43016d873124d39034edb8cd164794db">pi</a>/180          </td>
         </tr>
       </table>
 </div>
@@ -1739,7 +1739,7 @@ deviation&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </div>
 </div><p>
 </div>
-<hr size="1"><address style="text-align: right;"><small>Generated on Fri Aug 28 13:30:32 2009 for cspinach by&nbsp;
+<hr size="1"><address style="text-align: right;"><small>Generated on Mon Sep 21 19:10:58 2009 for cspinach by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img src="doxygen.png" alt="doxygen" align="middle" border="0"></a> 1.5.8 </small></address>
 </body>

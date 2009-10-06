@@ -1,7 +1,7 @@
 
 
 #include <shared/spinsys.hpp>
-#include <shared/spinsys_spec.hpp>
+#include <shared/spinxml_schema.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -260,7 +260,7 @@ void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
     std::string label(thisSpin->GetLabel());
 
     vector coords(x,y,z);
-    spin outSpin(coords,i,"H1",0);
+    spin outSpin(coords,i,0);
     outSpin.label(label);
     spins.push_back(outSpin);
   }

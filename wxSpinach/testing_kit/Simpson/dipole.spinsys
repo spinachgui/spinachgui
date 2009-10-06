@@ -1,0 +1,5 @@
+spinsys {
+  channels 1H
+  nuclei 1H 1H
+  dipole 1 2 -2000 0 0 0
+}

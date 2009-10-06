@@ -166,11 +166,29 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
   }
 }
 
+void SpinGrid::OnRightClick(wxGridEvent& e) {
+  wxMenu* menu = new wxMenu();
+
+  menu->Append(MENU_NEW_SPIN, wxT("Spin Properties..."));    
+
+  if(e.GetRow()<mSS->GetSpinCount()) {
+    menu->Append(MENU_SPIN_DIALOG, wxT("Spin Properties..."));    
+    menu->Append(MENU_DELETE_SPINS, wxT("Delete Spins..."));
+  }
+  PopupMenu(menu);
+  delete menu;
+
+}
+
+
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)
 
 EVT_GRID_SELECT_CELL     (         SpinGrid::OnCellSelect)
 EVT_GRID_CMD_CELL_CHANGE (wxID_ANY,SpinGrid::OnCellChange)
 EVT_GRID_EDITOR_HIDDEN   (         SpinGrid::OnEndEdit)
 EVT_GRID_EDITOR_SHOWN    (         SpinGrid::OnEdit)
+
+EVT_GRID_CELL_RIGHT_CLICK(         SpinGrid::OnRightClick)
+
 
 END_EVENT_TABLE()

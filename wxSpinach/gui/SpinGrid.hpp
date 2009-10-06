@@ -17,6 +17,7 @@ public:
   void OnEndEdit(wxGridEvent& e);
   void OnCellChange(wxGridEvent& e);
   void OnCellSelect(wxGridEvent& e);
+  void OnRightClick(wxGridEvent& e);
 
   enum COL_TYPE {
     COL_SELECTED,   
@@ -31,6 +32,11 @@ public:
     COL_QUADRAPOLAR
   };
 
+  enum MENU_EVENT {
+    MENU_SPIN_DIALOG,
+    MENU_DELETE_SPINS,
+    MENU_NEW_SPIN
+  };
 
 protected:
   DECLARE_EVENT_TABLE();
@@ -40,6 +46,7 @@ protected:
   void RefreshFromSpinSystem();
   void UpdateRow(long rowNumber);
   void SetupRow(long rowNumber);
+
 private:
   struct SpinGridColum {
     long type;

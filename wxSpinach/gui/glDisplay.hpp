@@ -6,6 +6,8 @@
 #include <shared/spinsys.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <gui/SpinSysManager.hpp>
+
 #include <GL/glx.h>
 #include <GL/glu.h>
 
@@ -40,7 +42,6 @@ protected:
 
   //Drawing functions
   void Geometary(bool depthOnly=false);
-
   void DrawAtoms(bool depthOnly=false);
   void DrawBonds();
   void DrawLinear(long atom);
@@ -53,7 +54,7 @@ private:
   bool mGLEnabled;
   wxGLContext* mGLContext;
 
-  shared_ptr<SpinSystem> mSS;
+  const SpinSysPtr* mSS;
 
   //Display Lists
   int mDLSphereWire;

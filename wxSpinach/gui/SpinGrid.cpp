@@ -95,36 +95,35 @@ void SpinGrid::HidePopup() {
 
 void SpinGrid::RefreshFromSpinSystem() {
   ClearGrid();
-  AppendRows(mSS->GetSpinCount());
+  AppendRows(mSS->GetSpinCount()+1);
   for (long i=0; i < mSS->GetSpinCount(); i++) {
-    Spin* thisSpin = mSS->GetSpin(i);
-    double x,y,z;
-    thisSpin->GetCoordinates(&x,&y,&z);
-
-    //Set the selected column renderers and editors to be boolian
-    SetCellRenderer(i,COL_SELECTED,new wxGridCellBoolRenderer());
-    SetCellEditor(i,COL_SELECTED,new wxGridCellBoolEditor());
-
-    //Setup the label and the element columns
-    SetCellValue(i,COL_LABEL,wxString(thisSpin->GetLabel(),wxConvUTF8));
-    
-
-    SetCellValue(i,COL_X,wxString() << x);
-    SetCellValue(i,COL_Y,wxString() << y);
-    SetCellValue(i,COL_Z,wxString() << z);
-            
-    //Set up floating point editors, so the user can't enter something stupid
-    SetCellEditor(i,COL_X,new wxGridCellFloatEditor());
-    SetCellEditor(i,COL_Y,new wxGridCellFloatEditor());
-    SetCellEditor(i,COL_Z,new wxGridCellFloatEditor());
-            
-    //Set up the special interaction editors
-    //SetCellEditor(i,COL_LINEAR,InterCellEditor(self.ss.GetSpin(i)));
-    //self.SetCellEditor(i,COL_BILINEAR,InterCellEditor())
-    //SetCellEditor(i,COL_QUADRAPOLAR,InterCellEditor(self.ss.GetSpin(i)));
+    SetupRow(i);
+    UpdateRow(i);
   }
+}
 
+void SpinGrid::SetupRow(long rowNumber) {
+  //Set the selected column renderers and editors to be boolian
+  SetCellRenderer(rowNumber,COL_SELECTED,new wxGridCellBoolRenderer());
+  SetCellEditor(rowNumber,COL_SELECTED,new wxGridCellBoolEditor());
 
+  //Set up floating point editors, so the user can't enter something stupid
+  SetCellEditor(rowNumber,COL_X,new wxGridCellFloatEditor());
+  SetCellEditor(rowNumber,COL_Y,new wxGridCellFloatEditor());
+  SetCellEditor(rowNumber,COL_Z,new wxGridCellFloatEditor());
+}
+
+void SpinGrid::UpdateRow(long rowNumber) {
+  Spin* thisSpin = mSS->GetSpin(rowNumber);
+  double x,y,z;
+  thisSpin->GetCoordinates(&x,&y,&z);
+
+  //Setup the label and the element columns
+  SetCellValue(rowNumber,COL_LABEL,wxString(thisSpin->GetLabel(),wxConvUTF8));
+
+  SetCellValue(rowNumber,COL_X,wxString() << x);
+  SetCellValue(rowNumber,COL_Y,wxString() << y);
+  SetCellValue(rowNumber,COL_Z,wxString() << z);
 }
 
 void SpinGrid::OnCellChange(wxGridEvent& e) {
@@ -144,6 +143,16 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
 }
 
 void SpinGrid::OnCellSelect(wxGridEvent& e) {
+  if(e.GetRow()==mSS->GetSpinCount()) {
+    //The user has clicked the blank row at the bottom of the grid.
+    //We should create a new spin
+    mSS->InsertSpin(new Spin(mSS.get(),new Vector3(0,0,0),"New Spin",mSS->GetRootFrame(),0));
+    UpdateRow(mSS->GetSpinCount()-1);
+    SetupRow(mSS->GetSpinCount()-1);        
+    AppendRows(1);
+    e.Skip();
+    return;
+  }
   if(mPopupLock) {
     cout << "OnCellSelect() called, but locked " << endl;
     e.Skip();

@@ -38,7 +38,8 @@ protected:
   void ShowPopup(SpinXML::Spin* spin);
   void HidePopup();
   void RefreshFromSpinSystem();
-
+  void UpdateRow(long rowNumber);
+  void SetupRow(long rowNumber);
 private:
   struct SpinGridColum {
     long type;

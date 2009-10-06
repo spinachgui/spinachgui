@@ -1,5 +1,6 @@
 
 #include <gui/SpinDialog.hpp>
+#include <shared/nuclear_data.hpp>
 
 #include <string>
 #include <wx/log.h>
@@ -13,6 +14,16 @@ SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBa
   interSizer->Add(mInterEdit,1,wxEXPAND | wxALL);
 
   GetSizer()->Fit(this);
+
+  //Populate the element combo
+  for(long i=0;i<getElementCount();i++) {
+    mElementCombo->Append(wxString() <<
+			  i <<
+			  wxT(" ") <<
+			  wxString(getElementSymbol(i),wxConvUTF8) <<
+			  wxT(" - ") <<
+			  wxString(getElementName(i),wxConvUTF8));
+  }
 
   LoadFromSpin();
 }
@@ -65,6 +76,8 @@ void SpinDialog::LoadFromSpin() {
   mXPosCtrl->SetValue(strX);
   mYPosCtrl->SetValue(strY);
   mZPosCtrl->SetValue(strZ);
+
+  mElementCombo->SetSelection(mSpin->GetElement());
 
   //mInterEdit->LoadFromSpin();
 }

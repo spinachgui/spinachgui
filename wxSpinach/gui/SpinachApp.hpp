@@ -12,6 +12,7 @@ using boost::shared_ptr;
 
 #include <res/SpinachGUI.h>
 
+#include <gui/SpinSysManager.hpp>
 #include <gui/glDisplay.hpp>
 #include <gui/SpinGrid.hpp>
 
@@ -55,6 +56,7 @@ public:
   shared_ptr<SpinSystem> GetSpinSystem() const {return mSS;}
 private:
   shared_ptr<SpinSystem> mSS;
+  shared_ptr<SpinSysManager> mSSMgr;
 };
 
 DECLARE_APP(SpinachApp);

@@ -148,6 +148,41 @@ void Matrix3::Dump() const {
 // SpinSystem
 
 SpinSystem::SpinSystem() : mLabFrame(new ReferenceFrame(NULL,new Vector3(0,0,0),new Orientation())) {
+}
+
+SpinSystem::SpinSystem(const SpinSystem& system) : mLabFrame(system.mLabFrame) {
+  long spinCount=system.mSpins.size();
+  long interCount=system.mInteractions.size();
+
+  mSpins.resize(spinCount);
+  mInteractions.resize(interCount);
+
+  for(long i=0;i<spinCount;i++) {
+    mSpins[i]=new Spin(*system.mSpins[i],this);
+  }
+  for(long i=0;i<interCount;i++) {
+    mInteractions[i]=new Interaction(*system.mInteractions[i]);
+    //Problem, mSpin1 and mSpin2 will still point to the spins in the
+    //old SpinSystem
+    Spin* Spin1=system.mInteractions[i]->mSpin1;
+    Spin* Spin2=system.mInteractions[i]->mSpin2;
+    int found=0;
+    for(long j=0;j<spinCount;j++) {
+      if(Spin1==system.mSpins[j]) {
+	mInteractions[i]->mSpin1=mSpins[j];
+	found++;
+      }
+      if(Spin2==system.mSpins[j]) {
+	mInteractions[i]->mSpin2=mSpins[j];
+	found++;
+      }
+      if(found==2) {
+	break;
+      }
+    }
+  }
+  //TODO: Impliment proper copying of reference frames
+  mLabFrame=new ReferenceFrame(NULL,new Vector3(0,0,0),new Orientation());
   mLabFrame->GetOrientation()->SetQuaternion(1.0,0.0,0.0,0.0);
 }
 
@@ -457,6 +492,16 @@ Spin::Spin(SpinSystem* Parent,Vector3* Position,string Label,ReferenceFrame* mFr
   
 }
 
+Spin::Spin(const Spin& s,SpinSystem* ss) :
+  mParent(ss),
+  mPosition(new Vector3(*s.mPosition)),
+  mLabel(s.mLabel),
+  mFrame(NULL),
+  mElement(s.mElement),
+  mIsotopes(s.mIsotopes){
+  
+}
+
 Spin::~Spin() {
   if(mPosition != NULL) {
     delete mPosition;
@@ -733,6 +778,26 @@ Orientation::Orientation() : mType(UNDEFINED) {
   
 }
 
+Orientation::Orientation(const Orientation& orient) :
+  mType(orient.mType) {
+  if(mType==ANGLE_AXIS) {
+    mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
+  } else if(mType==EIGENSYSTEM) {
+    mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);
+    mData.mEigenSystem.YAxis = new Vector3(*orient.mData.mEigenSystem.YAxis);
+    mData.mEigenSystem.ZAxis = new Vector3(*orient.mData.mEigenSystem.ZAxis);
+  } else if(mType==QUATERNION) {
+    mData.mQuaternion.real = orient.mData.mQuaternion.real;
+    mData.mQuaternion.i    = orient.mData.mQuaternion.i;
+    mData.mQuaternion.j    = orient.mData.mQuaternion.j;
+    mData.mQuaternion.k    = orient.mData.mQuaternion.k;
+  } else if(mType==EULER) {
+    mData.mEuler.alpha =     orient.mData.mEuler.alpha;
+    mData.mEuler.beta  =     orient.mData.mEuler.beta;
+    mData.mEuler.gamma =     orient.mData.mEuler.gamma;
+  }
+}
+
 Orientation::~Orientation() {
   if(mType==ANGLE_AXIS && mData.mAngleAxis.axis != NULL) {
     delete mData.mAngleAxis.axis;
@@ -874,7 +939,12 @@ Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY),mSpin1(NULL),mSpi
   
 }
 
-Interaction::Interaction(const Interaction& inter) : mType(inter.mType),mSubType(inter.mSubType),mSpin1(inter.mSpin1),mSpin2(inter.mSpin2) {
+Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
+  mType(inter.mType),
+  mSubType(inter.mSubType),
+  mSpin1(inter.mSpin1),
+  mSpin2(inter.mSpin2) {
+
   if(mType==SCALAR) {
     mData.mScalar=inter.mData.mScalar;
   } else if(mType==MATRIX) {
@@ -883,17 +953,17 @@ Interaction::Interaction(const Interaction& inter) : mType(inter.mType),mSubType
     mData.mEigenvalues.XX=inter.mData.mEigenvalues.XX;
     mData.mEigenvalues.YY=inter.mData.mEigenvalues.YY;
     mData.mEigenvalues.ZZ=inter.mData.mEigenvalues.ZZ;
-    mData.mEigenvalues.Orient=new Orientation();
+    mData.mEigenvalues.Orient=new Orientation(*inter.mData.mEigenvalues.Orient);
   } else if(mType==AXRHOM) {
     mData.mAxRhom.ax=inter.mData.mAxRhom.ax;
     mData.mAxRhom.rh=inter.mData.mAxRhom.rh;
     mData.mAxRhom.iso=inter.mData.mAxRhom.iso;
-    mData.mAxRhom.Orient=new Orientation();
+    mData.mAxRhom.Orient=new Orientation(*inter.mData.mEigenvalues.Orient);
   } else if(mType==SPANSKEW) {
     mData.mSpanSkew.span=inter.mData.mSpanSkew.span;
     mData.mSpanSkew.skew=inter.mData.mSpanSkew.skew;
     mData.mSpanSkew.iso=inter.mData.mSpanSkew.iso;
-    mData.mSpanSkew.Orient=new Orientation();
+    mData.mSpanSkew.Orient=new Orientation(*inter.mData.mEigenvalues.Orient);
   }
 }
 

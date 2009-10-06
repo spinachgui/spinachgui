@@ -67,6 +67,7 @@ class Matrix3 {
 class Orientation {
   public:
     Orientation();
+    Orientation(const Orientation& orient);
     ~Orientation();
     
     enum Type {
@@ -145,9 +146,10 @@ class ReferenceFrame {
 };
 
 class Interaction {
+  friend class SpinSystem;
   public:
     Interaction();
-    Interaction(const Interaction& inter);
+    Interaction(const Interaction& inter, SpinSystem* newSystem=NULL);
     ~Interaction();
     
      void Dump() const;
@@ -248,8 +250,10 @@ class Interaction {
 };
 
 class Spin {
-  public:
+  friend class SpinSystem;
+  public:  
     Spin(SpinSystem* Parent,Vector3* mPosition,std::string mLabel,ReferenceFrame* mFrame,long atomicNumber=1);
+    Spin(const Spin& s,SpinSystem* newParent=NULL);
     ~Spin();
   
     void Dump() const;
@@ -303,6 +307,7 @@ class Spin {
 class SpinSystem {
   public:
     SpinSystem();
+    SpinSystem(const SpinSystem& system);
     ~SpinSystem();
 
     void Clear();
@@ -329,10 +334,10 @@ class SpinSystem {
   
   private:
     friend class Spin;
-    
-     std::vector<Spin*> mSpins;
-     std::vector<Interaction*> mInteractions;
-     ReferenceFrame* mLabFrame; 
+
+    std::vector<Spin*> mSpins;
+    std::vector<Interaction*> mInteractions;
+    ReferenceFrame* mLabFrame; 
 };
 
 }; //End Namespace

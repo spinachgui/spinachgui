@@ -54,6 +54,7 @@ class SpinachApp : public wxApp {
 public:
   virtual bool OnInit();
   shared_ptr<SpinSystem> GetSpinSystem() const {return mSS;}
+  shared_ptr<SpinSysManager> GetSpinSystemMgr() const {return mSSMgr;}
 private:
   shared_ptr<SpinSystem> mSS;
   shared_ptr<SpinSysManager> mSSMgr;

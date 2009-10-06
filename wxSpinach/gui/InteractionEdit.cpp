@@ -188,6 +188,8 @@ void InterEditPanel::UpdateSubTypeCombo() {
   long len;
   const Interaction::SubType* dropdownLookup;
 
+  mSubTypeCombo->Clear();
+
   if(mInter->GetIsLinear()) {
     len=LinearSTLookupLen;
     dropdownLookup = LinearSTLookup;
@@ -195,7 +197,7 @@ void InterEditPanel::UpdateSubTypeCombo() {
     len=BilinearSTLookupLen;
     dropdownLookup = BilinearSTLookup;
   } else {
-    len=LinearSTLookupLen;
+    len=QuadSTLookupLen;
     dropdownLookup = QuadSTLookup;
   }
   for(long i=0;i<len;i++) {
@@ -206,7 +208,6 @@ void InterEditPanel::UpdateSubTypeCombo() {
 void InterEditPanel::LoadFromInter() {
   mLoading=true;
 
-  mSubTypeCombo->Clear();
   mSpin2Combo->Clear();
 
   UpdateSubTypeCombo();

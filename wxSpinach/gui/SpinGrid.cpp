@@ -1,6 +1,7 @@
 
 #include <gui/SpinachApp.hpp>
 #include <gui/SpinGrid.hpp>
+#include <shared/nuclear_data.hpp>
 
 #include <iostream>
 
@@ -106,6 +107,18 @@ void SpinGrid::SetupRow(long rowNumber) {
   //Set the selected column renderers and editors to be boolian
   SetCellRenderer(rowNumber,COL_SELECTED,new wxGridCellBoolRenderer());
   SetCellEditor(rowNumber,COL_SELECTED,new wxGridCellBoolEditor());
+
+  //
+  long count=getElementCount();
+
+  wxArrayString strArray;
+  for(long i=0;i<count;i++) {
+    wxString str(getElementSymbol(i),wxConvUTF8);
+    str << wxT(" ") << wxString(getElementName(i),wxConvUTF8);
+    strArray.Add(str);
+  }
+
+  SetCellEditor(rowNumber,COL_ELEMENT,new wxGridCellChoiceEditor(strArray));
 
   //Set up floating point editors, so the user can't enter something stupid
   SetCellEditor(rowNumber,COL_X,new wxGridCellFloatEditor());

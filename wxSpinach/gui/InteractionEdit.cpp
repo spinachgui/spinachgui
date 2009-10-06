@@ -1,18 +1,30 @@
 
+#include <boost/shared_ptr.hpp>
+
 #include <gui/InteractionEdit.hpp>
 #include <gui/CustomEvents.hpp>
+#include <gui/SpinachApp.hpp>
 
 #include <iostream>
 #include <map>
 
+#include <wx/log.h>
+
+#include <stdexcept>
+
 using namespace std;
 using namespace SpinXML;
-
+using namespace boost;
 
 //============================================================//
 // InterEditPanel
 
 //Static constructory stuff
+
+enum {
+  SUBTYPE_COMBO,
+  SPIN2_COMBO
+};
 
 static bool DropDownSetup = false;
 
@@ -101,7 +113,7 @@ void InterEditPanel_StaticConstructor() {
 }
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
-  : InterEditPanelBase(parent,id),mInter(NULL),mLoading(false) {
+  : InterEditPanelBase(parent,id),mInter(NULL),mLoading(false),mSubTypeComboLookup(NULL),mSubTypeComboLookupLen(0) {
 
   Enable(false);
 
@@ -112,6 +124,9 @@ InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   mEigenEditPanel->   GetSizer()->Add(mOrientEigenvalueCtrl,1.0,wxALL);
   mAxRhomEditPanel->  GetSizer()->Add(mOrientAxRhomCtrl,1.0,wxALL);
   mSpanSkewEditPanel->GetSizer()->Add(mOrientSpanSkewCtrl,1.0,wxALL);
+
+  mSubTypeCombo->SetId(SUBTYPE_COMBO);
+  mSpin2Combo->SetId(SPIN2_COMBO);
 
   if(DropDownSetup) { //Fakes a static constructor
     DropDownSetup=true;
@@ -129,16 +144,7 @@ void InterEditPanel::SetInter(Interaction* inter) {
   }
 }
 
-void InterEditPanel::OnQuadChecked(wxCommandEvent& e) {
-  if(e.IsChecked()) {
-    mInter->SetQuadratic();
-  } else {
-    mInter->SetLinear();
-  }
-  wxCommandEvent event(EVT_SS_UPDATE,GetId());
-  event.SetEventObject(this);
-  GetEventHandler()->ProcessEvent(event);
-}
+
  
 void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
   if (mLoading) {
@@ -182,41 +188,69 @@ void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
   e.Skip();
 }
 
-void InterEditPanel::UpdateSubTypeCombo() {
+void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
   //TODO: We need to test if the spin is an election, because then
   //slightly different options should become avaliable
-  long len;
-  const Interaction::SubType* dropdownLookup;
-
   mSubTypeCombo->Clear();
 
   if(mInter->GetIsLinear()) {
-    len=LinearSTLookupLen;
-    dropdownLookup = LinearSTLookup;
+    mSubTypeComboLookupLen = LinearSTLookupLen;
+    mSubTypeComboLookup    = LinearSTLookup;
   } else if(mInter->GetIsBilinear()) {
-    len=BilinearSTLookupLen;
-    dropdownLookup = BilinearSTLookup;
+    mSubTypeComboLookupLen = BilinearSTLookupLen;
+    mSubTypeComboLookup    = BilinearSTLookup;
   } else {
-    len=QuadSTLookupLen;
-    dropdownLookup = QuadSTLookup;
+    mSubTypeComboLookupLen = QuadSTLookupLen;
+    mSubTypeComboLookup    = QuadSTLookup;
   }
-  for(long i=0;i<len;i++) {
-    mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(dropdownLookup[i]),wxConvUTF8));
+  for(long i=0;i<mSubTypeComboLookupLen;i++) {
+    mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(mSubTypeComboLookup[i]),wxConvUTF8));
+  }
+
+  Interaction::SubType st = mInter->GetSubType();
+  bool found=false;
+  for(long i=0;i<mSubTypeComboLookupLen;i++) {
+	if(st==mSubTypeComboLookup[i]) {
+	  mSubTypeCombo->SetSelection(i);
+	  found=true;
+	  break;
+	}
+  }
+  if(!found) {
+	if(subtypeWarning) {
+	  wxString form(mInter->GetIsLinear() ? wxT("linear") : (mInter->GetIsBilinear() ? wxT("bilinear") : wxT("quadratic")));
+	  wxLogError(wxString() << wxT("Warning, interaction has an invalid type (") 
+				 << wxString(Interaction::GetSubTypeName(st),wxConvUTF8)
+				 << wxT(") for its algebrate form (")
+				 << form << wxT(")"));
+	} else {
+	  mSubTypeCombo->SetSelection(0);
+	}
   }
 }
 
 void InterEditPanel::LoadFromInter() {
   mLoading=true;
 
-  mSpin2Combo->Clear();
 
   UpdateSubTypeCombo();
+
   if(mInter->GetIsLinear()) {
-    mSpin2Combo->Enable(false);
+	mSpin2Combo->Enable(false);	
   } else if(mInter->GetIsBilinear()) {
-    mSpin2Combo->Enable(true);
+	mSpin2Combo->Enable(true);
   } else {
-    mSpin2Combo->Enable(false);
+	//Interaction is quadratic
+	mSpin2Combo->Enable(false);
+  }
+
+  //Populate the spin 2 combobox with every other spin
+  mSpin2Combo->Clear();
+  shared_ptr<SpinSystem> SS(wxGetApp().GetSpinSystem());
+  long spinCount=SS->GetSpinCount();
+
+  for(long i=0;i<spinCount;i++) {
+	mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(SS->GetSpin(i)->GetLabel(),wxConvUTF8));
   }
 
   if(mInter->GetType()==Interaction::SCALAR) {
@@ -277,7 +311,6 @@ void InterEditPanel::LoadFromInter() {
 
     mTypeChoiceBook->SetSelection(4);
   }
-  mQuadCheckbox->SetValue(mInter->GetIsQuadratic());
 
   mLoading=false;
 }
@@ -338,7 +371,8 @@ void InterEditPanel::SaveToInter() {
 
 
 void InterEditPanel::onTextChange(wxCommandEvent& e) {
-  if(mLoading) {  //If we are loading from a spin we should ignore this event
+  if(mLoading) {  //If we are loading from a spin we should ignore
+				  //this event
     return;
   }
   SaveToInter();
@@ -350,11 +384,58 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
   return;
 }
 
+void InterEditPanel::OnSpin2Change(wxCommandEvent& e) {
+  mInter->SetSpin2(wxGetApp().GetSpinSystem()->GetSpin(mSpin2Combo->GetSelection()));
+  wxCommandEvent event(EVT_SS_UPDATE,GetId());
+  event.SetEventObject(this);
+  GetEventHandler()->ProcessEvent(event);
+}
+
+void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
+  if(mSubTypeComboLookup==NULL) {
+	wxLogError(wxT("mSubTypeComboLookup was null"));
+	throw logic_error("mSubTypeComboLookup was null");
+  }
+
+  mInter->SetSubType(mSubTypeComboLookup[mSubTypeCombo->GetSelection()]);
+
+  wxCommandEvent event(EVT_SS_UPDATE,GetId());
+  event.SetEventObject(this);
+  GetEventHandler()->ProcessEvent(event);
+}
+
+void InterEditPanel::OnInterFormChange(wxCommandEvent& e) {
+  long selection=mFormBox->GetSelection();
+
+  if(selection==0) { 
+	//User set the interaction to linear
+	mInter->SetLinear();
+	mSpin2Combo->Enable(false);
+  } else if (selection==2) {
+	//User set the interaction to quadratic
+	mInter->SetQuadratic();
+	mSpin2Combo->Enable(false);
+  } else {
+	//User set the interaction to bilinear
+	mInter->SetSpin2(wxGetApp().GetSpinSystem()->GetSpin(0));
+	mSpin2Combo->Enable(true);
+  }
+
+  UpdateSubTypeCombo(false);
+
+  wxCommandEvent event(EVT_SS_UPDATE,GetId());
+  event.SetEventObject(this);
+  GetEventHandler()->ProcessEvent(event);
+}
+
+
 BEGIN_EVENT_TABLE(InterEditPanel,wxPanel)
 
-EVT_CHECKBOX               (wxID_ANY,InterEditPanel::OnQuadChecked)
-EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,InterEditPanel::OnPageChange)
-EVT_TEXT                   (wxID_ANY,InterEditPanel::onTextChange)
+EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,     InterEditPanel::OnPageChange)
+EVT_CHOICE                 (SUBTYPE_COMBO,InterEditPanel::OnSubTypeChange)
+EVT_CHOICE                 (SPIN2_COMBO,  InterEditPanel::OnSpin2Change)
+EVT_TEXT                   (wxID_ANY,     InterEditPanel::onTextChange)
+EVT_RADIOBOX               (wxID_ANY,     InterEditPanel::OnInterFormChange)
 
 END_EVENT_TABLE()
 

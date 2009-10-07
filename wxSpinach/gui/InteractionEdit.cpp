@@ -246,11 +246,13 @@ void InterEditPanel::LoadFromInter() {
 
   //Populate the spin 2 combobox with every other spin
   mSpin2Combo->Clear();
-  shared_ptr<SpinSystem> SS(wxGetApp().GetSpinSystem());
-  long spinCount=SS->GetSpinCount();
+  shared_ptr<SpinSysManager> SSMgr(wxGetApp().GetSpinSysManager());
+  const SpinSysPtr* head=SSMgr->Get();
+
+  long spinCount=(*head)->GetSpinCount();
 
   for(long i=0;i<spinCount;i++) {
-	mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(SS->GetSpin(i)->GetLabel(),wxConvUTF8));
+    mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString((*head)->GetSpin(i)->GetLabel(),wxConvUTF8));
   }
 
   if(mInter->GetType()==Interaction::SCALAR) {
@@ -385,7 +387,7 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
 }
 
 void InterEditPanel::OnSpin2Change(wxCommandEvent& e) {
-  mInter->SetSpin2(wxGetApp().GetSpinSystem()->GetSpin(mSpin2Combo->GetSelection()));
+  mInter->SetSpin2((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpin(mSpin2Combo->GetSelection()));
   wxCommandEvent event(EVT_SS_UPDATE,GetId());
   event.SetEventObject(this);
   GetEventHandler()->ProcessEvent(event);
@@ -417,7 +419,7 @@ void InterEditPanel::OnInterFormChange(wxCommandEvent& e) {
 	mSpin2Combo->Enable(false);
   } else {
 	//User set the interaction to bilinear
-	mInter->SetSpin2(wxGetApp().GetSpinSystem()->GetSpin(0));
+	mInter->SetSpin2((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpin(0));
 	mSpin2Combo->Enable(true);
   }
 

@@ -22,18 +22,14 @@ bool SpinachApp::OnInit() {
   }
 
 
-  mSS = shared_ptr<SpinSystem>(new SpinSystem);
+  shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
 
-  mSS->LoadFromG03File("data/tryosine.log");
-  mSS->SaveToXMLFile("data/tryosine.xml");
-
-
-  mSSMgr = new SpinSysManager(mSS);
+  mSSMgr = new SpinSysManager(SS);
   const SpinSysPtr* head = mSSMgr->Get();
 
   mSSMgr->Checkpoint();
-  (*head)->LoadFromG03File("install/data/tryosine.log");
-  (*head)->SaveToXMLFile("install/data/tryosine.xml");
+  (*head)->LoadFromG03File("data/tryosine.log");
+  (*head)->SaveToXMLFile("data/tryosine.xml");
 
   RootFrame* frame = new RootFrame(NULL);
 

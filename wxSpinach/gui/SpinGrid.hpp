@@ -55,7 +55,7 @@ private:
   };
   const static SpinGridColum columns[];
 
-  boost::shared_ptr<SpinXML::SpinSystem> mSS;
+  const SpinSysPtr* mHead;
 
   InterPopup* mInterPopup;
   bool mPopupLock;

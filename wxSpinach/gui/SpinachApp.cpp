@@ -40,8 +40,30 @@ bool SpinachApp::OnInit() {
   return true;
 }
 
+
 //============================================================//
 // RootFrame
+
+void RootFrame::InitFrame() {
+  mNotebook=new wxAuiNotebook(mAuiPanel);
+
+  mSpinGrid=new SpinGrid(mNotebook);
+
+  mGLDisplay=new glDisplay(mNotebook);
+
+  // add the panes to the manager
+  mNotebook->AddPage(mGLDisplay, wxT("3D View"));
+  mNotebook->AddPage(mSpinGrid, wxT("Grid View"));
+
+  mAuiPanel->GetSizer()->Add(mNotebook,1,wxEXPAND);
+
+  //Grey the undo and redo menu ideams. They can be ungreyed when
+  //there is an undo history
+
+  mMenuItemUndo->Enable(false);
+  mMenuItemRedo->Enable(false);
+}
+
 
 void RootFrame::OnUndo(wxCommandEvent& e) {
   wxGetApp().GetSpinSysManager()->Undo();

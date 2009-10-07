@@ -1,0 +1,11 @@
+#Layout: 
+#proton number, mass number,multiplicity,gyromagnetic ratio
+#Everything after a '#' is a comment
+#Electron
+0	0	2	1.760859770e11
+#Hydrogen
+1	1	2	1.760859770e11
+#Carbon
+6	12	2	1.760859770e11
+#Nitrogen
+7	14	3	1.9337798e7

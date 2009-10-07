@@ -1,10 +1,15 @@
 
 #include <gui/SpinDialog.hpp>
+#include <shared/nuclear_data.hpp>
 
 #include <string>
 #include <wx/log.h>
 
 using namespace SpinXML;
+
+enum {
+  ID_ELEMENT
+};
 
 SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBase(parent,id),mSpin(spin) {
   mInterEdit=new SpinInterEditPanel(mSpinDialogPanel,spin);
@@ -14,7 +19,34 @@ SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBa
 
   GetSizer()->Fit(this);
 
+  //Populate the element combo
+
+  for(long i=0;i<getElementCount();i++) {
+    mElementCombo->Append(wxString() <<
+			  i <<
+			  wxT(" ") <<
+			  wxString(getElementSymbol(i),wxConvUTF8) <<
+			  wxT(" - ") <<
+			  wxString(getElementName(i),wxConvUTF8));
+  }
+
+  mElementCombo->SetId(ID_ELEMENT);
   LoadFromSpin();
+}
+
+void SpinDialog::UpdateIsotopeDropDown() {
+  long p=mElementCombo->GetSelection();
+
+  mIsotopeCombo->Clear();
+  for(long i=0;i<getIsotopeCount(p);i++) {
+    mIsotopeCombo->Append(wxString(getElementSymbol(p),wxConvUTF8) <<
+			  wxT("(") <<
+			  (getNeutrons(p,i) + p)<<
+			  wxT(")"));
+  }
+  if(getIsotopeCount(p)>0) {
+    mIsotopeCombo->SetSelection(0);
+  }
 }
  
 void SpinDialog::OnApply(wxCommandEvent& e) {
@@ -46,7 +78,8 @@ void SpinDialog::SaveToSpin() {
   wxString label=mSpinTitle->GetValue();
   mSpin->SetLabel(string(label.mb_str()));
 
-  mInterEdit->SaveToSpin();
+
+  mSpin->SetElement(mElementCombo->GetSelection());
 }
 
 
@@ -66,8 +99,22 @@ void SpinDialog::LoadFromSpin() {
   mYPosCtrl->SetValue(strY);
   mZPosCtrl->SetValue(strZ);
 
-  //mInterEdit->LoadFromSpin();
+  mElementCombo->SetSelection(mSpin->GetElement());
+
+  UpdateIsotopeDropDown();
+  mIsotopeCombo->SetSelection(0);
 }
+
+void SpinDialog::OnElementChange(wxCommandEvent& e) {
+  UpdateIsotopeDropDown();
+}
+
+
+BEGIN_EVENT_TABLE(SpinDialog,wxDialog) 
+
+EVT_CHOICE(ID_ELEMENT,SpinDialog::OnElementChange)
+
+END_EVENT_TABLE()
 
 
 

@@ -133,7 +133,7 @@ long getIsotopeCount(long protonN){
   return gIsotopes[protonN].size();
 }
 
-long getNeutronCount(long protonN,long index) {
+long getNeutrons(long protonN,long index) {
   return gIsotopes[protonN][index].neutron;
 }
 

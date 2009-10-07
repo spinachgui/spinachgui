@@ -26,7 +26,7 @@ long getIsotopeCount(long protonN);
 ///getIsotopeCount()
 
 //
-long getNeutronCount(long protonN,long index);
+long getNeutrons(long protonN,long index);
 
 ///
 long getMultiplicity(long protonN,long index);

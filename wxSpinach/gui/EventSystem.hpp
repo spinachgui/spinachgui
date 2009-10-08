@@ -20,7 +20,7 @@ class CEventType {
 public:	
   CEventType(const string& eventTypeName) : mId(hash_name(eventTypeName.c_str())) {};
   const EventTypeId getId() const{return mId;}
-  const string& getStr();
+  const string& getStr() const {return mEventName;}
   const bool operator< (CEventType const& e)const {return mId<e.mId;}
   bool operator == (CEventType const& e) const;
 
@@ -93,8 +93,6 @@ class CEventSnooper: public IEventListener {
 public:
   CEventSnooper();
   ~CEventSnooper();
-	
-  LOGGING_DECLARE_CLASS_SCOPE();
 	
   bool HandleEvent(CEvent const& event);
 };

@@ -2,12 +2,13 @@
 #ifndef SPINGRID_H
 #define SPINGRID_H
 
+#include <gui/EventSystem.hpp>
 #include <gui/InteractionEdit.hpp>
 #include <shared/spinsys.hpp>
 #include <boost/shared_ptr.hpp>
 #include <wx/grid.h>
 
-class SpinGrid : public wxGrid {
+class SpinGrid : public wxGrid, public IEventListener {
 public:
   SpinGrid(wxWindow* parent,wxWindowID id= -1);
 

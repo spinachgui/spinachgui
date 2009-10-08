@@ -4,11 +4,18 @@
 #include <gui/SpinDialog.hpp>
 
 #include <shared/nuclear_data.hpp>
+#include <gui/EventSystem.hpp>
 #include <wx/log.h>
 
 IMPLEMENT_APP(SpinachApp);
 
 bool SpinachApp::OnInit() {
+
+  //Start the event system up
+
+  CEventManager* evSys=CEventManager::Instance();
+
+  //Load the isotopes
 
   try {
     LoadIsotopes();

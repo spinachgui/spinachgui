@@ -30,6 +30,8 @@ const double pi=3.141592654;
 const float radius=0.3;
 const float radius2=radius*radius;
 
+const CEventType EV_SSCHANGE("SSCHANGE");
+const CEventType EV_SCHANGE("SCHANGE");
 
 using namespace std;
 
@@ -47,6 +49,12 @@ GLfloat redMaterial[]   = {0.9, 0.00, 0.0};
 
 
 void glDisplay::EnableGL() {
+  
+  //Listen for all instances of the spin system changing because this
+  //means we need to redraw the display
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SSCHANGE);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SCHANGE);
+
   if(mGLContext == NULL) {
     mGLContext = new wxGLContext(this);
   }
@@ -560,6 +568,7 @@ void glDisplay::OnMouseMove(wxMouseEvent& e) {
   
 
   Refresh();
+  CEventManager::Instance()->trigger(CEvent("SSChange"));
 }
 
 
@@ -612,6 +621,15 @@ void glDisplay::OnDisplaySpinDialog(wxCommandEvent& e) {
   } else {
     wxLogError(wxT("In glDisplay::OnDisplaySpinDialog(wxCommandEvent&) mHover < 0"));
   }
+}
+
+//============================================================//
+// virtual bool HandleEvent(CEvent const& event);
+// The McShafry style event handler
+
+bool glDisplay::HandleEvent(CEvent const& event) {
+  cout << "glDisplayj just got an event of type " << event.getType().getStr() << endl;
+  return true;
 }
 
 BEGIN_EVENT_TABLE(glDisplay,wxGLCanvas)

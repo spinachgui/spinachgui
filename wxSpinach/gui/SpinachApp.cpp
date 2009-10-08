@@ -29,7 +29,7 @@ bool SpinachApp::OnInit() {
 
   mSSMgr->Checkpoint();
   (*head)->LoadFromG03File("data/tryosine.log");
-  (*head)->SaveToXMLFile("data/tryosine.xml");
+  (*head)->SaveToXMLFile("tryosine.xml");
 
   RootFrame* frame = new RootFrame(NULL);
 

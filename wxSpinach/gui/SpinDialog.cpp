@@ -7,6 +7,7 @@
 
 using namespace SpinXML;
 
+
 SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBase(parent,id),mSpin(spin) {
   mInterEdit=new SpinInterEditPanel(mSpinDialogPanel,spin);
 
@@ -16,6 +17,7 @@ SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBa
   GetSizer()->Fit(this);
 
   //Populate the element combo
+
   for(long i=0;i<getElementCount();i++) {
     mElementCombo->Append(wxString() <<
 			  i <<
@@ -57,7 +59,7 @@ void SpinDialog::SaveToSpin() {
   wxString label=mSpinTitle->GetValue();
   mSpin->SetLabel(string(label.mb_str()));
 
-  //mInterEdit->SaveToSpin();
+  mSpin->SetElement(mElementCombo->GetSelection());
 }
 
 
@@ -81,6 +83,7 @@ void SpinDialog::LoadFromSpin() {
 
   //mInterEdit->LoadFromSpin();
 }
+
 
 
 

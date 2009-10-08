@@ -20,6 +20,9 @@ public:
   void OnCellSelect(wxGridEvent& e);
   void OnRightClick(wxGridEvent& e);
 
+  //The McShaffy style event handler
+  virtual bool HandleEvent(CEvent const& event);
+
   enum COL_TYPE {
     COL_SELECTED,   
     COL_LABEL,       

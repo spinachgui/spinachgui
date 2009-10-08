@@ -568,7 +568,6 @@ void glDisplay::OnMouseMove(wxMouseEvent& e) {
   
 
   Refresh();
-  CEventManager::Instance()->trigger(CEvent("SSChange"));
 }
 
 
@@ -628,7 +627,8 @@ void glDisplay::OnDisplaySpinDialog(wxCommandEvent& e) {
 // The McShafry style event handler
 
 bool glDisplay::HandleEvent(CEvent const& event) {
-  cout << "glDisplayj just got an event of type " << event.getType().getStr() << endl;
+  cout << "glDisplay just got an event of type " << event.getType().getStr() << endl;
+  Refresh();
   return true;
 }
 

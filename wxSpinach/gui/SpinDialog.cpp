@@ -7,6 +7,9 @@
 
 using namespace SpinXML;
 
+enum {
+  ID_ELEMENT
+};
 
 SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBase(parent,id),mSpin(spin) {
   mInterEdit=new SpinInterEditPanel(mSpinDialogPanel,spin);
@@ -27,7 +30,23 @@ SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBa
 			  wxString(getElementName(i),wxConvUTF8));
   }
 
+  mElementCombo->SetId(ID_ELEMENT);
   LoadFromSpin();
+}
+
+void SpinDialog::UpdateIsotopeDropDown() {
+  long p=mElementCombo->GetSelection();
+
+  mIsotopeCombo->Clear();
+  for(long i=0;i<getIsotopeCount(p);i++) {
+    mIsotopeCombo->Append(wxString(getElementSymbol(p),wxConvUTF8) <<
+			  wxT("(") <<
+			  (getNeutrons(p,i) + p)<<
+			  wxT(")"));
+  }
+  if(getIsotopeCount(p)>0) {
+    mIsotopeCombo->SetSelection(0);
+  }
 }
  
 void SpinDialog::OnApply(wxCommandEvent& e) {
@@ -81,9 +100,20 @@ void SpinDialog::LoadFromSpin() {
 
   mElementCombo->SetSelection(mSpin->GetElement());
 
-  //mInterEdit->LoadFromSpin();
+  UpdateIsotopeDropDown();
+  mIsotopeCombo->SetSelection(0);
 }
 
+void SpinDialog::OnElementChange(wxCommandEvent& e) {
+  UpdateIsotopeDropDown();
+}
+
+
+BEGIN_EVENT_TABLE(SpinDialog,wxDialog) 
+
+EVT_CHOICE(ID_ELEMENT,SpinDialog::OnElementChange)
+
+END_EVENT_TABLE()
 
 
 

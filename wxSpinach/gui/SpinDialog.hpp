@@ -20,6 +20,14 @@ public:
   void SaveToSpin();
   void LoadFromSpin();
 
+  void UpdateIsotopeDropDown();
+
+  //Event Handlers
+  void OnElementChange(wxCommandEvent& e);
+
+protected:
+  DECLARE_EVENT_TABLE();
+
 private:
   SpinXML::Spin* mSpin;
   SpinInterEditPanel* mInterEdit;

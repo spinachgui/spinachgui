@@ -7,8 +7,8 @@ IMPLEMENT_APP(SpinachApp);
 
 bool SpinachApp::OnInit() {
   mSS = shared_ptr<SpinSystem>(new SpinSystem);
-  mSS->LoadFromG03File("install/data/tryosine.log");
-  mSS->SaveToXMLFile("install/data/tryosine.xml");
+  mSS->LoadFromG03File("data/tryosine.log");
+  mSS->SaveToXMLFile("data/tryosine.xml");
 
   mSSMgr = shared_ptr<SpinSysManager>(new SpinSysManager(mSS));
   

@@ -159,7 +159,7 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
     (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetZ(z);
   }
-  CEventManager::Instance()->trigger(CEvent("SCHANGE"));
+  CEventManager::Instance()->trigger(EvtSChange(e.GetRow()));
 }
 
 void SpinGrid::OnCellSelect(wxGridEvent& e) {
@@ -205,7 +205,13 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 // The McShafry style event handler
 
 bool SpinGrid::HandleEvent(CEvent const& event) {
-  cout << "SpinGrid just got an event of type " << event.getType().getStr() << endl;
+  if(event.getType()==EV_SCHANGE) {
+    //A single spin has changed, update one row
+    UpdateRow(event.getDataPtr<EvtDataSChange>()->mSpinNumber);
+  } else if(event.getType()==EV_SSCHANGE) {
+    //The entire system has changed, need to reload the grid.
+    void RefreshFromSpinSystem();
+  }
   return true;
 }
 

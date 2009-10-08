@@ -2,6 +2,8 @@
 #ifndef __SPINSYSMANAGER_H__
 #define __SPINSYSMANAGER_H__
 
+#include <gui/EventSystem.hpp>
+
 #include <boost/shared_ptr.hpp>
 
 #include <shared/spinsys.hpp>
@@ -44,6 +46,17 @@ private:
   SpinSysPtr mHead;
   std::list<SpinSysPtr>::iterator mPos;
   std::list<SpinSysPtr> mHistory;
+};
+
+class EvtDataSChange : public IEventData {
+public:
+  explicit EvtDataSChange(long spinNumber) : mSpinNumber(spinNumber){}
+  long  mSpinNumber;
+};
+
+class EvtSChange : public CEvent {
+public:
+  explicit EvtSChange(long spinNumber);
 };
 
 #endif

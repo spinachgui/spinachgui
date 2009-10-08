@@ -51,17 +51,14 @@ typedef boost::shared_ptr<IEventData> IEventDataPtr;
 class CEvent {
 public:
   CEvent(const string& inEventTypeName,
-	 float inTime=0.f,
 	 IEventDataPtr inData = IEventDataPtr((IEventData*)NULL))
     :
     mType(inEventTypeName),
-    mTime(inTime),
     mUserData(inData)
   {}
 	
   CEvent(CEvent const& o)
     :mType(o.mType),
-     mTime(o.mTime),
      mUserData(o.mUserData) {}
 	
   CEventType const & getType()  const {return mType;}

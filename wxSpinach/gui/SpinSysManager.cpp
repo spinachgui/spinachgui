@@ -54,4 +54,6 @@ bool SpinSysManager::CanRedo() const {
   return mPos != --mHistory.end();
 }
 
-
+EvtSChange::EvtSChange(long spinNumber) : CEvent("SCHANGE",IEventDataPtr(new EvtDataSChange(spinNumber))){
+  
+}

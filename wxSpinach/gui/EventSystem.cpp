@@ -13,6 +13,12 @@ const char* const pWildcardEventType="*";
 
 //==============================>> CEventType <<========================//
 
+bool CEventType::operator==(CEventType const& e) const {
+  return getId()==e.getId();
+}
+
+
+
 EventTypeId CEventType::hash_name(const char* typeName) {
   // Relatively simple hash of arbitrary text string into a
   // 32-bit identifier Output value is

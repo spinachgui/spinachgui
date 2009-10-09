@@ -139,9 +139,16 @@ void SpinGrid::UpdateRow(long rowNumber) {
   //Setup the label and the element columns
   SetCellValue(rowNumber,COL_LABEL,wxString(thisSpin->GetLabel(),wxConvUTF8));
 
+  //Setup the x,y,z coordinates
   SetCellValue(rowNumber,COL_X,wxString() << x);
   SetCellValue(rowNumber,COL_Y,wxString() << y);
   SetCellValue(rowNumber,COL_Z,wxString() << z);
+
+  //Set the element and isotope
+  long element=thisSpin->GetElement();
+  wxString str(getElementSymbol(element),wxConvUTF8);
+  str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
+  SetCellValue(rowNumber,COL_ELEMENT,str);
 }
 
 void SpinGrid::OnCellChange(wxGridEvent& e) {

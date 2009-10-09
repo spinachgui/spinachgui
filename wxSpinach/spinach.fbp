@@ -258,7 +258,7 @@
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">&amp;Undo</property>
                         <property name="name">mMenuItemUndo</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>
@@ -273,7 +273,7 @@
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">&amp;Redo</property>
                         <property name="name">mMenuItemRedo</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>

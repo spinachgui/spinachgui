@@ -628,6 +628,7 @@ void glDisplay::OnDisplaySpinDialog(wxCommandEvent& e) {
 
 bool glDisplay::HandleEvent(CEvent const& event) {
   cout << "glDisplay just got an event of type " << event.getType().getStr() << endl;
+  CreateBondList();
   Refresh();
   return true;
 }

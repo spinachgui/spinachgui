@@ -60,10 +60,8 @@ private:
 class SpinachApp : public wxApp {
 public:
   virtual bool OnInit();
-  shared_ptr<SpinSystem> GetSpinSystem() const {return mSS;}
   SpinSysManager* GetSpinSysManager() const {return mSSMgr;}
 private:
-  shared_ptr<SpinSystem> mSS;
   SpinSysManager* mSSMgr;
 };
 

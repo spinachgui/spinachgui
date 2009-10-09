@@ -29,7 +29,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 
 SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
-  :wxGrid(parent,id),mSS(wxGetApp().GetSpinSystem()),mInterPopup(NULL),mPopupLock(false) {
+  :wxGrid(parent,id),mHead(wxGetApp().GetSpinSysManager()->Get()),mInterPopup(NULL),mPopupLock(false) {
 
 
   CreateGrid(0, ColumCount);
@@ -67,7 +67,7 @@ void SpinGrid::OnEdit(wxGridEvent& e) {
 void SpinGrid::OnEndEdit(wxGridEvent& e) {
   if(e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR) {
     cout << "OnEndEdit" << endl;
-    ShowPopup(mSS->GetSpin(e.GetRow()));
+    ShowPopup((*mHead)->GetSpin(e.GetRow()));
   }
 }
 
@@ -96,8 +96,8 @@ void SpinGrid::HidePopup() {
 
 void SpinGrid::RefreshFromSpinSystem() {
   ClearGrid();
-  AppendRows(mSS->GetSpinCount()+1);
-  for (long i=0; i < mSS->GetSpinCount(); i++) {
+  AppendRows((*mHead)->GetSpinCount()+1);
+  for (long i=0; i < (*mHead)->GetSpinCount(); i++) {
     SetupRow(i);
     UpdateRow(i);
   }
@@ -127,7 +127,7 @@ void SpinGrid::SetupRow(long rowNumber) {
 }
 
 void SpinGrid::UpdateRow(long rowNumber) {
-  Spin* thisSpin = mSS->GetSpin(rowNumber);
+  Spin* thisSpin = (*mHead)->GetSpin(rowNumber);
   double x,y,z;
   thisSpin->GetCoordinates(&x,&y,&z);
 
@@ -143,25 +143,25 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
   if(e.GetCol()==COL_X) {
     double x;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
-    mSS->GetSpin(e.GetRow())->GetPosition()->SetX(x);
+    (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetX(x);
   } else if(e.GetCol()==COL_Y) {
     double y;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&y);
-    mSS->GetSpin(e.GetRow())->GetPosition()->SetY(y);
+    (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetY(y);
   } else if(e.GetCol()==COL_Z) {
     double z;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
-    mSS->GetSpin(e.GetRow())->GetPosition()->SetZ(z);
+    (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetZ(z);
   }
 }
 
 void SpinGrid::OnCellSelect(wxGridEvent& e) {
-  if(e.GetRow()==mSS->GetSpinCount()) {
+  if(e.GetRow()==(*mHead)->GetSpinCount()) {
     //The user has clicked the blank row at the bottom of the grid.
     //We should create a new spin
-    mSS->InsertSpin(new Spin(mSS.get(),new Vector3(0,0,0),"New Spin",mSS->GetRootFrame(),0));
-    UpdateRow(mSS->GetSpinCount()-1);
-    SetupRow(mSS->GetSpinCount()-1);        
+    (*mHead)->InsertSpin(new Spin((*mHead).get(),new Vector3(0,0,0),"New Spin",(*mHead)->GetRootFrame(),0));
+    UpdateRow((*mHead)->GetSpinCount()-1);
+    SetupRow((*mHead)->GetSpinCount()-1);        
     AppendRows(1);
     e.Skip();
     return;
@@ -171,7 +171,7 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
     e.Skip();
   } else if(e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR) {
     HidePopup();
-    ShowPopup(mSS->GetSpin(e.GetRow()));
+    ShowPopup((*mHead)->GetSpin(e.GetRow()));
     e.Skip();
   } else {
     HidePopup();
@@ -184,7 +184,7 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 
   menu->Append(MENU_NEW_SPIN, wxT("Spin Properties..."));    
 
-  if(e.GetRow()<mSS->GetSpinCount()) {
+  if(e.GetRow()<(*mHead)->GetSpinCount()) {
     menu->Append(MENU_SPIN_DIALOG, wxT("Spin Properties..."));    
     menu->Append(MENU_DELETE_SPINS, wxT("Delete Spins..."));
   }

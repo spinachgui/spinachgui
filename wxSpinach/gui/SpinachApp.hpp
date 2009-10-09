@@ -13,6 +13,7 @@ using boost::shared_ptr;
 #include <res/SpinachGUI.h>
 
 #include <gui/SpinSysManager.hpp>
+#include <gui/EventSystem.hpp>
 #include <gui/glDisplay.hpp>
 #include <gui/SpinGrid.hpp>
 
@@ -20,7 +21,7 @@ using boost::shared_ptr;
 
 using namespace SpinXML;
 
-class RootFrame : public RootFrameBase {
+class RootFrame : public RootFrameBase,public IEventListener {
 public:
   RootFrame(wxWindow* parent) : RootFrameBase(parent) {
     SetSize(wxSize(1024,768));
@@ -34,6 +35,8 @@ public:
 
   void OnUndo(wxCommandEvent& e);
   void OnRedo(wxCommandEvent& e);
+
+  virtual bool HandleEvent(CEvent const& event);
 
   DECLARE_EVENT_TABLE();
 
@@ -53,5 +56,10 @@ private:
 };
 
 DECLARE_APP(SpinachApp);
+
+//Define macros for accessing the most up to date spin system
+#define GetSSMgr() (*(wxGetApp().GetSpinSysManager()))
+#define GetSS() (*(wxGetApp().GetSpinSysManager()->Get()))
+#define Chkpoint(x) wxGetApp().GetSpinSysManager()->Checkpoint((x));
 
 #endif

@@ -32,6 +32,8 @@ const float radius2=radius*radius;
 
 const CEventType EV_SSCHANGE("SSCHANGE");
 const CEventType EV_SCHANGE("SCHANGE");
+const CEventType EV_UNDO("undo");
+const CEventType EV_REDO("redo");
 
 using namespace std;
 
@@ -54,6 +56,8 @@ void glDisplay::EnableGL() {
   //means we need to redraw the display
   CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SSCHANGE);
   CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SCHANGE);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_UNDO);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_REDO);
 
   if(mGLContext == NULL) {
     mGLContext = new wxGLContext(this);

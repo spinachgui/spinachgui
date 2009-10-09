@@ -9,6 +9,10 @@
 
 IMPLEMENT_APP(SpinachApp);
 
+const CEventType EVT_CHECKPOINT("checkpoint");
+const CEventType EVT_UNDO("undo");
+const CEventType EVT_REDO("redo");
+
 bool SpinachApp::OnInit() {
 
   //Start the event system up
@@ -53,6 +57,10 @@ bool SpinachApp::OnInit() {
 // RootFrame
 
 void RootFrame::InitFrame() {
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_CHECKPOINT);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_UNDO);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_REDO);
+
   mNotebook=new wxAuiNotebook(mAuiPanel);
 
   mSpinGrid=new SpinGrid(mNotebook);
@@ -72,6 +80,18 @@ void RootFrame::InitFrame() {
   mMenuItemRedo->Enable(false);
 }
 
+bool RootFrame::HandleEvent(CEvent const& event) {
+  cout << "Root window got an event" << endl;
+  if(event.getType() == EVT_CHECKPOINT ||
+     event.getType() == EVT_UNDO || 
+     event.getType() == EVT_REDO) {
+    //In these circumstances, we may need to grey or ungrey the
+    //edit->undo and edit->redo menus.
+    mMenuItemUndo->Enable(GetSSMgr().CanUndo());
+    mMenuItemRedo->Enable(GetSSMgr().CanRedo());
+  }
+  return true;
+}
 
 void RootFrame::OnUndo(wxCommandEvent& e) {
   wxGetApp().GetSpinSysManager()->Undo();

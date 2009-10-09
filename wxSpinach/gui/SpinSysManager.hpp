@@ -15,7 +15,7 @@
 typedef boost::shared_ptr<SpinXML::SpinSystem> SpinSysPtr;
 //typedef SpinXML::SpinSystem* SpinSysPtr;
 
-class SpinSysManager {
+class SpinSysManager : public IEventListener {
 public:
   SpinSysManager(SpinSysPtr system);
 
@@ -36,6 +36,9 @@ public:
 
   ///True if it is possible to redo a change
   bool CanRedo() const;
+
+  ///The McShafry style event handler
+  virtual bool HandleEvent(CEvent const& event);
 
 private:
   ///Default constructor is disabled

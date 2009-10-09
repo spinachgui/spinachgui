@@ -6,10 +6,20 @@ using namespace boost;
 using namespace SpinXML;
 using namespace std;
 
+const CEventType EVT_CHECKPOINT("checkpoint");
+const CEventType EVT_UNDO("undo");
+const CEventType EVT_REDO("redo");
+const CEventType EVT_SSCHANGE("SSCHANGE");
+const CEventType EVT_SCHANGE("SCHANGE");
+
 SpinSysManager::SpinSysManager(SpinSysPtr system) {
   mHistory.push_back(system);
   mPos=mHistory.begin();
   mHead=*mPos;
+
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_CHECKPOINT);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SCHANGE);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SSCHANGE);
 }
 
 
@@ -26,10 +36,20 @@ void SpinSysManager::Checkpoint(wxString message) {
   mHead=NewSystem;
 }
 
+bool SpinSysManager::HandleEvent(CEvent const& event) {
+  cout << "SpinSysManager::HandleEvent" << endl;
+  if(event.getType()==EVT_SCHANGE || event.getType()==EVT_SSCHANGE) {
+    CEventManager::Instance()->trigger(CEvent("checkpoint"));
+  } else if(event.getType()==EVT_CHECKPOINT) {
+    Checkpoint(wxT("Unknown Change"));
+  }
+}
+
 
 void SpinSysManager::Undo() {
   if(CanUndo()) {
     mHead=*--mPos;
+    CEventManager::Instance()->trigger(CEvent("undo"));    
   } else {
     cout << "Warning, can't SpinSysManager::Undo() any futher" << endl;
   }
@@ -39,6 +59,7 @@ void SpinSysManager::Undo() {
 void SpinSysManager::Redo() {
   if(CanRedo()) {
     mHead=*++mPos;
+    CEventManager::Instance()->trigger(CEvent("redo"));
   } else {
     cout << "Warning, can't SpinSysManager::Redo() any futher" << endl;
   }

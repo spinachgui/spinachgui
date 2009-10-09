@@ -1,11 +1,17 @@
 
 #include <gui/SpinDialog.hpp>
+#include <gui/EventSystem.hpp>
+#include <gui/SpinachApp.hpp>
 #include <shared/nuclear_data.hpp>
+#include <gui/SpinSysManager.hpp>
 
 #include <string>
 #include <wx/log.h>
 
 using namespace SpinXML;
+
+const CEventType EV_SSCHANGE("SSCHANGE");
+const CEventType EV_SCHANGE("SCHANGE");
 
 enum {
   ID_ELEMENT
@@ -80,8 +86,8 @@ void SpinDialog::SaveToSpin() {
 
 
   mSpin->SetElement(mElementCombo->GetSelection());
-  mInterEdit->SaveToSpin();
 
+  CEventManager::Instance()->trigger(EvtSChange((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpinNumber(mSpin)));
 }
 
 

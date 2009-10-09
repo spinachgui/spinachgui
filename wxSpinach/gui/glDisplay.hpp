@@ -6,6 +6,7 @@
 #include <shared/spinsys.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <gui/EventSystem.hpp>
 #include <gui/SpinSysManager.hpp>
 
 #include <GL/glx.h>
@@ -15,7 +16,7 @@
 using namespace boost;
 using namespace SpinXML;
 
-class glDisplay : public wxGLCanvas {
+class glDisplay : public wxGLCanvas, public IEventListener {
 public:
   glDisplay(wxWindow* parent,wxWindowID id= -1);
   ~glDisplay();
@@ -28,6 +29,9 @@ public:
   void OnResize(wxSizeEvent& e);
 
   void OnDisplaySpinDialog(wxCommandEvent& e);
+
+  //The McShaffy style event handler
+  virtual bool HandleEvent(CEvent const& event);
 
 protected:
 

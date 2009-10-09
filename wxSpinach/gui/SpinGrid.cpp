@@ -11,7 +11,8 @@ using namespace SpinXML;
 
 const long ColumCount=10;  
 
-
+const CEventType EV_SSCHANGE("SSCHANGE");
+const CEventType EV_SCHANGE("SCHANGE");
 
 const SpinGrid::SpinGridColum SpinGrid::columns[]={
   {COL_SELECTED,   "Selected",73},
@@ -31,6 +32,10 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
   :wxGrid(parent,id),mHead(wxGetApp().GetSpinSysManager()->Get()),mInterPopup(NULL),mPopupLock(false) {
 
+  //Listen for all instances of the spin system changing because this
+  //means we need to redraw the display
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SSCHANGE);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SCHANGE);
 
   CreateGrid(0, ColumCount);
 
@@ -153,6 +158,7 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
     (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetZ(z);
   }
+  CEventManager::Instance()->trigger(EvtSChange(e.GetRow()));
 }
 
 void SpinGrid::OnCellSelect(wxGridEvent& e) {
@@ -192,6 +198,22 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
   delete menu;
 
 }
+
+//============================================================//
+// virtual bool HandleEvent(CEvent const& event);
+// The McShafry style event handler
+
+bool SpinGrid::HandleEvent(CEvent const& event) {
+  if(event.getType()==EV_SCHANGE) {
+    //A single spin has changed, update one row
+    UpdateRow(event.getDataPtr<EvtDataSChange>()->mSpinNumber);
+  } else if(event.getType()==EV_SSCHANGE) {
+    //The entire system has changed, need to reload the grid.
+    void RefreshFromSpinSystem();
+  }
+  return true;
+}
+
 
 
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)

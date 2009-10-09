@@ -43,6 +43,13 @@ public:
     mAuiPanel->GetSizer()->Add(mNotebook,1,wxEXPAND);
   }
 
+  //Event handlers
+
+  void OnUndo(wxCommandEvent& e);
+  void OnRedo(wxCommandEvent& e);
+
+  DECLARE_EVENT_TABLE();
+
 private:
   wxAuiNotebook* mNotebook;
   SpinGrid* mSpinGrid;
@@ -54,7 +61,7 @@ class SpinachApp : public wxApp {
 public:
   virtual bool OnInit();
   shared_ptr<SpinSystem> GetSpinSystem() const {return mSS;}
-  shared_ptr<SpinSysManager> GetSpinSystemMgr() const {return mSSMgr;}
+  shared_ptr<SpinSysManager> GetSpinSysManager() const {return mSSMgr;}
 private:
   shared_ptr<SpinSystem> mSS;
   shared_ptr<SpinSysManager> mSSMgr;

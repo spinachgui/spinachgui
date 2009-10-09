@@ -40,3 +40,21 @@ bool SpinachApp::OnInit() {
   frame->Show();
   return true;
 }
+
+//============================================================//
+// RootFrame
+
+void RootFrame::OnUndo(wxCommandEvent& e) {
+  wxGetApp().GetSpinSysManager()->Undo();
+}
+
+void RootFrame::OnRedo(wxCommandEvent& e) {
+  wxGetApp().GetSpinSysManager()->Redo();
+}
+
+BEGIN_EVENT_TABLE(RootFrame,wxFrame)
+
+EVT_MENU(ID_UNDO,RootFrame::OnUndo)
+EVT_MENU(ID_REDO,RootFrame::OnRedo)
+
+END_EVENT_TABLE()

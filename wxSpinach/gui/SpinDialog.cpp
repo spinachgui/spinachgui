@@ -78,7 +78,10 @@ void SpinDialog::SaveToSpin() {
   wxString label=mSpinTitle->GetValue();
   mSpin->SetLabel(string(label.mb_str()));
 
+
   mSpin->SetElement(mElementCombo->GetSelection());
+  mInterEdit->SaveToSpin();
+
 }
 
 

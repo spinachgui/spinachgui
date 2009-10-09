@@ -164,8 +164,24 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     double z;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
     (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetZ(z);
+  } else if(e.GetCol()==COL_ELEMENT) {
+    wxString content=GetCellValue(e.GetRow(),e.GetCol());
+    long space=content.Find(wxT(" "));
+    wxString symbol=content.SubString(0,space-1);
+    long element=getElementBySymbol(symbol.char_str());
+    if(element==-1) {
+      cerr << "Reverse lookup of element symbol " << symbol.char_str() << " failed!" << endl;
+    } else {
+      UpdateRowIsotopes(e.GetRow());
+      (*mHead)->GetSpin(e.GetRow())->SetElement(element);
+    }
+    cout << space << " " << symbol.char_str() << endl;
   }
   CEventManager::Instance()->trigger(EvtSChange(e.GetRow()));
+}
+
+void SpinGrid::UpdateRowIsotopes(long row) {
+
 }
 
 void SpinGrid::OnCellSelect(wxGridEvent& e) {

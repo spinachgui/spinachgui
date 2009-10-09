@@ -49,6 +49,7 @@ protected:
   void HidePopup();
   void RefreshFromSpinSystem();
   void UpdateRow(long rowNumber);
+  void UpdateRowIsotopes(long row);
   void SetupRow(long rowNumber);
 
 private:

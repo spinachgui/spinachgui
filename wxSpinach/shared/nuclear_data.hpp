@@ -13,6 +13,8 @@ double getElementR(long p);
 double getElementG(long p);
 double getElementB(long p);
 
+long getElementBySymbol(const char* symb);
+
 
 //Isotope functions
 

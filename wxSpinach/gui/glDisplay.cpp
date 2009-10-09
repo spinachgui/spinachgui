@@ -140,8 +140,8 @@ void glDisplay::EnableGL() {
 void glDisplay::CreateBondList() {
 	glNewList(mDLBonds,GL_COMPILE);
 	
-	for(long i=0;i<mSS->GetSpinCount();i++) {   //Draw the spins and the bonds
-		Spin* thisSpin=mSS->GetSpin(i);
+	for(long i=0;i<(*mSS)->GetSpinCount();i++) {   //Draw the spins and the bonds
+		Spin* thisSpin=(*mSS)->GetSpin(i);
 		double x1,y1,z1;
 		thisSpin->GetCoordinates(&x1,&y1,&z1);
 		
@@ -177,7 +177,7 @@ void glDisplay::FindHover() {
   mHover=-1;     //The index of the spin the user is hovering over
   mHoverDist=0;  //This distance to that spin
 	
-  long spinCount=mSS->GetSpinCount();
+  long spinCount=(*mSS)->GetSpinCount();
   int width,height;
   GetClientSize(&width,&height);
 	
@@ -194,7 +194,7 @@ void glDisplay::FindHover() {
 
   for(long i=0;i<spinCount;i++) {  //Decide which spin is selected
     double x,y,z;
-    Spin* thisSpin=mSS->GetSpin(i);
+    Spin* thisSpin=(*mSS)->GetSpin(i);
     thisSpin->GetCoordinates(&x,&y,&z);
 		
     //The distance from the near clipping plane is reused in the colision detection
@@ -266,10 +266,10 @@ void glDisplay::Geometary(bool depthOnly) {
 
 
 void glDisplay::DrawAtoms(bool depthOnly) {
-  long spinCount=mSS->GetSpinCount();
+  long spinCount=(*mSS)->GetSpinCount();
   for(long i=0;i<spinCount;i++) {  
     double x,y,z;
-    Spin* thisSpin=mSS->GetSpin(i);
+    Spin* thisSpin=(*mSS)->GetSpin(i);
     thisSpin->GetCoordinates(&x,&y,&z);
 		
     glPushMatrix(); {
@@ -303,7 +303,7 @@ void glDisplay::DrawBonds() {
 }
 
 void glDisplay::DrawLinear(long atom) {
-  Spin* thisSpin=mSS->GetSpin(atom);
+  Spin* thisSpin=(*mSS)->GetSpin(atom);
   Matrix3 mat3=thisSpin->GetLinearInteractionAsMatrix();
 
   //Convert to a openGL 4x4 matrix
@@ -365,14 +365,14 @@ void glDisplay::DrawLinear(long atom) {
 }
 
 void glDisplay::DrawBilinear() {
-  long spinCount=mSS->GetSpinCount();
+  long spinCount=(*mSS)->GetSpinCount();
   for(long i=0;i<spinCount;i++) { //Draw the J couplings
     //Do the two spin couplings
-    Spin* thisSpin=mSS->GetSpin(i);
+    Spin* thisSpin=(*mSS)->GetSpin(i);
     double x1,y1,z1;
     thisSpin->GetCoordinates(&x1,&y1,&z1);  
     for (long j=i+1;j<spinCount;j++) {
-      Spin* jSpin=mSS->GetSpin(j);
+      Spin* jSpin=(*mSS)->GetSpin(j);
       double scalar=abs(thisSpin->GetBilinearInteractionAsScalar(jSpin))/300;
       if (scalar < 20) {
 	continue;
@@ -503,7 +503,7 @@ void glDisplay::OnPaint(wxPaintEvent& e) {
 glDisplay::glDisplay(wxWindow* parent,wxWindowID id) : wxGLCanvas(parent,id,NULL) {
   mGLContext=NULL;
   mGLEnabled=false;
-  mSS=wxGetApp().GetSpinSystem();
+  mSS=wxGetApp().GetSpinSysManager()->Get();
 
   mZoom=0.01;
   mCamX=0.0;
@@ -607,7 +607,7 @@ void glDisplay::OnResize(wxSizeEvent& e) {
 
 void glDisplay::OnDisplaySpinDialog(wxCommandEvent& e) {
   if(mHover>-1) {
-    SpinDialog* dialog=new SpinDialog(this,mSS->GetSpin(mHover));
+    SpinDialog* dialog=new SpinDialog(this,(*mSS)->GetSpin(mHover));
     dialog->ShowModal();      
   } else {
     wxLogError(wxT("In glDisplay::OnDisplaySpinDialog(wxCommandEvent&) mHover < 0"));

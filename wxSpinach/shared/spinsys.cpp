@@ -1015,7 +1015,10 @@ const char* Interaction::GetTypeName(Type t) {
   case SPANSKEW:
     return "Span-Skew";
   default:
-    throw std::runtime_error("Unknow subtype submited to Interaction::GetTypeName()");
+    ostringstream stream;
+    stream << "Unknow type submited to Interaction::GetTypeName() (t=";
+    stream << t << ")" << endl;
+    throw std::runtime_error(stream.str());
     return "Error in Interaction::GetTypeName()";
   };         
 };
@@ -1036,7 +1039,10 @@ const char* Interaction::GetSubTypeName(SubType st) {
   case ST_SCALAR:      return "Scalar";
   case ST_CUSTOM:      return "Custom";
   default:
-    throw std::runtime_error("Unknow subtype submited to Interaction::GetSubTypeName()");
+    ostringstream stream;
+    stream << "Unknow subtype submited to Interaction::GetSubTypeName() (st=";
+    stream << st << ")" << endl;
+    throw std::runtime_error(stream.str());
     return "Error in Interaction::GetSubTypeName()";
   }
 }

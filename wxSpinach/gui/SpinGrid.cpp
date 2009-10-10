@@ -304,6 +304,7 @@ SpinGridPanel::SpinGridPanel(wxWindow* parent,wxWindowID id)
   //mInterEdit->SetSpin as the correct behavior obtained by default
   //(so long as mInterEdit is constructed)
   mInterEdit=new SpinInterEditPanel(this);
+  mInterEdit->SetDialogMode(false);
   mGrid=new SpinGrid(this);
 
   sizer->Add(mGrid,1,wxEXPAND | wxALL);

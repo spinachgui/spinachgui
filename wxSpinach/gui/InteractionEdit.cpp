@@ -113,7 +113,12 @@ void InterEditPanel_StaticConstructor() {
 }
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
-  : InterEditPanelBase(parent,id),mInter(NULL),mLoading(false),mSubTypeComboLookup(NULL),mSubTypeComboLookupLen(0) {
+  : InterEditPanelBase(parent,id),
+    mInter(NULL),
+    mLoading(false),
+    mSubTypeComboLookup(NULL),
+    mSubTypeComboLookupLen(0),
+    mDialogMode(true) {
 
   Enable(false);
 
@@ -465,7 +470,11 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 
 
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id) 
-  : SpinInterEditPanelBase(parent,id),mSpin(NULL),mUpdatingListBox(false),mEditMode(EDIT_ALL) {
+  : SpinInterEditPanelBase(parent,id),
+    mSpin(NULL),
+    mUpdatingListBox(false),
+    mEditMode(EDIT_ALL),
+    mDialogMode(true) {
   mInterEdit=new InterEditPanel(this);
   GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
   Enable(false);
@@ -544,7 +553,7 @@ void SpinInterEditPanel::UpdateListBox() {
     interTitle << wxT("(") << quadStr << wxT(", ");
     interTitle << wxString(Interaction::GetTypeName(inter->GetType()),wxConvUTF8);
     interTitle << wxT(")");
-    if(mTempInteractions[i].modified) {
+    if(mTempInteractions[i].modified && mDialogMode) {
       interTitle << wxT("*");
     } 
     mLBIndex2SpinIndex.push_back(i);

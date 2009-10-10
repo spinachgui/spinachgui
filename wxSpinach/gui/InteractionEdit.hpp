@@ -15,6 +15,7 @@ public:
   InterEditPanel(wxWindow* parent, wxWindowID id=-1);
 
   void SetInter(SpinXML::Interaction* inter);
+  void SetDialogMode(bool dialogMode=true) {mDialogMode=dialogMode;}
 
   void OnPageChange(wxChoicebookEvent& e);
   void LoadFromInter();
@@ -51,6 +52,9 @@ private:
   const SpinXML::Interaction::SubType* mSubTypeComboLookup;
   ///The length of SubTypeComboLookup
   long mSubTypeComboLookupLen;
+  ///If in dialog mode do not checkpoint changes and show a star* next
+  ///to changed interactions. On by default
+  bool mDialogMode;
 };
 
 
@@ -59,6 +63,8 @@ class SpinInterEditPanel : public SpinInterEditPanelBase {
 public:
   SpinInterEditPanel(wxWindow* parent,wxWindowID id= -1);
   ~SpinInterEditPanel();
+
+  void SetDialogMode(bool dialogMode=true) {mDialogMode=dialogMode; mInterEdit->SetDialogMode();}
 
   void SetSpin(SpinXML::Spin* spin);
 
@@ -118,6 +124,10 @@ private:
   ///when mUpdatingListBox is true should usually be ignored
   bool mUpdatingListBox;
   std::vector<ListBoxInteraction> mTempInteractions;
+
+  ///If in dialog mode do not checkpoint changes and show a star* next
+  ///to changed interactions. On by default
+  bool mDialogMode;
 };
 
 class InterPopup : public wxFrame {

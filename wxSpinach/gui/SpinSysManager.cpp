@@ -35,7 +35,7 @@ void SpinSysManager::Checkpoint(wxString message) {
 bool SpinSysManager::HandleEvent(CEvent const& event) {
   cout << "SpinSysManager::HandleEvent" << endl;
   if(event.getType()==EVT_SCHANGE || event.getType()==EVT_SSCHANGE) {
-    CEventManager::Instance()->trigger(CEvent("checkpoint"));
+    CEventManager::Instance()->trigger(CEvent(EVT_CHECKPOINT));
   } else if(event.getType()==EVT_CHECKPOINT) {
     Checkpoint(wxT("Unknown Change"));
   }
@@ -45,7 +45,7 @@ bool SpinSysManager::HandleEvent(CEvent const& event) {
 void SpinSysManager::Undo() {
   if(CanUndo()) {
     mHead=*--mPos;
-    CEventManager::Instance()->trigger(CEvent("undo"));    
+    CEventManager::Instance()->trigger(CEvent(EVT_UNDO));    
   } else {
     cout << "Warning, can't SpinSysManager::Undo() any futher" << endl;
   }
@@ -55,7 +55,7 @@ void SpinSysManager::Undo() {
 void SpinSysManager::Redo() {
   if(CanRedo()) {
     mHead=*++mPos;
-    CEventManager::Instance()->trigger(CEvent("redo"));
+    CEventManager::Instance()->trigger(CEvent(EVT_REDO));
   } else {
     cout << "Warning, can't SpinSysManager::Redo() any futher" << endl;
   }
@@ -71,6 +71,6 @@ bool SpinSysManager::CanRedo() const {
   return mPos != --mHistory.end();
 }
 
-EvtSChange::EvtSChange(long spinNumber) : CEvent("SCHANGE",IEventDataPtr(new EvtDataSChange(spinNumber))){
+EvtSChange::EvtSChange(long spinNumber) : CEvent(EVT_SCHANGE,IEventDataPtr(new EvtDataSChange(spinNumber))){
   
 }

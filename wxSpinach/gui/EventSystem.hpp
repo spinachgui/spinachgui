@@ -50,10 +50,10 @@ typedef boost::shared_ptr<IEventData> IEventDataPtr;
 
 class CEvent {
 public:
-  CEvent(const string& inEventTypeName,
+  CEvent(const CEventType& inEventType,
 	 IEventDataPtr inData = IEventDataPtr((IEventData*)NULL))
     :
-    mType(inEventTypeName),
+    mType(inEventType),
     mUserData(inData)
   {}
 	

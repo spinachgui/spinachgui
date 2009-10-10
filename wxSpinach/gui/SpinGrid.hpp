@@ -33,7 +33,7 @@ public:
     COL_Z,
     COL_LINEAR,
     COL_BILINEAR,
-    COL_QUADRAPOLAR
+    COL_QUAD
   };
 
   enum MENU_EVENT {

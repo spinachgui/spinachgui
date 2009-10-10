@@ -68,7 +68,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
   {COL_Z,          "z",70},	    
   {COL_LINEAR,     "Linear",70},    
   {COL_BILINEAR,   "Bilinear",70},
-  {COL_QUADRAPOLAR,"Quadrapolar",100}
+  {COL_QUAD,"Quadrapolar",100}
 };		   
 
 
@@ -107,13 +107,13 @@ SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
     
 
 void SpinGrid::OnEdit(wxGridEvent& e) {
-  if (e.GetCol()==COL_LINEAR || e.GetCol()==COL_QUADRAPOLAR) {
+  if (e.GetCol()==COL_LINEAR || e.GetCol()==COL_QUAD) {
     cout << "OnEdit" << endl;
   }
 }
 
 void SpinGrid::OnEndEdit(wxGridEvent& e) {
-  if(e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR) {
+  if(e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUAD) {
     cout << "OnEndEdit" << endl;
   }
 }
@@ -155,7 +155,7 @@ void SpinGrid::SetupRow(long rowNumber) {
   //The Linear, Bilienar and Quad colums should not be editable
   SetReadOnly(rowNumber,COL_LINEAR);
   SetReadOnly(rowNumber,COL_BILINEAR);
-  SetReadOnly(rowNumber,COL_QUADRAPOLAR);
+  SetReadOnly(rowNumber,COL_QUAD);
 }
 
 void SpinGrid::UpdateRow(long rowNumber) {
@@ -180,7 +180,7 @@ void SpinGrid::UpdateRow(long rowNumber) {
   //Set the interactions
   SetCellValue(rowNumber,COL_LINEAR     ,FormatLinearInteractions(thisSpin,LINEAR));
   SetCellValue(rowNumber,COL_BILINEAR   ,FormatLinearInteractions(thisSpin,BILINEAR));
-  SetCellValue(rowNumber,COL_QUADRAPOLAR,FormatLinearInteractions(thisSpin,QUAD));
+  SetCellValue(rowNumber,COL_QUAD,FormatLinearInteractions(thisSpin,QUAD));
 }
 
 void SpinGrid::OnCellChange(wxGridEvent& e) {
@@ -229,7 +229,7 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
     AppendRows(1);
   }
   
-  if(e.GetCol()==COL_LINEAR || e.GetCol()==COL_BILINEAR || e.GetCol()==COL_QUADRAPOLAR) {
+  if(e.GetCol()==COL_LINEAR || e.GetCol()==COL_BILINEAR || e.GetCol()==COL_QUAD) {
 
     wxCommandEvent event(EVT_INTER_SELECT);
     event.SetEventObject( this );

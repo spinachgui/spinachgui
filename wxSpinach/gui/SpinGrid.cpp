@@ -270,12 +270,15 @@ SpinGridPanel::SpinGridPanel(wxWindow* parent,wxWindowID id)
 }
 
 void SpinGridPanel::OnInterSelect(wxCommandEvent& e) {
+  mInterEdit->Show(true);
   mInterEdit->SetSpin(GetSS()->GetSpin(e.GetInt()));
+  Layout();
 }
 
 void SpinGridPanel::OnInterUnSelect(wxCommandEvent& e) {
-  
+  mInterEdit->Show(false);
   mInterEdit->SetSpin(NULL);
+  Layout();
 }
 
 BEGIN_EVENT_TABLE(SpinGridPanel,wxPanel)

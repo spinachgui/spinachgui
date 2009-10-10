@@ -14,6 +14,14 @@ const long ColumCount=10;
 const CEventType EV_SSCHANGE("SSCHANGE");
 const CEventType EV_SCHANGE("SCHANGE");
 
+//Event generated whenever the spin system changes
+DECLARE_EVENT_TYPE(EVT_INTER_SELECT, -1)
+DEFINE_EVENT_TYPE(EVT_INTER_SELECT)
+
+DECLARE_EVENT_TYPE(EVT_INTER_UNSELECT, -1)
+DEFINE_EVENT_TYPE(EVT_INTER_UNSELECT)
+
+
 const SpinGrid::SpinGridColum SpinGrid::columns[]={
   {COL_SELECTED,   "Selected",73},
   {COL_LABEL,      "Label",105},    
@@ -30,7 +38,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 
 SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
-  :wxGrid(parent,id),mHead(wxGetApp().GetSpinSysManager()->Get()),mInterPopup(NULL),mPopupLock(false) {
+  :wxGrid(parent,id),mHead(wxGetApp().GetSpinSysManager()->Get()),mUpdating(false) {
 
   //Listen for all instances of the spin system changing because this
   //means we need to redraw the display
@@ -65,47 +73,25 @@ SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
 void SpinGrid::OnEdit(wxGridEvent& e) {
   if (e.GetCol()==COL_LINEAR || e.GetCol()==COL_QUADRAPOLAR) {
     cout << "OnEdit" << endl;
-    HidePopup();
   }
 }
 
 void SpinGrid::OnEndEdit(wxGridEvent& e) {
   if(e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR) {
     cout << "OnEndEdit" << endl;
-    ShowPopup((*mHead)->GetSpin(e.GetRow()));
   }
 }
 
-void SpinGrid::ShowPopup(Spin* spin) {
-  mPopupLock=true;
-  cout << "Show Popup" << endl;
-  if(mInterPopup == NULL) {
-    mInterPopup = new InterPopup(this,spin);
-    wxPoint pos = ClientToScreen(wxPoint(10,10));
-    mInterPopup->SetPosition(pos);
-    mInterPopup->Show(true);
-
-    wxGetTopLevelParent(this)->Raise(); //The window's appearence on the screen should be passive. It should not grab the focus away from the grid.
-  }
-  mPopupLock=false;
-}
-
-void SpinGrid::HidePopup() {
-  cout << "HidePopup" << endl;
-  if (mInterPopup != NULL) {
-    mInterPopup->Show(false);
-    mInterPopup->Destroy(); //Marks this frame for iminent deletion
-    mInterPopup = NULL;     
-  }
-}
 
 void SpinGrid::RefreshFromSpinSystem() {
+  mUpdating=true;
   ClearGrid();
   AppendRows((*mHead)->GetSpinCount()+1);
   for (long i=0; i < (*mHead)->GetSpinCount(); i++) {
     SetupRow(i);
     UpdateRow(i);
   }
+  mUpdating=false;
 }
 
 void SpinGrid::SetupRow(long rowNumber) {
@@ -152,6 +138,9 @@ void SpinGrid::UpdateRow(long rowNumber) {
 }
 
 void SpinGrid::OnCellChange(wxGridEvent& e) {
+  if(mUpdating) {
+    return;
+  }
   if(e.GetCol()==COL_X) {
     double x;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
@@ -192,20 +181,22 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
     UpdateRow((*mHead)->GetSpinCount()-1);
     SetupRow((*mHead)->GetSpinCount()-1);        
     AppendRows(1);
-    e.Skip();
-    return;
   }
-  if(mPopupLock) {
-    cout << "OnCellSelect() called, but locked " << endl;
-    e.Skip();
-  } else if(e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUADRAPOLAR) {
-    HidePopup();
-    ShowPopup((*mHead)->GetSpin(e.GetRow()));
-    e.Skip();
+  
+  if(e.GetCol()==COL_LINEAR || e.GetCol()==COL_BILINEAR || e.GetCol()==COL_QUADRAPOLAR) {
+
+    wxCommandEvent event(EVT_INTER_SELECT);
+    event.SetEventObject( this );
+    event.SetInt(e.GetRow());
+    ProcessEvent(event);
+
   } else {
-    HidePopup();
-    e.Skip();
+
+    /*wxCommandEvent event(EVT_INTER_UNSELECT);
+    event.SetEventObject( this );
+    ProcessEvent(event);*/
   }
+  e.Skip();
 }
 
 void SpinGrid::OnRightClick(wxGridEvent& e) {
@@ -248,5 +239,39 @@ EVT_GRID_EDITOR_SHOWN    (         SpinGrid::OnEdit)
 
 EVT_GRID_CELL_RIGHT_CLICK(         SpinGrid::OnRightClick)
 
+
+END_EVENT_TABLE()
+
+
+//============================================================//
+// SpinGridPanel
+
+SpinGridPanel::SpinGridPanel(wxWindow* parent,wxWindowID id) 
+: wxPanel(parent,id){
+  wxBoxSizer* sizer=new wxBoxSizer(wxVERTICAL);
+
+  mGrid=new SpinGrid(this);
+  sizer->Add(mGrid,1,wxEXPAND | wxALL);
+
+  mInterEdit=new SpinInterEditPanel(this);
+  sizer->Add(mInterEdit,0,wxEXPAND | wxALL);
+  
+  SetSizer(sizer);
+
+  //  mInterEdit->SetSpin(GetSS()->GetSpin(0));
+}
+
+void SpinGridPanel::OnInterSelect(wxCommandEvent& e) {
+  mInterEdit->SetSpin(GetSS()->GetSpin(e.GetInt()));
+}
+
+void SpinGridPanel::OnInterUnSelect(wxCommandEvent& e) {
+  mInterEdit->SetSpin(NULL);
+}
+
+BEGIN_EVENT_TABLE(SpinGridPanel,wxPanel)
+
+EVT_COMMAND  (wxID_ANY, EVT_INTER_SELECT,   SpinGridPanel::OnInterSelect)
+EVT_COMMAND  (wxID_ANY, EVT_INTER_UNSELECT, SpinGridPanel::OnInterUnSelect)
 
 END_EVENT_TABLE()

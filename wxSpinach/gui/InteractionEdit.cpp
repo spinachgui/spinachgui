@@ -452,7 +452,8 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 	    wxDefaultPosition,
 	    wxDefaultSize,
 	    wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR),
-    mPanel(new SpinInterEditPanel(this,spin)) {
+    mPanel(new SpinInterEditPanel(this)) {
+  mPanel->SetSpin(spin);
   wxBoxSizer* sizer=new wxBoxSizer(wxVERTICAL);
   sizer->Add(mPanel,1.0,wxALL | wxEXPAND);
   SetSizer(sizer);  
@@ -462,24 +463,25 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 // SpinInterEditPanel
 
 
-SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,SpinXML::Spin* spin,wxWindowID id) 
-  : SpinInterEditPanelBase(parent,id),mSpin(spin),mUpdatingListBox(false),mEditMode(EDIT_ALL) {
+SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id) 
+  : SpinInterEditPanelBase(parent,id),mSpin(NULL),mUpdatingListBox(false),mEditMode(EDIT_ALL) {
   mInterEdit=new InterEditPanel(this);
   GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
-
-
-  LoadFromSpin();
+  Enable(false);
 };
 
 SpinInterEditPanel::~SpinInterEditPanel() {
   Clear();
 }
 
+void SpinInterEditPanel::SetSpin(Spin* spin) {
+  mSpin=spin;
+  LoadFromSpin();
+}
+
 void SpinInterEditPanel::Clear() {
-  long intCount=mTempInteractions.size();
-  for(long i=0;i<intCount;i++) {
-    delete mTempInteractions[i].inter;
-  }
+  mTempInteractions.resize(0);
+  Enable(false);
 }
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
@@ -492,10 +494,16 @@ void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
 
 void SpinInterEditPanel::LoadFromSpin() {
   Clear();
+  if(mSpin==NULL) {
+    return;
+  } else {
+    Enable(true);
+  }
+
   std::vector<Interaction*> oldInteractions=mSpin->GetInteractions(); 
   for(long i=0;i<oldInteractions.size();i++) {              //Make sure all the interactions here are copies
     ListBoxInteraction lbi;
-    lbi.inter=new Interaction(*(oldInteractions[i]));
+    lbi.inter=oldInteractions[i];
     lbi.modified=false;
     mTempInteractions.push_back(lbi);
   }
@@ -601,6 +609,9 @@ void SpinInterEditPanel::InteractionChange() {
 }
 
 void SpinInterEditPanel::OnSSChange(wxCommandEvent& e) {
+  if(mSpin==NULL) {
+    return;
+  }
   //If one of the interactions we're interested in just changed, it must
   //be the one currently being displayed, thus that is the one we mark as modifed
   long selected=GetSelectedInterIndex();

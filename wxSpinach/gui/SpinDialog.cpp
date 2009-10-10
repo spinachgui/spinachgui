@@ -18,7 +18,8 @@ enum {
 };
 
 SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBase(parent,id),mSpin(spin) {
-  mInterEdit=new SpinInterEditPanel(mSpinDialogPanel,spin);
+  mInterEdit=new SpinInterEditPanel(mSpinDialogPanel);
+  mInterEdit->SetSpin(spin);
 
   wxSizer* interSizer=mSpinDialogPanel->GetSizer()->GetItem(2)->GetSizer();
   interSizer->Add(mInterEdit,1,wxEXPAND | wxALL);

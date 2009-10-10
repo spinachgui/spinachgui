@@ -42,7 +42,7 @@ public:
 
 private:
   wxAuiNotebook* mNotebook;
-  SpinGrid* mSpinGrid;
+  SpinGridPanel* mSpinGridPanel;
   glDisplay* mGLDisplay;
 };
 

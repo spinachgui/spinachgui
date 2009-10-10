@@ -63,13 +63,13 @@ void RootFrame::InitFrame() {
 
   mNotebook=new wxAuiNotebook(mAuiPanel);
 
-  mSpinGrid=new SpinGrid(mNotebook);
+  mSpinGridPanel=new SpinGridPanel(mNotebook);
 
   mGLDisplay=new glDisplay(mNotebook);
 
   // add the panes to the manager
   mNotebook->AddPage(mGLDisplay, wxT("3D View"));
-  mNotebook->AddPage(mSpinGrid, wxT("Grid View"));
+  mNotebook->AddPage(mSpinGridPanel, wxT("Grid View"));
 
   mAuiPanel->GetSizer()->Add(mNotebook,1,wxEXPAND);
 

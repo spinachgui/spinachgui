@@ -45,8 +45,6 @@ public:
 protected:
   DECLARE_EVENT_TABLE();
 
-  void ShowPopup(SpinXML::Spin* spin);
-  void HidePopup();
   void RefreshFromSpinSystem();
   void UpdateRow(long rowNumber);
   void UpdateRowIsotopes(long row);
@@ -61,9 +59,21 @@ private:
   const static SpinGridColum columns[];
 
   const SpinSysPtr* mHead;
+  bool mUpdating;
+};
 
-  InterPopup* mInterPopup;
-  bool mPopupLock;
+class SpinGridPanel : public wxPanel {
+public:
+  SpinGridPanel(wxWindow* parent,wxWindowID id=-1);
+
+  void OnInterSelect(wxCommandEvent& e);
+  void OnInterUnSelect(wxCommandEvent& e);
+protected:
+  DECLARE_EVENT_TABLE();
+
+private:
+  SpinInterEditPanel* mInterEdit;
+  SpinGrid* mGrid;
 };
 
 #endif

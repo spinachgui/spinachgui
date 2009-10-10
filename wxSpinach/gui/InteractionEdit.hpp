@@ -57,8 +57,10 @@ private:
 
 class SpinInterEditPanel : public SpinInterEditPanelBase {
 public:
-  SpinInterEditPanel(wxWindow* parent,SpinXML::Spin* spin,wxWindowID id= -1);
+  SpinInterEditPanel(wxWindow* parent,wxWindowID id= -1);
   ~SpinInterEditPanel();
+
+  void SetSpin(SpinXML::Spin* spin);
 
   void OnNewButton(wxCommandEvent& e);
   void OnDeleteButton(wxCommandEvent& e);

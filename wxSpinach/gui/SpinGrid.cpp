@@ -192,9 +192,9 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
 
   } else {
 
-    /*wxCommandEvent event(EVT_INTER_UNSELECT);
+    wxCommandEvent event(EVT_INTER_UNSELECT);
     event.SetEventObject( this );
-    ProcessEvent(event);*/
+    ProcessEvent(event);
   }
   e.Skip();
 }
@@ -250,10 +250,18 @@ SpinGridPanel::SpinGridPanel(wxWindow* parent,wxWindowID id)
 : wxPanel(parent,id){
   wxBoxSizer* sizer=new wxBoxSizer(wxVERTICAL);
 
-  mGrid=new SpinGrid(this);
-  sizer->Add(mGrid,1,wxEXPAND | wxALL);
-
+  //NB: Construction must be in this order as wxGrid will emit a cell
+  //selection event as they are being constucted. This would cause
+  //this->OnInterUnSelect to be called which tries to do something
+  //with mInterEdit which is currently uninialised.
+  //
+  //The bright side is that we don't need to explicity call
+  //mInterEdit->SetSpin as the correct behavior obtained by default
+  //(so long as mInterEdit is constructed)
   mInterEdit=new SpinInterEditPanel(this);
+  mGrid=new SpinGrid(this);
+
+  sizer->Add(mGrid,1,wxEXPAND | wxALL);
   sizer->Add(mInterEdit,0,wxEXPAND | wxALL);
   
   SetSizer(sizer);
@@ -266,6 +274,7 @@ void SpinGridPanel::OnInterSelect(wxCommandEvent& e) {
 }
 
 void SpinGridPanel::OnInterUnSelect(wxCommandEvent& e) {
+  
   mInterEdit->SetSpin(NULL);
 }
 

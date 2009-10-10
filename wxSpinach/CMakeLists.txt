@@ -60,6 +60,7 @@ set(guiSources ${guiSources} "gui/EventSystem.cpp")
 set(guiSources ${guiSources} "gui/SpinDialog.cpp")
 set(guiSources ${guiSources} "gui/SpinGrid.cpp")
 set(guiSources ${guiSources} "gui/SpinSysManager.cpp")
+set(guiSources ${guiSources} "gui/RootFrame.cpp")
 set(guiSources ${guiSources} "res/SpinachGUI.cpp")
 
 set(sharedSources "shared/nuclear_data.cpp")

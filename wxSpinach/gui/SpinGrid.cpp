@@ -21,6 +21,42 @@ DEFINE_EVENT_TYPE(EVT_INTER_SELECT)
 DECLARE_EVENT_TYPE(EVT_INTER_UNSELECT, -1)
 DEFINE_EVENT_TYPE(EVT_INTER_UNSELECT)
 
+//============================================================//
+// Utility functions.
+
+//Enum for use with wxString FormatLinearInteractions()
+enum AlgebrakeForm {
+  LINEAR,
+  BILINEAR,
+  QUAD,
+  ALL
+};
+
+//Write a string representing the interactions acting on a spin
+wxString FormatLinearInteractions(Spin* spin,AlgebrakeForm form=ALL) {
+  wxString str;
+  vector<Interaction*> Interactions=spin->GetInteractions();
+  long count=Interactions.size();
+  bool first=true;
+  for(long i=0;i<count;i++) {
+
+    Interaction* inter=Interactions[i];
+    AlgebrakeForm f=(inter->GetIsLinear() ?
+		     LINEAR : (inter->GetIsBilinear() ? BILINEAR :
+			       (QUAD)));
+    if(f==form || form==ALL) {
+      if(!first) {
+	str << wxT(", ");
+      }
+      first=false;
+      str << wxString(Interaction::GetSubTypeName(inter->GetSubType()),wxConvUTF8);
+    }
+  }
+  return str;
+}
+
+//============================================================//
+// SpinGrid
 
 const SpinGrid::SpinGridColum SpinGrid::columns[]={
   {COL_SELECTED,   "Selected",73},
@@ -115,6 +151,11 @@ void SpinGrid::SetupRow(long rowNumber) {
   SetCellEditor(rowNumber,COL_X,new wxGridCellFloatEditor());
   SetCellEditor(rowNumber,COL_Y,new wxGridCellFloatEditor());
   SetCellEditor(rowNumber,COL_Z,new wxGridCellFloatEditor());
+
+  //The Linear, Bilienar and Quad colums should not be editable
+  SetReadOnly(rowNumber,COL_LINEAR);
+  SetReadOnly(rowNumber,COL_BILINEAR);
+  SetReadOnly(rowNumber,COL_QUADRAPOLAR);
 }
 
 void SpinGrid::UpdateRow(long rowNumber) {
@@ -135,6 +176,11 @@ void SpinGrid::UpdateRow(long rowNumber) {
   wxString str(getElementSymbol(element),wxConvUTF8);
   str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
   SetCellValue(rowNumber,COL_ELEMENT,str);
+
+  //Set the interactions
+  SetCellValue(rowNumber,COL_LINEAR     ,FormatLinearInteractions(thisSpin,LINEAR));
+  SetCellValue(rowNumber,COL_BILINEAR   ,FormatLinearInteractions(thisSpin,BILINEAR));
+  SetCellValue(rowNumber,COL_QUADRAPOLAR,FormatLinearInteractions(thisSpin,QUAD));
 }
 
 void SpinGrid::OnCellChange(wxGridEvent& e) {

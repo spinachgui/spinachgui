@@ -2,7 +2,7 @@
 #include <gui/SpinachApp.hpp>
 #include <gui/SpinGrid.hpp>
 #include <shared/nuclear_data.hpp>
-
+#include <gui/StdEvents.hpp>
 #include <iostream>
 
 using namespace std;
@@ -11,8 +11,7 @@ using namespace SpinXML;
 
 const long ColumCount=10;  
 
-const CEventType EV_SSCHANGE("SSCHANGE");
-const CEventType EV_SCHANGE("SCHANGE");
+
 
 //Event generated whenever the spin system changes
 DECLARE_EVENT_TYPE(EVT_INTER_SELECT, -1)
@@ -78,8 +77,8 @@ SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
 
   //Listen for all instances of the spin system changing because this
   //means we need to redraw the display
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SSCHANGE);
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EV_SCHANGE);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SSCHANGE);
+  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SCHANGE);
 
   CreateGrid(0, ColumCount);
 
@@ -264,10 +263,10 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 // The McShafry style event handler
 
 bool SpinGrid::HandleEvent(CEvent const& event) {
-  if(event.getType()==EV_SCHANGE) {
+  if(event.getType()==EVT_SCHANGE) {
     //A single spin has changed, update one row
     UpdateRow(event.getDataPtr<EvtDataSChange>()->mSpinNumber);
-  } else if(event.getType()==EV_SSCHANGE) {
+  } else if(event.getType()==EVT_SSCHANGE) {
     //The entire system has changed, need to reload the grid.
     void RefreshFromSpinSystem();
   }

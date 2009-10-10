@@ -6,11 +6,7 @@ using namespace boost;
 using namespace SpinXML;
 using namespace std;
 
-const CEventType EVT_CHECKPOINT("checkpoint");
-const CEventType EVT_UNDO("undo");
-const CEventType EVT_REDO("redo");
-const CEventType EVT_SSCHANGE("SSCHANGE");
-const CEventType EVT_SCHANGE("SCHANGE");
+#include <gui/StdEvents.hpp>
 
 SpinSysManager::SpinSysManager(SpinSysPtr system) {
   mHistory.push_back(system);

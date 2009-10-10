@@ -51,15 +51,5 @@ private:
   std::list<SpinSysPtr> mHistory;
 };
 
-class EvtDataSChange : public IEventData {
-public:
-  explicit EvtDataSChange(long spinNumber) : mSpinNumber(spinNumber){}
-  long  mSpinNumber;
-};
-
-class EvtSChange : public CEvent {
-public:
-  explicit EvtSChange(long spinNumber);
-};
 
 #endif

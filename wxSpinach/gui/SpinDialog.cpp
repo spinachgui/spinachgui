@@ -1,6 +1,7 @@
 
 #include <gui/SpinDialog.hpp>
 #include <gui/EventSystem.hpp>
+#include <gui/StdEvents.hpp>
 #include <gui/SpinachApp.hpp>
 #include <shared/nuclear_data.hpp>
 #include <gui/SpinSysManager.hpp>

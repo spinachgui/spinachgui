@@ -246,7 +246,8 @@ void InterEditPanel::LoadFromInter() {
 
   //Populate the spin 2 combobox with every other spin
   mSpin2Combo->Clear();
-  shared_ptr<SpinSysManager> SSMgr(wxGetApp().GetSpinSysManager());
+  
+  SpinSysManager* SSMgr=wxGetApp().GetSpinSysManager();
   const SpinSysPtr* head=SSMgr->Get();
 
   long spinCount=(*head)->GetSpinCount();

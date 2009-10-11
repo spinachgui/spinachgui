@@ -1,11 +1,17 @@
 
 #include <gui/RootFrame.hpp>
 #include <gui/SpinachApp.hpp>
+#include <gui/StdEvents.hpp>
+#include <wx/log.h>
 
-const CEventType EVT_CHECKPOINT("checkpoint");
-const CEventType EVT_UNDO("undo");
-const CEventType EVT_REDO("redo");
+//============================================================//
+// Utility Functions
 
+wxString GetExtension(const wxString& filename) {
+  int dot=filename.find(wxT("."));
+  wxString ext=(dot != wxNOT_FOUND ? filename.Mid(dot+1) : wxT(""));
+  return ext;
+}
 
 //============================================================//
 // RootFrame
@@ -58,8 +64,82 @@ void RootFrame::OnRedo(wxCommandEvent& e) {
   wxGetApp().GetSpinSysManager()->Redo();
 }
 
+void RootFrame::OnNew(wxCommandEvent& e) {
+
+}
+
+void RootFrame::OnOpen(wxCommandEvent& e) {
+  wxFileDialog* fd=new wxFileDialog(this,
+				    wxString(wxT("Choose a file")),
+				    wxString(wxT("")), //Default file
+				    wxString(wxT("")), //Default dir
+				    wxString(wxT("Spin XML files (*.xml)|*.xml|Gausian03 files (*.log)|*.log|All Files (*.*)|*.*")) ,
+				    wxFD_OPEN);
+  if(fd->ShowModal()) {
+    mOpenPath=fd->GetPath();
+    mOpenFile=fd->GetFilename();
+    mOpenDir=fd->GetDirectory();
+    wxString ext=GetExtension(mOpenFile);
+
+    if(ext.Lower()==wxT("log")) {
+      GetSS()->LoadFromG03File(mOpenPath.char_str());
+    } else {
+      //assume xml for everything else
+      GetSS()->LoadFromXMLFile(mOpenPath.char_str());
+    }
+    SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
+  }
+}
+
+void RootFrame::OnSave(wxCommandEvent& e) {
+  if(GetExtension(mOpenFile) == wxT("xml")) {
+    SaveToFile(mOpenPath);
+  } else {
+    SaveAs();
+  }
+}
+
+void RootFrame::OnSaveAs(wxCommandEvent& e) {
+  SaveAs();
+}
+
+void RootFrame::SaveAs() {
+  wxFileDialog* fd=new wxFileDialog(this,
+				    wxString(wxT("Choose a file")),
+				    wxString(wxT("")), //Default file
+				    wxString(wxT("")), //Default dir
+				    wxString(wxT("Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*")) ,
+				    wxFD_SAVE);
+  if(fd->ShowModal()) {
+    mOpenPath=fd->GetPath();
+    mOpenFile=fd->GetFilename();
+    mOpenDir=fd->GetDirectory();
+    wxString ext=GetExtension(mOpenFile);
+
+    SaveToFile(fd->GetPath());
+    SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
+  }
+}
+
+void RootFrame::OnExit(wxCommandEvent& e) {
+  delete this;
+}
+
+void RootFrame::SaveToFile(const wxString& filename) {
+  GetSS()->SaveToXMLFile(filename.char_str());
+}
+
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
+//File Menu
+EVT_MENU(ID_NEW   ,RootFrame::OnNew   )
+EVT_MENU(ID_OPEN  ,RootFrame::OnOpen  )
+EVT_MENU(ID_SAVE  ,RootFrame::OnSave  )
+EVT_MENU(ID_SAVEAS,RootFrame::OnSaveAs)
+EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
+
+//Edit Menu
 EVT_MENU(ID_UNDO,RootFrame::OnUndo)
 EVT_MENU(ID_REDO,RootFrame::OnRedo)
 

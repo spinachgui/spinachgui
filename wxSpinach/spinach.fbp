@@ -114,7 +114,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;File</property>
                     <property name="name">mMenuFile</property>
                     <property name="permission">protected</property>
@@ -123,7 +123,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_NEW</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">&amp;New</property>
                         <property name="name">mMenuItemNew</property>
@@ -138,7 +138,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_OPEN</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">Open</property>
                         <property name="name">mMenuItemOpen</property>
@@ -153,7 +153,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_SAVE</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">Save</property>
                         <property name="name">mMenuItemSave</property>
@@ -168,7 +168,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_SAVEAS</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">Save &amp;As</property>
                         <property name="name">mMenuItemSaveAs</property>
@@ -186,7 +186,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_IMPORT</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">Import...</property>
                         <property name="name">mMenuItemImport</property>
@@ -204,7 +204,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_OPTIONS</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">&amp;Options...</property>
                         <property name="name">mMenuItemOptions</property>
@@ -222,7 +222,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">wxID_ANY</property>
+                        <property name="id">ID_EXIT</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">E&amp;xit</property>
                         <property name="name">mMenuItemExit</property>

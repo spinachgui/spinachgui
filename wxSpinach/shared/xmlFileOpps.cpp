@@ -242,7 +242,7 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
 void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
   xml_schema::namespace_infomap map;
   map[""].name = "";
-  map[""].schema = "../data/spinsys_spec.xsd";
+  map[""].schema = "../data/spinxml_schema.xsd";
 
   std::ofstream fout(filename);
   if(!fout.is_open()) {

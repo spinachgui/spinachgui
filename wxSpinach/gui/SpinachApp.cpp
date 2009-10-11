@@ -34,21 +34,11 @@ bool SpinachApp::OnInit() {
 
 
   shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
-
   mSSMgr = new SpinSysManager(SS);
 
-  const SpinSysPtr* head = mSSMgr->Get();
-
-  mSSMgr->Checkpoint(wxT("Load File"));
-  (*head)->LoadFromG03File("data/tryosine.log");
-  (*head)->SaveToXMLFile("tryosine.xml");
-
   RootFrame* frame = new RootFrame(NULL);
-
-  //SpinDialog* dialog = new SpinDialog(frame,mSS->GetSpin(0));
-  //dialog->ShowModal();
-
   frame->Show();
+
   return true;
 }
 

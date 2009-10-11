@@ -2,6 +2,7 @@
 
 #include <shared/spinsys.hpp>
 #include <shared/spinxml_schema.hpp>
+#include <shared/nuclear_data.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -178,6 +179,7 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
       mSpins[i]=new SpinXML::Spin(this,new Vector3(x,y,z),"",GetRootFrame());
     }
     
+    mSpins[i]->SetElement(getElementBySymbol(xsdSpin.element().c_str()));
 
   }
 
@@ -262,6 +264,7 @@ void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
     vector coords(x,y,z);
     spin outSpin(coords,i,0);
     outSpin.label(label);
+    outSpin.element(getElementSymbol(thisSpin->GetElement()));
     spins.push_back(outSpin);
   }
   ss.spin(spins);

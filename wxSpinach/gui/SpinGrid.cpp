@@ -119,10 +119,17 @@ void SpinGrid::OnEndEdit(wxGridEvent& e) {
 
 
 void SpinGrid::RefreshFromSpinSystem() {
+  cout << "SpinGrid::RefreshFromSpinSystem()" << endl;
   mUpdating=true;
-  ClearGrid();
-  AppendRows((*mHead)->GetSpinCount()+1);
-  for (long i=0; i < (*mHead)->GetSpinCount(); i++) {
+  GetSSMgr().DumpHistory();
+
+  if(GetNumberRows()) {
+    //Clear grid only clears the underlying data rather. The cells
+    //remain and are black. wxGrid::DeleteRows solves this
+    DeleteRows(0,GetNumberRows());
+  }
+  AppendRows(GetSS()->GetSpinCount()+1);
+  for (long i=0; i < GetSS()->GetSpinCount(); i++) {
     SetupRow(i);
     UpdateRow(i);
   }
@@ -272,7 +279,9 @@ bool SpinGrid::HandleEvent(CEvent const& event) {
     UpdateRow(event.getDataPtr<EvtDataSChange>()->mSpinNumber);
   } else if(event.getType()==EVT_SSCHANGE) {
     //The entire system has changed, need to reload the grid.
-    void RefreshFromSpinSystem();
+    cout << "SpinGrid::HandleEvent received an SSCHANGE event" << endl;
+    GetSSMgr().DumpHistory();
+    RefreshFromSpinSystem();
   }
   return true;
 }

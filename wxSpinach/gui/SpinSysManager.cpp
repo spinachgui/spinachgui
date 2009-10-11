@@ -85,6 +85,9 @@ void SpinSysManager::Redo() {
   }
 }
 
+void SpinSysManager::ClearHistory() {
+  mHistory.erase(mHistory.begin(),--mHistory.end());
+}
 
 bool SpinSysManager::CanUndo() const {
   return mPos != mHistory.begin();
@@ -95,3 +98,9 @@ bool SpinSysManager::CanRedo() const {
   return mPos != --mHistory.end();
 }
 
+void SpinSysManager::DumpHistory() const {
+  cout << "Dumping the contents of the history" << endl;
+  for(ConstHistIter it=mHistory.begin();it != mHistory.end();++it) {
+    cout << (*it).message.char_str() << endl;
+  }
+} 

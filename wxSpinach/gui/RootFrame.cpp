@@ -88,6 +88,9 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
       GetSS()->LoadFromXMLFile(mOpenPath.char_str());
     }
     SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
+    Chkpoint(wxT("Load File"));
+    GetSSMgr().ClearHistory();
+    CEventManager::Instance()->trigger(CEvent(EVT_SSCHANGE));
   }
 }
 

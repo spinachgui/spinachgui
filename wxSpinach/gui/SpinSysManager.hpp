@@ -31,6 +31,9 @@ public:
   ///Redo one change
   void Redo();
 
+  ///Clear all the undo history
+  void ClearHistory();
+
   ///True if it is possible to undo a change
   bool CanUndo() const;
 
@@ -43,6 +46,11 @@ public:
 
   ///The McShafry style event handler
   virtual bool HandleEvent(CEvent const& event);
+
+  //Debug functions
+
+  ///Print out the history to the stdout
+  void DumpHistory() const;
 
 private:
   ///Default constructor is disabled
@@ -57,7 +65,9 @@ private:
     wxString message;
   };
 
-  std::list<HistoryItem>::iterator mPos;
+  typedef std::list<HistoryItem>::iterator HistIter;
+  typedef std::list<HistoryItem>::const_iterator ConstHistIter;
+  HistIter mPos;
   std::list<HistoryItem> mHistory;
 };
 

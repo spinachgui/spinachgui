@@ -41,6 +41,9 @@ bool RootFrame::HandleEvent(CEvent const& event) {
      event.getType() == EVT_REDO) {
     //In these circumstances, we may need to grey or ungrey the
     //edit->undo and edit->redo menus.
+    mMenuItemUndo->SetText(wxString(wxT("Undo ")) << GetSSMgr().GetUndoMessage());
+    mMenuItemRedo->SetText(wxString(wxT("Redo ")) << GetSSMgr().GetRedoMessage());
+
     mMenuItemUndo->Enable(GetSSMgr().CanUndo());
     mMenuItemRedo->Enable(GetSSMgr().CanRedo());
   }

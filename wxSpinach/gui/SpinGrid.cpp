@@ -189,14 +189,17 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
   if(e.GetCol()==COL_X) {
     double x;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
+    Chkpoint(wxT("Spin Coordinates"));
     (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetX(x);
   } else if(e.GetCol()==COL_Y) {
     double y;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&y);
+    Chkpoint(wxT("Spin Coordinates"));
     (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetY(y);
   } else if(e.GetCol()==COL_Z) {
     double z;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
+    Chkpoint(wxT("Spin Coordinates"));
     (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetZ(z);
   } else if(e.GetCol()==COL_ELEMENT) {
     wxString content=GetCellValue(e.GetRow(),e.GetCol());
@@ -207,6 +210,7 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
       cerr << "Reverse lookup of element symbol " << symbol.char_str() << " failed!" << endl;
     } else {
       UpdateRowIsotopes(e.GetRow());
+      Chkpoint(wxT("Spin Element"));
       (*mHead)->GetSpin(e.GetRow())->SetElement(element);
     }
     cout << space << " " << symbol.char_str() << endl;

@@ -9,11 +9,15 @@ using namespace std;
 #include <gui/StdEvents.hpp>
 
 SpinSysManager::SpinSysManager(SpinSysPtr system) {
-  mHistory.push_back(system);
-  mPos=mHistory.begin();
-  mHead=*mPos;
+  HistoryItem hi;
+  hi.state=SpinSysPtr(system);
+  hi.message=wxT("");
 
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_CHECKPOINT);
+  mHistory.push_back(hi);
+
+  mPos=mHistory.begin();
+  mHead=(*mPos).state;
+
   CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SCHANGE);
   CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SSCHANGE);
 }
@@ -24,27 +28,47 @@ const SpinSysPtr* SpinSysManager::Get() const {
 }
 
 
-void SpinSysManager::Checkpoint(wxString message) {
-  SpinSysPtr NewSystem=SpinSysPtr(new SpinSystem(*mHead));
+void SpinSysManager::Checkpoint(const wxString& message) {
+  HistoryItem hi;
+  hi.state=SpinSysPtr(new SpinSystem(*mHead));
+  hi.message=message;
+
   mHistory.erase(++mPos,mHistory.end());
-  mHistory.push_back(NewSystem);
+
+  mHistory.push_back(hi);
   mPos=--mHistory.end();
-  mHead=NewSystem;
+  mHead=hi.state;
 }
 
 bool SpinSysManager::HandleEvent(CEvent const& event) {
   cout << "SpinSysManager::HandleEvent" << endl;
   if(event.getType()==EVT_SCHANGE || event.getType()==EVT_SSCHANGE) {
     CEventManager::Instance()->trigger(CEvent(EVT_CHECKPOINT));
-  } else if(event.getType()==EVT_CHECKPOINT) {
-    Checkpoint(wxT("Unknown Change"));
+  }
+}
+
+wxString SpinSysManager::GetUndoMessage() {
+  if(CanUndo()) {
+    std::list<HistoryItem>::iterator pos=mPos;
+    return (*pos).message;
+  } else {
+    return wxString(wxT(""));
+  }
+}
+
+wxString SpinSysManager::GetRedoMessage() {
+  if(CanRedo()) {
+    std::list<HistoryItem>::iterator pos=mPos;
+    return (*++pos).message;
+  } else {
+    return wxString(wxT(""));
   }
 }
 
 
 void SpinSysManager::Undo() {
   if(CanUndo()) {
-    mHead=*--mPos;
+    mHead=(*--mPos).state;
     CEventManager::Instance()->trigger(CEvent(EVT_UNDO));    
   } else {
     cout << "Warning, can't SpinSysManager::Undo() any futher" << endl;
@@ -54,7 +78,7 @@ void SpinSysManager::Undo() {
 
 void SpinSysManager::Redo() {
   if(CanRedo()) {
-    mHead=*++mPos;
+    mHead=(*++mPos).state;
     CEventManager::Instance()->trigger(CEvent(EVT_REDO));
   } else {
     cout << "Warning, can't SpinSysManager::Redo() any futher" << endl;

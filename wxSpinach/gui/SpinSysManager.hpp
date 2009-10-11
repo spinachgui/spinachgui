@@ -23,7 +23,7 @@ public:
   const SpinSysPtr* Get() const;
   
   ///Save the changes to the spin system.
-  void Checkpoint(wxString message=wxT(""));
+  void Checkpoint(const wxString& message=wxT(""));
 
   ///Undo one change
   void Undo();
@@ -37,6 +37,10 @@ public:
   ///True if it is possible to redo a change
   bool CanRedo() const;
 
+  wxString GetUndoMessage();
+
+  wxString GetRedoMessage();
+
   ///The McShafry style event handler
   virtual bool HandleEvent(CEvent const& event);
 
@@ -47,8 +51,14 @@ private:
   SpinSysManager(const SpinSysManager&);
 
   SpinSysPtr mHead;
-  std::list<SpinSysPtr>::iterator mPos;
-  std::list<SpinSysPtr> mHistory;
+
+  struct HistoryItem {
+    SpinSysPtr state;
+    wxString message;
+  };
+
+  std::list<HistoryItem>::iterator mPos;
+  std::list<HistoryItem> mHistory;
 };
 
 

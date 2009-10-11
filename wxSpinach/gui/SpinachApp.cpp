@@ -39,7 +39,7 @@ bool SpinachApp::OnInit() {
 
   const SpinSysPtr* head = mSSMgr->Get();
 
-  mSSMgr->Checkpoint();
+  mSSMgr->Checkpoint(wxT("Load File"));
   (*head)->LoadFromG03File("data/tryosine.log");
   (*head)->SaveToXMLFile("tryosine.xml");
 

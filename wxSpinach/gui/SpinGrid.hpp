@@ -3,7 +3,7 @@
 #define SPINGRID_H
 
 #include <gui/EventSystem.hpp>
-#include <gui/InteractionEdit.hpp>
+#include <gui/SpinInteractionEdit.hpp>
 #include <shared/spinsys.hpp>
 #include <boost/shared_ptr.hpp>
 #include <wx/grid.h>

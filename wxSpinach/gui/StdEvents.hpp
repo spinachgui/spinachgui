@@ -4,6 +4,10 @@
 
 #include <gui/EventSystem.hpp>
 #include <wx/string.h>
+#include <wx/event.h>
+
+//wx declerations
+DECLARE_EVENT_TYPE(EVT_SS_UPDATE, -1)
 
 /* Define standard event types that are useful at an application
    level. NB: Other event types can be defined elsewhere as needed. NB

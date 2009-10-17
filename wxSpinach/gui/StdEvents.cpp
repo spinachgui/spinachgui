@@ -1,6 +1,9 @@
 
 #include <gui/StdEvents.hpp>
 
+//wx definitions
+DEFINE_EVENT_TYPE(EVT_SS_UPDATE)
+
 //Event definitions
 const CEventType EVT_CHECKPOINT("checkpoint");
 const CEventType EVT_UNDO("undo");

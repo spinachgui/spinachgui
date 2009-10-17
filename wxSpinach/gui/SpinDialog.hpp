@@ -4,7 +4,7 @@
 
 #include <shared/spinsys.hpp>
 #include <res/SpinachGUI.h>
-#include <gui/InteractionEdit.hpp>
+#include <gui/SpinInteractionEdit.hpp>
 
 
 using namespace std;

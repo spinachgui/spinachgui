@@ -28,6 +28,8 @@ public:
 
 protected:
   DECLARE_EVENT_TABLE();
+
+
 private:
   //GUI Stuff
   OrientDialogCombo* mOrientEigenvalueCtrl;

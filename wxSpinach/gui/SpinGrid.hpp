@@ -8,6 +8,7 @@
 #include <boost/shared_ptr.hpp>
 #include <wx/grid.h>
 
+
 class SpinGrid : public wxGrid, public IEventListener {
 public:
   SpinGrid(wxWindow* parent,wxWindowID id= -1);
@@ -19,6 +20,7 @@ public:
   void OnCellChange(wxGridEvent& e);
   void OnCellSelect(wxGridEvent& e);
   void OnRightClick(wxGridEvent& e);
+  void OnDeleteSpinHover(wxCommandEvent& e);
 
   //The McShaffy style event handler
   virtual bool HandleEvent(CEvent const& event);

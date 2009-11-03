@@ -32,7 +32,6 @@ public:
   void OnExit  (wxCommandEvent& e);
 
   //Edit Menu Event handlers
-
   void OnUndo(wxCommandEvent& e);
   void OnRedo(wxCommandEvent& e);
 

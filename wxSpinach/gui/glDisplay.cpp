@@ -9,6 +9,7 @@
 
 #include <gui/SpinachApp.hpp>
 #include <gui/SpinDialog.hpp>
+#include <gui/RightClickMenu.hpp>
 #include <shared/nuclear_data.hpp>
 
 
@@ -25,6 +26,7 @@ Event Handlers
  */
 
 
+
 const double pi=3.141592654;
 
 const float radius=0.3;
@@ -39,7 +41,8 @@ using namespace std;
 
 enum MENU_EVENTS {
   MENU_SPIN_DIALOG,
-  MENU_COUPLING_DIALOG
+  MENU_COUPLING_DIALOG,
+  MENU_DELETE_SPIN_HOVER
 };
 
 GLfloat whiteMaterial[] = {0.5, 0.5,  0.5}; 
@@ -585,18 +588,16 @@ void glDisplay::OnWheel(wxMouseEvent& e) {
 }
 
 void glDisplay::OnRightClick(wxMouseEvent& e) {
-  if(not e.Dragging()) {
-    wxMenu* menu = new wxMenu();
-    menu->Append(-1, wxT("Test Menu Item"));
+  if(!e.Dragging()) {
 
     if(mHover>=0) {
-      menu->Append(MENU_SPIN_DIALOG, wxT("Spin Properties..."));
+      RightClickMenu* menu = new RightClickMenu(this);
+      menu->OptionDeleteSpin(mHover);
+      menu->OptionShowSpinProperties(GetSS()->GetSpin(mHover));
+      menu->Build();
+      PopupMenu(menu);
+      delete menu;
     }
-    //  if(len(self.selected)==2) {
-    //  menu->Append(-1, wxT("Coupling Properties"));
-    // }
-    PopupMenu(menu);
-    delete menu;
   }
 }
 
@@ -617,12 +618,12 @@ void glDisplay::OnResize(wxSizeEvent& e) {
   }
 }
 
-void glDisplay::OnDisplaySpinDialog(wxCommandEvent& e) {
+
+void glDisplay::OnDeleteSpinHover(wxCommandEvent& e) {
   if(mHover>-1) {
-    SpinDialog* dialog=new SpinDialog(this,(*mSS)->GetSpin(mHover));
-    dialog->ShowModal();      
-  } else {
-    wxLogError(wxT("In glDisplay::OnDisplaySpinDialog(wxCommandEvent&) mHover < 0"));
+    Chkpoint(wxT("Delete Spin"));
+    GetSS()->RemoveSpin(mHover);
+    Refresh();
   }
 }
 
@@ -639,13 +640,13 @@ bool glDisplay::HandleEvent(CEvent const& event) {
 
 BEGIN_EVENT_TABLE(glDisplay,wxGLCanvas)
 
-EVT_PAINT     (                 glDisplay::OnPaint)
-EVT_MOTION    (                 glDisplay::OnMouseMove)
-EVT_MOUSEWHEEL(                 glDisplay::OnWheel)
-EVT_RIGHT_UP  (                 glDisplay::OnRightClick)
-EVT_LEFT_UP   (                 glDisplay::OnLeftClick)
-EVT_MENU      (MENU_SPIN_DIALOG,glDisplay::OnDisplaySpinDialog)
-EVT_SIZE      (                 glDisplay::OnResize)
+EVT_PAINT     (                       glDisplay::OnPaint)
+EVT_MOTION    (                       glDisplay::OnMouseMove)
+EVT_MOUSEWHEEL(                       glDisplay::OnWheel)
+EVT_RIGHT_UP  (                       glDisplay::OnRightClick)
+EVT_LEFT_UP   (                       glDisplay::OnLeftClick)
+EVT_SIZE      (                       glDisplay::OnResize)
+
 
 END_EVENT_TABLE()
 

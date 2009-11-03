@@ -48,7 +48,6 @@ public:
   virtual bool HandleEvent(CEvent const& event);
 
   //Debug functions
-
   ///Print out the history to the stdout
   void DumpHistory() const;
 

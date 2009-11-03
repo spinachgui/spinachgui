@@ -7,7 +7,11 @@
 #include <gui/RootFrame.hpp>
 #include <wx/log.h>
 #include <boost/shared_ptr.hpp>
+
+#include <gui/StdEvents.hpp>
 using boost::shared_ptr;
+using boost::shared_ptr;
+
 
 
 IMPLEMENT_APP(SpinachApp);

@@ -4,6 +4,7 @@
 #include <shared/nuclear_data.hpp>
 #include <gui/StdEvents.hpp>
 #include <iostream>
+#include <gui/RightClickMenu.hpp>
 
 using namespace std;
 
@@ -11,14 +12,13 @@ using namespace SpinXML;
 
 const long ColumCount=10;  
 
-
-
 //Event generated whenever the spin system changes
 DECLARE_EVENT_TYPE(EVT_INTER_SELECT, -1)
 DEFINE_EVENT_TYPE(EVT_INTER_SELECT)
 
 DECLARE_EVENT_TYPE(EVT_INTER_UNSELECT, -1)
 DEFINE_EVENT_TYPE(EVT_INTER_UNSELECT)
+
 
 //============================================================//
 // Utility functions.
@@ -106,6 +106,15 @@ SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
     
 
 void SpinGrid::OnEdit(wxGridEvent& e) {
+  long sc=GetSS()->GetSpinCount();
+  if(e.GetRow()==sc) {
+    //User is trying to edit the blank line at the bottom of the grid,
+    //so create a new spin for them
+    GetSS()->InsertSpin(new Spin(GetSS().get(),new Vector3(0,0,0),"New Spin",NULL,1));
+    SetupRow(sc);
+    UpdateRow(sc);
+    AppendRows(1);
+  }
   if (e.GetCol()==COL_LINEAR || e.GetCol()==COL_QUAD) {
     cout << "OnEdit" << endl;
   }
@@ -121,7 +130,6 @@ void SpinGrid::OnEndEdit(wxGridEvent& e) {
 void SpinGrid::RefreshFromSpinSystem() {
   cout << "SpinGrid::RefreshFromSpinSystem()" << endl;
   mUpdating=true;
-  GetSSMgr().DumpHistory();
 
   if(GetNumberRows()) {
     //Clear grid only clears the underlying data rather. The cells
@@ -129,7 +137,7 @@ void SpinGrid::RefreshFromSpinSystem() {
     DeleteRows(0,GetNumberRows());
   }
   AppendRows(GetSS()->GetSpinCount()+1);
-  for (long i=0; i < GetSS()->GetSpinCount(); i++) {
+  for (long i=0; i < GetSS()->GetSpinCount()+1; i++) {
     SetupRow(i);
     UpdateRow(i);
   }
@@ -165,6 +173,9 @@ void SpinGrid::SetupRow(long rowNumber) {
 }
 
 void SpinGrid::UpdateRow(long rowNumber) {
+  if(rowNumber<0 || rowNumber>=GetSS()->GetSpinCount()) {
+    return;
+  }
   Spin* thisSpin = (*mHead)->GetSpin(rowNumber);
   double x,y,z;
   thisSpin->GetCoordinates(&x,&y,&z);
@@ -221,6 +232,10 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
       (*mHead)->GetSpin(e.GetRow())->SetElement(element);
     }
     cout << space << " " << symbol.char_str() << endl;
+  } else if(e.GetCol()==COL_LABEL) {
+    Chkpoint(wxT("Change Spin Label"));
+    std::string label(GetCellValue(e.GetRow(),e.GetCol()).char_str());
+    GetSS()->GetSpin(e.GetRow())->SetLabel(label);
   }
   CEventManager::Instance()->trigger(EvtSChange(e.GetRow()));
 }
@@ -230,24 +245,20 @@ void SpinGrid::UpdateRowIsotopes(long row) {
 }
 
 void SpinGrid::OnCellSelect(wxGridEvent& e) {
-  if(e.GetRow()==(*mHead)->GetSpinCount()) {
-    //The user has clicked the blank row at the bottom of the grid.
-    //We should create a new spin
-    (*mHead)->InsertSpin(new Spin((*mHead).get(),new Vector3(0,0,0),"New Spin",(*mHead)->GetRootFrame(),0));
-    UpdateRow((*mHead)->GetSpinCount()-1);
-    SetupRow((*mHead)->GetSpinCount()-1);        
-    AppendRows(1);
+  if(e.GetRow()==GetSS()->GetSpinCount()) {
+    //The user clicked the last line, which means there is no spin to
+    //edit
+    e.Skip();
+    return;
   }
-  
-  if(e.GetCol()==COL_LINEAR || e.GetCol()==COL_BILINEAR || e.GetCol()==COL_QUAD) {
 
+  if(e.GetCol()==COL_LINEAR || e.GetCol()==COL_BILINEAR || e.GetCol()==COL_QUAD) {
     wxCommandEvent event(EVT_INTER_SELECT);
     event.SetEventObject( this );
     event.SetInt(e.GetRow());
     ProcessEvent(event);
 
   } else {
-
     wxCommandEvent event(EVT_INTER_UNSELECT);
     event.SetEventObject( this );
     ProcessEvent(event);
@@ -256,17 +267,18 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
 }
 
 void SpinGrid::OnRightClick(wxGridEvent& e) {
-  wxMenu* menu = new wxMenu();
-
-  menu->Append(MENU_NEW_SPIN, wxT("Spin Properties..."));    
-
+  RightClickMenu* menu=new RightClickMenu(this);
   if(e.GetRow()<(*mHead)->GetSpinCount()) {
-    menu->Append(MENU_SPIN_DIALOG, wxT("Spin Properties..."));    
-    menu->Append(MENU_DELETE_SPINS, wxT("Delete Spins..."));
+    menu->OptionDeleteSpin(e.GetRow());
+    menu->OptionShowSpinProperties(GetSS()->GetSpin(e.GetRow()));
   }
+  menu->Build();
   PopupMenu(menu);
   delete menu;
 
+}
+
+void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
 //============================================================//
@@ -297,7 +309,6 @@ EVT_GRID_EDITOR_SHOWN    (         SpinGrid::OnEdit)
 
 EVT_GRID_CELL_RIGHT_CLICK(         SpinGrid::OnRightClick)
 
-
 END_EVENT_TABLE()
 
 
@@ -322,7 +333,7 @@ SpinGridPanel::SpinGridPanel(wxWindow* parent,wxWindowID id)
 
   sizer->Add(mGrid,1,wxEXPAND | wxALL);
   sizer->Add(mInterEdit,0,wxEXPAND | wxALL);
-  
+
   SetSizer(sizer);
 
   //  mInterEdit->SetSpin(GetSS()->GetSpin(0));

@@ -104,3 +104,4 @@ void SpinSysManager::DumpHistory() const {
     cout << (*it).message.char_str() << endl;
   }
 } 
+

@@ -5,7 +5,6 @@
 
 #include <wx/app.h>
 #include <gui/SpinSysManager.hpp>
-#include <shared/spinsys.hpp>
 
 class SpinachApp : public wxApp {
 public:

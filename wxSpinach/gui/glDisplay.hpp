@@ -27,8 +27,7 @@ public:
   void OnRightClick(wxMouseEvent& e);
   void OnLeftClick(wxMouseEvent& e);
   void OnResize(wxSizeEvent& e);
-
-  void OnDisplaySpinDialog(wxCommandEvent& e);
+  void OnDeleteSpinHover(wxCommandEvent& e);
 
   //The McShaffy style event handler
   virtual bool HandleEvent(CEvent const& event);

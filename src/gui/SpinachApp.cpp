@@ -9,6 +9,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include <gui/StdEvents.hpp>
+
+#include <wx/filename.h>
+
 using boost::shared_ptr;
 using boost::shared_ptr;
 
@@ -18,7 +21,6 @@ IMPLEMENT_APP(SpinachApp);
 
 
 bool SpinachApp::OnInit() {
-
   //Start the event system up
 
   CEventManager* evSys=CEventManager::Instance();
@@ -36,6 +38,16 @@ bool SpinachApp::OnInit() {
     return false;
   }
 
+  //Load the xml schema
+  wxFileName fn(argv[0]);
+  fn.Normalize();
+  fn=fn.GetPath();
+  fn.AppendDir(wxT("data"));
+  fn.SetFullName(wxT("spinxml_schema.xsd"));
+  wxString url(wxString(wxT("file://")) << fn.GetFullPath());
+  SpinXML::SetSchemaLocation(url.char_str());
+  
+  cout << "Loaded " << fn.GetFullPath() << endl;
 
   shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
   mSSMgr = new SpinSysManager(SS);

@@ -9,6 +9,7 @@
 
 namespace SpinXML {
 
+void SetSchemaLocation(const char* loc);
 
 const long END=-1;
 

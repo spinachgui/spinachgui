@@ -85,7 +85,12 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
       GetSS()->LoadFromG03File(mOpenPath.char_str());
     } else {
       //assume xml for everything else
-      GetSS()->LoadFromXMLFile(mOpenPath.char_str());
+      try {
+	GetSS()->LoadFromXMLFile(mOpenPath.char_str());
+      } catch(const runtime_error& e) {
+	wxLogError(wxT("Error Parsing XML file. File is corrupt"));
+	wxLogError(wxString(e.what(),wxConvUTF8));
+      }
     }
     SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
     Chkpoint(wxT("Load File"));

@@ -12,7 +12,12 @@ using std::endl;
 using std::cout;
 using std::cerr;
 
+std::string schemaLocation;
 
+void SpinXML::SetSchemaLocation(const char* loc) {
+  cout << "Schema Location is begin set to " << loc << endl;
+  schemaLocation=loc;
+}
 
 type::value GetXSDTypeFromSpinXMLType(SpinXML::Interaction::SubType subtype) {
   switch(subtype) {
@@ -150,7 +155,13 @@ SpinXML::Orientation* ConvertXMLToOrientation(const orientation& o) {
 void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
   std::auto_ptr<spin_system> ss;
   try {
-     ss=spin_system_(filename);
+    cout << "Trying" << schemaLocation << endl;
+
+    xml_schema::properties p;
+    //p.schema_location("http://www.w3.org/XML/1998/namespace","xml.xsd");
+    p.no_namespace_schema_location(schemaLocation);
+
+    ss=spin_system_(filename,0,p);
   } catch(const xml_schema::exception& e) {
     std::cerr << e << std::endl;
     std::ostringstream errStream;

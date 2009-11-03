@@ -1,6 +1,6 @@
-wxSpinach/build/*
+src/build/*
 *~
-wxSpinach/res/SpinachGUI.*
+src/res/SpinachGUI.*
 *#*#
 
 

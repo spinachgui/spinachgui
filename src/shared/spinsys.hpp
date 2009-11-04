@@ -184,7 +184,6 @@ class Orientation {
         } mEigenSystem;
     } mData;
     Type mType;
-  bool deleted;
 };
 
   ///Class representing a reference frame. This class has not been

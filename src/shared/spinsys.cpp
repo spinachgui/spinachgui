@@ -774,17 +774,14 @@ vector<long> Spin::GetIsotopes() const {
 //==============================================================================//
 // Orientation
 
-Orientation::Orientation() : mType(UNDEFINED),deleted(false) {
-  cout << this << " Constructing an orientation, *this=" << ToString() << endl;
+Orientation::Orientation() : mType(UNDEFINED) {
 }
 
 Orientation::Orientation(const Orientation& orient) :
   mType(orient.mType) {
-  cout << this << " an orientation was copied today (from " << &orient << ")" << endl;
   if(mType==ANGLE_AXIS) {
     mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
   } else if(mType==EIGENSYSTEM) {
-    cout << this << "I am allocating an  eigensystem now (copy)" << endl;
     mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);
     mData.mEigenSystem.YAxis = new Vector3(*orient.mData.mEigenSystem.YAxis);
     mData.mEigenSystem.ZAxis = new Vector3(*orient.mData.mEigenSystem.ZAxis);
@@ -802,11 +799,9 @@ Orientation::Orientation(const Orientation& orient) :
 
 const Orientation& Orientation::operator=(const Orientation& orient) {
   mType=orient.mType;
-  cout << this << " an orientation was =assigned= today (from " << &orient << ")" << endl;
   if(mType==ANGLE_AXIS) {
     mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
   } else if(mType==EIGENSYSTEM) {
-    cout << this << "I am allocating an  eigensystem now (assignment)" << endl;
     mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);
     mData.mEigenSystem.YAxis = new Vector3(*orient.mData.mEigenSystem.YAxis);
     mData.mEigenSystem.ZAxis = new Vector3(*orient.mData.mEigenSystem.ZAxis);
@@ -825,22 +820,13 @@ const Orientation& Orientation::operator=(const Orientation& orient) {
 
 
 Orientation::~Orientation() {
-  if(mType==EIGENSYSTEM) cout << this << "Calling clear from the destructor" << endl;
-  if(!deleted) {
-    Clear();
-    deleted=true;
-  } else {
-    cout << this << "Double delete!" << endl;
-  }
-  memset(this,0,sizeof(Orientation));
+  Clear();
 }
 
 void Orientation::Clear() {
-  cout << this << " (Clear)Interaction is:" << ToString() << endl;
   if(mType==ANGLE_AXIS && mData.mAngleAxis.axis != NULL) {
     delete mData.mAngleAxis.axis;
   } else if(mType==EIGENSYSTEM) {
-    if(mType==EIGENSYSTEM) cout << this << "I would like to be deleteing the eigensystem now" << endl;
     delete mData.mEigenSystem.XAxis;
     delete mData.mEigenSystem.YAxis;
     delete mData.mEigenSystem.ZAxis;
@@ -894,7 +880,6 @@ void Orientation::GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) 
 }
 
 void Orientation::SetEuler(double alpha,double beta,double gamma) {
-  cout << this << "Calling clear from set euler" << endl;
   Clear();
   mType=EULER;
   mData.mEuler.alpha=alpha;
@@ -904,7 +889,6 @@ void Orientation::SetEuler(double alpha,double beta,double gamma) {
 }
 
 void Orientation::SetAngleAxis(double angle,const Vector3& axis) {
-  cout << this << "Calling clear from set set angle axis" << endl;
   Clear();
   mType=ANGLE_AXIS;
   mData.mAngleAxis.angle=angle;
@@ -914,7 +898,6 @@ void Orientation::SetAngleAxis(double angle,const Vector3& axis) {
 }
 
 void Orientation::SetQuaternion(double real, double i, double j, double k) {
-  cout << this << "Calling clear from set set quaternion" << endl;
   Clear();
   mType=QUATERNION;
   mData.mQuaternion.real=real;
@@ -925,10 +908,8 @@ void Orientation::SetQuaternion(double real, double i, double j, double k) {
 }
 
 void Orientation::SetEigenSystem(const Vector3& XAxis,const Vector3& YAxis, const Vector3& ZAxis) {
-  cout << this << "Calling clear from set set eigensystem" << endl;
   Clear();
   mType=EIGENSYSTEM;
-  cout << this << "I am allocating an  eigensystem now" << endl;
   mData.mEigenSystem.XAxis=new Vector3(1.0,0.0,0.0);
   mData.mEigenSystem.YAxis=new Vector3(0.0,1.0,0.0);
   mData.mEigenSystem.ZAxis=new Vector3(0.0,0.0,1.0);

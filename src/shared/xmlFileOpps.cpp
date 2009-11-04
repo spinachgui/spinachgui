@@ -117,7 +117,6 @@ orientation ConvertOrientationToXML(const SpinXML::Orientation& o) {
 
 SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
   SpinXML::Orientation ret;
-  cout << &ret << " in ConvertXMLToOrientation" << endl;
   if(o.euler_angles().present()) {
     double alpha,beta,gamma;
     euler_angles ea=o.euler_angles().get();
@@ -153,7 +152,6 @@ SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
   } else {
     throw std::runtime_error("Unknown orientation form encounted. Is the XSD schema corrupt?");
   }
-  cout << &ret << " exit ConvertXMLToOrientation" << endl;
   return ret;
 }
 

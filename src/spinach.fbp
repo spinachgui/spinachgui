@@ -681,6 +681,49 @@
                     <event name="OnToolRClicked"></event>
                     <event name="OnUpdateUI"></event>
                 </object>
+                <object class="toolSeparator" expanded="1" />
+                <object class="tool" expanded="1">
+                    <property name="bitmap">res/nmr_epr.xpm; Load From File</property>
+                    <property name="id">ID_NMR_EPR</property>
+                    <property name="kind">wxITEM_RADIO</property>
+                    <property name="label">Show All Interactions</property>
+                    <property name="name">mNmrEpr</property>
+                    <property name="statusbar"></property>
+                    <property name="tooltip"></property>
+                    <event name="OnMenuSelection"></event>
+                    <event name="OnToolClicked"></event>
+                    <event name="OnToolEnter"></event>
+                    <event name="OnToolRClicked"></event>
+                    <event name="OnUpdateUI"></event>
+                </object>
+                <object class="tool" expanded="1">
+                    <property name="bitmap">res/epr.xpm; Load From File</property>
+                    <property name="id">ID_EPR</property>
+                    <property name="kind">wxITEM_RADIO</property>
+                    <property name="label">EPR Mode</property>
+                    <property name="name">mEpr</property>
+                    <property name="statusbar"></property>
+                    <property name="tooltip"></property>
+                    <event name="OnMenuSelection"></event>
+                    <event name="OnToolClicked"></event>
+                    <event name="OnToolEnter"></event>
+                    <event name="OnToolRClicked"></event>
+                    <event name="OnUpdateUI"></event>
+                </object>
+                <object class="tool" expanded="1">
+                    <property name="bitmap">res/nmr.xpm; Load From File</property>
+                    <property name="id">ID_NMR</property>
+                    <property name="kind">wxITEM_RADIO</property>
+                    <property name="label">NMR Mode</property>
+                    <property name="name">mNmr</property>
+                    <property name="statusbar"></property>
+                    <property name="tooltip"></property>
+                    <event name="OnMenuSelection"></event>
+                    <event name="OnToolClicked"></event>
+                    <event name="OnToolEnter"></event>
+                    <event name="OnToolRClicked"></event>
+                    <event name="OnUpdateUI"></event>
+                </object>
             </object>
         </object>
         <object class="Frame" expanded="0">

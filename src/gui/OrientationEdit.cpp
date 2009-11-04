@@ -17,24 +17,22 @@ OrientEditPanel::OrientEditPanel(wxWindow* parent,
 		  const wxPoint& pos,
 		  const wxSize& size,
 		  long style)
-  : OrientEditPanelBase(parent,id,pos,size,style),mOrient(NULL),mLoading(false) {
+  : OrientEditPanelBase(parent,id,pos,size,style),mOrient(),mLoading(false) {
   Enable(false);
 }
 
-void OrientEditPanel::SetOrient(SpinXML::Orientation* orient) {
-  Enable(orient != NULL);
+void OrientEditPanel::SetOrient(const Orientation& orient) {
+  Enable(true);
   mOrient=orient;
-  if(orient != NULL) { 
-    LoadFromOrient();
-  }
+  LoadFromOrient();
 }
 
 void OrientEditPanel::LoadFromOrient() {
   mLoading=true;
-  switch(mOrient->GetType()) {
+  switch(mOrient.GetType()) {
   case Orientation::EULER: {
     double alpha,beta,gamma;
-    mOrient->GetEuler(&alpha,&beta,&gamma);
+    mOrient.GetEuler(&alpha,&beta,&gamma);
     mAlphaCtrl->SetValue(wxString() << alpha);
     mBetaCtrl-> SetValue(wxString() << beta);
     mGammaCtrl->SetValue(wxString() << gamma);
@@ -45,7 +43,7 @@ void OrientEditPanel::LoadFromOrient() {
   case Orientation::ANGLE_AXIS: {
     double angle;
     Vector3 axis;
-    mOrient->GetAngleAxis(&angle,&axis);
+    mOrient.GetAngleAxis(&angle,&axis);
     mAngleCtrl->SetValue(wxString() << angle);
     mXCtrl->SetValue(wxString() << axis.GetX());
     mYCtrl->SetValue(wxString() << axis.GetY());
@@ -56,7 +54,7 @@ void OrientEditPanel::LoadFromOrient() {
   }
   case Orientation::QUATERNION: {
     double re,i,j,k;
-    mOrient->GetQuaternion(&re,&i,&j,&k);
+    mOrient.GetQuaternion(&re,&i,&j,&k);
     mReCtrl->SetValue(wxString() << re);
     mICtrl-> SetValue(wxString() << i);
     mJCtrl-> SetValue(wxString() << j);
@@ -67,7 +65,7 @@ void OrientEditPanel::LoadFromOrient() {
   }
   case Orientation::EIGENSYSTEM: {
     Vector3 x,y,z;
-    mOrient->GetEigenSystem(&x,&y,&z);
+    mOrient.GetEigenSystem(&x,&y,&z);
 
     mXXCtrl->SetValue(wxString() << x.GetX());
     mXYCtrl->SetValue(wxString() << x.GetY());
@@ -104,7 +102,7 @@ void OrientEditPanel::SaveToOrient() {
     mBetaCtrl ->GetValue().ToDouble(&beta);
     mGammaCtrl->GetValue().ToDouble(&gamma);
 
-    mOrient->SetEuler(alpha,beta,gamma);
+    mOrient.SetEuler(alpha,beta,gamma);
     break;
   }
   case 1: {
@@ -115,7 +113,7 @@ void OrientEditPanel::SaveToOrient() {
     mYCtrl    ->GetValue().ToDouble(&y);
     mZCtrl    ->GetValue().ToDouble(&z);
 
-    mOrient->SetAngleAxis(angle,new Vector3(x,y,z));
+    mOrient.SetAngleAxis(angle,Vector3(x,y,z));
     break;
   }
   case 2: {
@@ -126,7 +124,7 @@ void OrientEditPanel::SaveToOrient() {
     mJCtrl ->GetValue().ToDouble(&j);
     mKCtrl ->GetValue().ToDouble(&k);
 
-    mOrient->SetQuaternion(re,i,j,k);
+    mOrient.SetQuaternion(re,i,j,k);
     break;
   }
   case 3:{
@@ -147,7 +145,7 @@ void OrientEditPanel::SaveToOrient() {
     mZYCtrl->GetValue().ToDouble(&zy);
     mZZCtrl->GetValue().ToDouble(&zz);
 
-    mOrient->SetEigenSystem(new Vector3(xx,xy,xz),new Vector3(yx,yy,yz),new Vector3(zx,zy,zz));
+    mOrient.SetEigenSystem(Vector3(xx,xy,xz),Vector3(yx,yy,yz),Vector3(zx,zy,zz));
     break;
   }
   }
@@ -218,9 +216,6 @@ int OrientEditDialog::ShowModal() {
   return result;
 }
 
-void OrientEditDialog::SetOrient(Orientation* orient) {
-  mOrientEditPanel->SetOrient(orient);
-} 
 
 void OrientEditDialog::OnApply(wxCommandEvent& e) {
   mOrientEditPanel->SaveToOrient(); 
@@ -236,17 +231,13 @@ END_EVENT_TABLE()
   //==========================================================//
 
 OrientDialogCombo::OrientDialogCombo(wxWindow* parent,wxWindowID id) 
-  : DialogCombo<OrientEditDialog>(parent,id),mOrient(NULL) {
+  : DialogCombo<OrientEditDialog>(parent,id),mOrient() {
   
 }
 
-void OrientDialogCombo::SetOrient(Orientation* orient) {
-  if(mOrient != NULL) {
-    SetText(wxString(mOrient->ToString().c_str(),wxConvUTF8));
-  } else {
-    SetText(wxT(""));
-  }
+void OrientDialogCombo::SetOrient(const Orientation& orient) {
   mOrient=orient;
+  SetText(wxString(mOrient.ToString().c_str(),wxConvUTF8));
 }
 
 OrientEditDialog* OrientDialogCombo::CreateDialog() {
@@ -261,10 +252,7 @@ void OrientDialogCombo::SetStringValue(const wxString& s) {
 }
 
 wxString OrientDialogCombo::GetStringFromDialog(OrientEditDialog* dlg) {
-  if(mOrient != NULL) {
-    cout << "Getting the string " << mOrient->ToString() << endl;
-    return wxString(mOrient->ToString().c_str(),wxConvUTF8);
-  } else {
-    return wxString(wxT("Error"));
-  }
+  mOrient=dlg->GetOrient();
+  cout << "Getting the string " << mOrient.ToString() << endl;
+  return wxString(mOrient.ToString().c_str(),wxConvUTF8);
 }

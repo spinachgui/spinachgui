@@ -186,10 +186,9 @@ target_link_libraries (wxSpinach xerces-c)
 
 
 #command line exe
-#set(spinachSources ${cmdSources} ${sharedSources})
-#add_executable (spinach ${spinachSources})
-#target_link_libraries (spinach atlas  xerces-c) 
-#target_link_libraries (spinach  xerces-c) 
+set(spinachSources ${cmdSources} ${sharedSources})
+add_executable (spinach ${spinachSources})
+target_link_libraries (spinach xerces-c) 
 
 
 #Create an "install" target (copy everything to a test directory)

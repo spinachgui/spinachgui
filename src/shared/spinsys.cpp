@@ -151,10 +151,10 @@ void Matrix3::Dump() const {
 //==============================================================================//
 // SpinSystem
 
-SpinSystem::SpinSystem() : mLabFrame(new ReferenceFrame(NULL,new Vector3(0,0,0),new Orientation())) {
+SpinSystem::SpinSystem() : mLabFrame(NULL) {
 }
 
-SpinSystem::SpinSystem(const SpinSystem& system) : mLabFrame(system.mLabFrame) {
+SpinSystem::SpinSystem(const SpinSystem& system) : mLabFrame(NULL) {
   long spinCount=system.mSpins.size();
   long interCount=system.mInteractions.size();
 
@@ -186,8 +186,8 @@ SpinSystem::SpinSystem(const SpinSystem& system) : mLabFrame(system.mLabFrame) {
     }
   }
   //TODO: Impliment proper copying of reference frames
-  mLabFrame=new ReferenceFrame(NULL,new Vector3(0,0,0),new Orientation());
-  mLabFrame->GetOrientation()->SetQuaternion(1.0,0.0,0.0,0.0);
+  mLabFrame=NULL;//new ReferenceFrame(NULL,Vector3(0,0,0),Orientation());
+  //mLabFrame->GetOrientation().SetQuaternion(1.0,0.0,0.0,0.0);
 }
 
 SpinSystem::~SpinSystem() {
@@ -201,6 +201,8 @@ void SpinSystem::Clear() {
   for(long i=0;i<mInteractions.size();i++) {
     delete mInteractions[i];
   }
+  mSpins.resize(0);
+  mInteractions.resize(0);
 }
 
 void SpinSystem::Dump() const {
@@ -265,7 +267,7 @@ void SpinSystem::LoadFromGamesFile(const char* filename) {
   
 }
 
-void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
+void SpinSystem::LoadFromG03File(const char* filename) {
   /*
     This function really needs some work done on in, as it's not using C++
     streams properly. This is due to it being adapted from matlab code (which uses
@@ -471,8 +473,8 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 	//Skip a line
 	fin.getline(buff,500); line=buff; //Read a line
 
-	Orientation* o=new Orientation();
-	o->SetEigenSystem(new Vector3(x1,y1,z1),new Vector3(x2,y2,z2),new Vector3(x3,y3,z3));
+	Orientation o;
+	o.SetEigenSystem(Vector3(x1,y1,z1),Vector3(x2,y2,z2),Vector3(x3,y3,z3));
 
 	Interaction* inter=new Interaction(); //Last paramiter is reference frame, which is always lab
 	inter->SetEigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05,o);
@@ -772,15 +774,17 @@ vector<long> Spin::GetIsotopes() const {
 //==============================================================================//
 // Orientation
 
-Orientation::Orientation() : mType(UNDEFINED) {
-  
+Orientation::Orientation() : mType(UNDEFINED),deleted(false) {
+  cout << this << " Constructing an orientation, *this=" << ToString() << endl;
 }
 
 Orientation::Orientation(const Orientation& orient) :
   mType(orient.mType) {
+  cout << this << " an orientation was copied today (from " << &orient << ")" << endl;
   if(mType==ANGLE_AXIS) {
     mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
   } else if(mType==EIGENSYSTEM) {
+    cout << this << "I am allocating an  eigensystem now (copy)" << endl;
     mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);
     mData.mEigenSystem.YAxis = new Vector3(*orient.mData.mEigenSystem.YAxis);
     mData.mEigenSystem.ZAxis = new Vector3(*orient.mData.mEigenSystem.ZAxis);
@@ -796,27 +800,59 @@ Orientation::Orientation(const Orientation& orient) :
   }
 }
 
+const Orientation& Orientation::operator=(const Orientation& orient) {
+  mType=orient.mType;
+  cout << this << " an orientation was =assigned= today (from " << &orient << ")" << endl;
+  if(mType==ANGLE_AXIS) {
+    mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
+  } else if(mType==EIGENSYSTEM) {
+    cout << this << "I am allocating an  eigensystem now (assignment)" << endl;
+    mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);
+    mData.mEigenSystem.YAxis = new Vector3(*orient.mData.mEigenSystem.YAxis);
+    mData.mEigenSystem.ZAxis = new Vector3(*orient.mData.mEigenSystem.ZAxis);
+  } else if(mType==QUATERNION) {
+    mData.mQuaternion.real = orient.mData.mQuaternion.real;
+    mData.mQuaternion.i    = orient.mData.mQuaternion.i;
+    mData.mQuaternion.j    = orient.mData.mQuaternion.j;
+    mData.mQuaternion.k    = orient.mData.mQuaternion.k;
+  } else if(mType==EULER) {
+    mData.mEuler.alpha =     orient.mData.mEuler.alpha;
+    mData.mEuler.beta  =     orient.mData.mEuler.beta;
+    mData.mEuler.gamma =     orient.mData.mEuler.gamma;
+  }
+
+}
+
+
 Orientation::~Orientation() {
+  if(mType==EIGENSYSTEM) cout << this << "Calling clear from the destructor" << endl;
+  if(!deleted) {
+    Clear();
+    deleted=true;
+  } else {
+    cout << this << "Double delete!" << endl;
+  }
+  memset(this,0,sizeof(Orientation));
+}
+
+void Orientation::Clear() {
+  cout << this << " (Clear)Interaction is:" << ToString() << endl;
   if(mType==ANGLE_AXIS && mData.mAngleAxis.axis != NULL) {
     delete mData.mAngleAxis.axis;
   } else if(mType==EIGENSYSTEM) {
-    if(mData.mEigenSystem.XAxis != NULL) {
-      delete mData.mEigenSystem.XAxis;
-    }
-    if(mData.mEigenSystem.YAxis != NULL) {
-      delete mData.mEigenSystem.YAxis;
-    }
-    if(mData.mEigenSystem.ZAxis != NULL) {
-      delete mData.mEigenSystem.ZAxis;
-    }
+    if(mType==EIGENSYSTEM) cout << this << "I would like to be deleteing the eigensystem now" << endl;
+    delete mData.mEigenSystem.XAxis;
+    delete mData.mEigenSystem.YAxis;
+    delete mData.mEigenSystem.ZAxis;
   }
+  mType=UNDEFINED;
 }
  
 Orientation::Type Orientation::GetType() const {
   return mType;
 }
 
-Matrix3 Orientation::GetAsMatrix() const throw(logic_error) {
+Matrix3 Orientation::GetAsMatrix() const {
   if(mType==EIGENSYSTEM) {
     const Vector3* xa=mData.mEigenSystem.XAxis;
     const Vector3* ya=mData.mEigenSystem.YAxis;
@@ -858,38 +894,44 @@ void Orientation::GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) 
 }
 
 void Orientation::SetEuler(double alpha,double beta,double gamma) {
+  cout << this << "Calling clear from set euler" << endl;
+  Clear();
   mType=EULER;
   mData.mEuler.alpha=alpha;
-  mData.mEuler.beta=beta;
+  mData.mEuler.beta =beta;
   mData.mEuler.gamma=gamma;
-  mType=EULER;
   return;
 }
 
-void Orientation::SetAngleAxis(double angle,Vector3* axis) {
+void Orientation::SetAngleAxis(double angle,const Vector3& axis) {
+  cout << this << "Calling clear from set set angle axis" << endl;
+  Clear();
   mType=ANGLE_AXIS;
   mData.mAngleAxis.angle=angle;
-  mData.mAngleAxis.axis=axis;
-  mType=ANGLE_AXIS;
+  mData.mAngleAxis.axis=new Vector3(axis);
   return;
 
 }
 
 void Orientation::SetQuaternion(double real, double i, double j, double k) {
+  cout << this << "Calling clear from set set quaternion" << endl;
+  Clear();
   mType=QUATERNION;
   mData.mQuaternion.real=real;
   mData.mQuaternion.i=i;
   mData.mQuaternion.j=j;
   mData.mQuaternion.k=k;
-  mType=QUATERNION;
   return;
 }
 
-void Orientation::SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) {
+void Orientation::SetEigenSystem(const Vector3& XAxis,const Vector3& YAxis, const Vector3& ZAxis) {
+  cout << this << "Calling clear from set set eigensystem" << endl;
+  Clear();
   mType=EIGENSYSTEM;
-  mData.mEigenSystem.XAxis=XAxis;
-  mData.mEigenSystem.YAxis=YAxis;
-  mData.mEigenSystem.ZAxis=ZAxis;
+  cout << this << "I am allocating an  eigensystem now" << endl;
+  mData.mEigenSystem.XAxis=new Vector3(1.0,0.0,0.0);
+  mData.mEigenSystem.YAxis=new Vector3(0.0,1.0,0.0);
+  mData.mEigenSystem.ZAxis=new Vector3(0.0,0.0,1.0);
   return;
 }
 
@@ -951,17 +993,17 @@ Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
     mData.mEigenvalues.XX=inter.mData.mEigenvalues.XX;
     mData.mEigenvalues.YY=inter.mData.mEigenvalues.YY;
     mData.mEigenvalues.ZZ=inter.mData.mEigenvalues.ZZ;
-    mData.mEigenvalues.Orient=new Orientation(*inter.mData.mEigenvalues.Orient);
+    mOrient=mOrient;
   } else if(mType==AXRHOM) {
     mData.mAxRhom.ax=inter.mData.mAxRhom.ax;
     mData.mAxRhom.rh=inter.mData.mAxRhom.rh;
     mData.mAxRhom.iso=inter.mData.mAxRhom.iso;
-    mData.mAxRhom.Orient=new Orientation(*inter.mData.mEigenvalues.Orient);
+    mOrient=mOrient;
   } else if(mType==SPANSKEW) {
     mData.mSpanSkew.span=inter.mData.mSpanSkew.span;
     mData.mSpanSkew.skew=inter.mData.mSpanSkew.skew;
     mData.mSpanSkew.iso=inter.mData.mSpanSkew.iso;
-    mData.mSpanSkew.Orient=new Orientation(*inter.mData.mEigenvalues.Orient);
+    mOrient=mOrient;
   }
 }
 
@@ -974,21 +1016,38 @@ void Interaction::Dump() const {
   switch (GetType()) {
   case UNDEFINED:
     cout << "    Type=Undefined" <<  endl;
+    break;
   case SCALAR:
     cout << "    Type=Scalar" <<  endl;
     cout << "    Value=" << mData.mScalar << endl;
+    break;
   case MATRIX:
     cout << "    Type=Matrix" <<  endl;
     cout << "    Value=" << endl;
+    mData.mMatrix->Dump();
+    break;
   case EIGENVALUES:
     cout << "    Type=Eigenvalues" <<  endl;
-    cout << "    Value=" << endl;
+    cout << "    Value=(XX=" 
+	 << mData.mEigenvalues.XX << ",YY="
+	 << mData.mEigenvalues.YY << ",ZZ="
+	 << mData.mEigenvalues.ZZ << ")"
+	 << endl;
+    cout << "    Orient=";
+    cout << mOrient.ToString() << endl;
+    break;
   case AXRHOM:
     cout << "    Type=Axiality Rhombicity" <<  endl;
     cout << "    Value=" << endl; 
+    cout << "    Orient=";
+    cout << mOrient.ToString() << endl;
+    break;
   case SPANSKEW:
     cout << "    Type=Span-Skew" <<  endl;
     cout << "    Value=" << endl;
+    cout << "    Orient=";
+    cout << mOrient.ToString() << endl;
+    break;
   }
 }
 
@@ -1073,7 +1132,7 @@ void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation*
   *XX=mData.mEigenvalues.XX;
   *YY=mData.mEigenvalues.YY;
   *ZZ=mData.mEigenvalues.ZZ;
-  *OrientOut=*mData.mEigenvalues.Orient;
+  *OrientOut=mOrient;
   return;
 }
 
@@ -1081,7 +1140,7 @@ void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* Ori
   *iso=mData.mAxRhom.iso;
   *ax=mData.mAxRhom.ax;
   *rh=mData.mAxRhom.rh;
-  *OrientOut=*mData.mAxRhom.Orient;
+  *OrientOut=mOrient;
   return;
 }
 
@@ -1089,7 +1148,7 @@ void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientatio
   *iso=mData.mSpanSkew.iso;
   *Span=mData.mSpanSkew.span;
   *Skew=mData.mSpanSkew.skew;
-  *OrientOut=*mData.mSpanSkew.Orient;
+  *OrientOut=mOrient;
   return;
 }
 
@@ -1108,16 +1167,16 @@ void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientati
   mData.mEigenvalues.XX=XX;
   mData.mEigenvalues.YY=YY;
   mData.mEigenvalues.ZZ=ZZ;
-  mData.mEigenvalues.Orient=Orient;
+  mOrient=Orient;
   return;
 }
 
 void Interaction::SetAxRhom(double iso,double ax, double rh, const Orientation& Orient) {
   mType=AXRHOM;
-  iso=mData.mAxRhom.iso;
-  ax=mData.mAxRhom.ax;
-  rh=mData.mAxRhom.rh;
-  Orient=mData.mAxRhom.Orient;
+  mData.mAxRhom.iso=iso;
+  mData.mAxRhom.ax=ax;
+  mData.mAxRhom.rh=rh;
+  mOrient=Orient;
   return;
 }
 
@@ -1126,7 +1185,7 @@ void Interaction::SetSpanSkew(double iso,double Span, double Skew, const Orienta
   mData.mSpanSkew.iso=iso;
   mData.mSpanSkew.span= Span;
   mData.mSpanSkew.skew=Skew;
-  mData.mSpanSkew.Orient=Orient;
+  mOrient=Orient;
   return;
 }
 
@@ -1134,7 +1193,7 @@ double Interaction::GetAsScalar() const {
   return 0;
 }
 
-Matrix3 Interaction::GetAsMatrix() const throw(logic_error) {
+Matrix3 Interaction::GetAsMatrix() const {
   if(mType==SCALAR) {
     //Return the identity multipled by the scalar
     double s=mData.mScalar;
@@ -1148,17 +1207,14 @@ Matrix3 Interaction::GetAsMatrix() const throw(logic_error) {
     //Convert to a matrix
     double xx,yy,zz;
 
-    Orientation* Orient;
     if(mType==EIGENVALUES) {
       xx=mData.mEigenvalues.XX;
       xx=mData.mEigenvalues.YY;
       xx=mData.mEigenvalues.ZZ;
-      Orient=mData.mEigenvalues.Orient;
     } else if(mType==AXRHOM) {
       double a=mData.mAxRhom.ax;
       double r=mData.mAxRhom.rh;
       double iso=mData.mAxRhom.iso;
-      Orient=mData.mAxRhom.Orient;
       xx=a/3+iso/3;
       yy=-r/2-a/6+iso/3;
       zz= r/2-a/6+iso/3;
@@ -1166,13 +1222,12 @@ Matrix3 Interaction::GetAsMatrix() const throw(logic_error) {
       double span=mData.mSpanSkew.span;
       double skew=mData.mSpanSkew.skew;
       double iso=mData.mSpanSkew.iso;
-      Orient=mData.mSpanSkew.Orient;
       xx=span*skew/6-span/2;
       yy=iso-span*skew/3;
       zz=span*skew/6+span/2;
     }
-    Orient=mData.mSpanSkew.Orient;
-    Matrix3 intMatrix=Orient->GetAsMatrix();
+
+    Matrix3 intMatrix=mOrient.GetAsMatrix();
 
     intMatrix.Set(0,0,intMatrix.Get(0,0)*xx);
     intMatrix.Set(0,1,intMatrix.Get(0,1)*yy);
@@ -1221,21 +1276,16 @@ bool Interaction::GetIsQuadratic() const {
 //==============================================================================//
 // Reference Frame
 
-ReferenceFrame::ReferenceFrame() : mParent(NULL),mPosition(NULL){
+ReferenceFrame::ReferenceFrame() : mParent(),mPosition(){
   
 }
 
-ReferenceFrame::ReferenceFrame(ReferenceFrame* Parent,Vector3* Position,Orientation* Orient) : mParent(Parent),mPosition(Position),mOrient(Orient) {
+ReferenceFrame::ReferenceFrame(ReferenceFrame* Parent,const Vector3& Position,const Orientation& Orient) :
+  mParent(Parent),mPosition(Position),mOrient(Orient) {
 
 }
 
 ReferenceFrame::~ReferenceFrame() {
-  if(mPosition != NULL) {
-    delete mPosition;
-  }
-  if(mOrient != NULL) {
-    delete mOrient;
-  }
 }
     
 long ReferenceFrame::GetChildCount() const {
@@ -1274,15 +1324,15 @@ void ReferenceFrame::RemoveChild(ReferenceFrame* Child) {
   }
 }
 
-void ReferenceFrame::SetPosition(Vector3* Position) {
+void ReferenceFrame::SetPosition(const Vector3& Position) {
   mPosition=Position;
 }
 
-Vector3* ReferenceFrame::GetPosition() const {
+Vector3& ReferenceFrame::GetPosition() {
   return mPosition;
 }
 
-Orientation* ReferenceFrame::GetOrientation() const {
+Orientation& ReferenceFrame::GetOrientation() {
   return mOrient;
 }
 

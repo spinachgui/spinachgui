@@ -115,20 +115,21 @@ orientation ConvertOrientationToXML(const SpinXML::Orientation& o) {
   return oout;
 }
 
-SpinXML::Orientation* ConvertXMLToOrientation(const orientation& o) {
-  SpinXML::Orientation* ret=new SpinXML::Orientation;
+SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
+  SpinXML::Orientation ret;
+  cout << &ret << " in ConvertXMLToOrientation" << endl;
   if(o.euler_angles().present()) {
     double alpha,beta,gamma;
     euler_angles ea=o.euler_angles().get();
     alpha=ea.alpha();
     beta=ea.beta();
     gamma=ea.gamma();
-    ret->SetEuler(alpha,beta,gamma);
+    ret.SetEuler(alpha,beta,gamma);
   } else if(o.angle_axis().present()) {
     angle_axis aa=o.angle_axis().get();
     vector axis=aa.axis();
     double angle=aa.angle();
-    ret->SetAngleAxis(angle,new SpinXML::Vector3(axis.x(),axis.y(),axis.z()));
+    ret.SetAngleAxis(angle,SpinXML::Vector3(axis.x(),axis.y(),axis.z()));
   } else if(o.quaternion().present()) {
     double re,i,j,k;
     quaternion q=o.quaternion().get();
@@ -136,18 +137,23 @@ SpinXML::Orientation* ConvertXMLToOrientation(const orientation& o) {
     i=q.i();
     j=q.j();
     k=q.k();
-    ret->SetQuaternion(re,i,j,k);
+    ret.SetQuaternion(re,i,j,k);
   } else if(o.eigensystem().present()) {
     eigensystem es=o.eigensystem().get();
     vector vx=es.x_axis();
     vector vy=es.y_axis();
     vector vz=es.z_axis();    
-    ret->SetEigenSystem(new SpinXML::Vector3(vx.x(),vx.y(),vx.z()),
-			new SpinXML::Vector3(vy.x(),vy.y(),vy.z()),
-			new SpinXML::Vector3(vz.x(),vz.y(),vz.z()));
+    //ret.SetEigenSystem(SpinXML::Vector3(vx.x(),vx.y(),vx.z()),
+    //	       SpinXML::Vector3(vy.x(),vy.y(),vy.z()),
+    //		       SpinXML::Vector3(vz.x(),vz.y(),vz.z()));
+    ret.SetEigenSystem(SpinXML::Vector3(1.0,0.0,0.0),
+		       SpinXML::Vector3(0.0,1.0,0.0),
+		       SpinXML::Vector3(0.0,0.0,1.0));
+    
   } else {
     throw std::runtime_error("Unknown orientation form encounted. Is the XSD schema corrupt?");
   }
+  cout << &ret << " exit ConvertXMLToOrientation" << endl;
   return ret;
 }
 
@@ -232,17 +238,17 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
 						 eseq[6],eseq[7],eseq[8]);
       thisInter->SetMatrix(mat);
     } else if(xsdInter.eigenvalues().present()) {
-      SpinXML::Orientation* o=ConvertXMLToOrientation(xsdInter.orientation().get());
+      SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
       double xx,yy,zz;
       eigenvalues eigv=xsdInter.eigenvalues().get();
       thisInter->SetEigenvalues(eigv.XX(),eigv.YY(),eigv.ZZ(),o);
     } else if(xsdInter.axiality_rhombicity().present()) {
-      SpinXML::Orientation* o=ConvertXMLToOrientation(xsdInter.orientation().get());
+      SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
       double ax,rhom,iso;
       axiality_rhombicity ar=xsdInter.axiality_rhombicity().get();
       thisInter->SetAxRhom(ar.ax(),ar.rh(),ar.iso(),o);
     } else if(xsdInter.span_skew().present()) {
-      SpinXML::Orientation* o=ConvertXMLToOrientation(xsdInter.orientation().get());
+      SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
       double span,skew,iso;
       span_skew spanskew=xsdInter.span_skew().get();
       thisInter->SetSpanSkew(spanskew.span(),spanskew.skew(),spanskew.iso(),o);
@@ -321,29 +327,29 @@ void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
       break;
     }
     case SpinXML::Interaction::EIGENVALUES: {
-      SpinXML::Orientation* o;
+      SpinXML::Orientation o;
       double xx,yy,zz;
       thisInter->GetEigenvalues(&xx,&yy,&zz,&o);
       eigenvalues eigv(xx,yy,zz);
-      inter.orientation(ConvertOrientationToXML(*o));
+      inter.orientation(ConvertOrientationToXML(o));
       inter.eigenvalues(eigv);
       break;
     }
     case SpinXML::Interaction::AXRHOM: {
-      SpinXML::Orientation* o;
+      SpinXML::Orientation o;
       double ax,rhom,iso;
       thisInter->GetAxRhom(&ax,&rhom,&iso,&o);
       axiality_rhombicity ar(iso,ax,rhom);
-      inter.orientation(ConvertOrientationToXML(*o));
+      inter.orientation(ConvertOrientationToXML(o));
       inter.axiality_rhombicity(ar);
       break;
     }
     case SpinXML::Interaction::SPANSKEW: {
-      SpinXML::Orientation* o;
+      SpinXML::Orientation o;
       double span,skew,iso;
       thisInter->GetSpanSkew(&span,&skew,&iso,&o);
       span_skew spsk(iso,span,skew);
-      inter.orientation(ConvertOrientationToXML(*o));
+      inter.orientation(ConvertOrientationToXML(o));
       inter.span_skew(spsk);
       break;
     }

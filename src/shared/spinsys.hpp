@@ -101,6 +101,8 @@ class Orientation {
     Orientation();
   ///Copies an orientation
     Orientation(const Orientation& orient);
+  ///Assignment Operation
+    const Orientation& operator=(const Orientation& orient);
   ///Destructor
     ~Orientation();
     
@@ -139,14 +141,14 @@ class Orientation {
   ///Set the value of the rotation in terms of the angle axis
   ///paramiters. This function also sets the type value as returned by
   ///GetType()
-    void SetAngleAxis(double angle,Vector3* axis);
+    void SetAngleAxis(double angle,const Vector3& axis);
   ///Set the value of the rotation in terms of quaternion
   ///paramiters. This function also sets the type value as returned by
   ///GetType()
     void SetQuaternion(double real, double i, double j, double k);
   ///Set the value of the rotation in terms of eigensystem. This
   ///function also sets the type value as returned by GetType()
-    void SetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis);
+    void SetEigenSystem(const Vector3& XAxis,const Vector3& YAxis, const Vector3& ZAxis);
 
   ///Converts to a rotation matrix
     Matrix3 GetAsMatrix() const;
@@ -158,6 +160,7 @@ class Orientation {
   ///the representation should be the same as returned by ToString
     void FromString(std::string string);
   private:
+    void Clear();
     union  {
         struct {
             double alpha;
@@ -181,6 +184,7 @@ class Orientation {
         } mEigenSystem;
     } mData;
     Type mType;
+  bool deleted;
 };
 
   ///Class representing a reference frame. This class has not been
@@ -188,7 +192,7 @@ class Orientation {
 class ReferenceFrame {
   public:
     ReferenceFrame();
-    ReferenceFrame(ReferenceFrame* Parent,Vector3* Position,Orientation* Orient);
+    ReferenceFrame(ReferenceFrame* Parent,const Vector3& Position,const Orientation& Orient);
     ~ReferenceFrame();
     
     long GetChildCount() const;
@@ -198,16 +202,17 @@ class ReferenceFrame {
     void RemoveChild(long Position);
     void RemoveChild(ReferenceFrame* Child);
     
-    Vector3* GetPosition() const;
-    void SetPosition(Vector3* Position);
-    Orientation* GetOrientation() const;
+    Vector3& GetPosition();
+    void SetPosition(const Vector3& Position);
+
+    Orientation& GetOrientation();
     
   private:
     ReferenceFrame* mParent;
     std::vector<ReferenceFrame*> mChildren;
     
-    Vector3* mPosition;
-    Orientation* mOrient;
+    Vector3 mPosition;
+    Orientation mOrient;
 };
 
   ///Class representing one of the shielding paramiters such as the
@@ -349,21 +354,21 @@ class Interaction {
         double XX;
         double YY;
         double ZZ;
-        Orientation Orient;
       } mEigenvalues;
       struct {
 	double iso;
 	double ax;
 	double rh;
-	Orientation Orient;
       } mAxRhom;
       struct {
           double iso;
           double span;
           double skew;
-          Orientation Orient;
       } mSpanSkew;
    } mData;
+
+  Orientation mOrient;
+
    Type mType;
    SubType mSubType;
    Spin* mSpin1;
@@ -453,6 +458,8 @@ class SpinSystem {
 
     void LoadFromXMLFile(const char* filename);
     void SaveToXMLFile(const char* filename) const;
+
+    std::vector<Interaction*>& GetInteractions() {return mInteractions;}
   
   private:
     friend class Spin;

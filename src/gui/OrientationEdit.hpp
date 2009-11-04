@@ -16,8 +16,10 @@ public:
 		  const wxPoint& pos = wxDefaultPosition,
 		  const wxSize& size = wxDefaultSize,
 		  long style = wxTAB_TRAVERSAL);
-  void SetOrient(SpinXML::Orientation* orient);
-  
+
+  void SetOrient(const SpinXML::Orientation& orient);
+  const SpinXML::Orientation& GetOrient() {return mOrient;}  
+
   void OnTextChange(wxCommandEvent& e);
   void OnPageChange(wxChoicebookEvent& e);
 
@@ -28,7 +30,7 @@ public:
 protected:
   DECLARE_EVENT_TABLE();
 private:
-  SpinXML::Orientation* mOrient;
+  SpinXML::Orientation mOrient;
   bool mLoading;
 };
 
@@ -41,7 +43,9 @@ public:
 
   int ShowModal();
 
-  void SetOrient(SpinXML::Orientation* orient);
+  void SetOrient(const SpinXML::Orientation& orient) {mPanel->SetOrient(orient);}
+  const SpinXML::Orientation& GetOrient() {return mPanel->GetOrient();}
+
   void OnApply(wxCommandEvent& e);
 protected:
   DECLARE_EVENT_TABLE();
@@ -55,16 +59,17 @@ private:
 class OrientDialogCombo : public DialogCombo<OrientEditDialog> {
 public:
   OrientDialogCombo(wxWindow* parent,wxWindowID id=-1);
-  void SetOrient(SpinXML::Orientation* orient);
 
-  int ShowModal();
+  void SetOrient(const SpinXML::Orientation& orient);
+  const SpinXML::Orientation& GetOrient() {return mOrient;}
 
   virtual void SetStringValue(const wxString& s);
+
 protected:
   virtual OrientEditDialog* CreateDialog();
   virtual wxString GetStringFromDialog(OrientEditDialog* dlg);
 private:
-  SpinXML::Orientation* mOrient;
+  SpinXML::Orientation mOrient;
 };
 
 #endif

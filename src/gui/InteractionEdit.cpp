@@ -175,19 +175,19 @@ void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
     mEigenYYCtrl->SetValue(wxT("0.0"));
     mEigenZZCtrl->SetValue(wxT("0.0"));
 
-    mOrientEigenvalueCtrl->SetOrient(new Orientation());
+    mOrientEigenvalueCtrl->SetOrient(Orientation());
   } else if(type==Interaction::AXRHOM) {
     mAxCtrl->       SetValue(wxT("0.0"));
     mRhomCtrl->     SetValue(wxT("0.0"));
     mAxRhomIsoCtrl->SetValue(wxT("0.0"));
 
-    mOrientAxRhomCtrl->SetOrient(new Orientation());
+    mOrientAxRhomCtrl->SetOrient(Orientation());
   } else if(type==Interaction::SPANSKEW) {
     mSpanCtrl->       SetValue(wxT("0.0"));
     mSkewCtrl->       SetValue(wxT("0.0"));
     mSpanSkewIsoCtrl->SetValue(wxT("0.0"));
 
-    mOrientSpanSkewCtrl->SetOrient(new Orientation());
+    mOrientSpanSkewCtrl->SetOrient(Orientation());
   }
   SaveToInter();        
   e.Skip();
@@ -285,7 +285,7 @@ void InterEditPanel::LoadFromInter() {
     mTypeChoiceBook->SetSelection(1);
   } else if(mInter->GetType()==Interaction::EIGENVALUES) {
     double xx,yy,zz;
-    Orientation* o;
+    Orientation o;
     mInter->GetEigenvalues(&xx,&yy,&zz,&o);
 
     mEigenXXCtrl->SetValue(wxString() << xx);
@@ -298,7 +298,7 @@ void InterEditPanel::LoadFromInter() {
 
   } else if(mInter->GetType()==Interaction::AXRHOM) {
     double ax,rhom,iso;
-    Orientation* o;
+    Orientation o;
     mInter->GetAxRhom(&ax,&rhom,&iso,&o);
     mAxCtrl->       SetValue(wxString() <<ax);
     mRhomCtrl->     SetValue(wxString() << rhom);
@@ -309,7 +309,7 @@ void InterEditPanel::LoadFromInter() {
     mTypeChoiceBook->SetSelection(3);
   } else if(mInter->GetType()==Interaction::SPANSKEW) {
     double span,skew,iso;
-    Orientation* o;
+    Orientation o;
     mInter->GetSpanSkew(&span,&skew,&iso,&o);
     mSpanCtrl->       SetValue(wxString() << span);
     mSkewCtrl->       SetValue(wxString() << skew);
@@ -356,7 +356,7 @@ void InterEditPanel::SaveToInter() {
     mEigenYYCtrl->GetValue().ToDouble(&yy);
     mEigenZZCtrl->GetValue().ToDouble(&zz);
  
-    mInter->SetEigenvalues(xx,yy,zz,new Orientation());
+    mInter->SetEigenvalues(xx,yy,zz,mOrientEigenvalueCtrl->GetOrient());
 
   } else if(type==Interaction::AXRHOM) {
     double ax,rhom,iso;
@@ -365,7 +365,7 @@ void InterEditPanel::SaveToInter() {
     mRhomCtrl->     GetValue().ToDouble(&rhom);
     mAxRhomIsoCtrl->GetValue().ToDouble(&iso);
 
-    mInter->SetAxRhom(ax,rhom,iso,new Orientation());
+    mInter->SetAxRhom(ax,rhom,iso,mOrientAxRhomCtrl->GetOrient());
   } else if(type==Interaction::SPANSKEW) {
     double span,skew,iso;
 
@@ -373,7 +373,7 @@ void InterEditPanel::SaveToInter() {
     mSkewCtrl->       GetValue().ToDouble(&skew);
     mSpanSkewIsoCtrl->GetValue().ToDouble(&iso);
 
-    mInter->SetSpanSkew(span,skew,iso,new Orientation());
+    mInter->SetSpanSkew(span,skew,iso,mOrientSpanSkewCtrl->GetOrient());
   }
 }
 

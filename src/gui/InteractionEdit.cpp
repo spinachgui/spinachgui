@@ -345,9 +345,9 @@ void InterEditPanel::SaveToInter() {
     mMatZYCtrl->GetValue().ToDouble(&zy);
     mMatZZCtrl->GetValue().ToDouble(&zz);
 
-    mInter->SetMatrix(new Matrix3(xx,xy,xz,
-				  yx,yy,yz,
-				  zx,zy,zz));
+    mInter->SetMatrix(Matrix3(xx,xy,xz,
+			      yx,yy,yz,
+			      zx,zy,zz));
 
   } else if(type==Interaction::EIGENVALUES) {
     double xx,yy,zz;

@@ -231,9 +231,9 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
       thisInter->SetScalar(scalar);
     } else if(xsdInter.matrix().present()) {
       matrix::element_sequence eseq=xsdInter.matrix().get().element();
-      SpinXML::Matrix3* mat=new SpinXML::Matrix3(eseq[0],eseq[1],eseq[2],
-						 eseq[3],eseq[4],eseq[5],
-						 eseq[6],eseq[7],eseq[8]);
+      SpinXML::Matrix3 mat(eseq[0],eseq[1],eseq[2],
+			   eseq[3],eseq[4],eseq[5],
+			   eseq[6],eseq[7],eseq[8]);
       thisInter->SetMatrix(mat);
     } else if(xsdInter.eigenvalues().present()) {
       SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));

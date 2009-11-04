@@ -1138,9 +1138,9 @@ void Interaction::SetScalar(double Scalar) {
   mData.mScalar=Scalar;
 }
 
-void Interaction::SetMatrix(Matrix3* Matrix) {
+void Interaction::SetMatrix(const Matrix3& Matrix) {
   mType=MATRIX;
-  mData.mMatrix=Matrix;
+  mData.mMatrix=new Matrix3(Matrix);
 }
 
 void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient) {

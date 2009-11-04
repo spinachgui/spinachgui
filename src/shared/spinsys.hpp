@@ -306,7 +306,7 @@ class Interaction {
   ///Set the value of the interaction using the scalar covention.
     void SetScalar(double Scalar);
   ///Set the value of the interaction using the matrix covention.
-    void SetMatrix(Matrix3* InMatrix);
+    void SetMatrix(const Matrix3& InMatrix);
   ///Set the value of the interaction using the eigenvalue covention.
     void SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient);
   ///Set the value of the interaction using the axiality-rhombicity covention.

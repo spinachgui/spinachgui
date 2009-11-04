@@ -21,6 +21,10 @@ Vector3::Vector3(double _x,double _y,double _z) : x(_x),y(_y),z(_z) {
 
 }
 
+Vector3::Vector3(const Vector3& v) :  x(v.x),y(v.y),z(v.z) {
+
+}
+
 double Vector3::GetX() const {
   return x;
 }
@@ -302,7 +306,7 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 	if(standardOrientFound) {
 	  //Update an existing spin
 	  if(mSpins.size() > nAtoms) {
-	    mSpins[nAtoms]->SetPosition(new Vector3(x,y,z));
+	    mSpins[nAtoms]->SetPosition(Vector3(x,y,z));
 	  } else {
 	    cerr << "Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables" << endl;
 	    throw runtime_error("Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables");
@@ -311,7 +315,7 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 	  //Create a new spin
 	  string isotopeSymbol(getElementSymbol(atomicNumber));
 	  isotopeSymbol=isotopeSymbol; //We have no clue what the mass number is yet
-	  Spin* s=new Spin(this,new Vector3(x,y,z),string("A Spin")+isotopeSymbol,GetRootFrame(),atomicNumber);
+	  Spin* s=new Spin(this,Vector3(x,y,z),string("A Spin")+isotopeSymbol,GetRootFrame(),atomicNumber);
 	  mSpins.push_back(s);
 	}
 	nAtoms++;
@@ -487,14 +491,14 @@ void SpinSystem::LoadFromG03File(const char* filename) throw(runtime_error){
 //==============================================================================//
 // Spin
 
-Spin::Spin(SpinSystem* Parent,Vector3* Position,string Label,ReferenceFrame* mFrame,long atomicNumber) 
+Spin::Spin(SpinSystem* Parent,Vector3 Position,string Label,ReferenceFrame* mFrame,long atomicNumber) 
   : mParent(Parent),mPosition(Position),mLabel(Label),mElement(atomicNumber) {
   
 }
 
 Spin::Spin(const Spin& s,SpinSystem* ss) :
   mParent(ss),
-  mPosition(new Vector3(*s.mPosition)),
+  mPosition(s.mPosition),
   mLabel(s.mLabel),
   mFrame(NULL),
   mElement(s.mElement),
@@ -503,36 +507,30 @@ Spin::Spin(const Spin& s,SpinSystem* ss) :
 }
 
 Spin::~Spin() {
-  if(mPosition != NULL) {
-    delete mPosition;
-  }
 }
 
 void Spin::Dump() const {
   cout << "  Dumping class Spin" << endl;
   cout << "    Label=" << mLabel << endl;
-  cout << "    Position=(" << mPosition->GetX() << "," << mPosition->GetY() << "," << mPosition->GetZ() << ")" << endl;
+  cout << "    Position=(" << mPosition.GetX() << "," << mPosition.GetY() << "," << mPosition.GetZ() << ")" << endl;
   cout << "    Interaction Count=" << GetInteractionCount() << endl;
 }
 
-Vector3* Spin::GetPosition() const {
+Vector3& Spin::GetPosition() {
   return mPosition;
 }
 
-void Spin::SetPosition(Vector3* Position) {
-  if(mPosition != NULL) {
-    delete mPosition;
-  }
+void Spin::SetPosition(Vector3 Position) {
   mPosition=Position;
 }
 
 void Spin::GetCoordinates(double* _x,double* _y, double* _z) const {
-  mPosition->GetCoordinates(_x,_y,_z);
+  mPosition.GetCoordinates(_x,_y,_z);
 }
 
 
 void Spin::SetCoordinates(double _x,double _y, double _z) {
-  mPosition->SetCoordinates(_x,_y,_z);
+  mPosition.SetCoordinates(_x,_y,_z);
 }
 
 void Spin::SetLabel(string Label) {
@@ -968,13 +966,7 @@ Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
 }
 
 Interaction::~Interaction() {
-  if(mType==EIGENVALUES && mData.mEigenvalues.Orient != NULL) {
-    delete mData.mEigenvalues.Orient;
-  } else if(mType==AXRHOM && mData.mAxRhom.Orient != NULL) {
-    delete mData.mEigenvalues.Orient;
-  } else if(mType==SPANSKEW && mData.mSpanSkew.Orient != NULL) {
-    delete mData.mSpanSkew.Orient;
-  }
+
 }
 
 void Interaction::Dump() const {
@@ -1077,27 +1069,27 @@ void Interaction::GetMatrix(Matrix3* OutMatrix) const {
   return;
 }
 
-void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation** OrientOut) const {
+void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const {
   *XX=mData.mEigenvalues.XX;
   *YY=mData.mEigenvalues.YY;
   *ZZ=mData.mEigenvalues.ZZ;
-  *OrientOut=mData.mEigenvalues.Orient;
+  *OrientOut=*mData.mEigenvalues.Orient;
   return;
 }
 
-void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation** OrientOut) const {
+void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const {
   *iso=mData.mAxRhom.iso;
   *ax=mData.mAxRhom.ax;
   *rh=mData.mAxRhom.rh;
-  *OrientOut=mData.mAxRhom.Orient;
+  *OrientOut=*mData.mAxRhom.Orient;
   return;
 }
 
-void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation** OrientOut) const {
+void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const {
   *iso=mData.mSpanSkew.iso;
   *Span=mData.mSpanSkew.span;
   *Skew=mData.mSpanSkew.skew;
-  *OrientOut=mData.mSpanSkew.Orient;
+  *OrientOut=*mData.mSpanSkew.Orient;
   return;
 }
 
@@ -1111,7 +1103,7 @@ void Interaction::SetMatrix(Matrix3* Matrix) {
   mData.mMatrix=Matrix;
 }
 
-void Interaction::SetEigenvalues(double XX,double YY, double ZZ, Orientation* Orient) {
+void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient) {
   mType=EIGENVALUES;
   mData.mEigenvalues.XX=XX;
   mData.mEigenvalues.YY=YY;
@@ -1120,7 +1112,7 @@ void Interaction::SetEigenvalues(double XX,double YY, double ZZ, Orientation* Or
   return;
 }
 
-void Interaction::SetAxRhom(double iso,double ax, double rh, Orientation* Orient) {
+void Interaction::SetAxRhom(double iso,double ax, double rh, const Orientation& Orient) {
   mType=AXRHOM;
   iso=mData.mAxRhom.iso;
   ax=mData.mAxRhom.ax;
@@ -1129,7 +1121,7 @@ void Interaction::SetAxRhom(double iso,double ax, double rh, Orientation* Orient
   return;
 }
 
-void Interaction::SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient) {
+void Interaction::SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient) {
   mType=SPANSKEW;
   mData.mSpanSkew.iso=iso;
   mData.mSpanSkew.span= Span;

@@ -24,6 +24,8 @@ class Vector3 {
   public:
   ///Constructs an uninitalised vector
     Vector3();
+  ///Copy Constructor
+    Vector3(const Vector3& v);
   ///Constructs a new vector
     Vector3(double _x,double _y,double _z);
 
@@ -221,7 +223,8 @@ class Interaction {
   ///Destructor
     ~Interaction();
     
-  ///Print the interaction to the strandard output in a human readable form.
+  ///Print the interaction to the strandard output in a human readable
+  ///form.
      void Dump() const;
 
   ///Enumeration of the storage conventions used by this interaction
@@ -286,26 +289,26 @@ class Interaction {
   ///If the Eigenvalues sorage convention being used then this function will set
   ///the value of its arguments to the appropreate value. Otherwise the
   ///result is undefined.
-    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation** OrientOut) const;
+    void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const;
   ///If the Axiality-Rhombicity sorage convention being used then this function will set
   ///the value of its arguments to the appropreate value. Otherwise the
   ///result is undefined.
-    void GetAxRhom(double* iso,double* ax, double* rh, Orientation** OrientOut) const;
+    void GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const;
   ///If the Span-Skew sorage convention being used then this function will set
   ///the value of its arguments to the appropreate value. Otherwise the
   ///result is undefined.
-    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation** OrientOut) const;
+    void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const;
 
   ///Set the value of the interaction using the scalar covention.
     void SetScalar(double Scalar);
   ///Set the value of the interaction using the matrix covention.
     void SetMatrix(Matrix3* InMatrix);
   ///Set the value of the interaction using the eigenvalue covention.
-    void SetEigenvalues(double XX,double YY, double ZZ, Orientation* Orient);
+    void SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient);
   ///Set the value of the interaction using the axiality-rhombicity covention.
-    void SetAxRhom(double iso,double ax, double rh, Orientation* Orient);
+    void SetAxRhom(double iso,double ax, double rh, const Orientation& Orient);
   ///Set the value of the interaction using the span-skew covention.
-    void SetSpanSkew(double iso,double Span, double Skew, Orientation* Orient);
+    void SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient);
 
   ///Get a pointer to the first spin this interaction acts on. This
   ///function is always defined.
@@ -346,19 +349,19 @@ class Interaction {
         double XX;
         double YY;
         double ZZ;
-        Orientation* Orient;
+        Orientation Orient;
       } mEigenvalues;
       struct {
-          double iso;
-          double ax;
-          double rh;
-          Orientation* Orient;
+	double iso;
+	double ax;
+	double rh;
+	Orientation Orient;
       } mAxRhom;
       struct {
           double iso;
           double span;
           double skew;
-          Orientation* Orient;
+          Orientation Orient;
       } mSpanSkew;
    } mData;
    Type mType;
@@ -371,14 +374,14 @@ class Interaction {
 class Spin {
   friend class SpinSystem;
   public:  
-    Spin(SpinSystem* Parent,Vector3* mPosition,std::string mLabel,ReferenceFrame* mFrame,long atomicNumber=1);
+    Spin(SpinSystem* Parent,Vector3 mPosition,std::string mLabel,ReferenceFrame* mFrame,long atomicNumber=1);
     Spin(const Spin& s,SpinSystem* newParent=NULL);
     ~Spin();
   
     void Dump() const;
 
-    Vector3* GetPosition() const;
-    void SetPosition(Vector3* Position);
+    Vector3& GetPosition();
+    void SetPosition(Vector3 Position);
     void GetCoordinates(double* _x,double* _y, double* _z) const;
     void SetCoordinates(double _x,double _y, double _z);
 
@@ -413,7 +416,7 @@ class Spin {
 
   private:
     SpinSystem* mParent;
-    Vector3* mPosition;
+    Vector3 mPosition;
     std::string mLabel;
     ReferenceFrame* mFrame;
     long mElement;

@@ -185,9 +185,9 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
 
 
     if(xsdSpin.label().present()) {
-      mSpins[i]=new SpinXML::Spin(this,new Vector3(x,y,z),xsdSpin.label().get(),GetRootFrame());
+      mSpins[i]=new SpinXML::Spin(this,Vector3(x,y,z),xsdSpin.label().get(),GetRootFrame());
     } else {
-      mSpins[i]=new SpinXML::Spin(this,new Vector3(x,y,z),"",GetRootFrame());
+      mSpins[i]=new SpinXML::Spin(this,Vector3(x,y,z),"",GetRootFrame());
     }
     
     mSpins[i]->SetElement(getElementBySymbol(xsdSpin.element().c_str()));

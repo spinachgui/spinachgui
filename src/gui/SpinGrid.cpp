@@ -208,17 +208,17 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     double x;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
     Chkpoint(wxT("Spin Coordinates"));
-    (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetX(x);
+    (*mHead)->GetSpin(e.GetRow())->GetPosition().SetX(x);
   } else if(e.GetCol()==COL_Y) {
     double y;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&y);
     Chkpoint(wxT("Spin Coordinates"));
-    (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetY(y);
+    (*mHead)->GetSpin(e.GetRow())->GetPosition().SetY(y);
   } else if(e.GetCol()==COL_Z) {
     double z;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
     Chkpoint(wxT("Spin Coordinates"));
-    (*mHead)->GetSpin(e.GetRow())->GetPosition()->SetZ(z);
+    (*mHead)->GetSpin(e.GetRow())->GetPosition().SetZ(z);
   } else if(e.GetCol()==COL_ELEMENT) {
     wxString content=GetCellValue(e.GetRow(),e.GetCol());
     long space=content.Find(wxT(" "));

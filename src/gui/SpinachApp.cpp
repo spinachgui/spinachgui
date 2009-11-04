@@ -50,8 +50,6 @@ bool SpinachApp::OnInit() {
   cout << "Loaded " << fn.GetFullPath() << endl;
 
   shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
-  SS->LoadFromXMLFile("tryo.xml");
-  SS->LoadFromXMLFile("tryo.xml");
   mSSMgr = new SpinSysManager(SS);
 
   RootFrame* frame = new RootFrame(NULL);

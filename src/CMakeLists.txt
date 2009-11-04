@@ -142,6 +142,17 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/shared/swig/nuclear_data_w
                    COMMENT "Automatically exporting the nuclear data tables to python")
 
 
+add_custom_command(OUTPUT res/SpinachGUI.h
+                   MAIN_DEPENDENCY spinach.fbp
+                   COMMAND wxformbuilder -g  spinach.fbp
+                   COMMENT "Generating GUI Code with wxFormBuilder")
+
+add_custom_command(OUTPUT res/SpinachGUI.cpp
+                   MAIN_DEPENDENCY spinach.fbp
+                   COMMAND wxformbuilder -g  spinach.fbp
+                   COMMENT "Generating GUI Code with wxFormBuilder")
+
+
 
 
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}) #If you include via absolute paths, you can move source files about more easily.

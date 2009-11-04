@@ -1,5 +1,0 @@
-#!/bin/bash
-
-make
-cd install
-python driver.py 

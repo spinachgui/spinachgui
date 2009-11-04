@@ -625,11 +625,11 @@
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
                 <object class="tool" expanded="1">
-                    <property name="bitmap">res/S.xpm; Load From File</property>
-                    <property name="id">wxID_ANY</property>
-                    <property name="kind">wxITEM_RADIO</property>
-                    <property name="label">Spin</property>
-                    <property name="name">mSpinTool</property>
+                    <property name="bitmap">res/document_new.xpm; Load From File</property>
+                    <property name="id">ID_NEW</property>
+                    <property name="kind">wxITEM_NORMAL</property>
+                    <property name="label">tool</property>
+                    <property name="name">mNew</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
                     <event name="OnMenuSelection"></event>
@@ -639,11 +639,11 @@
                     <event name="OnUpdateUI"></event>
                 </object>
                 <object class="tool" expanded="1">
-                    <property name="bitmap">res/Jcoupling.xpm; Load From File</property>
-                    <property name="id">wxID_ANY</property>
-                    <property name="kind">wxITEM_RADIO</property>
-                    <property name="label">J Coupling</property>
-                    <property name="name">mJTool</property>
+                    <property name="bitmap">res/document_open.xpm; Load From File</property>
+                    <property name="id">ID_OPEN</property>
+                    <property name="kind">wxITEM_NORMAL</property>
+                    <property name="label">tool</property>
+                    <property name="name">mLoad</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
                     <event name="OnMenuSelection"></event>
@@ -653,11 +653,11 @@
                     <event name="OnUpdateUI"></event>
                 </object>
                 <object class="tool" expanded="1">
-                    <property name="bitmap">res/cluster.xpm; Load From File</property>
-                    <property name="id">wxID_ANY</property>
-                    <property name="kind">wxITEM_RADIO</property>
-                    <property name="label">Cluster</property>
-                    <property name="name">mClusterTool</property>
+                    <property name="bitmap">res/document_save.xpm; Load From File</property>
+                    <property name="id">ID_SAVE</property>
+                    <property name="kind">wxITEM_NORMAL</property>
+                    <property name="label">tool</property>
+                    <property name="name">mSave</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
                     <event name="OnMenuSelection"></event>

@@ -55,6 +55,7 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
   Interaction* inter=new Interaction();
   inter->SetScalar(0.0);
   inter->SetSpin1(mSpin);
+  inter->SetSubType(Interaction::ST_SHIELDING);
   mSpin->InsertInteraction(inter);
 
   ListBoxInteraction lbi;

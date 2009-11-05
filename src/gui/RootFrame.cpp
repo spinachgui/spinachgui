@@ -2,7 +2,10 @@
 #include <gui/RootFrame.hpp>
 #include <gui/SpinachApp.hpp>
 #include <gui/StdEvents.hpp>
+#include <stdexcept>
 #include <wx/log.h>
+
+using namespace std;
 
 //============================================================//
 // Utility Functions
@@ -17,10 +20,6 @@ wxString GetExtension(const wxString& filename) {
 // RootFrame
 
 void RootFrame::InitFrame() {
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_CHECKPOINT);
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_UNDO);
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_REDO);
-
   mNotebook=new wxAuiNotebook(mAuiPanel);
 
   mSpinGridPanel=new SpinGridPanel(mNotebook);
@@ -40,21 +39,6 @@ void RootFrame::InitFrame() {
   mMenuItemRedo->Enable(false);
 }
 
-bool RootFrame::HandleEvent(CEvent const& event) {
-  cout << "Root window got an event" << endl;
-  if(event.getType() == EVT_CHECKPOINT ||
-     event.getType() == EVT_UNDO || 
-     event.getType() == EVT_REDO) {
-    //In these circumstances, we may need to grey or ungrey the
-    //edit->undo and edit->redo menus.
-    mMenuItemUndo->SetText(wxString(wxT("Undo ")) << GetSSMgr().GetUndoMessage());
-    mMenuItemRedo->SetText(wxString(wxT("Redo ")) << GetSSMgr().GetRedoMessage());
-
-    mMenuItemUndo->Enable(GetSSMgr().CanUndo());
-    mMenuItemRedo->Enable(GetSSMgr().CanRedo());
-  }
-  return true;
-}
 
 void RootFrame::OnUndo(wxCommandEvent& e) {
   wxGetApp().GetSpinSysManager()->Undo();
@@ -95,7 +79,6 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
     SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
     Chkpoint(wxT("Load File"));
     GetSSMgr().ClearHistory();
-    CEventManager::Instance()->trigger(CEvent(EVT_SSCHANGE));
   }
 }
 

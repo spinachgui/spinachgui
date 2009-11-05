@@ -68,8 +68,6 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
   mInterListBox->SetSelection(mInterListBox->GetCount()-1);
   mInterEdit->SetInter(inter);
   InteractionChange();
-
-  CEventManager::Instance()->trigger(EvtSChange(GetSS()->GetSpinNumber(mSpin)));
 }
 
 void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
@@ -78,7 +76,6 @@ void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
   UpdateListBox();
   mInterEdit->SetInter(NULL);
   InteractionChange();
-  CEventManager::Instance()->trigger(EvtSChange(GetSS()->GetSpinNumber(mSpin)));
 }
 
 void SpinInterEditPanel::LoadFromSpin() {
@@ -180,8 +177,6 @@ void SpinInterEditPanel::OnSSChange(wxCommandEvent& e) {
   } 
   UpdateListBox();
   e.Skip();
-
-  CEventManager::Instance()->trigger(EvtSChange(GetSS()->GetSpinNumber(mSpin)));
 }
 
 long SpinInterEditPanel::GetSelectedInterIndex() const {

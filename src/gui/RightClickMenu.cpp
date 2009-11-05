@@ -2,7 +2,6 @@
 #include <gui/RightClickMenu.hpp>
 #include <gui/SpinDialog.hpp>
 #include <gui/SpinachApp.hpp>
-#include <gui/EventSystem.hpp>
 #include <gui/StdEvents.hpp>
 
 //============================================================//
@@ -37,7 +36,6 @@ void RightClickMenu::OnShowSpinProperties(wxCommandEvent& e) {
 void RightClickMenu::OnDeleteSpin(wxCommandEvent& e) {
   Chkpoint(wxT("Delete Spin"));
   GetSS()->RemoveSpin(mOptionDelete);
-  CEventManager::Instance()->trigger(EVT_SSCHANGE);
 }
 
 

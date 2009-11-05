@@ -2,7 +2,7 @@
 #ifndef SPINGRID_H
 #define SPINGRID_H
 
-#include <gui/EventSystem.hpp>
+#include <gui/Event.hpp>
 #include <gui/SpinInteractionEdit.hpp>
 #include <shared/spinsys.hpp>
 #include <boost/shared_ptr.hpp>
@@ -14,7 +14,7 @@ public:
   SpinGrid(wxWindow* parent,wxWindowID id= -1);
 
 
-  //Event Handlers
+  //wx Event Handlers
   void OnEdit(wxGridEvent& e);
   void OnEndEdit(wxGridEvent& e);
   void OnCellChange(wxGridEvent& e);
@@ -22,8 +22,9 @@ public:
   void OnRightClick(wxGridEvent& e);
   void OnDeleteSpinHover(wxCommandEvent& e);
 
-  //The McShaffy style event handler
-  virtual bool HandleEvent(CEvent const& event);
+  //Other event handlers
+  void OnChange();
+  void OnAnnihilation();
 
   enum COL_TYPE {
     COL_SELECTED,   

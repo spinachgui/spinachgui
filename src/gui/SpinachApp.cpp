@@ -21,10 +21,6 @@ IMPLEMENT_APP(SpinachApp);
 
 
 bool SpinachApp::OnInit() {
-  //Start the event system up
-
-  CEventManager* evSys=CEventManager::Instance();
-
   //Load the isotopes
 
   try {

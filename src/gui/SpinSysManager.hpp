@@ -2,7 +2,6 @@
 #ifndef __SPINSYSMANAGER_H__
 #define __SPINSYSMANAGER_H__
 
-#include <gui/EventSystem.hpp>
 
 #include <boost/shared_ptr.hpp>
 
@@ -15,7 +14,7 @@
 typedef boost::shared_ptr<SpinXML::SpinSystem> SpinSysPtr;
 //typedef SpinXML::SpinSystem* SpinSysPtr;
 
-class SpinSysManager : public IEventListener {
+class SpinSysManager  {
 public:
   SpinSysManager(SpinSysPtr system);
 
@@ -43,9 +42,6 @@ public:
   wxString GetUndoMessage();
 
   wxString GetRedoMessage();
-
-  ///The McShafry style event handler
-  virtual bool HandleEvent(CEvent const& event);
 
   //Debug functions
   ///Print out the history to the stdout

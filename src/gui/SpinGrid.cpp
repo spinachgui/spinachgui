@@ -77,8 +77,6 @@ SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
 
   //Listen for all instances of the spin system changing because this
   //means we need to redraw the display
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SSCHANGE);
-  CEventManager::Instance()->addListener(EventListenerPtr(this),EVT_SCHANGE);
 
   CreateGrid(0, ColumCount);
 
@@ -237,7 +235,6 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     std::string label(GetCellValue(e.GetRow(),e.GetCol()).char_str());
     GetSS()->GetSpin(e.GetRow())->SetLabel(label);
   }
-  CEventManager::Instance()->trigger(EvtSChange(e.GetRow()));
 }
 
 void SpinGrid::UpdateRowIsotopes(long row) {
@@ -281,23 +278,13 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
-//============================================================//
-// virtual bool HandleEvent(CEvent const& event);
-// The McShafry style event handler
+void SpinGrid::OnChange() {
 
-bool SpinGrid::HandleEvent(CEvent const& event) {
-  if(event.getType()==EVT_SCHANGE) {
-    //A single spin has changed, update one row
-    UpdateRow(event.getDataPtr<EvtDataSChange>()->mSpinNumber);
-  } else if(event.getType()==EVT_SSCHANGE) {
-    //The entire system has changed, need to reload the grid.
-    cout << "SpinGrid::HandleEvent received an SSCHANGE event" << endl;
-    GetSSMgr().DumpHistory();
-    RefreshFromSpinSystem();
-  }
-  return true;
 }
 
+void SpinGrid::OnAnnihilation() {
+
+}
 
 
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)

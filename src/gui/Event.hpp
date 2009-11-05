@@ -31,10 +31,7 @@ public:
   virtual void OnAnnihilation() = 0;
 };
 
-long GetUID() {
-  static counter=0;
-  return counter++;
-}
+long GetUID();
 
 class EventNode {
 public:

@@ -8,7 +8,7 @@
 #include <wx/aui/auibook.h>
 
 
-class RootFrame : public RootFrameBase,public IEventListener {
+class RootFrame : public RootFrameBase {
 public:
   RootFrame(wxWindow* parent) : RootFrameBase(parent) {
     SetSize(wxSize(1024,768));
@@ -40,7 +40,6 @@ public:
   void OnNmr(wxCommandEvent& e);
   void OnEpr(wxCommandEvent& e);
 
-  virtual bool HandleEvent(CEvent const& event);
 
   DECLARE_EVENT_TABLE();
 

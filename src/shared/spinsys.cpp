@@ -685,7 +685,7 @@ bool Interaction::IsSubType(SubType t) const {
     return true;
   }
   if(t==ST_EPR) {
-    switch(t) {
+    switch(mSubType) {
     case ST_HFC:
     case ST_G_TENSER:
     case ST_ZFS: 
@@ -699,7 +699,7 @@ bool Interaction::IsSubType(SubType t) const {
     }
   }
   if(t==ST_NMR) {
-    switch(t) {
+    switch(mSubType) {
     case ST_SHIELDING:
     case ST_SCALAR:
     case ST_QUADRUPOLAR:

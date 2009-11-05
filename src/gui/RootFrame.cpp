@@ -137,6 +137,18 @@ void RootFrame::SaveToFile(const wxString& filename) {
   GetSS()->SaveToXMLFile(filename.char_str());
 }
 
+void RootFrame::OnNmrEpr(wxCommandEvent& e) {
+  mGLDisplay->SetMode(glDisplay::NMR_EPR);
+}
+
+void RootFrame::OnNmr(wxCommandEvent& e) {
+  mGLDisplay->SetMode(glDisplay::NMR);
+}
+
+void RootFrame::OnEpr(wxCommandEvent& e) {
+  mGLDisplay->SetMode(glDisplay::EPR);
+}
+
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
@@ -150,6 +162,11 @@ EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
 //Edit Menu
 EVT_MENU(ID_UNDO,RootFrame::OnUndo)
 EVT_MENU(ID_REDO,RootFrame::OnRedo)
+
+//View Menu
+EVT_MENU(ID_NMR_EPR,RootFrame::OnNmrEpr)
+EVT_MENU(ID_NMR,    RootFrame::OnNmr)
+EVT_MENU(ID_EPR,    RootFrame::OnEpr)
 
 END_EVENT_TABLE()
 

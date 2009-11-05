@@ -29,8 +29,18 @@ public:
   void OnResize(wxSizeEvent& e);
   void OnDeleteSpinHover(wxCommandEvent& e);
 
+  enum INTERACTION_MODE {
+    NMR,
+    EPR,
+    NMR_EPR,
+    NONE
+  };
+
+  void SetMode(INTERACTION_MODE m);
+
   //The McShaffy style event handler
   virtual bool HandleEvent(CEvent const& event);
+
 
 protected:
 
@@ -54,6 +64,8 @@ protected:
 
   DECLARE_EVENT_TABLE();
 private:
+  INTERACTION_MODE mMode;
+
   bool mGLEnabled;
   wxGLContext* mGLContext;
 

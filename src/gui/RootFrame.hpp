@@ -35,6 +35,11 @@ public:
   void OnUndo(wxCommandEvent& e);
   void OnRedo(wxCommandEvent& e);
 
+  //View Menu Event Hanlders
+  void OnNmrEpr(wxCommandEvent& e);
+  void OnNmr(wxCommandEvent& e);
+  void OnEpr(wxCommandEvent& e);
+
   virtual bool HandleEvent(CEvent const& event);
 
   DECLARE_EVENT_TABLE();

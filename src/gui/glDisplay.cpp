@@ -187,6 +187,14 @@ void glDisplay::CreateBondList() {
 //============================================================//
 // Change of State Functions
 
+
+
+void glDisplay::SetMode(INTERACTION_MODE m) {
+  mMode=m;
+  Refresh();
+}
+
+
 void glDisplay::FindHover() {
 	
   mHover=-1;     //The index of the spin the user is hovering over
@@ -319,7 +327,17 @@ void glDisplay::DrawBonds() {
 
 void glDisplay::DrawLinear(long atom) {
   Spin* thisSpin=(*mSS)->GetSpin(atom);
-  Matrix3 mat3=thisSpin->GetLinearInteractionAsMatrix();
+
+  if(mMode==NONE) {
+    //Don't draw anything
+    return;
+  }
+
+  Interaction::SubType t=(mMode == NMR ? Interaction::ST_NMR : (
+								mMode == EPR ? Interaction::ST_EPR : Interaction::ST_ANY
+								)
+			  );
+  Matrix3 mat3=thisSpin->GetLinearInteractionAsMatrix(t);
 
   //Convert to a openGL 4x4 matrix
   float mat[16];
@@ -518,6 +536,7 @@ void glDisplay::OnPaint(wxPaintEvent& e) {
 glDisplay::glDisplay(wxWindow* parent,wxWindowID id) : wxGLCanvas(parent,id,NULL) {
   mGLContext=NULL;
   mGLEnabled=false;
+  mMode=NMR_EPR;
   mSS=wxGetApp().GetSpinSysManager()->Get();
 
   mZoom=0.01;

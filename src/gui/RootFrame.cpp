@@ -139,14 +139,20 @@ void RootFrame::SaveToFile(const wxString& filename) {
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {
   mGLDisplay->SetMode(glDisplay::NMR_EPR);
+  mMenuItemNmrEpr->Check(true);
+  mRootToolbar->ToggleTool(ID_NMR_EPR,true);
 }
 
 void RootFrame::OnNmr(wxCommandEvent& e) {
   mGLDisplay->SetMode(glDisplay::NMR);
+  mMenuItemNmr->Check(true);
+  mRootToolbar->ToggleTool(ID_NMR,true);
 }
 
 void RootFrame::OnEpr(wxCommandEvent& e) {
   mGLDisplay->SetMode(glDisplay::EPR);
+  mMenuItemEpr->Check(true);
+  mRootToolbar->ToggleTool(ID_EPR,true);
 }
 
 

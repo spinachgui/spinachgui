@@ -341,22 +341,22 @@
                         <property name="permission">none</property>
                     </object>
                     <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap">res/nmr_epr.xpm; Load From File</property>
-                        <property name="checked">0</property>
+                        <property name="bitmap">; Load From File</property>
+                        <property name="checked">1</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
                         <property name="id">ID_NMR_EPR</property>
                         <property name="kind">wxITEM_RADIO</property>
                         <property name="label">Mixed Mode</property>
-                        <property name="name">mMenuItemNmrMode</property>
-                        <property name="permission">none</property>
+                        <property name="name">mMenuItemNmrEpr</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
-                        <property name="unchecked_bitmap">res/nmr_epr.xpm; Load From File</property>
+                        <property name="unchecked_bitmap">; Load From File</property>
                         <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
                     </object>
                     <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap">res/epr.xpm; Load From File</property>
+                        <property name="bitmap">; Load From File</property>
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
@@ -364,14 +364,14 @@
                         <property name="kind">wxITEM_RADIO</property>
                         <property name="label">EPR Mode</property>
                         <property name="name">mMenuItemEpr</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
-                        <property name="unchecked_bitmap">res/epr.xpm; Load From File</property>
+                        <property name="unchecked_bitmap">; Load From File</property>
                         <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
                     </object>
                     <object class="wxMenuItem" expanded="1">
-                        <property name="bitmap">res/nmr.xpm; Load From File</property>
+                        <property name="bitmap">; Load From File</property>
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
@@ -379,9 +379,9 @@
                         <property name="kind">wxITEM_RADIO</property>
                         <property name="label">NMR Mode</property>
                         <property name="name">mMenuItemNmr</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
-                        <property name="unchecked_bitmap">res/nmr.xpm; Load From File</property>
+                        <property name="unchecked_bitmap">; Load From File</property>
                         <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
                     </object>

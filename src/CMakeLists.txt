@@ -190,7 +190,9 @@ set(spinachSources ${cmdSources} ${sharedSources})
 add_executable (spinach ${spinachSources})
 target_link_libraries (spinach xerces-c) 
 
-
+#Automatic Tests
+add_executable (event_test gui/Event.cpp commandln/Event_Test.cpp)
+target_link_libraries (event_test ${wxWidgets_LIBRARIES})
 #Create an "install" target (copy everything to a test directory)
 #This is probaly not how to do it in a production build, but it works and will
 #do for now

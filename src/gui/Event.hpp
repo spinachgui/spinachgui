@@ -29,6 +29,8 @@ public:
 
   EventNode* AddParent(EventNode* parent);
   EventNode* AddChild(EventNode* child);
+  void RemoveParent(EventNode* parent);
+  void RemoveChild(EventNode* child);
 
   void Change(bool PropogateDown=true);
 

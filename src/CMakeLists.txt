@@ -176,20 +176,22 @@ link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
 
 
 
+#command line exe
+#set(spinachSources ${cmdSources} ${sharedSources})
+#add_executable (spinach ${spinachSources})
+#target_link_libraries (spinach xerces-c) 
+
+
 #C++ GUI
 set(wxSpinachSources ${guiSources} ${sharedSources})
 add_executable (wxSpinach ${wxSpinachSources})
 add_definitions(${wxWidgets_DEFINITIONS})
+add_definitions(-DSPINXML_EVENTS)
 target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
 #target_link_libraries (wxSpinach atlas) 
 target_link_libraries (wxSpinach GL GLEW) 
 target_link_libraries (wxSpinach xerces-c)
 
-
-#command line exe
-set(spinachSources ${cmdSources} ${sharedSources})
-add_executable (spinach ${spinachSources})
-target_link_libraries (spinach xerces-c) 
 
 #Automatic Tests
 add_executable (event_test gui/Event.cpp commandln/Event_Test.cpp)

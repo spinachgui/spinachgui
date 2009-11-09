@@ -73,6 +73,24 @@ EventNode* EventNode::AddChild(EventNode* child) {
   return child;
 }
 
+void EventNode::RemoveParent(EventNode* parent) {
+  graphItor i = find(mParents.begin(),mParents.end(),parent);
+  if(i == mParents.end()) {
+    return;
+  }
+  mParents.erase(i);
+  return;
+}
+
+void EventNode::RemoveChild(EventNode* child) {
+  graphItor i = find(mChildren.begin(),mChildren.end(),child);
+  if(i == mChildren.end()) {
+    return;
+  }
+  mParents.erase(i);
+  return;
+}
+
 void EventNode::Change(bool PropogateDown) {
   long uid=GetUID();
   PropogateChangeUp(uid);

@@ -46,11 +46,13 @@ bool SpinachApp::OnInit() {
   cout << "Loaded " << fn.GetFullPath() << endl;
 
   shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
+  SS->LoadFromG03File("data/tryosine.log");
+  SS->GetNode()->Dump();
   mSSMgr = new SpinSysManager(SS);
 
   RootFrame* frame = new RootFrame(NULL);
   frame->Show();
 
-  return true;
+  return false;
 }
 

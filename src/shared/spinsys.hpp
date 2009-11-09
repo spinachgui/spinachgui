@@ -8,6 +8,11 @@
 #include <stdexcept>
 #include <shared/mathtypes.hpp>
 
+#ifdef SPINXML_EVENTS
+#include <wx/string.h>
+#include <gui/Event.hpp>
+#endif
+
 namespace SpinXML {
 
 void SetSchemaLocation(const char* loc);
@@ -207,6 +212,12 @@ class Interaction {
    SubType mSubType;
    Spin* mSpin1;
    Spin* mSpin2;
+
+#ifdef SPINXML_EVENTS
+  EventNode* mNode;
+public:
+  EventNode* GetNode() const {return mNode;}
+#endif
 };
 
   ///A class representing a spin in a spin system
@@ -260,6 +271,12 @@ class Spin {
     ReferenceFrame* mFrame;
     long mElement;
     std::vector<long> mIsotopes;
+
+#ifdef SPINXML_EVENTS
+  EventNode* mNode;
+public:
+  EventNode* GetNode() const {return mNode;}
+#endif
 };
 
 
@@ -301,6 +318,13 @@ class SpinSystem {
     std::vector<Spin*> mSpins;
     std::vector<Interaction*> mInteractions;
     ReferenceFrame* mLabFrame; 
+
+#ifdef SPINXML_EVENTS
+  EventNode* mNode;
+public:
+  EventNode* GetNode() const {return mNode;}
+#endif
+
 };
 
 }; //End Namespace

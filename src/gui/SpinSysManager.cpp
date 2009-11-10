@@ -26,6 +26,7 @@ const SpinSysPtr* SpinSysManager::Get() const {
 
 
 void SpinSysManager::Checkpoint(const wxString& message) {
+  return;
   HistoryItem hi;
   hi.state=SpinSysPtr(new SpinSystem(*mHead));
   hi.message=message;
@@ -80,11 +81,13 @@ void SpinSysManager::ClearHistory() {
 }
 
 bool SpinSysManager::CanUndo() const {
+  return false;
   return mPos != mHistory.begin();
 }
 
 
 bool SpinSysManager::CanRedo() const {
+  return false;
   return mPos != --mHistory.end();
 }
 

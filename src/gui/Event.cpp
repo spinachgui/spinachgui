@@ -115,6 +115,11 @@ void EventNode::RemoveChild(EventNode* child) {
 }
 
 void EventNode::Change(IEventListener::REASON r) {
+  EventNode* n=this;
+  while(n->mParents.size() !=0) {
+    n=*(n->mParents.begin());
+  }
+  n->Dump();
   long uid=GetUID();
   Event e(r);
   PropogateChangeUp(uid,e);
@@ -161,6 +166,7 @@ void EventNode::RemoveListener(IEventListener* el,long hint) {
 
 void EventNode::Dump() const {
   PrivateDump(0);
+  cout << endl;
 }
 
 void EventNode::PrivateDump(long indentDepth) const {
@@ -177,9 +183,15 @@ void EventNode::PrivateDump(long indentDepth) const {
   for(graphItorConst i=mChildren.begin(); i!= mChildren.end();++i) {
     cout << (*i)->mName.char_str() << ",";
   }
+  cout << ")";
+  cout << " Listeners=" << mListeners.size() << " (";
+  for(cListenerItor i = mListeners.begin(); i != mListeners.end(); ++i) {
+    cout << i->Listener << " " << i->hint;
+  }
   cout << ")" << endl;
   indentDepth++;
   for(graphItorConst i=mChildren.begin();i != mChildren.end(); ++i) {
     (*i)->PrivateDump(indentDepth);
   }
+
 }

@@ -91,6 +91,7 @@ private:
   };
 
   typedef std::vector<ListenerStruct>::iterator ListenerItor;
+  typedef std::vector<ListenerStruct>::const_iterator cListenerItor;
   std::vector<ListenerStruct> mListeners;
 
   long LastUID;

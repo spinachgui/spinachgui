@@ -533,7 +533,7 @@ double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
   long interCount=mParent->mInteractions.size();
   for(long i=0;i < interCount;++i) {
     Interaction* inter=mParent->mInteractions[i];
-    if(inter->GetSpin2()!=NULL) {
+    if(inter->GetIsLinear()) {
       continue;
     }
     if(inter->GetSpin1()==this) {
@@ -547,11 +547,39 @@ double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
 }
 
 double Spin::GetBilinearInteractionAsScalar(Spin* OtherSpin,Interaction::SubType t) const {
-  return 0;
+  double total=0.0;
+  long interCount=mParent->mInteractions.size();
+  for(long i=0;i < interCount;++i) {
+    Interaction* inter=mParent->mInteractions[i];
+    if(inter->GetIsBilinear()) {
+      continue;
+    }
+    if(inter->GetSpin1()==this && inter->GetSpin2() == OtherSpin) {
+      //Interaction is relevent
+      if(inter->IsSubType(t)) {
+	total+=inter->GetAsScalar();
+      }
+    }
+  }
+  return total;
 }
 
 double Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
-  return 0;
+  double total=0.0;
+  long interCount=mParent->mInteractions.size();
+  for(long i=0;i < interCount;++i) {
+    Interaction* inter=mParent->mInteractions[i];
+    if(inter->GetIsQuadratic()) {
+      continue;
+    }
+    if(inter->GetSpin1()==this) {
+      //Interaction is relevent
+      if(inter->IsSubType(t)) {
+	total+=inter->GetAsScalar();
+      }
+    }
+  }
+  return total;
 }
 
 Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
@@ -561,7 +589,7 @@ Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
   long interCount=mParent->mInteractions.size();
   for(long i=0;i < interCount;++i) {
     Interaction* inter=mParent->mInteractions[i];
-    if(inter->GetSpin2()!=NULL) {
+    if(!inter->GetIsLinear()) {
       continue;
     }
     if(inter->GetSpin1()==this) {
@@ -575,11 +603,43 @@ Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
 }
 
 Matrix3 Spin::GetBilinearInteractionAsMatrix(Spin* OtherSpin,Interaction::SubType t) const {
-  return Matrix3(1,0,0,0,1,0,0,0,1);
+  Matrix3 total=Matrix3(0,0,0,
+			0,0,0,
+			0,0,0);
+  long interCount=mParent->mInteractions.size();
+  for(long i=0;i < interCount;++i) {
+    Interaction* inter=mParent->mInteractions[i];
+    if(!inter->GetIsBilinear()) {
+      continue;
+    }
+    if(inter->GetSpin1()==this && inter->GetSpin2()==OtherSpin) {
+      //Interaction is relevent
+      if(inter->IsSubType(t)) {
+	total+=inter->GetAsMatrix();
+      }
+    }
+  }
+  return total;
 }
 
 Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
-  return Matrix3(10,0,0,0,10,0,0,0,10);
+  Matrix3 total=Matrix3(0,0,0,
+			0,0,0,
+			0,0,0);
+  long interCount=mParent->mInteractions.size();
+  for(long i=0;i < interCount;++i) {
+    Interaction* inter=mParent->mInteractions[i];
+    if(!inter->GetIsQuadratic()) {
+      continue;
+    }
+    if(inter->GetSpin1()==this) {
+      //Interaction is relevent
+      if(inter->IsSubType(t)) {
+	total+=inter->GetAsMatrix();
+      }
+    }
+  }
+  return total;
 }
 
 

@@ -115,11 +115,6 @@ void EventNode::RemoveChild(EventNode* child) {
 }
 
 void EventNode::Change(IEventListener::REASON r) {
-  EventNode* n=this;
-  while(n->mParents.size() !=0) {
-    n=*(n->mParents.begin());
-  }
-  n->Dump();
   long uid=GetUID();
   Event e(r);
   PropogateChangeUp(uid,e);

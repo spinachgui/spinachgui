@@ -17,6 +17,26 @@ IEventListener::~IEventListener() {
   }
 }
 
+void Event::PushHistory(long part, long hint) {
+  History.push_back(PartHint(part,hint));
+}
+
+long Event::GetHintGivenPart(long part) const {
+  for(long i=History.size()-1;i!=0;i--) {
+    if(History[i].part==part) {
+      return History[i].hint;
+    }
+  }
+  return -1;
+}
+
+void Event::Dump() const {
+  cout << "  Event Object:" << endl;
+  for(long i=0;i<History.size();i++) {
+    cout << "     part=" << History[i].part
+	 << " hint=" << History[i].hint << endl;
+  }
+}
 
 EventNode::EventNode() : LastUID(-1) {
 
@@ -27,7 +47,8 @@ EventNode::EventNode(long part,long hint,const wxString& name)
 }
 
 EventNode::~EventNode() {
-  PropogateChangeUp(GetUID(),Event(mPart,mHint,IEventListener::REMOVAL));
+  Event e(IEventListener::REMOVAL);
+  PropogateChangeUp(GetUID(),e);
   while(mParents.begin() != mParents.end()) {
     graphItor i=mChildren.begin();
     EventNode* parent=*i;
@@ -62,7 +83,8 @@ EventNode::~EventNode() {
 
 EventNode* EventNode::AddParent(EventNode* parent) {
   mParents.push_back(parent);
-  PropogateChangeUp(GetUID(),Event(mPart,mHint,IEventListener::CHANGE));
+  Event e(IEventListener::CHANGE);
+  PropogateChangeUp(GetUID(),e);
   return parent;
 }
 
@@ -92,38 +114,25 @@ void EventNode::RemoveChild(EventNode* child) {
   return;
 }
 
-void EventNode::Change(IEventListener::REASON r,bool PropogateDown) {
+void EventNode::Change(IEventListener::REASON r) {
   long uid=GetUID();
-  Event e(mPart,mHint,r);
+  Event e(r);
   PropogateChangeUp(uid,e);
-  if(PropogateDown) {
-    PropogateChangeDown(uid,e);
-  }
 }
 
 //Private functions
 
-void EventNode::PropogateChangeUp(long UID,const Event& e) {
+void EventNode::PropogateChangeUp(long UID,Event& e) {
   if(LastUID==UID) {
     //This propogation has already touched this node
     return;
   } else {
     LastUID=UID;
   }
+  e.PushHistory(mPart,mHint);
   SendChange(e);
   for(graphItorConst i=mParents.begin();i != mParents.end();++i) {
     (*i)->PropogateChangeUp(UID,e);
-  }
-}
-
-void EventNode::PropogateChangeDown(long UID,const Event& e) {
-  if(LastUID!=UID) {
-    LastUID=UID;
-    SendChange(e);
-  }
-
-  for(graphItorConst i=mChildren.begin();i != mChildren.end();++i) {
-    (*i)->PropogateChangeDown(UID,e);
   }
 }
 

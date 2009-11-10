@@ -10,9 +10,8 @@ public:
   TestListener(std::string name) : mName(name) {}
   virtual void OnChange(const Event& e) {
     cout << mName << " (" << this
-	 << ") recived a change event"
-         << " part=" << e.part
-         << " hint=" << e.hint << endl;
+	 << ") recived a change event" << endl;
+    e.Dump();
   }
 private:
   std::string mName;
@@ -46,15 +45,15 @@ int main(int argc,char** argv) {
   ss.AddListener(lss);
 
   cout << "===START TEST, edit ss===" << endl;
-  ss.Change(IEventListener::CHANGE,true);
+  ss.Change(IEventListener::CHANGE);
   cout << "===END TEST===" << endl;
 
   cout << "===START TEST, edit i1===" << endl;
-  i1->Change(IEventListener::CHANGE,true);
+  i1->Change(IEventListener::CHANGE);
   cout << "===END TEST===" << endl;
 
   cout << "===START TEST, edit s3===" << endl;
-  s3->Change(IEventListener::CHANGE,true);
+  s3->Change(IEventListener::CHANGE);
   cout << "===END TEST===" << endl;
 
   delete l1;

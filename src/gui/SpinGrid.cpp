@@ -280,10 +280,19 @@ void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
 void SpinGrid::OnChange(const Event& e) {
-    cout << "SpinGrid (" << this
-	 << ") recived a change event"
-         << " part=" << e.part
-         << " hint=" << e.hint << endl;
+  if(e.GetHistory()[0].part==PART_SYSTEM) {
+    //The spin system changed directly. We should reload the grid
+    cout << "I'm about to reload the grid" << endl;
+    RefreshFromSpinSystem();
+  } else {
+    long hint=e.GetHintGivenPart(PART_SPIN);
+    if(hint != -1) {
+      //The system was edited such that at least one row needs
+      //updating
+      cout << "I'm just going to reload row " << hint << endl;
+      UpdateRow(hint);
+    }
+  }
 }
 
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)

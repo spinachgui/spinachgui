@@ -31,12 +31,21 @@ private:
 
 class Event {
 public:
-  Event(long _part,long _hint,IEventListener::REASON r) 
-    : part(_part),hint(_hint),reason(r) {
+  struct PartHint {
+    PartHint(long p, long h) : part(p),hint(h) {}
+    long part;   //General Description of where in the spin system the change occured (eg. spin, interaction)
+    long hint;   //More specific hint about which part of the spin system chagned (eg. 1 for spin 1)
+  };
 
+  Event(IEventListener::REASON r) 
+    : reason(r) {
   }
-  long part;   //General Description of where in the spin system the change occured (eg. spin, interaction)
-  long hint;   //More specific hint about which part of the spin system chagned (eg. 1 for spin 1)
+  void PushHistory(long part, long hint);
+  const std::vector<PartHint>& GetHistory() const {return History;}
+  long GetHintGivenPart(long part) const;
+  void Dump() const;
+private:
+  std::vector<PartHint> History;
   IEventListener::REASON reason;  //What exactly changed.
 };
 
@@ -51,7 +60,7 @@ public:
   void RemoveParent(EventNode* parent);
   void RemoveChild(EventNode* child);
 
-  void Change(IEventListener::REASON r=IEventListener::CHANGE,bool PropogateDown=false);
+  void Change(IEventListener::REASON r=IEventListener::CHANGE);
 
   void AddListener(IEventListener* el,long Hint=0);
   void RemoveListener(IEventListener* el,long Hint=0);
@@ -62,8 +71,7 @@ public:
 private:
   void PrivateDump(long indentDepth) const;
 
-  void PropogateChangeUp(long UID,const Event& e);
-  void PropogateChangeDown(long UID,const Event& e);
+  void PropogateChangeUp(long UID,Event& e);
   void SendChange(const Event& e) const;
 
   typedef std::list<EventNode*>::const_iterator graphItorConst;

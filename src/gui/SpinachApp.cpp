@@ -53,6 +53,6 @@ bool SpinachApp::OnInit() {
   RootFrame* frame = new RootFrame(NULL);
   frame->Show();
 
-  return false;
+  return true;
 }
 

@@ -15,6 +15,18 @@
 
 namespace SpinXML {
 
+
+#ifdef SPINXML_EVENTS
+
+  enum SPINSYS_PART {
+    PART_SYSTEM,
+    PART_SPIN,
+    PART_INTERACTION
+  };
+
+#endif
+
+
 void SetSchemaLocation(const char* loc);
 
 const long END=-1;

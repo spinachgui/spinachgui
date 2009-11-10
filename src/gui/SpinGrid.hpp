@@ -23,8 +23,7 @@ public:
   void OnDeleteSpinHover(wxCommandEvent& e);
 
   //Other event handlers
-  void OnChange();
-  void OnAnnihilation();
+  void OnChange(const Event& e);
 
   enum COL_TYPE {
     COL_SELECTED,   

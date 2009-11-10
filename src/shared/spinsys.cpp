@@ -15,7 +15,7 @@ using namespace SpinXML;
 
 SpinSystem::SpinSystem() : mLabFrame(NULL) {
 #ifdef SPINXML_EVENTS
-  mNode=new EventNode(wxString(wxT("RootNode")));
+  mNode=new EventNode(PART_SYSTEM,0,wxString(wxT("RootNode")));
 #endif
 }
 
@@ -117,8 +117,16 @@ vector<Spin*> SpinSystem::GetSpins() const {
 void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
   if(Position==END) {
     mSpins.push_back(_Spin);
+#ifdef SPINXML_EVENTS
+    _Spin->mNode->SetPartAndHint(PART_SPIN,mSpins.size()-1);
+    cout << "Set Hint to " << mSpins.size()-1 <<  endl;
+#endif
   } else {
     mSpins.insert(mSpins.begin()+Position,_Spin);
+#ifdef SPINXML_EVENTS
+    _Spin->mNode->SetPartAndHint(PART_SPIN,Position);
+    cout << "'Set Hint to " << Position <<  endl;
+#endif
   }
 }
 
@@ -141,7 +149,7 @@ ReferenceFrame* SpinSystem::GetRootFrame() const {
 
 void SpinSystem::LoadFromGamesFile(const char* filename) {
 #ifdef SPINXML_EVENTS
-  mNode->Change();
+  mNode->Change(IEventListener::CHANGE);
 #endif
 }
 
@@ -196,7 +204,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	  string isotopeSymbol(getElementSymbol(atomicNumber));
 	  isotopeSymbol=isotopeSymbol; //We have no clue what the mass number is yet
 	  Spin* s=new Spin(this,Vector3(x,y,z),string("A Spin")+isotopeSymbol,GetRootFrame(),atomicNumber);
-	  mSpins.push_back(s);
+	  InsertSpin(s);
 	}
 	nAtoms++;
       }
@@ -365,7 +373,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
   }
   cout << "Finished loading the g03 file, saving mSpins.size()=" << mSpins.size() << endl;
 #ifdef SPINXML_EVENTS
-  mNode->Change();
+  mNode->Change(IEventListener::CHANGE);
 #endif
 }
 
@@ -378,7 +386,7 @@ Spin::Spin(SpinSystem* Parent,Vector3 Position,string Label,ReferenceFrame* mFra
   : mParent(Parent),mPosition(Position),mLabel(Label),mElement(atomicNumber) {
 
 #ifdef SPINXML_EVENTS
-  mNode=new EventNode(wxString(wxT("Spin: ")) << wxString(Label.c_str(),wxConvUTF8));
+  mNode=new EventNode(PART_SPIN,0,wxString(wxT("Spin: ")) << wxString(Label.c_str(),wxConvUTF8));
   mParent->GetNode()->AddChild(mNode);
 #endif
 }
@@ -411,7 +419,10 @@ Vector3& Spin::GetPosition() {
 
 void Spin::SetPosition(Vector3 Position) {
 #ifdef SPINXML_EVENTS
-  mNode->Change();
+  if(mParent != NULL) {
+    //If the spin has no parent, we probably don't want to emit events anyway.
+    mNode->Change(IEventListener::CHANGE);
+  }
 #endif
   mPosition=Position;
 }
@@ -423,14 +434,14 @@ void Spin::GetCoordinates(double* _x,double* _y, double* _z) const {
 
 void Spin::SetCoordinates(double _x,double _y, double _z) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mPosition.SetCoordinates(_x,_y,_z);
 }
 
 void Spin::SetLabel(string Label) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mLabel=Label;
 }
@@ -574,7 +585,7 @@ Interaction::SubType Interaction::GetSubType() const {
 
 void Interaction::SetSubType(SubType st) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mSubType=st;
 }
@@ -657,7 +668,7 @@ long Spin::GetElement() const {
 
 void Spin::SetElement(long element) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mElement=element;
 }
@@ -679,7 +690,9 @@ vector<long> Spin::GetIsotopes() const {
 
 Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY),mSpin1(NULL),mSpin2(NULL) {
 #ifdef SPINXML_EVENTS
-  mNode=new EventNode(wxString(wxT("Interaction")));
+  #warning "Interactions do not know their index, so all report as index 0."
+  //Which could cause gui elements to needlessly refresh themselves.
+  mNode=new EventNode(PART_INTERACTION,0,wxString(wxT("Interaction")));
 #endif
 }
 
@@ -876,7 +889,7 @@ void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientatio
 
 void Interaction::SetScalar(double Scalar) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mType=SCALAR;
   mData.mScalar=Scalar;
@@ -884,7 +897,7 @@ void Interaction::SetScalar(double Scalar) {
 
 void Interaction::SetMatrix(const Matrix3& Matrix) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mType=MATRIX;
   mData.mMatrix=new Matrix3(Matrix);
@@ -892,7 +905,7 @@ void Interaction::SetMatrix(const Matrix3& Matrix) {
 
 void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mType=EIGENVALUES;
   mData.mEigenvalues.XX=XX;
@@ -904,7 +917,7 @@ void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientati
 
 void Interaction::SetAxRhom(double iso,double ax, double rh, const Orientation& Orient) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mType=AXRHOM;
   mData.mAxRhom.iso=iso;
@@ -916,7 +929,7 @@ void Interaction::SetAxRhom(double iso,double ax, double rh, const Orientation& 
 
 void Interaction::SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient) {
 #ifdef SPINXML_EVENTS
-  mNode->Change(false);
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mType=SPANSKEW;
   mData.mSpanSkew.iso=iso;
@@ -992,7 +1005,7 @@ void Interaction::SetQuadratic() {
   if(mSpin2 != NULL && mSpin2 != mSpin1) {
     mNode->RemoveParent(mSpin2->GetNode());
   }
-  mNode->Change();
+  mNode->Change(IEventListener::CHANGE);
 #endif
   mSpin2=mSpin1;
 }
@@ -1001,7 +1014,7 @@ void Interaction::SetLinear() {
 #ifdef SPINXML_EVENTS
   if(mSpin2 != NULL) {
     mNode->RemoveParent(mSpin2->GetNode());
-    mNode->Change();
+    mNode->Change(IEventListener::CHANGE);
   }
 #endif
   mSpin2=NULL;

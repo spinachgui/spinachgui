@@ -74,9 +74,10 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
   :wxGrid(parent,id),mHead(wxGetApp().GetSpinSysManager()->Get()),mUpdating(false) {
-
   //Listen for all instances of the spin system changing because this
   //means we need to redraw the display
+  GetSS()->GetNode()->AddListener(this,0);
+
 
   CreateGrid(0, ColumCount);
 
@@ -278,14 +279,12 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
-void SpinGrid::OnChange() {
-
+void SpinGrid::OnChange(const Event& e) {
+    cout << "SpinGrid (" << this
+	 << ") recived a change event"
+         << " part=" << e.part
+         << " hint=" << e.hint << endl;
 }
-
-void SpinGrid::OnAnnihilation() {
-
-}
-
 
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)
 

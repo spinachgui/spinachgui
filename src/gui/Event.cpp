@@ -60,7 +60,7 @@ EventNode::~EventNode() {
   Event e(IEventListener::REMOVAL);
   PropogateChangeUp(GetUID(),e);
   while(mParents.begin() != mParents.end()) {
-    graphItor i=mChildren.begin();
+    graphItor i=mParent.begin();
     EventNode* parent=*i;
     for(graphItor j=parent->mChildren.begin();j != parent->mChildren.end();++j) {
       if((*j)==this) {

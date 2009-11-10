@@ -579,7 +579,7 @@ Matrix3 Spin::GetBilinearInteractionAsMatrix(Spin* OtherSpin,Interaction::SubTyp
 }
 
 Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
-  return Matrix3(1,0,0,0,1,0,0,0,1);
+  return Matrix3(10,0,0,0,10,0,0,0,10);
 }
 
 

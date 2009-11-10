@@ -289,7 +289,12 @@ void glDisplay::DrawAtoms(bool depthOnly) {
 	  glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
 	  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);	
       }
-      DrawLinear(i);
+      DrawSingleAtomInteraction(i,Interaction::LINEAR);
+      if(!depthOnly) {
+	  glMaterialfv(GL_FRONT, GL_SPECULAR, redMaterial);
+	  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);	
+      }
+      DrawSingleAtomInteraction(i,Interaction::QUADRATIC);
       glScalef(radius,radius,radius);
       if(!depthOnly) {
 	if(mHover!=i) {
@@ -313,7 +318,7 @@ void glDisplay::DrawBonds() {
   glCallList(mDLBonds);
 }
 
-void glDisplay::DrawLinear(long atom) {
+void glDisplay::DrawSingleAtomInteraction(long atom,Interaction::Form form) {
   Spin* thisSpin=(*mSS)->GetSpin(atom);
 
   if(mMode==NONE) {
@@ -325,7 +330,12 @@ void glDisplay::DrawLinear(long atom) {
 								mMode == EPR ? Interaction::ST_EPR : Interaction::ST_ANY
 								)
 			  );
-  Matrix3 mat3=thisSpin->GetLinearInteractionAsMatrix(t);
+  Matrix3 mat3;
+  if(form==Interaction::LINEAR) {
+    mat3=thisSpin->GetLinearInteractionAsMatrix(t);
+  } else if(form==Interaction::QUADRATIC) {
+    mat3=thisSpin->GetQuadrapolarInteractionAsMatrix(t);
+  }
 
   //Convert to a openGL 4x4 matrix
   float mat[16];
@@ -409,9 +419,6 @@ void glDisplay::DrawBilinear() {
   }
 }
 
-void glDisplay::DrawQuadratic(long atom) {
-	
-}
 
 void glDisplay::OnPaint(wxPaintEvent& e) {
   if(!mGLEnabled) {

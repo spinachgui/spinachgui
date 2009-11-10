@@ -83,6 +83,14 @@ class Interaction {
   ///form.
      void Dump() const;
 
+  ///Enumeration of the agebrake forms
+  enum Form {
+    LINEAR,
+    BILINEAR,
+    QUADRATIC,
+    ANY_FORM
+  };
+
   ///Enumeration of the storage conventions used by this interaction
     enum Type {
         UNDEFINED,

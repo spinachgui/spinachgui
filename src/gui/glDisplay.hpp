@@ -53,10 +53,8 @@ protected:
   void Geometary(bool depthOnly=false);
   void DrawAtoms(bool depthOnly=false);
   void DrawBonds();
-  void DrawLinear(long atom);
+  void DrawSingleAtomInteraction(long atom,Interaction::Form form);
   void DrawBilinear();
-  void DrawQuadratic(long atom);
-
 
   DECLARE_EVENT_TABLE();
 private:

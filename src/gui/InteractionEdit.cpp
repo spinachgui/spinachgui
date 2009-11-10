@@ -429,6 +429,7 @@ void InterEditPanel::OnInterFormChange(wxCommandEvent& e) {
   } else {
 	//User set the interaction to bilinear
 	mInter->SetSpin2((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpin(0));
+	mSpin2Combo->SetSelection(0);
 	mSpin2Combo->Enable(true);
   }
 

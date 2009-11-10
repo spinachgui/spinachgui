@@ -4,6 +4,16 @@
 #include <algorithm>
 using namespace std;
 
+bool eventLock=false; //Do not dispach events when this lock is true
+
+void SetEventLock() {
+  eventLock=true;
+}
+
+void ClearEventLock() {
+  eventLock=false;
+}
+
 long GetUID() {
   long static counter=0;
   return counter++;
@@ -115,6 +125,9 @@ void EventNode::RemoveChild(EventNode* child) {
 }
 
 void EventNode::Change(IEventListener::REASON r) {
+  if(eventLock) {
+    return;
+  }
   long uid=GetUID();
   Event e(r);
   PropogateChangeUp(uid,e);

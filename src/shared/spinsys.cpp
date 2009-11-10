@@ -159,6 +159,9 @@ void SpinSystem::LoadFromG03File(const char* filename) {
     streams properly. This is due to it being adapted from matlab code (which uses
     c style I/O
   */
+#ifdef SPINXML_EVENTS
+  SetEventLock();
+#endif
   ifstream fin(filename);
   cout << "Opening a g03 file:" << filename << endl;
   if(!fin.is_open()) {
@@ -373,6 +376,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
   }
   cout << "Finished loading the g03 file, saving mSpins.size()=" << mSpins.size() << endl;
 #ifdef SPINXML_EVENTS
+  ClearEventLock();
   mNode->Change(IEventListener::CHANGE);
 #endif
 }

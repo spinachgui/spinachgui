@@ -68,11 +68,13 @@ SpinSystem::~SpinSystem() {
 }
 
 void SpinSystem::Clear() {
-  for(long i=0;i<mSpins.size();i++) {
-    delete mSpins[i];
-  }
+  //Currently we need to delete the interactions Before the spins as
+  //the spins have interactions as their children. 
   for(long i=0;i<mInteractions.size();i++) {
     delete mInteractions[i];
+  }
+  for(long i=0;i<mSpins.size();i++) {
+    delete mSpins[i];
   }
   mSpins.resize(0);
   mInteractions.resize(0);
@@ -162,6 +164,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 #ifdef SPINXML_EVENTS
   SetEventLock();
 #endif
+  Clear();
   ifstream fin(filename);
   cout << "Opening a g03 file:" << filename << endl;
   if(!fin.is_open()) {

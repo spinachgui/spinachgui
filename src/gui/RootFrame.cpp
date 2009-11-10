@@ -59,7 +59,7 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
 				    wxString(wxT("")), //Default dir
 				    wxString(wxT("Spin XML files (*.xml)|*.xml|Gausian03 files (*.log)|*.log|All Files (*.*)|*.*")) ,
 				    wxFD_OPEN);
-  if(fd->ShowModal()) {
+  if(fd->ShowModal() == wxID_OK) {
     mOpenPath=fd->GetPath();
     mOpenFile=fd->GetFilename();
     mOpenDir=fd->GetDirectory();

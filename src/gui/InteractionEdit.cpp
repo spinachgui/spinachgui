@@ -241,12 +241,15 @@ void InterEditPanel::LoadFromInter() {
   UpdateSubTypeCombo();
 
   if(mInter->GetIsLinear()) {
-	mSpin2Combo->Enable(false);	
+	mSpin2Combo->Enable(false);
+	mFormBox->SetSelection(0);
   } else if(mInter->GetIsBilinear()) {
 	mSpin2Combo->Enable(true);
+	mFormBox->SetSelection(1);
   } else {
 	//Interaction is quadratic
 	mSpin2Combo->Enable(false);
+	mFormBox->SetSelection(2);
   }
 
   //Populate the spin 2 combobox with every other spin

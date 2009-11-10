@@ -56,6 +56,13 @@ int main(int argc,char** argv) {
   s3->Change(IEventListener::CHANGE);
   cout << "===END TEST===" << endl;
 
+  
+  delete s1;
+  delete s2;
+  delete s3;
+
+  ss.Dump();
+
   delete l1;
   delete lss;
   return 0;

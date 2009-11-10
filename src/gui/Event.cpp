@@ -59,18 +59,20 @@ EventNode::EventNode(long part,long hint,const wxString& name)
 EventNode::~EventNode() {
   Event e(IEventListener::REMOVAL);
   PropogateChangeUp(GetUID(),e);
+  //Make the parents of this node forget it
   while(mParents.begin() != mParents.end()) {
-    graphItor i=mParent.begin();
+    graphItor i=mParents.begin();
     EventNode* parent=*i;
     for(graphItor j=parent->mChildren.begin();j != parent->mChildren.end();++j) {
       if((*j)==this) {
 	graphItor e=j;
 	--j; //E will soon point to an invalid position
-	parent->mChildren.erase(j);
+	parent->mChildren.erase(e);
       }
     }
     mParents.erase(i);
   }
+  //Make the children of this node forget it (delete orphans)
   while(mChildren.begin() != mChildren.end()) {
     graphItor i=mChildren.begin();
     EventNode* child=*i;
@@ -87,6 +89,12 @@ EventNode::~EventNode() {
       delete child;
     }
     mChildren.erase(i);
+  }
+  //Make listeners forget they were listening to this node
+  for(ListenerItor i=mListeners.begin();i != mListeners.end(); ++i) {
+    IEventListener* el=(*i).Listener;
+    IEventListener::SubItor j=find(el->mEventNodeSubscriptions.begin(),el->mEventNodeSubscriptions.end(),this);
+    el->mEventNodeSubscriptions.erase(j);
   }
 }
 
@@ -119,7 +127,15 @@ void EventNode::RemoveChild(EventNode* child) {
   if(i == mChildren.end()) {
     return;
   }
-  mParents.erase(i);
+  graphItor j = find(child->mParents.begin(),child->mParents.end(),this);
+  if(j == child->mParents.end()) {
+    cerr << "Error: a child was found to not know it's parent in " 
+	 << __FILE__ << " on line " << __LINE__ << endl;
+  } else {
+    child->mParents.erase(j);
+  }
+
+  mChildren.erase(i);
   Change(IEventListener::REMOVAL);
   return;
 }

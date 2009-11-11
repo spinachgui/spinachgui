@@ -175,19 +175,25 @@ void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
     mEigenYYCtrl->SetValue(wxT("0.0"));
     mEigenZZCtrl->SetValue(wxT("0.0"));
 
-    mOrientEigenvalueCtrl->SetOrient(Orientation());
+    Orientation o;
+    o.SetQuaternion(1.0,0.0,0.0,0.0);
+    mOrientEigenvalueCtrl->SetOrient(o);
   } else if(type==Interaction::AXRHOM) {
     mAxCtrl->       SetValue(wxT("0.0"));
     mRhomCtrl->     SetValue(wxT("0.0"));
     mAxRhomIsoCtrl->SetValue(wxT("0.0"));
 
-    mOrientAxRhomCtrl->SetOrient(Orientation());
+    Orientation o;
+    o.SetQuaternion(1.0,0.0,0.0,0.0);
+    mOrientAxRhomCtrl->SetOrient(o);
   } else if(type==Interaction::SPANSKEW) {
     mSpanCtrl->       SetValue(wxT("0.0"));
     mSkewCtrl->       SetValue(wxT("0.0"));
     mSpanSkewIsoCtrl->SetValue(wxT("0.0"));
 
-    mOrientSpanSkewCtrl->SetOrient(Orientation());
+    Orientation o;
+    o.SetQuaternion(1.0,0.0,0.0,0.0);
+    mOrientSpanSkewCtrl->SetOrient(o);
   }
   SaveToInter();        
   e.Skip();

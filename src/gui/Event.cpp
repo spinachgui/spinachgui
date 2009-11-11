@@ -154,6 +154,9 @@ void EventNode::Change(IEventListener::REASON r) {
 //Private functions
 
 void EventNode::PropogateChangeUp(long UID,Event& e) {
+  if(eventLock!=0) {
+    return;
+  }
   if(LastUID==UID) {
     //This propogation has already touched this node
     return;

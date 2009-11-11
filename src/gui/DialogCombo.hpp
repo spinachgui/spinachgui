@@ -43,6 +43,7 @@ public:
   }
 protected:
   virtual DialogClass* CreateDialog() = 0;
+  virtual void ReadDialog(DialogClass* dlg) =0;
   virtual wxString GetStringFromDialog(DialogClass* dlg) = 0;
 
 public:
@@ -54,6 +55,7 @@ public:
     }
     if (dlg->ShowModal() == wxID_OK) {
       SetValue(GetStringFromDialog(dlg));
+      ReadDialog(dlg);
     }
     dlg->Destroy();
     SetFocus();

@@ -450,6 +450,10 @@ void InterEditPanel::OnInterFormChange(wxCommandEvent& e) {
   GetEventHandler()->ProcessEvent(event);
 }
 
+void InterEditPanel::OnOrientChange(wxCommandEvent& e){
+  SaveToInter();
+}
+
 
 BEGIN_EVENT_TABLE(InterEditPanel,wxPanel)
 
@@ -458,6 +462,7 @@ EVT_CHOICE                 (SUBTYPE_COMBO,InterEditPanel::OnSubTypeChange)
 EVT_CHOICE                 (SPIN2_COMBO,  InterEditPanel::OnSpin2Change)
 EVT_TEXT                   (wxID_ANY,     InterEditPanel::onTextChange)
 EVT_RADIOBOX               (wxID_ANY,     InterEditPanel::OnInterFormChange)
+EVT_COMMAND                (wxID_ANY,EVT_ORIENT_EDIT,InterEditPanel::OnOrientChange)
 
 END_EVENT_TABLE()
 

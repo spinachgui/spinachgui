@@ -24,6 +24,7 @@ public:
   void OnSubTypeChange(wxCommandEvent& e);
   void OnSpin2Change(wxCommandEvent& e);
   void OnInterFormChange(wxCommandEvent& e);
+  void OnOrientChange(wxCommandEvent& e);
 
 
 protected:

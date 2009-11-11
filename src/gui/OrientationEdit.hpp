@@ -6,6 +6,8 @@
 #include <shared/spinsys.hpp>
 #include <gui/DialogCombo.hpp>
 
+DECLARE_EVENT_TYPE(EVT_ORIENT_EDIT, -1)
+
 //============================================================//
 // OrientEditPanel
 
@@ -46,6 +48,8 @@ public:
   void SetOrient(const SpinXML::Orientation& orient) {mOrientEditPanel->SetOrient(orient);}
   const SpinXML::Orientation& GetOrient() {return mOrientEditPanel->GetOrient();}
 
+  void SaveToOrient() {mOrientEditPanel->SaveToOrient();}
+
   void OnApply(wxCommandEvent& e);
 protected:
   DECLARE_EVENT_TABLE();
@@ -67,6 +71,7 @@ public:
 
 protected:
   virtual OrientEditDialog* CreateDialog();
+  virtual void ReadDialog(OrientEditDialog* dlg);
   virtual wxString GetStringFromDialog(OrientEditDialog* dlg);
 private:
   SpinXML::Orientation mOrient;

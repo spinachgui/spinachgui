@@ -5,6 +5,8 @@
 using namespace std;
 using namespace SpinXML;
 
+DEFINE_EVENT_TYPE(EVT_ORIENT_EDIT)
+
 Orientation::Type TypeOrder[]={
   Orientation::EULER,
   Orientation::ANGLE_AXIS,
@@ -94,6 +96,7 @@ void OrientEditPanel::LoadFromOrient() {
 }
 
 void OrientEditPanel::SaveToOrient() {
+  cout << "Saving" << endl;
   switch(mOrientTypeChoiceBook->GetSelection()) {
   case 0: {
     //Euler Angles
@@ -251,6 +254,10 @@ OrientEditDialog* OrientDialogCombo::CreateDialog() {
   return dlg;
 }
 
+void OrientDialogCombo::ReadDialog(OrientEditDialog* dlg) {
+  mOrient=dlg->GetOrient();
+}
+
 void OrientDialogCombo::SetStringValue(const wxString& s) {
   
   return;
@@ -258,6 +265,11 @@ void OrientDialogCombo::SetStringValue(const wxString& s) {
 
 wxString OrientDialogCombo::GetStringFromDialog(OrientEditDialog* dlg) {
   mOrient=dlg->GetOrient();
+
+  wxCommandEvent event(EVT_ORIENT_EDIT,GetId());
+  event.SetEventObject(this);
+  GetEventHandler()->ProcessEvent(event);
+
   cout << "Getting the string " << mOrient.ToString() << endl;
   return wxString(mOrient.ToString().c_str(),wxConvUTF8);
 }

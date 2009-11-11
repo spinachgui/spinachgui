@@ -137,6 +137,10 @@
     <coordinates x="-10" y="4" z="0"/>
   </spin>
 
+  <spin element="O" label="No Rotation" number="34" reference_frame="0">
+    <coordinates x="-12" y="4" z="0"/>
+  </spin>
+
   <interaction reference_frame="0" spin_1="1" type="shielding" units="MHz">
     <scalar>10</scalar>
   </interaction>
@@ -276,21 +280,21 @@
   </interaction>
 
   <interaction reference_frame="0" spin_1="30" type="shielding" units="MHz">
-    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <eigenvalues XX="10" YY="20" ZZ="40"/>
     <orientation>
       <quaternion i="0" j="0" k="0" re="1"/>
     </orientation>
   </interaction>
 
   <interaction reference_frame="0" spin_1="31" type="shielding" units="MHz">
-    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <eigenvalues XX="10" YY="20" ZZ="40"/>
     <orientation>
       <quaternion i="0" j="0" k="0" re="1"/>
     </orientation>
   </interaction>
 
   <interaction reference_frame="0" spin_1="32" type="shielding" units="MHz">
-    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <eigenvalues XX="10" YY="20" ZZ="40"/>
     <orientation>
       <angle_axis>
         <angle>1.57</angle>
@@ -300,7 +304,18 @@
   </interaction>
 
   <interaction reference_frame="0" spin_1="33" type="shielding" units="MHz">
-    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <eigenvalues XX="10" YY="20" ZZ="40"/>
+    <orientation>
+      <eigensystem>
+        <x_axis x="1" y="0" z="0"/>
+        <y_axis x="0" y="1" z="0"/>
+        <z_axis x="0" y="0" z="1"/>
+      </eigensystem>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="34" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="20" ZZ="40"/>
     <orientation>
       <quaternion i="0" j="0" k="0" re="1"/>
     </orientation>

@@ -315,6 +315,8 @@ void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
       SpinXML::Matrix3 mat;
       thisInter->GetMatrix(&mat);
       matrix::element_sequence eseq;
+      eseq.resize(9);  //Yes we need to do this. Codesynthsis doesn't
+		       //do it for us
       eseq[0]=mat(0,0);
       eseq[1]=mat(1,0);
       eseq[2]=mat(2,0);

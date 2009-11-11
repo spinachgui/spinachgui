@@ -97,4 +97,40 @@
     <coordinates x="5" y="4" z="0"/>
   </spin>
 
+  <interaction reference_frame="0" spin_1="1" type="shielding" units="MHz">
+    <scalar>10</scalar>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="2" type="shielding" units="MHz">
+    <matrix>
+      <element>10</element>
+      <element>0</element>
+      <element>0</element>
+      <element>0</element>
+      <element>10</element>
+      <element>0</element>
+      <element>0</element>
+      <element>0</element>
+      <element>10</element>
+    </matrix>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="7" spin_2="7" type="shielding" units="MHz">
+    <scalar>10</scalar>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="8" spin_2="8" type="shielding" units="MHz">
+    <matrix>
+      <element>10</element>
+      <element>0</element>
+      <element>0</element>
+      <element>0</element>
+      <element>10</element>
+      <element>0</element>
+      <element>0</element>
+      <element>0</element>
+      <element>10</element>
+    </matrix>
+  </interaction>
+
 </spin_system>

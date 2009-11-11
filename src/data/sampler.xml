@@ -282,14 +282,14 @@
   <interaction reference_frame="0" spin_1="30" type="shielding" units="MHz">
     <eigenvalues XX="10" YY="20" ZZ="40"/>
     <orientation>
-      <quaternion i="0" j="0" k="0" re="1"/>
+      <euler_angles alpha="1.57" beta="1.57" gamma="1.57"/>
     </orientation>
   </interaction>
 
   <interaction reference_frame="0" spin_1="31" type="shielding" units="MHz">
     <eigenvalues XX="10" YY="20" ZZ="40"/>
     <orientation>
-      <quaternion i="0" j="0" k="0" re="1"/>
+      <quaternion i="0.707" j="0" k="0" re="0.707"/>
     </orientation>
   </interaction>
 

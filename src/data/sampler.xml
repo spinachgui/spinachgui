@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<spin_system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../data/spinxml_schema.xsd">
+
+  <spin element="H" label="(Linear Row)" number="0" reference_frame="0">
+    <coordinates x="0" y="0" z="0"/>
+  </spin>
+
+  <spin element="H" label="Scalar" number="1" reference_frame="0">
+    <coordinates x="1" y="0" z="0"/>
+  </spin>
+
+  <spin element="H" label="Matrix" number="2" reference_frame="0">
+    <coordinates x="2" y="0" z="0"/>
+  </spin>
+
+  <spin element="H" label="Eigenvalues" number="3" reference_frame="0">
+    <coordinates x="3" y="0" z="0"/>
+  </spin>
+
+  <spin element="H" label="AxRhom" number="4" reference_frame="0">
+    <coordinates x="4" y="0" z="0"/>
+  </spin>
+
+  <spin element="H" label="SpanSkew" number="5" reference_frame="0">
+    <coordinates x="5" y="0" z="0"/>
+  </spin>
+
+</spin_system>

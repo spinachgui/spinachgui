@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstring>
 #include <sstream>
+#include <cmath>
 
 using namespace std;
 using namespace SpinXML;
@@ -252,8 +253,75 @@ Matrix3 Orientation::GetAsMatrix() const {
 		 );
 
     return mat3;
-      } else if(mType==ANGLE_AXIS) {
+  } else if(mType==ANGLE_AXIS) {
+    double angle=mData.mAngleAxis.angle;
+    double x=mData.mAngleAxis.axis->GetX();
+    double y=mData.mAngleAxis.axis->GetY();
+    double z=mData.mAngleAxis.axis->GetZ();
+
+    double sin_a = sin(angle / 2);
+    double cos_a = cos(angle / 2);
+
+    double X = x * sin_a;
+    double Y = y * sin_a;
+    double Z = z * sin_a;
+    double W = cos_a;
+    //Normalise the quaternion
+    double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
+    X=X*inv_mag;
+    Y=Y*inv_mag;
+    Z=Z*inv_mag;
+    W=W*inv_mag;
+    double xx      = X * X;
+    double xy      = X * Y;
+    double xz      = X * Z;
+    double xw      = X * W;
+
+    double yy      = Y * Y;
+    double yz      = Y * Z;
+    double yw      = Y * W;
+
+    double zz      = Z * Z;
+    double zw      = Z * W;
+    
+    Matrix3 mat3(
+		 1 - 2 * ( yy + zz ),
+		 2 * ( xy - zw ),
+		 2 * ( xz + yw ),
+
+		 2 * ( xy + zw ),
+		 1 - 2 * ( xx + zz ),
+		 2 * ( yz - xw ),
+
+		 2 * ( xz - yw ),
+		 2 * ( yz + xw ),
+		 1 - 2 * ( xx + yy )
+		 );
+
   } else if(mType==EULER) {
+    double cos_alpha = cos(mData.mEuler.alpha);
+    double cos_beta  = cos(mData.mEuler.beta); 
+    double cos_gamma = cos(mData.mEuler.gamma);
+
+    double sin_alpha = sin(mData.mEuler.alpha);
+    double sin_beta  = sin(mData.mEuler.beta);
+    double sin_gamma = sin(mData.mEuler.gamma);
+
+    double a11 = cos_alpha*cos_gamma - cos_beta * sin_gamma * sin_alpha;
+    double a22 =-sin_alpha*sin_gamma + cos_beta * cos_gamma * cos_alpha;
+    double a33 = cos_beta;
+    
+    double a12 = cos_alpha*sin_gamma + cos_beta * cos_gamma * sin_alpha;
+    double a21 =-sin_alpha*cos_gamma + cos_beta * sin_gamma * sin_alpha;
+    
+    double a13 = sin_alpha*sin_beta;
+    double a31 = sin_beta *sin_gamma;
+    
+    double a23 = cos_alpha* sin_beta;
+    double a32 =-sin_beta * cos_gamma;
+    return Matrix3(a11,a12,a13,
+		   a21,a22,a23,
+		   a31,a32,a33);
   }
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }

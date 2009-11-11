@@ -97,6 +97,30 @@
     <coordinates x="5" y="4" z="0"/>
   </spin>
 
+  <spin element="H" label="Strong X Component" number="24" reference_frame="0">
+    <coordinates x="-4" y="0" z="0"/>
+  </spin>
+
+  <spin element="H" label="Strong Y Component" number="25" reference_frame="0">
+    <coordinates x="-6" y="0" z="0"/>
+  </spin>
+
+  <spin element="H" label="Strong Z Component" number="26" reference_frame="0">
+    <coordinates x="-8" y="0" z="0"/>
+  </spin>
+
+  <spin element="C" label="(10,0,0)" number="27" reference_frame="0">
+    <coordinates x="10" y="0" z="0"/>
+  </spin>
+
+  <spin element="C" label="(0,10,0)" number="28" reference_frame="0">
+    <coordinates x="0" y="10" z="0"/>
+  </spin>
+
+  <spin element="C" label="(0,0,10)" number="29" reference_frame="0">
+    <coordinates x="0" y="0" z="10"/>
+  </spin>
+
   <interaction reference_frame="0" spin_1="1" type="shielding" units="MHz">
     <scalar>10</scalar>
   </interaction>
@@ -209,6 +233,27 @@
 
   <interaction reference_frame="0" spin_1="23" spin_2="17" type="shielding" units="MHz">
     <span_skew iso="10" skew="10" span="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="24" type="shielding" units="MHz">
+    <eigenvalues XX="40" YY="10" ZZ="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="25" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="40" ZZ="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="26" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="10" ZZ="40"/>
     <orientation>
       <quaternion i="0" j="0" k="0" re="1"/>
     </orientation>

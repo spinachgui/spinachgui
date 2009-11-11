@@ -173,6 +173,7 @@ Orientation::Orientation(const Orientation& orient) :
 const Orientation& Orientation::operator=(const Orientation& orient) {
   mType=orient.mType;
   if(mType==ANGLE_AXIS) {
+    mData.mAngleAxis.angle = orient.mData.mAngleAxis.angle;
     mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
   } else if(mType==EIGENSYSTEM) {
     mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);

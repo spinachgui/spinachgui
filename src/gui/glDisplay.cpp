@@ -235,6 +235,16 @@ void glDisplay::FindHover() {
       mHoverDist=clipDist2;
     }
   }
+  
+  wxStatusBar* sb=dynamic_cast<wxFrame*>(wxGetTopLevelParent(this))->GetStatusBar();
+  if(sb != NULL) {
+    if(mHover != -1) {
+      sb->SetStatusText(wxString(GetSS()->GetSpin(mHover)->GetLabel(),wxConvUTF8));
+    } else {
+      sb->SetStatusText(wxT(""));
+    }
+  }
+
 }
 
 

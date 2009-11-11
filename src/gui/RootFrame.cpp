@@ -50,6 +50,14 @@ void RootFrame::OnRedo(wxCommandEvent& e) {
 
 void RootFrame::OnNew(wxCommandEvent& e) {
   GetSS()->Clear();
+  mOpenPath=wxT("Untitled");
+  mOpenFile=wxT("Untitled");
+  mOpenDir=wxT("");
+  UpdateTitle();
+}
+
+void RootFrame::UpdateTitle() {
+  SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
 }
 
 void RootFrame::OnOpen(wxCommandEvent& e) {
@@ -76,8 +84,8 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
 	wxLogError(wxString(e.what(),wxConvUTF8));
       }
     }
-    SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
     Chkpoint(wxT("Load File"));
+    UpdateTitle();
     GetSSMgr().ClearHistory();
   }
 }

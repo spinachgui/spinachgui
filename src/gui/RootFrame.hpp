@@ -44,6 +44,8 @@ public:
   DECLARE_EVENT_TABLE();
 
 private:
+  void UpdateTitle();
+
   wxAuiNotebook* mNotebook;
   SpinGridPanel* mSpinGridPanel;
   glDisplay* mGLDisplay;

@@ -149,7 +149,7 @@
   <xs:element name="spin_system">
     <xs:complexType>
       <xs:sequence minOccurs="1" maxOccurs="1">
-        <xs:element minOccurs="1" maxOccurs="unbounded" name="spin">
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="spin">
           <xs:complexType>
             <xs:sequence>
               <xs:element minOccurs="1" maxOccurs="1" name="coordinates" type="vector" />
@@ -197,7 +197,7 @@
             </xs:attribute>
           </xs:complexType>
         </xs:element>
-        <xs:element minOccurs="1" maxOccurs="unbounded" name="interaction">
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="interaction">
           <xs:complexType>
             <xs:complexContent mixed="false">
               <xs:extension base="interaction">

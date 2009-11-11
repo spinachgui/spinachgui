@@ -147,6 +147,9 @@ void OrientEditPanel::SaveToOrient() {
 
     mOrient.SetEigenSystem(Vector3(xx,xy,xz),Vector3(yx,yy,yz),Vector3(zx,zy,zz));
     break;
+    default:
+      //Uh-oh, we have an undefined orientation for some reason
+      cerr << "Trying to save back to the orientation, but could not determing the orientation's type" << endl;
   }
   }
 }
@@ -205,7 +208,9 @@ END_EVENT_TABLE()
 
 OrientEditDialog::OrientEditDialog(wxWindow* parent,wxWindowID id) 
 : OrientDialogBase(parent,id,wxT("Orientation")) {
-
+  mOrientEditPanel=new OrientEditPanel(this);
+  GetSizer()->Insert(0,mOrientEditPanel,1,wxEXPAND);
+  Fit();
 }
 
 int OrientEditDialog::ShowModal() {

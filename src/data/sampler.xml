@@ -137,4 +137,11 @@
     <scalar>10</scalar>
   </interaction>
 
+  <interaction reference_frame="0" spin_1="3" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="10" ZZ="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
 </spin_system>

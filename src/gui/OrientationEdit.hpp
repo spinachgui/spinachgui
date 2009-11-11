@@ -43,14 +43,14 @@ public:
 
   int ShowModal();
 
-  void SetOrient(const SpinXML::Orientation& orient) {mPanel->SetOrient(orient);}
-  const SpinXML::Orientation& GetOrient() {return mPanel->GetOrient();}
+  void SetOrient(const SpinXML::Orientation& orient) {mOrientEditPanel->SetOrient(orient);}
+  const SpinXML::Orientation& GetOrient() {return mOrientEditPanel->GetOrient();}
 
   void OnApply(wxCommandEvent& e);
 protected:
   DECLARE_EVENT_TABLE();
 private:
-  OrientEditPanel* mPanel;
+  OrientEditPanel* mOrientEditPanel;
 };
 
 //============================================================//

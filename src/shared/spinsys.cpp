@@ -70,6 +70,9 @@ SpinSystem::~SpinSystem() {
 void SpinSystem::Clear() {
   //Currently we need to delete the interactions Before the spins as
   //the spins have interactions as their children. 
+#ifdef SPINXML_EVENTS
+  PushEventLock();
+#endif
   for(long i=0;i<mInteractions.size();i++) {
     delete mInteractions[i];
   }
@@ -78,6 +81,10 @@ void SpinSystem::Clear() {
   }
   mSpins.resize(0);
   mInteractions.resize(0);
+#ifdef SPINXML_EVENTS
+  PopEventLock();
+  mNode->Change(IEventListener::CHANGE);
+#endif
 }
 
 void SpinSystem::Dump() const {
@@ -162,7 +169,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
     c style I/O
   */
 #ifdef SPINXML_EVENTS
-  SetEventLock();
+  PushEventLock();
 #endif
   Clear();
   ifstream fin(filename);
@@ -379,7 +386,7 @@ void SpinSystem::LoadFromG03File(const char* filename) {
   }
   cout << "Finished loading the g03 file, saving mSpins.size()=" << mSpins.size() << endl;
 #ifdef SPINXML_EVENTS
-  ClearEventLock();
+  PopEventLock();
   mNode->Change(IEventListener::CHANGE);
 #endif
 }

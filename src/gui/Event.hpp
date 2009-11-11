@@ -9,8 +9,8 @@
 class EventNode;
 class Event;
 
-void SetEventLock();
-void ClearEventLock();
+void PushEventLock();
+void PopEventLock();
 
 class IEventListener {
   friend class EventNode;

@@ -4,14 +4,16 @@
 #include <algorithm>
 using namespace std;
 
-bool eventLock=false; //Do not dispach events when this lock is true
+long eventLock=0; //Do not dispach events when this lock is true
 
-void SetEventLock() {
-  eventLock=true;
+void PushEventLock() {
+  eventLock++;
 }
 
-void ClearEventLock() {
-  eventLock=false;
+void PopEventLock() {
+  if(eventLock>0) {
+    eventLock--;
+  }
 }
 
 long GetUID() {
@@ -141,7 +143,7 @@ void EventNode::RemoveChild(EventNode* child) {
 }
 
 void EventNode::Change(IEventListener::REASON r) {
-  if(eventLock) {
+  if(eventLock!=0) {
     return;
   }
   long uid=GetUID();

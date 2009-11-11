@@ -49,7 +49,7 @@ void RootFrame::OnRedo(wxCommandEvent& e) {
 }
 
 void RootFrame::OnNew(wxCommandEvent& e) {
-
+  GetSS()->Clear();
 }
 
 void RootFrame::OnOpen(wxCommandEvent& e) {

@@ -1078,8 +1078,8 @@ Matrix3 Interaction::GetAsMatrix() const {
 
     if(mType==EIGENVALUES) {
       xx=mData.mEigenvalues.XX;
-      xx=mData.mEigenvalues.YY;
-      xx=mData.mEigenvalues.ZZ;
+      yy=mData.mEigenvalues.YY;
+      zz=mData.mEigenvalues.ZZ;
     } else if(mType==AXRHOM) {
       double a=mData.mAxRhom.ax;
       double r=mData.mAxRhom.rh;
@@ -1109,6 +1109,7 @@ Matrix3 Interaction::GetAsMatrix() const {
     intMatrix.Set(2,0,intMatrix.Get(2,0)*xx);
     intMatrix.Set(2,1,intMatrix.Get(2,1)*yy);
     intMatrix.Set(2,2,intMatrix.Get(2,2)*zz);
+
     return intMatrix;
   } else {
     cerr << "Interaction::mType is set to an invalid type! This is a serious programing error.\n" << endl;

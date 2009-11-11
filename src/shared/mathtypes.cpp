@@ -226,6 +226,13 @@ Matrix3 Orientation::GetAsMatrix() const {
     double X = mData.mQuaternion.i;
     double Y = mData.mQuaternion.j;
     double Z = mData.mQuaternion.k;
+
+    //Normalise the quaternion
+    double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
+    X=X*inv_mag;
+    Y=Y*inv_mag;
+    Z=Z*inv_mag;
+    W=W*inv_mag;
     
     double xx      = X * X;
     double xy      = X * Y;

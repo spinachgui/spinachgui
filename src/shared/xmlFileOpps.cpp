@@ -157,6 +157,9 @@ SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
 
 
 void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
+#ifdef SPINXML_EVENTS
+  PushEventLock();
+#endif
   std::auto_ptr<spin_system> ss;
   try {
     cout << "Trying" << schemaLocation << endl;
@@ -254,6 +257,10 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
       throw std::runtime_error("Interaction appeared to not be specified (is the xsd schema corrupt?)");
     }
   }
+#ifdef SPINXML_EVENTS
+  PopEventLock();
+  mNode->Change(IEventListener::CHANGE);
+#endif
 }
 
 void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {

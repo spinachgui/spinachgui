@@ -901,11 +901,19 @@ Interaction::Type Interaction::GetType() const {
 
 void Interaction::SetSpin1(Spin* Spin1) {
 #ifdef SPINXML_EVENTS
+  if(Spin1==mSpin1) {
+    //Nothing happens, return imediately.
+    return;
+  }
   if(mSpin1 != NULL && mSpin1 != mSpin2) {
+    //If we have a bilinear inital state, we need to remove mSpin1 as
+    //a parent
     mNode->RemoveParent(mSpin1->GetNode());
   }
-  if(mSpin2 != Spin1) {
-    Spin1->GetNode()->AddChild(mNode);
+  if(Spin1 != NULL && mSpin2 != Spin1 || (mSpin2 == Spin1 && mSpin2 == NULL)) {
+    //If we have a bilinear final state or we're comming from a blank
+    //inital state, we need to add Spin1 as a parent
+    mNode->AddParent(Spin1->GetNode());
   }
 #endif
   mSpin1=Spin1;
@@ -913,11 +921,19 @@ void Interaction::SetSpin1(Spin* Spin1) {
 
 void Interaction::SetSpin2(Spin* Spin2) {
 #ifdef SPINXML_EVENTS
+  if(Spin2==mSpin2) {
+    //Nothing happens, return imediately.
+    return;
+  }
   if(mSpin2 != NULL && mSpin2 != mSpin1) {
+    //If we have a bilinear inital state, we need to remove mSpin2 as
+    //a parent
     mNode->RemoveParent(mSpin2->GetNode());
   }
-  if(Spin2 != mSpin1) {
-    Spin2->GetNode()->AddChild(mNode);
+  if(Spin2 != NULL && Spin2 != mSpin1 || (mSpin2 == Spin2 && mSpin2 == NULL)) {
+    //If we have a bilinear final state or we're comming from a blank
+    //inital state, we need to add Spin2 as a parent
+    mNode->AddParent(Spin2->GetNode());
   }
 #endif
   mSpin2=Spin2;

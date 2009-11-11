@@ -221,7 +221,7 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
       if(spinNumber2 < 0 || spinNumber2 > spinCount) {
 	throw std::runtime_error("Spin index in interaction out of range");
       }
-      thisInter->SetSpin1(mSpins[spinNumber]);
+      thisInter->SetSpin2(mSpins[spinNumber]);
 
     } else {
       thisInter->SetSpin2(NULL);      

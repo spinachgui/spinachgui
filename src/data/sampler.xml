@@ -121,6 +121,22 @@
     <coordinates x="0" y="0" z="10"/>
   </spin>
 
+  <spin element="O" label="Euler Rotation" number="30" reference_frame="0">
+    <coordinates x="-4" y="4" z="0"/>
+  </spin>
+
+  <spin element="O" label="Quaternion" number="31" reference_frame="0">
+    <coordinates x="-6" y="4" z="0"/>
+  </spin>
+
+  <spin element="O" label="Angle Axis" number="32" reference_frame="0">
+    <coordinates x="-8" y="4" z="0"/>
+  </spin>
+
+  <spin element="O" label="Eigensystem" number="33" reference_frame="0">
+    <coordinates x="-10" y="4" z="0"/>
+  </spin>
+
   <interaction reference_frame="0" spin_1="1" type="shielding" units="MHz">
     <scalar>10</scalar>
   </interaction>
@@ -253,6 +269,34 @@
   </interaction>
 
   <interaction reference_frame="0" spin_1="26" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="30" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="31" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="32" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="10" ZZ="40"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="33" type="shielding" units="MHz">
     <eigenvalues XX="10" YY="10" ZZ="40"/>
     <orientation>
       <quaternion i="0" j="0" k="0" re="1"/>

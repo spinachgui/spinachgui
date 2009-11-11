@@ -142,12 +142,9 @@ SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
     vector vx=es.x_axis();
     vector vy=es.y_axis();
     vector vz=es.z_axis();    
-    //ret.SetEigenSystem(SpinXML::Vector3(vx.x(),vx.y(),vx.z()),
-    //	       SpinXML::Vector3(vy.x(),vy.y(),vy.z()),
-    //		       SpinXML::Vector3(vz.x(),vz.y(),vz.z()));
-    ret.SetEigenSystem(SpinXML::Vector3(1.0,0.0,0.0),
-		       SpinXML::Vector3(0.0,1.0,0.0),
-		       SpinXML::Vector3(0.0,0.0,1.0));
+    ret.SetEigenSystem(SpinXML::Vector3(vx.x(),vx.y(),vx.z()),
+		       SpinXML::Vector3(vy.x(),vy.y(),vy.z()),
+    		       SpinXML::Vector3(vz.x(),vz.y(),vz.z()));
     
   } else {
     throw std::runtime_error("Unknown orientation form encounted. Is the XSD schema corrupt?");

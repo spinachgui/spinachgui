@@ -393,9 +393,9 @@ void Orientation::SetQuaternion(double real, double i, double j, double k) {
 void Orientation::SetEigenSystem(const Vector3& XAxis,const Vector3& YAxis, const Vector3& ZAxis) {
   Clear();
   mType=EIGENSYSTEM;
-  mData.mEigenSystem.XAxis=new Vector3(1.0,0.0,0.0);
-  mData.mEigenSystem.YAxis=new Vector3(0.0,1.0,0.0);
-  mData.mEigenSystem.ZAxis=new Vector3(0.0,0.0,1.0);
+  mData.mEigenSystem.XAxis=new Vector3(XAxis);
+  mData.mEigenSystem.YAxis=new Vector3(YAxis);
+  mData.mEigenSystem.ZAxis=new Vector3(ZAxis);
   return;
 }
 

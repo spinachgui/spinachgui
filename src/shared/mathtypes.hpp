@@ -58,6 +58,9 @@ class Matrix3 {
   ///Print the matrix to the standard output in a human readable
   ///format
     void Dump() const;
+
+  ///Get the trace of the matrix
+    double Trace() const {return raw[0]+raw[4]+raw[8];}
     
   ///Get a pointer to the matrix in memory. The matrix is stored in
   ///row major form (GetRaw()[0]=a00,GetRaw()[1]=a01, etc.)

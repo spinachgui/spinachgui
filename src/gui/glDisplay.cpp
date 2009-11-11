@@ -414,17 +414,17 @@ void glDisplay::DrawBilinear() {
     thisSpin->GetCoordinates(&x1,&y1,&z1);  
     for (long j=i+1;j<spinCount;j++) {
       Spin* jSpin=(*mSS)->GetSpin(j);
-      double scalar=abs(thisSpin->GetBilinearInteractionAsScalar(jSpin))/300;
-      if (scalar < 20) {
+      double scalar=abs(thisSpin->GetBilinearInteractionAsScalar(jSpin));
+      if (scalar < 5) {
 	continue;
       }
       double x2,y2,z2;
       jSpin->GetCoordinates(&x2,&y2,&z2);
       glColor4f(scalar,0,0,scalar);
-      glBegin(GL_LINES);
-      glVertex3f(x1,y1,z1);
-      glVertex3f(x2,y2,z2);
-      glEnd();
+      glBegin(GL_LINES); {
+	glVertex3f(x1,y1,z1);
+	glVertex3f(x2,y2,z2);
+      } glEnd();
     }
   }
 }
@@ -481,17 +481,14 @@ void glDisplay::OnPaint(wxPaintEvent& e) {
 	
   Geometary(true);
   glEnable(GL_TEXTURE_2D); {
-
     glBindTexture(GL_TEXTURE_2D,mTexDepth);
     glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
   } glDisable(GL_TEXTURE_2D);
 	
 	
   glEnable(GL_LIGHTING);{
-
     glClear(GL_COLOR_BUFFER_BIT);
     Geometary();
-
   } glDisable(GL_LIGHTING);   
 
 

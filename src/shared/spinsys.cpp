@@ -546,7 +546,7 @@ double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
   long interCount=mParent->mInteractions.size();
   for(long i=0;i < interCount;++i) {
     Interaction* inter=mParent->mInteractions[i];
-    if(inter->GetIsLinear()) {
+    if(!inter->GetIsLinear()) {
       continue;
     }
     if(inter->GetSpin1()==this) {
@@ -564,10 +564,11 @@ double Spin::GetBilinearInteractionAsScalar(Spin* OtherSpin,Interaction::SubType
   long interCount=mParent->mInteractions.size();
   for(long i=0;i < interCount;++i) {
     Interaction* inter=mParent->mInteractions[i];
-    if(inter->GetIsBilinear()) {
+    if(!inter->GetIsBilinear()) {
       continue;
     }
-    if(inter->GetSpin1()==this && inter->GetSpin2() == OtherSpin) {
+    if((inter->GetSpin1()==this && inter->GetSpin2() == OtherSpin) ||
+       (inter->GetSpin1()==OtherSpin && inter->GetSpin2() == this)) {
       //Interaction is relevent
       if(inter->IsSubType(t)) {
 	total+=inter->GetAsScalar();
@@ -582,7 +583,7 @@ double Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
   long interCount=mParent->mInteractions.size();
   for(long i=0;i < interCount;++i) {
     Interaction* inter=mParent->mInteractions[i];
-    if(inter->GetIsQuadratic()) {
+    if(!inter->GetIsQuadratic()) {
       continue;
     }
     if(inter->GetSpin1()==this) {
@@ -1033,6 +1034,31 @@ void Interaction::SetSpanSkew(double iso,double Span, double Skew, const Orienta
 }
 
 double Interaction::GetAsScalar() const {
+  if(mType==SCALAR) {
+    //Return the identity multipled by the scalar
+    double s=mData.mScalar;
+    return s;
+  } else if(mType==MATRIX) {
+    return mData.mMatrix->Trace();
+  } else if(mType==EIGENVALUES) {
+    return mData.mEigenvalues.XX+mData.mEigenvalues.YY+mData.mEigenvalues.ZZ;
+  } else if(mType==AXRHOM) {
+    double a=mData.mAxRhom.ax;
+    double r=mData.mAxRhom.rh;
+    double iso=mData.mAxRhom.iso;
+    double xx=a/3+iso/3;
+    double yy=-r/2-a/6+iso/3;
+    double zz= r/2-a/6+iso/3;
+    return xx+yy+zz;
+  } else if(mType==SPANSKEW) {
+      double span=mData.mSpanSkew.span;
+      double skew=mData.mSpanSkew.skew;
+      double iso=mData.mSpanSkew.iso;
+      double xx=span*skew/6-span/2;
+      double yy=iso-span*skew/3;
+      double zz=span*skew/6+span/2;
+      return xx+yy+zz;
+  }
   return 0;
 }
 

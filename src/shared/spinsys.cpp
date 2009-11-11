@@ -1098,19 +1098,11 @@ Matrix3 Interaction::GetAsMatrix() const {
 
     Matrix3 intMatrix=mOrient.GetAsMatrix();
 
-    intMatrix.Set(0,0,intMatrix.Get(0,0)*xx);
-    intMatrix.Set(0,1,intMatrix.Get(0,1)*yy);
-    intMatrix.Set(0,2,intMatrix.Get(0,2)*zz);
+    Matrix3 result=intMatrix*Matrix3(xx, 0.0,0.0,
+				     0.0,yy, 0.0,
+				     0.0,0.0,zz)*intMatrix.Transpose();
+    return result;
 
-    intMatrix.Set(1,0,intMatrix.Get(1,0)*xx);
-    intMatrix.Set(1,1,intMatrix.Get(1,1)*yy);
-    intMatrix.Set(1,2,intMatrix.Get(1,2)*zz);
-
-    intMatrix.Set(2,0,intMatrix.Get(2,0)*xx);
-    intMatrix.Set(2,1,intMatrix.Get(2,1)*yy);
-    intMatrix.Set(2,2,intMatrix.Get(2,2)*zz);
-
-    return intMatrix;
   } else {
     cerr << "Interaction::mType is set to an invalid type! This is a serious programing error.\n" << endl;
     throw logic_error("Interaction::mType is set to an invalid type! This is a serious programing error.\n");

@@ -114,6 +114,38 @@ Matrix3 Matrix3::operator+ (const Matrix3& m) const {
   return result;
 }
 
+Matrix3 Matrix3::operator* (const Matrix3& m) const {
+  Matrix3 result;
+  result.raw[0]=raw[0]*m.raw[0] + raw[1]*m.raw[3] + raw[2]*m.raw[6];
+  result.raw[1]=raw[0]*m.raw[1] + raw[1]*m.raw[4] + raw[2]*m.raw[7];
+  result.raw[2]=raw[0]*m.raw[2] + raw[1]*m.raw[5] + raw[2]*m.raw[8];
+
+  result.raw[3]=raw[3]*m.raw[0] + raw[4]*m.raw[3] + raw[5]*m.raw[6];
+  result.raw[4]=raw[3]*m.raw[1] + raw[4]*m.raw[4] + raw[5]*m.raw[7];
+  result.raw[5]=raw[3]*m.raw[2] + raw[4]*m.raw[5] + raw[5]*m.raw[8];
+
+  result.raw[6]=raw[6]*m.raw[0] + raw[7]*m.raw[3] + raw[8]*m.raw[6];
+  result.raw[7]=raw[6]*m.raw[1] + raw[7]*m.raw[4] + raw[8]*m.raw[7];
+  result.raw[8]=raw[6]*m.raw[2] + raw[7]*m.raw[5] + raw[8]*m.raw[8];
+  return result;
+}
+
+Matrix3 Matrix3::Transpose() const {
+  Matrix3 result;
+  result.raw[0]=raw[0];
+  result.raw[4]=raw[4];
+  result.raw[8]=raw[8];
+
+  result.raw[1]=raw[3];
+  result.raw[2]=raw[6];
+  result.raw[5]=raw[7];
+
+  result.raw[3]=raw[1];
+  result.raw[6]=raw[2];
+  result.raw[7]=raw[5];
+  return result;
+}
+
 Matrix3& Matrix3::operator+= (const Matrix3& m) {
   raw[0]=raw[0]+m.raw[0];
   raw[1]=raw[1]+m.raw[1];

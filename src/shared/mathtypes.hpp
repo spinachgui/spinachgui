@@ -61,6 +61,9 @@ class Matrix3 {
 
   ///Get the trace of the matrix
     double Trace() const {return raw[0]+raw[4]+raw[8];}
+
+  ///Get the transpose of the matrix
+    Matrix3 Transpose() const;
     
   ///Get a pointer to the matrix in memory. The matrix is stored in
   ///row major form (GetRaw()[0]=a00,GetRaw()[1]=a01, etc.)
@@ -72,6 +75,8 @@ class Matrix3 {
     double operator() (long column, long row) const;
   ///Add together two matricese in the standard fasion.
     Matrix3 operator+ (const Matrix3& m) const;
+  ///Multiply two matricese together
+    Matrix3 operator* (const Matrix3& m) const;
   ///Add together two matricese in the standard fasion and set the
   ///value of the first to the result
     Matrix3& operator+= (const Matrix3& m);

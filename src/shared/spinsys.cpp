@@ -71,6 +71,9 @@ void SpinSystem::Clear() {
   //Currently we need to delete the interactions Before the spins as
   //the spins have interactions as their children. 
 #ifdef SPINXML_EVENTS
+  //NB: This lock is important for more than just efficency. this
+  //operation must be atomic as mSpins and mInteractions end up
+  //holding invalid values. during execution.
   PushEventLock();
 #endif
   for(long i=0;i<mInteractions.size();i++) {

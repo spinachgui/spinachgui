@@ -529,6 +529,8 @@ void glDisplay::OnPaint(wxPaintEvent& e) {
 // Constructions and destructor
 
 glDisplay::glDisplay(wxWindow* parent,wxWindowID id) : wxGLCanvas(parent,id,NULL) {
+  GetSS()->GetNode()->AddListener(this);
+
   mGLContext=NULL;
   mGLEnabled=false;
   mMode=NMR_EPR;
@@ -638,6 +640,14 @@ void glDisplay::OnDeleteSpinHover(wxCommandEvent& e) {
     Chkpoint(wxT("Delete Spin"));
     GetSS()->RemoveSpin(mHover);
     Refresh();
+  }
+}
+
+void glDisplay::OnChange(const Event& e) {
+  //If a spin was added, removed or changed or the system was reloaded
+  //we need to rebuild the skelliton
+  if(e.GetHistory()[0].part==PART_SYSTEM || e.GetHistory()[0].part==PART_SPIN) {
+    CreateBondList();
   }
 }
 

@@ -16,7 +16,7 @@
 using namespace boost;
 using namespace SpinXML;
 
-class glDisplay : public wxGLCanvas {
+class glDisplay : public wxGLCanvas, public IEventListener {
 public:
   glDisplay(wxWindow* parent,wxWindowID id= -1);
   ~glDisplay();
@@ -37,6 +37,8 @@ public:
   };
 
   void SetMode(INTERACTION_MODE m);
+
+  void OnChange(const Event& e);
 
 protected:
 

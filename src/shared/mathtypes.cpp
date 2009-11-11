@@ -324,19 +324,19 @@ Matrix3 Orientation::GetAsMatrix() const {
     double zz      = Z * Z;
     double zw      = Z * W;
     
-    Matrix3 mat3(
-		 1 - 2 * ( yy + zz ),
-		 2 * ( xy - zw ),
-		 2 * ( xz + yw ),
+    return Matrix3(
+		   1 - 2 * ( yy + zz ),
+		   2 * ( xy - zw ),
+		   2 * ( xz + yw ),
 
-		 2 * ( xy + zw ),
-		 1 - 2 * ( xx + zz ),
-		 2 * ( yz - xw ),
+		   2 * ( xy + zw ),
+		   1 - 2 * ( xx + zz ),
+		   2 * ( yz - xw ),
 
-		 2 * ( xz - yw ),
-		 2 * ( yz + xw ),
-		 1 - 2 * ( xx + yy )
-		 );
+		   2 * ( xz - yw ),
+		   2 * ( yz + xw ),
+		   1 - 2 * ( xx + yy )
+		   );
 
   } else if(mType==EULER) {
     double cos_alpha = cos(mData.mEuler.alpha);

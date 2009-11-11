@@ -263,6 +263,10 @@ void InterEditPanel::LoadFromInter() {
   for(long i=0;i<spinCount;i++) {
     mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString((*head)->GetSpin(i)->GetLabel(),wxConvUTF8));
   }
+  if(mInter->GetIsBilinear()) {
+    long Spin2Number=GetSS()->GetSpinNumber(mInter->GetSpin2());
+    mSpin2Combo->SetSelection(Spin2Number);
+  }
 
   if(mInter->GetType()==Interaction::SCALAR) {
     double scalar;

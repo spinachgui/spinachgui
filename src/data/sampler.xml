@@ -133,4 +133,8 @@
     </matrix>
   </interaction>
 
+  <interaction reference_frame="0" spin_1="13" spin_2="19" type="scalar" units="MHz">
+    <scalar>10</scalar>
+  </interaction>
+
 </spin_system>

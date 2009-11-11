@@ -72,6 +72,7 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 
 void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
   long n=GetSelectedInterIndex();
+  mSpin->RemoveInteraction(mTempInteractions[n].inter);
   mTempInteractions.erase(mTempInteractions.begin() + n);
   UpdateListBox();
   mInterEdit->SetInter(NULL);

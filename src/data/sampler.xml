@@ -25,4 +25,76 @@
     <coordinates x="5" y="0" z="0"/>
   </spin>
 
+  <spin element="H" label="(Quadratic Row)" number="6" reference_frame="0">
+    <coordinates x="0" y="2" z="0"/>
+  </spin>
+
+  <spin element="H" label="Scalar" number="7" reference_frame="0">
+    <coordinates x="1" y="2" z="0"/>
+  </spin>
+
+  <spin element="H" label="Matrix" number="8" reference_frame="0">
+    <coordinates x="2" y="2" z="0"/>
+  </spin>
+
+  <spin element="H" label="Eigenvalues" number="9" reference_frame="0">
+    <coordinates x="3" y="2" z="0"/>
+  </spin>
+
+  <spin element="H" label="AxRhom" number="10" reference_frame="0">
+    <coordinates x="4" y="2" z="0"/>
+  </spin>
+
+  <spin element="H" label="SpanSkew" number="11" reference_frame="0">
+    <coordinates x="5" y="2" z="0"/>
+  </spin>
+
+  <spin element="H" label="(Bilinear Row)" number="12" reference_frame="0">
+    <coordinates x="0" y="4" z="2"/>
+  </spin>
+
+  <spin element="H" label="Scalar" number="13" reference_frame="0">
+    <coordinates x="1" y="4" z="2"/>
+  </spin>
+
+  <spin element="H" label="Matrix" number="14" reference_frame="0">
+    <coordinates x="2" y="4" z="2"/>
+  </spin>
+
+  <spin element="H" label="Eigenvalues" number="15" reference_frame="0">
+    <coordinates x="3" y="4" z="2"/>
+  </spin>
+
+  <spin element="H" label="AxRhom" number="16" reference_frame="0">
+    <coordinates x="4" y="4" z="2"/>
+  </spin>
+
+  <spin element="H" label="SpanSkew" number="17" reference_frame="0">
+    <coordinates x="5" y="4" z="2"/>
+  </spin>
+
+  <spin element="H" label="(Bilinear Row)" number="18" reference_frame="0">
+    <coordinates x="0" y="4" z="0"/>
+  </spin>
+
+  <spin element="H" label="Scalar" number="19" reference_frame="0">
+    <coordinates x="1" y="4" z="0"/>
+  </spin>
+
+  <spin element="H" label="Matrix" number="20" reference_frame="0">
+    <coordinates x="2" y="4" z="0"/>
+  </spin>
+
+  <spin element="H" label="Eigenvalues" number="21" reference_frame="0">
+    <coordinates x="3" y="4" z="0"/>
+  </spin>
+
+  <spin element="H" label="AxRhom" number="22" reference_frame="0">
+    <coordinates x="4" y="4" z="0"/>
+  </spin>
+
+  <spin element="H" label="SpanSkew" number="23" reference_frame="0">
+    <coordinates x="5" y="4" z="0"/>
+  </spin>
+
 </spin_system>

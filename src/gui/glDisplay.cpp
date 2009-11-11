@@ -649,6 +649,7 @@ void glDisplay::OnChange(const Event& e) {
   if(e.GetHistory()[0].part==PART_SYSTEM || e.GetHistory()[0].part==PART_SPIN) {
     CreateBondList();
   }
+  Refresh();
 }
 
 

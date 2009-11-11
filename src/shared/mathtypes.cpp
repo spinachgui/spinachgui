@@ -219,6 +219,41 @@ Matrix3 Orientation::GetAsMatrix() const {
     return Matrix3(xa->GetX(),ya->GetX(),za->GetX(),
 		   xa->GetY(),ya->GetY(),za->GetY(),
 		   xa->GetZ(),ya->GetZ(),za->GetZ());
+  } else if(mType==QUATERNION) {
+    double W = mData.mQuaternion.real;
+    double X = mData.mQuaternion.i;
+    double Y = mData.mQuaternion.j;
+    double Z = mData.mQuaternion.k;
+    
+    double xx      = X * X;
+    double xy      = X * Y;
+    double xz      = X * Z;
+    double xw      = X * W;
+
+    double yy      = Y * Y;
+    double yz      = Y * Z;
+    double yw      = Y * W;
+
+    double zz      = Z * Z;
+    double zw      = Z * W;
+    
+    Matrix3 mat3(
+		 1 - 2 * ( yy + zz ),
+		 2 * ( xy - zw ),
+		 2 * ( xz + yw ),
+
+		 2 * ( xy + zw ),
+		 1 - 2 * ( xx + zz ),
+		 2 * ( yz - xw ),
+
+		 2 * ( xz - yw ),
+		 2 * ( yz + xw ),
+		 1 - 2 * ( xx + yy )
+		 );
+
+    return mat3;
+      } else if(mType==ANGLE_AXIS) {
+  } else if(mType==EULER) {
   }
   return Matrix3(1,0,0,0,1,0,0,0,1);
 }

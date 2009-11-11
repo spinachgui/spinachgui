@@ -144,4 +144,39 @@
     </orientation>
   </interaction>
 
+  <interaction reference_frame="0" spin_1="4" type="shielding" units="MHz">
+    <axiality_rhombicity ax="10" iso="10" rh="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="5" type="shielding" units="MHz">
+    <span_skew iso="10" skew="10" span="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="11" spin_2="11" type="shielding" units="MHz">
+    <span_skew iso="10" skew="10" span="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="9" spin_2="9" type="shielding" units="MHz">
+    <eigenvalues XX="10" YY="10" ZZ="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
+  <interaction reference_frame="0" spin_1="10" type="shielding" units="MHz">
+    <axiality_rhombicity ax="10" iso="10" rh="10"/>
+    <orientation>
+      <quaternion i="0" j="0" k="0" re="1"/>
+    </orientation>
+  </interaction>
+
 </spin_system>

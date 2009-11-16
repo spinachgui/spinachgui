@@ -1,14 +1,32 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include <shared/nuclear_data.hpp>
 #include <shared/spinsys.hpp>
+#include <boost/program_options.hpp>
 
 using namespace SpinXML;
 using namespace std;
+namespace po = boost::program_options;
 
 int main(int argc,char** argv) {
+  po::options_description desc("Options");
+  desc.add_options()
+    ("help,h", "produce this help message")
+    ("output-file,o", po::value<int>(), "Output File")
+    ("command,c",po::value<int>(),"command")
+    ;
+
+  try {
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+  } catch(exception& e) {
+    cerr << e.what() << endl;
+    exit(1);
+  }
   try {
     LoadIsotopes();
   } catch(runtime_error e) {
@@ -17,18 +35,6 @@ int main(int argc,char** argv) {
 
     return 1;
   }
-	
-  SpinSystem* SS = new SpinSystem;
-  SS->LoadFromXMLFile("tryo.xml");
-
-  vector<Interaction*> inters=SS->GetInteractions();
-
-  for(long i=0;i<inters.size();i++) {
-    inters[i]->Dump();
-  }
-
-  SS->LoadFromXMLFile("tryo.xml");
-  delete SS;
 
   return 0;
 }

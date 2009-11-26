@@ -165,6 +165,58 @@ void SpinSystem::LoadFromGamesFile(const char* filename) {
 #endif
 }
 
+void SpinSystem::SaveToXYZFile(const char* filename) const {
+  ofstream fout(filename);
+  if(!fout.is_open()) {
+    throw runtime_error("Couldn't open file");
+  }
+
+  fout << mSpins.size() << endl;
+  for(long i=0;i<mSpins.size();i++) {
+    double x,y,z;
+    mSpins[i]->GetCoordinates(&x,&y,&z);
+    fout << getElementSymbol(mSpins[i]->GetElement()) << " " 
+	 << x << " "<< y << " " << z << " " << endl;
+  }
+}
+
+void SpinSystem::LoadFromXYZFile(const char* filename) {
+#ifdef SPINXML_EVENTS
+  PushEventLock();
+#endif
+  Clear();
+  ifstream fin(filename);
+  if(!fin.is_open()) {
+    throw runtime_error("Couldn't open file");
+  }
+  long size;
+  fin >> size;
+  cout << size << endl;
+  for(long i=0;i<size;i++) {
+    if(fin.eof()) {
+#ifdef SPINXML_EVENTS
+      PopEventLock();
+      mNode->Change(IEventListener::CHANGE);
+#endif
+      throw runtime_error("Unexpected end of file");
+    }
+    string el;
+    double x,y,z;
+    fin >> el >> x >> y >> z;
+    cout << el << x << " " << y << " " << z << " " << endl;
+    long atomicN=getElementBySymbol(el.c_str());
+    if(atomicN==-1) {
+      throw runtime_error("Unknown Element");
+    }
+    InsertSpin(new Spin(this,Vector3(x,y,z),el,0,atomicN));
+  }
+
+#ifdef SPINXML_EVENTS
+  PopEventLock();
+  mNode->Change(IEventListener::CHANGE);
+#endif
+}
+
 void SpinSystem::LoadFromG03File(const char* filename) {
   /*
     This function really needs some work done on in, as it's not using C++
@@ -180,6 +232,10 @@ void SpinSystem::LoadFromG03File(const char* filename) {
   if(!fin.is_open()) {
     //Throw some sort of error here
     cerr << "Couldn't open file" << endl;
+#ifdef SPINXML_EVENTS
+      PopEventLock();
+      mNode->Change(IEventListener::CHANGE);
+#endif
     throw runtime_error("Couldn't Open File");
   }
   long nAtoms=0;
@@ -213,6 +269,10 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	    mSpins[nAtoms]->SetPosition(Vector3(x,y,z));
 	  } else {
 	    cerr << "Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables" << endl;
+#ifdef SPINXML_EVENTS
+      PopEventLock();
+      mNode->Change(IEventListener::CHANGE);
+#endif
 	    throw runtime_error("Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables");
 	  }
 	} else {
@@ -272,6 +332,10 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	  eout << " ZY=" << sZY;
 	  eout << " ZZ=" << sZZ << endl;
 	  cerr << eout.str();
+#ifdef SPINXML_EVENTS
+      PopEventLock();
+      mNode->Change(IEventListener::CHANGE);
+#endif
 	  throw runtime_error(eout.str());
 	} else {
 	  //Store the interaction
@@ -290,6 +354,10 @@ void SpinSystem::LoadFromG03File(const char* filename) {
 	    ostringstream eout;
 	    eout << "Error reading J couplings, found topCenterNumber=" << topCenterNumber << " expected " << i*5+k+1 << endl; 
 	    cerr << eout.str();
+#ifdef SPINXML_EVENTS
+      PopEventLock();
+      mNode->Change(IEventListener::CHANGE);
+#endif
 	    throw runtime_error(eout.str());
 	  }
 	}

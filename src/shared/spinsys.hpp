@@ -330,6 +330,9 @@ class SpinSystem {
     void LoadFromXMLFile(const char* filename);
     void SaveToXMLFile(const char* filename) const;
 
+    void LoadFromXYZFile(const char* filename);
+    void SaveToXYZFile(const char* filename) const;
+
     std::vector<Interaction*>& GetInteractions() {return mInteractions;}
   
   private:

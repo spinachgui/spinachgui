@@ -61,11 +61,16 @@ void RootFrame::UpdateTitle() {
 }
 
 void RootFrame::OnOpen(wxCommandEvent& e) {
+  wxString filter;
+  filter << wxT("Spin XML files (*.xml)|*.xml");
+  filter << wxT("|Gausian03 files (*.log)|*.log");
+  filter << wxT("|XYZ files (*.xyz)|*.xyz");
+  filter << wxT("|All Files (*.*)|*.*");
   wxFileDialog* fd=new wxFileDialog(this,
 				    wxString(wxT("Choose a file")),
 				    wxString(wxT("")), //Default file
 				    wxString(wxT("")), //Default dir
-				    wxString(wxT("Spin XML files (*.xml)|*.xml|Gausian03 files (*.log)|*.log|All Files (*.*)|*.*")) ,
+				    wxString(filter) ,
 				    wxFD_OPEN);
   if(fd->ShowModal() == wxID_OK) {
     mOpenPath=fd->GetPath();
@@ -73,8 +78,20 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
     mOpenDir=fd->GetDirectory();
     wxString ext=GetExtension(mOpenFile);
 
-    if(ext.Lower()==wxT("log")) {
-      GetSS()->LoadFromG03File(mOpenPath.char_str());
+    if(ext.Lower()==wxT("xyz")) {
+      try {
+	GetSS()->LoadFromXYZFile(mOpenPath.char_str());
+      } catch(const runtime_error& e) {
+	wxLogError(wxT("Error Parsing XYZ file. File is corrupt"));
+	wxLogError(wxString(e.what(),wxConvUTF8));
+      }
+    } else if(ext.Lower()==wxT("log")) {
+      try {
+	GetSS()->LoadFromG03File(mOpenPath.char_str());
+      } catch(const runtime_error& e) {
+	wxLogError(wxT("Error Parsing log file. File is corrupt"));
+	wxLogError(wxString(e.what(),wxConvUTF8));
+      }
     } else {
       //assume xml for everything else
       try {
@@ -103,19 +120,28 @@ void RootFrame::OnSaveAs(wxCommandEvent& e) {
 }
 
 void RootFrame::SaveAs() {
+  wxString filter;
+  filter << wxT("Spin XML files (*.xml)|*.xml");
+  filter << wxT("|XYZ Files (*.xyz)|*.xyz");
+  filter << wxT("|All Files (*.*)|*.*");
   wxFileDialog* fd=new wxFileDialog(this,
 				    wxString(wxT("Choose a file")),
 				    wxString(wxT("")), //Default file
 				    wxString(wxT("")), //Default dir
-				    wxString(wxT("Spin XML files (*.xml)|*.xml|All Files (*.*)|*.*")) ,
+				    filter ,
 				    wxFD_SAVE);
   if(fd->ShowModal()) {
     mOpenPath=fd->GetPath();
     mOpenFile=fd->GetFilename();
     mOpenDir=fd->GetDirectory();
     wxString ext=GetExtension(mOpenFile);
+    if(ext.Lower()==wxT("xyz")) {
+      SaveToFile(fd->GetPath(),XYZ_FILE);
+    } else {
+      //assume xml for everything else
+      SaveToFile(fd->GetPath(),XML_FILE);
+    }
 
-    SaveToFile(fd->GetPath());
     SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
   }
 }
@@ -124,8 +150,18 @@ void RootFrame::OnExit(wxCommandEvent& e) {
   delete this;
 }
 
-void RootFrame::SaveToFile(const wxString& filename) {
-  GetSS()->SaveToXMLFile(filename.char_str());
+void RootFrame::SaveToFile(const wxString& filename,FileType ft) {
+  if(ft==DEFAULT_FILE) {
+    ft=mFt;
+  }
+  if(ft==XML_FILE) {
+    GetSS()->SaveToXMLFile(filename.char_str());
+  } else if(ft==XYZ_FILE) {
+    GetSS()->SaveToXYZFile(filename.char_str());
+  } else {
+    throw runtime_error("RootFrame::SaveToFile - Unknown file type");
+  }
+  mFt=ft;
 }
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {

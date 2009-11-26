@@ -38,6 +38,22 @@ class Interaction;
 class ReferenceFrame;
 
 
+
+class ISpinSystemLoader {
+public:
+  enum FilterType {
+    LOAD,
+    SAVE,
+    LOADSAVE
+  };
+  virtual FilterType GetFilterType() const=0;
+  virtual const char* GetFilter() const=0;
+  virtual const char* GetFormatName() const=0;
+  virtual void LoadFile(SpinSystem* ss,const char* filename) const=0;
+  virtual void SaveFile(const SpinSystem* ss,const char* filename) const=0;
+};
+
+
   ///Class representing a reference frame. This class has not been
   ///properly implimented and should not be used yet.
 class ReferenceFrame {
@@ -330,8 +346,8 @@ class SpinSystem {
     void LoadFromXMLFile(const char* filename);
     void SaveToXMLFile(const char* filename) const;
 
-    void LoadFromXYZFile(const char* filename);
-    void SaveToXYZFile(const char* filename) const;
+    void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
+    void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;
 
     std::vector<Interaction*>& GetInteractions() {return mInteractions;}
   

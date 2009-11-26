@@ -72,6 +72,10 @@ set(sharedSources ${sharedSources} "shared/mathtypes.cpp")
 set(sharedSources ${sharedSources} "shared/xmlFileOpps.cpp")
 set(sharedSources ${sharedSources} "shared/spinxml_schema.cpp")
 
+set(formatSources "shared/formats/xyz.cpp")
+#set(formatSources ${sharedSources} "shared/spinsys.cpp")
+
+
 set(pySources              "shared/spinsys.cpp")
 set(pySources ${pySources} "shared/xmlFileOpps.cpp")
 set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
@@ -177,13 +181,13 @@ link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
 
 
 #command line exe
-set(spinachSources ${cmdSources} ${sharedSources})
+set(spinachSources ${cmdSources} ${sharedSources} ${formatSources})
 add_executable (spinach ${spinachSources})
 target_link_libraries (spinach xerces-c) 
 target_link_libraries(spinach ${Boost_LIBRARIES})
 
 #C++ GUI
-set(wxSpinachSources ${guiSources} ${sharedSources})
+set(wxSpinachSources ${guiSources} ${sharedSources} ${formatSources})
 add_executable (wxSpinach ${wxSpinachSources})
 add_definitions(${wxWidgets_DEFINITIONS})
 target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 

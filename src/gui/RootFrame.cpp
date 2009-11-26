@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <wx/log.h>
 
+//Input and output filters
+#include <shared/formats/xyz.hpp>
+
 using namespace std;
 
 //============================================================//
@@ -80,7 +83,9 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
 
     if(ext.Lower()==wxT("xyz")) {
       try {
-	GetSS()->LoadFromXYZFile(mOpenPath.char_str());
+	XYZLoader* loader=new XYZLoader;
+	GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
+	delete loader;
       } catch(const runtime_error& e) {
 	wxLogError(wxT("Error Parsing XYZ file. File is corrupt"));
 	wxLogError(wxString(e.what(),wxConvUTF8));
@@ -157,7 +162,9 @@ void RootFrame::SaveToFile(const wxString& filename,FileType ft) {
   if(ft==XML_FILE) {
     GetSS()->SaveToXMLFile(filename.char_str());
   } else if(ft==XYZ_FILE) {
-    GetSS()->SaveToXYZFile(filename.char_str());
+    XYZLoader* saver=new XYZLoader;
+    GetSS()->SaveToFile(filename.char_str(),saver);
+    delete saver;
   } else {
     throw runtime_error("RootFrame::SaveToFile - Unknown file type");
   }

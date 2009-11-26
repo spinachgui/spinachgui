@@ -165,56 +165,31 @@ void SpinSystem::LoadFromGamesFile(const char* filename) {
 #endif
 }
 
-void SpinSystem::SaveToXYZFile(const char* filename) const {
-  ofstream fout(filename);
-  if(!fout.is_open()) {
-    throw runtime_error("Couldn't open file");
-  }
-
-  fout << mSpins.size() << endl;
-  for(long i=0;i<mSpins.size();i++) {
-    double x,y,z;
-    mSpins[i]->GetCoordinates(&x,&y,&z);
-    fout << getElementSymbol(mSpins[i]->GetElement()) << " " 
-	 << x << " "<< y << " " << z << " " << endl;
-  }
-}
-
-void SpinSystem::LoadFromXYZFile(const char* filename) {
+void SpinSystem::LoadFromFile(const char* filename,ISpinSystemLoader* loader) {
 #ifdef SPINXML_EVENTS
   PushEventLock();
 #endif
-  Clear();
-  ifstream fin(filename);
-  if(!fin.is_open()) {
-    throw runtime_error("Couldn't open file");
-  }
-  long size;
-  fin >> size;
-  cout << size << endl;
-  for(long i=0;i<size;i++) {
-    if(fin.eof()) {
+  try {
+    loader->LoadFile(this,filename);
+  } catch(const runtime_error& e) {
 #ifdef SPINXML_EVENTS
-      PopEventLock();
-      mNode->Change(IEventListener::CHANGE);
+    PopEventLock();
+    mNode->Change(IEventListener::CHANGE);
 #endif
-      throw runtime_error("Unexpected end of file");
-    }
-    string el;
-    double x,y,z;
-    fin >> el >> x >> y >> z;
-    cout << el << x << " " << y << " " << z << " " << endl;
-    long atomicN=getElementBySymbol(el.c_str());
-    if(atomicN==-1) {
-      throw runtime_error("Unknown Element");
-    }
-    InsertSpin(new Spin(this,Vector3(x,y,z),el,0,atomicN));
+    throw e;
   }
-
 #ifdef SPINXML_EVENTS
   PopEventLock();
   mNode->Change(IEventListener::CHANGE);
 #endif
+
+  return;
+}
+
+void SpinSystem::SaveToFile(const char* filename,ISpinSystemLoader* saver) const 
+{
+  saver->SaveFile(this,filename);
+  return;
 }
 
 void SpinSystem::LoadFromG03File(const char* filename) {

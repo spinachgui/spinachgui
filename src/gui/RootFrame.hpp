@@ -2,7 +2,7 @@
 #ifndef ROOT_FRAME_H
 #define ROOT_FRAME_H
 
-#include <res/SpinachGUI.h>
+#include <auto/SpinachGUI.h>
 #include <gui/glDisplay.hpp>
 #include <gui/SpinGrid.hpp>
 #include <wx/aui/auibook.h>

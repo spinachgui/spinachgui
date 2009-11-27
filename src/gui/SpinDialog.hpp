@@ -3,7 +3,7 @@
 #define SPINDIALOG_H
 
 #include <shared/spinsys.hpp>
-#include <res/SpinachGUI.h>
+#include <auto/SpinachGUI.h>
 #include <gui/SpinInteractionEdit.hpp>
 
 

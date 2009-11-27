@@ -1,7 +1,7 @@
 
 
 #include <shared/spinsys.hpp>
-#include <shared/spinxml_schema.hpp>
+#include <auto/spinxml_schema.hpp>
 #include <shared/nuclear_data.hpp>
 #include <fstream>
 #include <sstream>

@@ -1,0 +1,15 @@
+#!/bin/bash
+# Generate the automatically generated code outside of the regular build process
+# and put the resulting files in auto
+# This makes the project buildable on systems without the more specialised tools such as
+# xsdcxx and wxFormBuilder
+
+
+echo "Refreshing the GUI classes with wxFormBuilder"
+wxformbuilder -g  spinach.fbp
+echo "Automatically generating XML parsing classes"
+xsdcxx cxx-tree --generate-serialization --generate-doxygen --cxx-suffix .cpp --hxx-suffix .hpp  --generate-doxygen --output-dir auto data/spinxml_schema.xsd
+#echo "Generating the swig interface files"
+#swig -c++ -python -I.  -o auto/spinsys_wrap.cpp -oh auto/spinsys_wrap.hpp swig/spinsys.i
+
+

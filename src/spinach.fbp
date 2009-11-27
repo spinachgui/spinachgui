@@ -13,7 +13,7 @@
         <property name="internationalize">0</property>
         <property name="name">spinach</property>
         <property name="namespace"></property>
-        <property name="path">./res</property>
+        <property name="path">./auto</property>
         <property name="precompiled_header"></property>
         <property name="relative_path">1</property>
         <property name="use_enum">0</property>

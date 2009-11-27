@@ -4,7 +4,7 @@
 
 #include <gui/InteractionEdit.hpp>
 #include <shared/spinsys.hpp>
-#include <res/SpinachGUI.h>
+#include <auto/SpinachGUI.h>
 
 class SpinInterEditPanel : public SpinInterEditPanelBase {
 public:

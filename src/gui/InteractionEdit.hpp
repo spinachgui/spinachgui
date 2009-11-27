@@ -4,7 +4,7 @@
 
 #include <gui/OrientationEdit.hpp>
 
-#include <res/SpinachGUI.h>
+#include <auto/SpinachGUI.h>
 #include <shared/spinsys.hpp>
 
 #include <gui/DialogCombo.hpp>

@@ -2,7 +2,7 @@
 #ifndef ORIENTEDIT_H
 #define ORIENTEDIT_H
 
-#include <res/SpinachGUI.h>
+#include <auto/SpinachGUI.h>
 #include <shared/spinsys.hpp>
 #include <gui/DialogCombo.hpp>
 

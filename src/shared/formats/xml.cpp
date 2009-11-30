@@ -1,6 +1,5 @@
 
-
-#include <shared/spinsys.hpp>
+#include <shared/formats/xml.hpp>
 #include <auto/spinxml_schema.hpp>
 #include <shared/nuclear_data.hpp>
 #include <fstream>
@@ -12,12 +11,6 @@ using std::endl;
 using std::cout;
 using std::cerr;
 
-std::string schemaLocation;
-
-void SpinXML::SetSchemaLocation(const char* loc) {
-  cout << "Schema Location is begin set to " << loc << endl;
-  schemaLocation=loc;
-}
 
 type::value GetXSDTypeFromSpinXMLType(SpinXML::Interaction::SubType subtype) {
   switch(subtype) {
@@ -153,17 +146,15 @@ SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
 }
 
 
-void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
-#ifdef SPINXML_EVENTS
-  PushEventLock();
-#endif
+void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const {
+  //libss => "library spin system" as apposed to the xml spin system ss
   std::auto_ptr<spin_system> ss;
   try {
-    cout << "Trying" << schemaLocation << endl;
+    cout << "Trying" << mSchemaLocation << endl;
 
     xml_schema::properties p;
     //p.schema_location("http://www.w3.org/XML/1998/namespace","xml.xsd");
-    p.no_namespace_schema_location(schemaLocation);
+    p.no_namespace_schema_location(mSchemaLocation);
 
     ss=spin_system_(filename,0,p);
   } catch(const xml_schema::exception& e) {
@@ -173,11 +164,10 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
     throw std::runtime_error(errStream.str());
   }
 
-  Clear();
+  libss->Clear();
 
   spin_system::spin_sequence spins=ss->spin(); 
   long spinCount=spins.size();
-  mSpins.resize(spinCount);
   for(long i=0;i<spinCount;i++) {
     spin xsdSpin=spins[i];
 
@@ -187,22 +177,22 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
     y=coords.y();
     z=coords.z();
 
-
+    SpinXML::Spin* newSpin;
     if(xsdSpin.label().present()) {
-      mSpins[i]=new SpinXML::Spin(this,Vector3(x,y,z),xsdSpin.label().get(),GetRootFrame());
+      newSpin=new SpinXML::Spin(libss,Vector3(x,y,z),xsdSpin.label().get(),libss->GetRootFrame());
     } else {
-      mSpins[i]=new SpinXML::Spin(this,Vector3(x,y,z),"",GetRootFrame());
+      newSpin=new SpinXML::Spin(libss,Vector3(x,y,z),"",libss->GetRootFrame());
     }
-    
-    mSpins[i]->SetElement(getElementBySymbol(xsdSpin.element().c_str()));
+    newSpin->SetElement(getElementBySymbol(xsdSpin.element().c_str()));
 
+    libss->InsertSpin(newSpin);
   }
 
   spin_system::interaction_sequence inters=ss->interaction();
   long interactionCount=inters.size();
-  mInteractions.resize(interactionCount);
+
   for(long i=0;i<interactionCount;i++) {
-    SpinXML::Interaction* thisInter=mInteractions[i]=new SpinXML::Interaction;
+    SpinXML::Interaction* thisInter=new SpinXML::Interaction;
     interaction xsdInter=inters[i];
 
     thisInter->SetSubType(GetSpinXMLTypeFromXSDType(xsdInter.type()));
@@ -211,14 +201,15 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
     if(spinNumber <0 || spinNumber >= spinCount) {
       throw std::runtime_error("Spin index in interaction out of range");
     }
-    thisInter->SetSpin1(mSpins[spinNumber]);
+    thisInter->SetSpin1(libss->GetSpin(spinNumber));
+    libss->GetSpin(spinNumber)->InsertInteraction(thisInter);
 
     if(xsdInter.spin_2().present()) {
       long spinNumber2=xsdInter.spin_2().get();
       if(spinNumber2 < 0 || spinNumber2 > spinCount) {
 	throw std::runtime_error("Spin index in interaction out of range");
       }
-      thisInter->SetSpin2(mSpins[spinNumber2]);
+      thisInter->SetSpin2(libss->GetSpin(spinNumber2));
 
     } else {
       thisInter->SetSpin2(NULL);      
@@ -254,13 +245,9 @@ void SpinXML::SpinSystem::LoadFromXMLFile(const char* filename)  {
       throw std::runtime_error("Interaction appeared to not be specified (is the xsd schema corrupt?)");
     }
   }
-#ifdef SPINXML_EVENTS
-  PopEventLock();
-  mNode->Change(IEventListener::CHANGE);
-#endif
 }
 
-void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
+void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) const {
   xml_schema::namespace_infomap map;
   map[""].name = "";
   map[""].schema = "../data/spinxml_schema.xsd";
@@ -273,8 +260,8 @@ void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
   spin_system ss;
 
   spin_system::spin_sequence spins; 
-  for(long i=0;i<GetSpinCount();i++) {
-    SpinXML::Spin* thisSpin=GetSpin(i);
+  for(long i=0;i<libss->GetSpinCount();i++) {
+    SpinXML::Spin* thisSpin=libss->GetSpin(i);
 
     double x,y,z;
     thisSpin->GetCoordinates(&x,&y,&z);
@@ -289,16 +276,16 @@ void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
   ss.spin(spins);
 
   spin_system::interaction_sequence inters;
-  for(long i=0;i<mInteractions.size();i++) {
-    SpinXML::Interaction* thisInter=mInteractions[i];
+  for(long i=0;i<libss->GetInteractionCount();i++) {
+    SpinXML::Interaction* thisInter=libss->GetInteraction(i);
 
     interaction1 inter(GetXSDTypeFromSpinXMLType(thisInter->GetSubType()),
 		       "MHz",
-		       GetSpinNumber(thisInter->GetSpin1()),
+		       libss->GetSpinNumber(thisInter->GetSpin1()),
 		       0);
 
     if(thisInter->GetSpin2() != NULL) {
-      inter.spin_2(GetSpinNumber(thisInter->GetSpin2()));
+      inter.spin_2(libss->GetSpinNumber(thisInter->GetSpin2()));
     }
 
     switch(thisInter->GetType()) {
@@ -374,3 +361,4 @@ void SpinXML::SpinSystem::SaveToXMLFile(const char* filename) const {
   }
 
 }
+

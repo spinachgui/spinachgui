@@ -11,6 +11,8 @@
 #include <gui/StdEvents.hpp>
 
 #include <shared/formats/xyz.hpp>
+#include <shared/formats/g03.hpp>
+#include <shared/formats/xml.hpp>
 
 #include <wx/filename.h>
 
@@ -31,7 +33,17 @@ bool SpinachApp::OnInit() {
   //Load the I/O Filters
 
   mIOFilters.push_back(new XYZLoader);
+  mIOFilters.push_back(new G03Loader);
 
+  //Load the xml schema, it's more complicated, of course
+  wxFileName fn(argv[0]);
+  fn.Normalize();
+  fn=fn.GetPath();
+  fn.AppendDir(wxT("data"));
+  fn.SetFullName(wxT("spinxml_schema.xsd"));
+  wxString url(wxString(wxT("file://")) << fn.GetFullPath());
+  mIOFilters.push_back(new XMLLoader(url.char_str()));
+  
   //Load the isotopes
 
   try {
@@ -45,20 +57,12 @@ bool SpinachApp::OnInit() {
     return false;
   }
 
-  //Load the xml schema
-  wxFileName fn(argv[0]);
-  fn.Normalize();
-  fn=fn.GetPath();
-  fn.AppendDir(wxT("data"));
-  fn.SetFullName(wxT("spinxml_schema.xsd"));
-  wxString url(wxString(wxT("file://")) << fn.GetFullPath());
-  SpinXML::SetSchemaLocation(url.char_str());
-  
-  cout << "Loaded " << fn.GetFullPath() << endl;
 
   shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
   //SS->LoadFromG03File("data/tryosine.log");
-  SS->LoadFromG03File("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log");
+  G03Loader* loader= new G03Loader();
+  SS->LoadFromFile("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log",loader);
+  delete loader;
   mSSMgr = new SpinSysManager(SS);
 
   RootFrame* frame = new RootFrame(NULL);

@@ -65,13 +65,13 @@ set(guiSources ${guiSources} "auto/SpinachGUI.cpp")
 set(sharedSources "shared/nuclear_data.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys.cpp")
 set(sharedSources ${sharedSources} "shared/mathtypes.cpp")
-set(sharedSources ${sharedSources} "shared/xmlFileOpps.cpp")
 set(sharedSources ${sharedSources} "auto/spinxml_schema.cpp")
 
 set(formatSources "shared/formats/xyz.cpp")
+set(formatSources ${formatSources} "shared/formats/g03.cpp")
+set(formatSources ${formatSources} "shared/formats/xml.cpp")
 
 set(pySources              "shared/spinsys.cpp")
-set(pySources ${pySources} "shared/xmlFileOpps.cpp")
 set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
 set(pySources ${pySources} "shared/spinxml_schema.cpp")
 

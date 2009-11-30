@@ -188,20 +188,12 @@ void RootFrame::OnExit(wxCommandEvent& e) {
   delete this;
 }
 
-void RootFrame::SaveToFile(const wxString& filename,FileType ft) {
-  if(ft==DEFAULT_FILE) {
-    ft=mFt;
+void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {
+  if(saver==NULL) {
+    saver=mSaver;
   }
-  if(ft==XML_FILE) {
-    GetSS()->SaveToXMLFile(filename.char_str());
-  } else if(ft==XYZ_FILE) {
-    XYZLoader* saver=new XYZLoader;
-    GetSS()->SaveToFile(filename.char_str(),saver);
-    delete saver;
-  } else {
-    throw runtime_error("RootFrame::SaveToFile - Unknown file type");
-  }
-  mFt=ft;
+  GetSS()->SaveToFile(filename.char_str(),saver);
+  mSaver=saver;
 }
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {

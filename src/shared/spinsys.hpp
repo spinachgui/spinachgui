@@ -332,19 +332,15 @@ class SpinSystem {
     Spin* GetSpin(long n) const;
     long GetSpinNumber(Spin* spin) const;
 
+    long GetInteractionCount() const;
+    Interaction* GetInteraction(long n) const;
+
     std::vector<Spin*> GetSpins() const;
     void InsertSpin(Spin* _Spin,long Position=END);
     void RemoveSpin(long Position);
     void RemoveSpin(Spin* _Spin);
 
     ReferenceFrame* GetRootFrame() const;
-    
-    void LoadFromGamesFile(const char* filename);
-
-    void LoadFromG03File(const char* filename) throw(std::runtime_error);
-
-    void LoadFromXMLFile(const char* filename);
-    void SaveToXMLFile(const char* filename) const;
 
     void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
     void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;

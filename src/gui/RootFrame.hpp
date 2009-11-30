@@ -19,13 +19,7 @@ public:
 
   void InitFrame();
 
-  enum FileType{
-    DEFAULT_FILE,
-    XML_FILE,
-    G03_FILE,
-    XYZ_FILE
-  };
-  void SaveToFile(const wxString& filename,FileType ft=DEFAULT_FILE);
+  void SaveToFile(const wxString& filename,ISpinSystemLoader* saver=NULL);
 
   //Utility Functions
   void SaveAs();
@@ -55,7 +49,7 @@ private:
   wxAuiNotebook* mNotebook;
   SpinGridPanel* mSpinGridPanel;
   glDisplay* mGLDisplay;
-  FileType mFt;
+  ISpinSystemLoader* mSaver;
 
   ///Full path of the open file
   wxString mOpenPath;

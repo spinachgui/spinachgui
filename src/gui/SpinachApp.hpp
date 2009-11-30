@@ -5,14 +5,19 @@
 
 #include <wx/app.h>
 #include <gui/SpinSysManager.hpp>
+#include <shared/spinsys.hpp>
 
 class SpinachApp : public wxApp {
 public:
+  ~SpinachApp();
   virtual bool OnInit();
   SpinSysManager* GetSpinSysManager() const {return mSSMgr;}
+  const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
 private:
   SpinSysManager* mSSMgr;
+  std::vector<SpinXML::ISpinSystemLoader*> mIOFilters;
 };
+
 
 
 DECLARE_APP(SpinachApp);

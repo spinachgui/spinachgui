@@ -10,6 +10,8 @@
 
 #include <gui/StdEvents.hpp>
 
+#include <shared/formats/xyz.hpp>
+
 #include <wx/filename.h>
 
 using boost::shared_ptr;
@@ -19,8 +21,17 @@ using boost::shared_ptr;
 
 IMPLEMENT_APP(SpinachApp);
 
+SpinachApp::~SpinachApp() {
+  for(long i=0;i<mIOFilters.size();i++) {
+    delete mIOFilters[i];
+  }
+}
 
 bool SpinachApp::OnInit() {
+  //Load the I/O Filters
+
+  mIOFilters.push_back(new XYZLoader);
+
   //Load the isotopes
 
   try {
@@ -55,4 +66,6 @@ bool SpinachApp::OnInit() {
 
   return true;
 }
+
+
 

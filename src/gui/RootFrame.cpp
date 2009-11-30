@@ -65,10 +65,22 @@ void RootFrame::UpdateTitle() {
 
 void RootFrame::OnOpen(wxCommandEvent& e) {
   wxString filter;
-  filter << wxT("Spin XML files (*.xml)|*.xml");
-  filter << wxT("|Gausian03 files (*.log)|*.log");
-  filter << wxT("|XYZ files (*.xyz)|*.xyz");
-  filter << wxT("|All Files (*.*)|*.*");
+  bool first=true;
+  for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
+      i!=wxGetApp().GetIOFilters().end();
+      ++i) {
+    if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
+       (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+      if(!first) {
+	filter << wxT("|");
+      } else {
+	first=false;
+      }
+      wxString ThisFilter((*i)->GetFilter(),wxConvUTF8);
+      wxString ThisFilterName((*i)->GetFormatName(),wxConvUTF8);
+      filter << ThisFilterName << wxT(" (*.") << ThisFilter << wxT(")|*.") << ThisFilter;
+    }
+  }
   wxFileDialog* fd=new wxFileDialog(this,
 				    wxString(wxT("Choose a file")),
 				    wxString(wxT("")), //Default file
@@ -79,31 +91,28 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
     mOpenPath=fd->GetPath();
     mOpenFile=fd->GetFilename();
     mOpenDir=fd->GetDirectory();
-    wxString ext=GetExtension(mOpenFile);
+    wxString ext=GetExtension(mOpenFile).Lower();
 
-    if(ext.Lower()==wxT("xyz")) {
-      try {
-	XYZLoader* loader=new XYZLoader;
-	GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
-	delete loader;
-      } catch(const runtime_error& e) {
-	wxLogError(wxT("Error Parsing XYZ file. File is corrupt"));
-	wxLogError(wxString(e.what(),wxConvUTF8));
+    ISpinSystemLoader* loader=NULL;
+    for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
+	i!=wxGetApp().GetIOFilters().end();
+	++i) {
+      if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
+	 (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+	if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
+	  loader=*i;
+	  break;
+	}
       }
-    } else if(ext.Lower()==wxT("log")) {
-      try {
-	GetSS()->LoadFromG03File(mOpenPath.char_str());
-      } catch(const runtime_error& e) {
-	wxLogError(wxT("Error Parsing log file. File is corrupt"));
-	wxLogError(wxString(e.what(),wxConvUTF8));
-      }
+    }
+    if(loader==NULL) {
+      wxLogError(wxString() << wxT("Unknown extension ") << ext);
     } else {
-      //assume xml for everything else
       try {
-	GetSS()->LoadFromXMLFile(mOpenPath.char_str());
+	GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
       } catch(const runtime_error& e) {
-	wxLogError(wxT("Error Parsing XML file. File is corrupt"));
-	wxLogError(wxString(e.what(),wxConvUTF8));
+	wxLogError(wxT("File is corrupt"));
+	wxString(e.what(),wxConvUTF8);
       }
     }
     Chkpoint(wxT("Load File"));
@@ -126,28 +135,52 @@ void RootFrame::OnSaveAs(wxCommandEvent& e) {
 
 void RootFrame::SaveAs() {
   wxString filter;
-  filter << wxT("Spin XML files (*.xml)|*.xml");
-  filter << wxT("|XYZ Files (*.xyz)|*.xyz");
-  filter << wxT("|All Files (*.*)|*.*");
+  bool first=true;
+  for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
+      i!=wxGetApp().GetIOFilters().end();
+      ++i) {
+    if((*i)->GetFilterType()==ISpinSystemLoader::SAVE ||
+       (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+      if(!first) {
+	filter << wxT("|");
+      } else {
+	first=false;
+      }
+      wxString ThisFilter((*i)->GetFilter(),wxConvUTF8);
+      wxString ThisFilterName((*i)->GetFormatName(),wxConvUTF8);
+      filter << ThisFilterName << wxT(" (*.") << ThisFilter << wxT(")|*.") << ThisFilter;
+    } 
+  }
   wxFileDialog* fd=new wxFileDialog(this,
 				    wxString(wxT("Choose a file")),
 				    wxString(wxT("")), //Default file
 				    wxString(wxT("")), //Default dir
 				    filter ,
 				    wxFD_SAVE);
-  if(fd->ShowModal()) {
+  if(fd->ShowModal() == wxID_OK) {
     mOpenPath=fd->GetPath();
     mOpenFile=fd->GetFilename();
     mOpenDir=fd->GetDirectory();
-    wxString ext=GetExtension(mOpenFile);
-    if(ext.Lower()==wxT("xyz")) {
-      SaveToFile(fd->GetPath(),XYZ_FILE);
-    } else {
-      //assume xml for everything else
-      SaveToFile(fd->GetPath(),XML_FILE);
-    }
+    wxString ext=GetExtension(mOpenFile).Lower();
 
-    SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
+    ISpinSystemLoader* saver=NULL;
+    for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
+	i!=wxGetApp().GetIOFilters().end();
+	++i) {
+      if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
+	 (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+	if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
+	  saver=*i;
+	  break;
+	}
+      }
+    }
+    if(saver==NULL) {
+      wxLogError(wxString() << wxT("Unknown extension ") << ext);
+    } else {
+      GetSS()->SaveToFile(mOpenPath.char_str(),saver);
+    }
+    UpdateTitle();
   }
 }
 

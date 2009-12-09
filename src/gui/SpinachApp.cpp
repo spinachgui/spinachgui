@@ -60,9 +60,9 @@ bool SpinachApp::OnInit() {
 
   shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
   //SS->LoadFromG03File("data/tryosine.log");
-  G03Loader* loader= new G03Loader();
-  SS->LoadFromFile("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log",loader);
-  delete loader;
+  //G03Loader* loader= new G03Loader();
+  //SS->LoadFromFile("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log",loader);
+  //delete loader;
   mSSMgr = new SpinSysManager(SS);
 
   RootFrame* frame = new RootFrame(NULL);

@@ -53,6 +53,7 @@ endif()
 #List of source files for all the targets
 set(guiSources "gui/SpinachApp.cpp")
 set(guiSources ${guiSources} "gui/glDisplay.cpp")
+set(guiSources ${guiSources} "gui/3DDisplay.cpp")
 set(guiSources ${guiSources} "gui/InteractionEdit.cpp")
 set(guiSources ${guiSources} "gui/SpinInteractionEdit.cpp")
 set(guiSources ${guiSources} "gui/OrientationEdit.cpp")

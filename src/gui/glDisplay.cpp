@@ -279,14 +279,14 @@ void glDisplay::ChangeViewport() {
 //============================================================//
 // Drawing, including onPaint()
 
-void glDisplay::Geometary(bool depthOnly) {
-  DrawAtoms(depthOnly);
+void glDisplay::Geometary() {
+  DrawAtoms();
   DrawBonds();
   DrawBilinear();
 }
 
 
-void glDisplay::DrawAtoms(bool depthOnly) {
+void glDisplay::DrawAtoms() {
   long spinCount=(*mSS)->GetSpinCount();
   for(long i=0;i<spinCount;i++) {  
     double x,y,z;
@@ -295,18 +295,18 @@ void glDisplay::DrawAtoms(bool depthOnly) {
 		
     glPushMatrix(); {
       glTranslatef(x,y,z);
-      if(!depthOnly) {
+      if(!mDC.depthOnly) {
 	  glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
 	  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);	
       }
       DrawSingleAtomInteraction(i,Interaction::LINEAR);
-      if(!depthOnly) {
+      if(!mDC.depthOnly) {
 	  glMaterialfv(GL_FRONT, GL_SPECULAR, redMaterial);
 	  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);	
       }
       DrawSingleAtomInteraction(i,Interaction::QUADRATIC);
       glScalef(radius,radius,radius);
-      if(!depthOnly) {
+      if(!mDC.depthOnly) {
 	if(mHover!=i) {
 	  GLfloat material[3];
 	  material[0] = getElementR(thisSpin->GetElement());
@@ -479,7 +479,7 @@ void glDisplay::OnPaint(wxPaintEvent& e) {
 
   glClear(GL_DEPTH_BUFFER_BIT);
 	
-  Geometary(true);
+  Geometary();
   glEnable(GL_TEXTURE_2D); {
     glBindTexture(GL_TEXTURE_2D,mTexDepth);
     glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
@@ -527,15 +527,11 @@ void glDisplay::OnPaint(wxPaintEvent& e) {
 
 
 
-
-
-
-
-
 //============================================================//
 // Constructions and destructor
 
-glDisplay::glDisplay(wxWindow* parent,wxWindowID id) : wxGLCanvas(parent,id,NULL) {
+glDisplay::glDisplay(wxWindow* parent,wxWindowID id)
+  : wxGLCanvas(parent,id,NULL),mDC(spinachDC()) {
   GetSS()->GetNode()->AddListener(this);
 
   mGLContext=NULL;

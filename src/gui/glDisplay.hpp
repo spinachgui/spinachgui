@@ -16,6 +16,17 @@
 using namespace boost;
 using namespace SpinXML;
 
+
+///A class for storing all drawing options
+class spinachDC {
+public:
+  ///If true draw only to the depth buffer
+  bool depthOnly;
+  spinachDC()
+    : depthOnly(false) {
+  }
+};
+
 class glDisplay : public wxGLCanvas, public IEventListener {
 public:
   glDisplay(wxWindow* parent,wxWindowID id= -1);
@@ -50,16 +61,19 @@ protected:
   //State Changing functions
   void ChangeViewport();
   void FindHover();
+  void SetDC(const spinachDC& dc) {mDC=dc;}
 
   //Drawing functions
-  void Geometary(bool depthOnly=false);
-  void DrawAtoms(bool depthOnly=false);
+  void Geometary();
+  void DrawAtoms();
   void DrawBonds();
   void DrawSingleAtomInteraction(long atom,Interaction::Form form);
   void DrawBilinear();
 
   DECLARE_EVENT_TABLE();
 private:
+  spinachDC mDC;
+
   INTERACTION_MODE mMode;
 
   bool mGLEnabled;

@@ -153,9 +153,12 @@ class Interaction {
     void SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient);
 
   ///Cache the form of the interaction
-     void SetForm(Form f) {mForm=f;}
+  bool SetLinear()     {return mForm==LINEAR;}
+  bool SetBilinear()  {return mForm==BILINEAR;}
+  bool SetQuadratic() {return mForm==QUADRATIC;}
+
   bool GetIsLinear()     {return mForm==LINEAR;}
-  bool GetIsBiLinear()  {return mForm==BILINEAR;}
+  bool GetIsBilinear()  {return mForm==BILINEAR;}
   bool GetIsQuadratic() {return mForm==QUADRATIC;}
 
   ///Get the isotropic value of the interaction

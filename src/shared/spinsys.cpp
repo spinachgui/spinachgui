@@ -18,28 +18,28 @@ SpinSystem::SpinSystem()  {
 
 SpinSystem::SpinSystem(const SpinSystem& system)  {
   long spinCount=system.mSpins.size();
-  long interCount=system.mInteractions.size();
+  long interCount=system.mBilinInter.size();
 
   mSpins.resize(spinCount);
-  mInteractions.resize(interCount);
+  mBilinInter.resize(interCount);
 
   for(long i=0;i<spinCount;i++) {
     mSpins[i]=new Spin(*system.mSpins[i]);
   }
   for(long i=0;i<interCount;i++) {
-    mInteractions[i]=new Interaction(*system.mInteractions[i]);
+    mBilinInter[i]=new Interaction(*system.mBilinInter[i]);
     //Problem, mSpin1 and mSpin2 will still point to the spins in the
-    //old SpinSystem
-    Spin* Spin1=system.mInteractions[i]->mSpin1;
-    Spin* Spin2=system.mInteractions[i]->mSpin2;
+    //old SpinSystemn
+    Spin* Spin1=system.mBilinInter[i]->GetSpin1();
+    Spin* Spin2=system.mBilinInter[i]->GetSpin2();
     int found=0;
     for(long j=0;j<spinCount;j++) {
       if(Spin1==system.mSpins[j]) {
-	mInteractions[i]->mSpin1=mSpins[j];
+	mBilinInter[i]->SetSpin1(mSpins[j]);
 	found++;
       }
       if(Spin2==system.mSpins[j]) {
-	mInteractions[i]->mSpin2=mSpins[j];
+	mBilinInter[i]->SetSpin2(mSpins[j]);
 	found++;
       }
       if(found==2) {
@@ -59,14 +59,14 @@ void SpinSystem::Clear() {
   //the spins have interactions as their children. 
   sigReloading();
 
-  for(long i=0;i<mInteractions.size();i++) {
-    delete mInteractions[i];
+  for(long i=0;i<mBilinInter.size();i++) {
+    delete mBilinInter[i];
   }
   for(long i=0;i<mSpins.size();i++) {
     delete mSpins[i];
   }
   mSpins.resize(0);
-  mInteractions.resize(0);
+  mBilinInter.resize(0);
  
   sigReloaded();
 }
@@ -74,7 +74,7 @@ void SpinSystem::Clear() {
 void SpinSystem::Dump() const {
   cout << "Dumping SpinSystem:" << endl;
   cout << " Spin count=" << mSpins.size() << endl;
-  cout << " Interaction count=" << mInteractions.size() << endl;
+  cout << " Bilinear Interaction count=" << mBilinInter.size() << endl;
   cout << endl;
 }
     
@@ -96,11 +96,11 @@ long SpinSystem::GetSpinNumber(Spin* spin) const {
 }
 
 long SpinSystem::GetInteractionCount() const {
-  return mInteractions.size();
+  return mBilinInter.size();
 }
 
 Interaction* SpinSystem::GetInteraction(long n) const {
-  return mInteractions[n];
+  return mBilinInter[n];
 }
 
 vector<Spin*> SpinSystem::GetSpins() const {
@@ -356,7 +356,7 @@ vector<long> Spin::GetIsotopes() const {
 //==============================================================================//
 // Interaction
 
-Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY),mSpin1(NULL),mSpin2(NULL) {
+ Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY),mForm(ANY_FORM) {
 }
 
 Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
@@ -483,31 +483,6 @@ Interaction::Type Interaction::GetType() const {
 }
 
 
-void Interaction::SetSpin1(Spin* Spin1) {
-  if(Spin1==mSpin1) {
-    //Nothing happens, return imediately.
-    return;
-  }
-  sigChange();
-  mSpin1=Spin1;
-}
-
-void Interaction::SetSpin2(Spin* Spin2) {
-  if(Spin2==mSpin2) {
-    //Nothing happens, return imediately.
-    return;
-  }
-  sigChange();
-  mSpin2=Spin2;
-}
-
-Spin* Interaction::GetSpin1() const {
-  return mSpin1;
-}
-
-Spin* Interaction::GetSpin2() const {
-  return mSpin2;
-}
     
 void Interaction::GetScalar(double* Scalar) const {
   *Scalar=mData.mScalar;
@@ -661,35 +636,5 @@ Matrix3 Interaction::GetAsMatrix() const {
   //Return the zero matrix identity
   Matrix3 zero(0,0,0,0,0,0,0,0,0);
   return zero;
-}
-
-void Interaction::SetQuadratic() {
-  if(mSpin1==mSpin2) {
-    return;
-  }
-  sigChange();
-  mSpin2=mSpin1;
-}
-
-void Interaction::SetLinear() {
-  if(mSpin2 == NULL) {
-    return;
-  }
-  sigChange();
-  mSpin2=NULL;
-}
-
-
-
-bool Interaction::GetIsLinear() const {
-  return mSpin2==NULL;
-}
-
-bool Interaction::GetIsBilinear() const {
-  return mSpin2!=NULL && mSpin1 != mSpin2;
-} 
-
-bool Interaction::GetIsQuadratic() const {
-  return mSpin2==mSpin1;
 }
 

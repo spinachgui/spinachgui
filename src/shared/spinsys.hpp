@@ -18,18 +18,6 @@
 
 namespace SpinXML {
 
-
-#ifdef SPINXML_EVENTS
-
-  enum SPINSYS_PART {
-    PART_SYSTEM,
-    PART_SPIN,
-    PART_INTERACTION
-  };
-
-#endif
-
-
 void SetSchemaLocation(const char* loc);
 
 const long END=-1;
@@ -60,7 +48,6 @@ public:
   ///Class representing one of the shielding paramiters such as the
   ///chemical shift or J coupling
 class Interaction {
-  friend class SpinSystem;
   public:
   ///Constructs an undefined interaction. The type are returned by
   ///GetType() is null UNDEFINED.
@@ -165,31 +152,11 @@ class Interaction {
   ///Set the value of the interaction using the span-skew covention.
     void SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient);
 
-  ///Get a pointer to the first spin this interaction acts on. This
-  ///function is always defined.
-    Spin* GetSpin1() const;
-  ///Set the first spin this interaction acts on.
-    void SetSpin1(Spin* Spin1);
-  ///Get the second spin this interaction acts on. If GetSpin2()==NULL
-  ///then this interaction is liner and only acts on one spin. If
-  ///GetSpin2()==GetSpin1() this interaction is quadratic
-    Spin* GetSpin2() const;
-  ///Set the value of second spin the interaction acts
-  ///on. SetSpin2(NULL) will result in a linear interaction and
-  ///SetSpin2(GetSpin1()) will result in a quadratic interaction.
-    void SetSpin2(Spin* Spin2);
-
-  ///Tells the interaction that it is quadratic
-    void SetQuadratic();
-  ///Tells the interaction that it is linear
-    void SetLinear();
-
-  ///True if this interaction is linear
-    bool GetIsLinear() const;
-  ///True if this interaction is bilinear
-    bool GetIsBilinear() const;
-  ///True if this interaction is quadratic.
-    bool GetIsQuadratic() const;
+  ///Cache the form of the interaction
+     void SetForm(Form f) {mForm=f;}
+  bool GetIsLinear()     {return mForm==LINEAR;}
+  bool GetIsBiLinear()  {return mForm==BILINEAR;}
+  bool GetIsQuadratic() {return mForm==QUADRATIC;}
 
   ///Get the isotropic value of the interaction
     double GetAsScalar() const;
@@ -221,10 +188,19 @@ class Interaction {
 
   Orientation mOrient;
 
+   Form mForm;
    Type mType;
    SubType mSubType;
-   Spin* mSpin1;
-   Spin* mSpin2;
+private:
+  Spin* mSpin1;
+  Spin* mSpin2;
+public:
+  Spin* GetSpin1() const {return mSpin1;}
+  Spin* GetSpin2() const {return mSpin2;}
+
+  void SetSpin1(Spin* s1) {sigChange();mSpin1=s1;}
+  void SetSpin2(Spin* s2) {sigChange();mSpin2=s2;}
+
 
 };
 
@@ -299,7 +275,7 @@ class SpinSystem {
     void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
     void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;
 
-    std::vector<Interaction*>& GetInteractions() {return mInteractions;}
+    std::vector<Interaction*>& GetInteractions()  {return mBilinInter;}
 
   boost::signal<void(Spin*,long)> sigNewSpin;
   boost::signal<void(Spin*,Spin*)> sigNewBilinear;
@@ -311,7 +287,7 @@ class SpinSystem {
     friend class Spin;
 
     std::vector<Spin*> mSpins;
-    std::vector<Interaction*> mInteractions;
+    std::vector<Interaction*> mBilinInter;
 };
 
 }; //End Namespace

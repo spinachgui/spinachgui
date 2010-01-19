@@ -2,6 +2,7 @@
 #include <gui/RootFrame.hpp>
 #include <gui/SpinachApp.hpp>
 #include <gui/StdEvents.hpp>
+#include <gui/MolSceneGraph.hpp>
 #include <stdexcept>
 #include <wx/log.h>
 
@@ -28,6 +29,7 @@ void RootFrame::InitFrame() {
   mSpinGridPanel=new SpinGridPanel(mNotebook);
 
   mDisplay3D=new Display3D(mNotebook);
+  mDisplay3D->SetRootSGNode(new MoleculeNode(NULL));
 
   // add the panes to the manager
   mNotebook->AddPage(mDisplay3D, wxT("3D View"));

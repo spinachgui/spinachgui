@@ -23,10 +23,21 @@ using namespace SpinXML;
 ///A class for storing all drawing options
 class SpinachDC {
 public:
+  GLUquadric* GetSolidQuadric() const {return mSolidQuadric;}
+  GLUquadric* GetWireQuadric() const {return mWireQuadric;}
   ///If true draw only to the depth buffer
   bool depthOnly;
+  GLUquadric* mSolidQuadric;
+  GLUquadric* mWireQuadric;
   SpinachDC()
-    : depthOnly(false) {
+    : depthOnly(false),
+      mSolidQuadric(gluNewQuadric()),
+      mWireQuadric(gluNewQuadric()) {
+    gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
+    gluQuadricNormals  (mSolidQuadric,GLU_SMOOTH);
+	
+    gluQuadricDrawStyle(mWireQuadric,GLU_LINE);
+    gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
   }
 };
 
@@ -34,6 +45,9 @@ class SGNode {
 public:
   ///Construct a dirty SGNode
   SGNode();
+
+  ///Destruct the SGNode
+  ~SGNode();
 
   ///Attach a child node to the SGNode
   void Attach(SGNode* node);
@@ -43,7 +57,7 @@ public:
 
   ///Mark this node as dirty, that is, needing to drewdraw its display
   ///list.
-  void Dirty();
+  void Dirty() {mDirty=true;}
 
   ///Draw, using RawDraw if needed or by calling the display list if
   ///one exists.
@@ -54,10 +68,14 @@ private:
   virtual void RawDraw(const SpinachDC& dc)=0;
 
   bool mDirty;
+  ///Stores an openGL display list for rendering the node
   int mList;
+  ///Stores an openGL display list for rendering the node
+  ///geomatary. Lighting and materials are not included
   int mGeomOnlyList;
 
   std::list<SGNode*> mChildren;
+  typedef std::list<SGNode*>::iterator itor;
 };
 
 ///Works like an SGNode, but manages its material
@@ -69,62 +87,6 @@ public:
 private:
   float material[3];
 };
-
-///Scene graph node that draws a sphere at the origin
-class SphereNode : public SGNodeWithMaterial {
-  ///Create a node that draws a sphere of unit radius
-  SphereNode() : mRadius(1.0f) {}
-  ///Create a node that draws a sphere a given radius
-  SphereNode(float radius) : mRadius(radius) {}
-  ///Change the radius of the sphere
-  void SetRadius(float radius){mRadius=radius; Dirty();}
-private:
-  virtual void RawDraw(const SpinachDC& dc)=0;
-  float mRadius;
-};
-
-///Scene graph node that draws a cylinder between two points
-class CyclinderNode : public SGNodeWithMaterial {
-  ///Create a node that draws a cyclinder of unit radius between
-  ///(0,0,0) and (0,0,1)
-  CyclinderNode()
-    : mRadius(1.0f),mR1(Vector3(0,0,0)),mR2(Vector3(0,0,0)) {}
-  ///Create a node that draws a cyclinder of a given radius between r1
-  ///and r2
-  CyclinderNode(Vector3& r1, Vector3& r2, float radius)
-    : mRadius(mRadius),mR1(r1),mR2(r2) {}
-  ///Set the paramiters of the cyclinder
-  void SetCyclinder(Vector3& r1, Vector3& r2, float radius) {
-    mRadius=radius; mR1=r1; mR2=r2; Dirty();
-  }
-private:
-  virtual void RawDraw(const SpinachDC& dc)=0;
-  float mRadius;
-  Vector3 mR1;
-  Vector3 mR2;
-};
-
-class EllipsoidNode : public SGNodeWithMaterial {
-  ///Create a node that draws an wireframe unit sphere at the origin
-  EllipsoidNode();
-  ///Create a node that draws an wireframe ellipsoid based on matrix A
-  EllipsoidNode(const Matrix3& mat);
-  ///Change the matrix transform performed
-  void SetMatrix(const Matrix3& mat);
-private:
-  virtual void RawDraw(const SpinachDC& dc);
-  ///Unpack a 3x3 matrix into a 4x4 opengl matrix
-  void Unpack(const Matrix3& mat);
-  float mMat[16];
-};
-
-class MoleculeNode : public SGNode {
-  MoleculeNode(SpinSystem* ss) : mSS(ss) {}
-private:
-  virtual void RawDraw(const SpinachDC& dc);
-  SpinSystem* mSS;
-};
-
 
 class Display3D :  public wxGLCanvas, public IEventListener {
 public:
@@ -139,6 +101,10 @@ public:
   void OnResize(wxSizeEvent& e);
   void OnDeleteSpinHover(wxCommandEvent& e);
 
+  void SetRootSGNode(SGNode* node) {
+    if(mRootNode) delete mRootNode; mRootNode=node;
+  }
+
   DECLARE_EVENT_TABLE();
 
   SpinachDC* GetDC();
@@ -146,6 +112,8 @@ public:
   void OnChange(const Event& e);
 protected:
   ///Call whenever the size of the viewport changes
+  
+
   void EnableGL();
   void ChangeViewport();
 

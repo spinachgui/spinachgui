@@ -1,11 +1,50 @@
 
-#include <gui/3DDisplay.hpp>
+#include <gui/Display3D.hpp>
 #include <gui/SpinachApp.hpp>
 #include <gui/RightClickMenu.hpp>
 #include <wx/dcclient.h>
 
+//============================================================//
+// Scene graphs
+
+SGNode::SGNode() : mDirty(true) {
+  mList         = glGenLists(1);
+  mGeomOnlyList = glGenLists(1);
+}
+
+SGNode::~SGNode() {
+  glDeleteLists(mList,1);
+  glDeleteLists(mGeomOnlyList,1);
+}
+
+void SGNode::Attach(SGNode* node) {
+  mChildren.push_back(node);
+}
+
+
+void SGNode::Detach(SGNode* node) {
+
+}
+
+
+void SGNode::Draw(const SpinachDC& dc) {
+  if(mDirty) {
+    glNewList(mList,GL_COMPILE);
+    RawDraw(dc);
+    glEndList();
+    for(itor i=mChildren.begin();i != mChildren.end();++i) {
+      (*i)->Draw(dc);
+    }
+  } 
+  glCallList(mList);
+}
+
+
+//============================================================//
+// Display3D class
+
 Display3D::Display3D(wxWindow* parent) 
-  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY){
+  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY),mRootNode(NULL){
   GetSS()->GetNode()->AddListener(this);
 
   mGLContext=NULL;
@@ -45,6 +84,9 @@ Display3D::Display3D(wxWindow* parent)
 }
 
 Display3D::~Display3D() {
+  if(mRootNode) {
+    delete mRootNode;
+  }
   gluDeleteQuadric(mQFilled);
   gluDeleteQuadric(mQWireframe);
 }
@@ -245,7 +287,11 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 	
   glEnable(GL_LIGHTING);{
     glClear(GL_COLOR_BUFFER_BIT);
-    /* Drawing of obejcts goes here  */
+    if(mRootNode) {
+      //TODO the DC should be a member
+      SpinachDC dc;
+      mRootNode->Draw(dc);
+    }
   } glDisable(GL_LIGHTING);   
 	
   SwapBuffers();

@@ -3,7 +3,7 @@
 #define ROOT_FRAME_H
 
 #include <auto/SpinachGUI.h>
-#include <gui/glDisplay.hpp>
+#include <gui/3DDisplay.hpp>
 #include <gui/SpinGrid.hpp>
 #include <wx/aui/auibook.h>
 
@@ -48,7 +48,7 @@ private:
 
   wxAuiNotebook* mNotebook;
   SpinGridPanel* mSpinGridPanel;
-  glDisplay* mGLDisplay;
+  Display3D* mDisplay3D;
   ISpinSystemLoader* mSaver;
 
   ///Full path of the open file

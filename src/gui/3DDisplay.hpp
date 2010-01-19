@@ -21,11 +21,11 @@ using namespace SpinXML;
 
 
 ///A class for storing all drawing options
-class spinachDC {
+class SpinachDC {
 public:
   ///If true draw only to the depth buffer
   bool depthOnly;
-  spinachDC()
+  SpinachDC()
     : depthOnly(false) {
   }
 };
@@ -47,11 +47,11 @@ public:
 
   ///Draw, using RawDraw if needed or by calling the display list if
   ///one exists.
-  void Draw(const spinachDC& dc);
+  void Draw(const SpinachDC& dc);
 
 private:
   ///Make whatever openGL calls are needed to draw the node.
-  virtual void RawDraw(const spinachDC& dc)=0;
+  virtual void RawDraw(const SpinachDC& dc)=0;
 
   bool mDirty;
   int mList;
@@ -65,7 +65,7 @@ class SGNodeWithMaterial : public SGNode {
 public:
   void SetMaterial();
   ///Sets the material, then calls SGNode::Draw();
-  void Draw(const spinachDC& dc);
+  void Draw(const SpinachDC& dc);
 private:
   float material[3];
 };
@@ -79,7 +79,7 @@ class SphereNode : public SGNodeWithMaterial {
   ///Change the radius of the sphere
   void SetRadius(float radius){mRadius=radius; Dirty();}
 private:
-  virtual void RawDraw(const spinachDC& dc)=0;
+  virtual void RawDraw(const SpinachDC& dc)=0;
   float mRadius;
 };
 
@@ -98,7 +98,7 @@ class CyclinderNode : public SGNodeWithMaterial {
     mRadius=radius; mR1=r1; mR2=r2; Dirty();
   }
 private:
-  virtual void RawDraw(const spinachDC& dc)=0;
+  virtual void RawDraw(const SpinachDC& dc)=0;
   float mRadius;
   Vector3 mR1;
   Vector3 mR2;
@@ -112,7 +112,7 @@ class EllipsoidNode : public SGNodeWithMaterial {
   ///Change the matrix transform performed
   void SetMatrix(const Matrix3& mat);
 private:
-  virtual void RawDraw(const spinachDC& dc);
+  virtual void RawDraw(const SpinachDC& dc);
   ///Unpack a 3x3 matrix into a 4x4 opengl matrix
   void Unpack(const Matrix3& mat);
   float mMat[16];
@@ -121,15 +121,63 @@ private:
 class MoleculeNode : public SGNode {
   MoleculeNode(SpinSystem* ss) : mSS(ss) {}
 private:
-  virtual void RawDraw(const spinachDC& dc);
+  virtual void RawDraw(const SpinachDC& dc);
   SpinSystem* mSS;
 };
 
 
 class Display3D :  public wxGLCanvas, public IEventListener {
 public:
+  Display3D(wxWindow* parent);
+  virtual ~Display3D();
+
+  void OnPaint(wxPaintEvent& e);
+  void OnMouseMove(wxMouseEvent& e);
+  void OnWheel(wxMouseEvent& e);
+  void OnRightClick(wxMouseEvent& e);
+  void OnLeftClick(wxMouseEvent& e);
+  void OnResize(wxSizeEvent& e);
+  void OnDeleteSpinHover(wxCommandEvent& e);
+
+  DECLARE_EVENT_TABLE();
+
+  SpinachDC* GetDC();
+
+  void OnChange(const Event& e);
+protected:
+  ///Call whenever the size of the viewport changes
+  void EnableGL();
+  void ChangeViewport();
+
 private:
+
   SGNode* mRootNode;
+
+  SpinachDC mDC;
+
+  bool mGLEnabled;
+  wxGLContext* mGLContext;
+
+  const SpinSysPtr* mSS;
+
+  //Textures
+  GLuint mTexDepth;
+
+  //GUI State Variables
+  long mHover;
+  double mHoverDist;
+  long mMouseX,mMouseY;
+  double mZoom;
+
+  //Quadrics
+  GLUquadric* mQFilled;
+  GLUquadric* mQWireframe;
+
+  //3D Variables
+  double mCamX,mCamY,mCamZ;
+  float mRotationMatrix[16];
+  float mXTranslate,mYTranslate;
+  float mXRotate,mYRotate;
 };
 
 #endif

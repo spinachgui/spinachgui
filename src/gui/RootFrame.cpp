@@ -27,10 +27,10 @@ void RootFrame::InitFrame() {
 
   mSpinGridPanel=new SpinGridPanel(mNotebook);
 
-  mGLDisplay=new glDisplay(mNotebook);
+  mDisplay3D=new Display3D(mNotebook);
 
   // add the panes to the manager
-  mNotebook->AddPage(mGLDisplay, wxT("3D View"));
+  mNotebook->AddPage(mDisplay3D, wxT("3D View"));
   mNotebook->AddPage(mSpinGridPanel, wxT("Grid View"));
 
   mAuiPanel->GetSizer()->Add(mNotebook,1,wxEXPAND);
@@ -197,19 +197,19 @@ void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {
 }
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {
-  mGLDisplay->SetMode(glDisplay::NMR_EPR);
+  #warning "OnNmrEpr Doesn't work"
   mMenuItemNmrEpr->Check(true);
   mRootToolbar->ToggleTool(ID_NMR_EPR,true);
 }
 
 void RootFrame::OnNmr(wxCommandEvent& e) {
-  mGLDisplay->SetMode(glDisplay::NMR);
+  #warning "OnNmr Doesn't work"
   mMenuItemNmr->Check(true);
   mRootToolbar->ToggleTool(ID_NMR,true);
 }
 
 void RootFrame::OnEpr(wxCommandEvent& e) {
-  mGLDisplay->SetMode(glDisplay::EPR);
+  #warning "OnEpr Doesn't work"
   mMenuItemEpr->Check(true);
   mRootToolbar->ToggleTool(ID_EPR,true);
 }

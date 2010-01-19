@@ -7,9 +7,14 @@
 //============================================================//
 // Scene graphs
 
-SGNode::SGNode() : mDirty(true) {
-  mList         = glGenLists(1);
-  mGeomOnlyList = glGenLists(1);
+GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5}; 
+
+SGNode::SGNode()
+  : mDirty(true),
+    mUseMaterial(false),
+    mMaterial(defaultMaterial),
+    mList(glGenLists(1)),
+    mGeomOnlyList(glGenLists(1)) {
 }
 
 SGNode::~SGNode() {
@@ -26,6 +31,10 @@ void SGNode::Detach(SGNode* node) {
 
 }
 
+void SGNode::SetMaterial(const float material[3],bool use) {
+  mMaterial=material;
+  mUseMaterial=use;
+}
 
 void SGNode::Draw(const SpinachDC& dc) {
   if(mDirty) {

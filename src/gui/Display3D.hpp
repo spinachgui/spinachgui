@@ -63,6 +63,8 @@ public:
   ///one exists.
   void Draw(const SpinachDC& dc);
 
+  ///
+  void SetMaterial(const float material[3],bool use=true);
 private:
   ///Make whatever openGL calls are needed to draw the node.
   virtual void RawDraw(const SpinachDC& dc)=0;
@@ -74,19 +76,13 @@ private:
   ///geomatary. Lighting and materials are not included
   int mGeomOnlyList;
 
+  bool mUseMaterial;
+  const float* mMaterial;
+
   std::list<SGNode*> mChildren;
   typedef std::list<SGNode*>::iterator itor;
 };
 
-///Works like an SGNode, but manages its material
-class SGNodeWithMaterial : public SGNode {
-public:
-  void SetMaterial();
-  ///Sets the material, then calls SGNode::Draw();
-  void Draw(const SpinachDC& dc);
-private:
-  float material[3];
-};
 
 class Display3D :  public wxGLCanvas, public IEventListener {
 public:

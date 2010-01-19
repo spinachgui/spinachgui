@@ -6,7 +6,7 @@
 
 
 ///Scene graph node that draws a sphere at the origin
-class SphereNode : public SGNodeWithMaterial {
+class SphereNode : public SGNode {
   ///Create a node that draws a sphere of unit radius
   SphereNode() : mRadius(1.0f) {}
   ///Create a node that draws a sphere a given radius
@@ -19,7 +19,7 @@ private:
 };
 
 ///Scene graph node that draws a cylinder between two points
-class CyclinderNode : public SGNodeWithMaterial {
+class CyclinderNode : public SGNode {
   ///Create a node that draws a cyclinder of unit radius between
   ///(0,0,0) and (0,0,1)
   CyclinderNode()
@@ -39,7 +39,7 @@ private:
   Vector3 mR2;
 };
 
-class EllipsoidNode : public SGNodeWithMaterial {
+class EllipsoidNode : public SGNode {
   ///Create a node that draws an wireframe unit sphere at the origin
   EllipsoidNode();
   ///Create a node that draws an wireframe ellipsoid based on matrix A

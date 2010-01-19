@@ -2,14 +2,13 @@
 #ifndef SPINGRID_H
 #define SPINGRID_H
 
-#include <gui/Event.hpp>
 #include <gui/SpinInteractionEdit.hpp>
 #include <shared/spinsys.hpp>
 #include <boost/shared_ptr.hpp>
 #include <wx/grid.h>
 
 
-class SpinGrid : public wxGrid, public IEventListener {
+class SpinGrid : public wxGrid{
 public:
   SpinGrid(wxWindow* parent,wxWindowID id= -1);
 
@@ -21,9 +20,6 @@ public:
   void OnCellSelect(wxGridEvent& e);
   void OnRightClick(wxGridEvent& e);
   void OnDeleteSpinHover(wxCommandEvent& e);
-
-  //Other event handlers
-  void OnChange(const Event& e);
 
   enum COL_TYPE {
     COL_SELECTED,   

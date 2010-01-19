@@ -4,6 +4,7 @@
 #include <iostream>
 #include <shared/nuclear_data.hpp>
 
+
 using namespace std;
 using namespace SpinXML;
 
@@ -11,18 +12,11 @@ using namespace SpinXML;
 //==============================================================================//
 // SpinSystem
 
-SpinSystem::SpinSystem() : mLabFrame(NULL) {
-#ifdef SPINXML_EVENTS
-  mNode=new EventNode(PART_SYSTEM,0,wxString(wxT("RootNode")));
-#endif
+SpinSystem::SpinSystem()  {
 }
 
 
-SpinSystem::SpinSystem(const SpinSystem& system) : mLabFrame(NULL) {
-#ifdef SPINXML_EVENTS
-  mNode=system.mNode;
-#endif
-
+SpinSystem::SpinSystem(const SpinSystem& system)  {
   long spinCount=system.mSpins.size();
   long interCount=system.mInteractions.size();
 
@@ -30,7 +24,7 @@ SpinSystem::SpinSystem(const SpinSystem& system) : mLabFrame(NULL) {
   mInteractions.resize(interCount);
 
   for(long i=0;i<spinCount;i++) {
-    mSpins[i]=new Spin(*system.mSpins[i],this);
+    mSpins[i]=new Spin(*system.mSpins[i]);
   }
   for(long i=0;i<interCount;i++) {
     mInteractions[i]=new Interaction(*system.mInteractions[i]);
@@ -53,27 +47,18 @@ SpinSystem::SpinSystem(const SpinSystem& system) : mLabFrame(NULL) {
       }
     }
   }
-  //TODO: Impliment proper copying of reference frames
-  mLabFrame=NULL;//new ReferenceFrame(NULL,Vector3(0,0,0),Orientation());
-  //mLabFrame->GetOrientation().SetQuaternion(1.0,0.0,0.0,0.0);
 }
 
 SpinSystem::~SpinSystem() {
   Clear();
-#ifdef SPINXML_EVENTS
-  delete mNode;
-#endif
+  sigDying();
 }
 
 void SpinSystem::Clear() {
   //Currently we need to delete the interactions Before the spins as
   //the spins have interactions as their children. 
-#ifdef SPINXML_EVENTS
-  //NB: This lock is important for more than just efficency. this
-  //operation must be atomic as mSpins and mInteractions end up
-  //holding invalid values. during execution.
-  PushEventLock();
-#endif
+  sigReloading();
+
   for(long i=0;i<mInteractions.size();i++) {
     delete mInteractions[i];
   }
@@ -82,25 +67,15 @@ void SpinSystem::Clear() {
   }
   mSpins.resize(0);
   mInteractions.resize(0);
-#ifdef SPINXML_EVENTS
-  PopEventLock();
-  mNode->Change(IEventListener::CHANGE);
-#endif
+ 
+  sigReloaded();
 }
 
 void SpinSystem::Dump() const {
-#ifdef SPINXML_EVENTS
-  mNode->Dump();
-#endif
   cout << "Dumping SpinSystem:" << endl;
   cout << " Spin count=" << mSpins.size() << endl;
   cout << " Interaction count=" << mInteractions.size() << endl;
   cout << endl;
-
-  cout << "Dumping Spins:" << endl;
-  for(long i=0;i<mSpins.size();i++) {
-    mSpins[i]->Dump();
-  }
 }
     
 long SpinSystem::GetSpinCount() const {
@@ -135,16 +110,10 @@ vector<Spin*> SpinSystem::GetSpins() const {
 void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
   if(Position==END) {
     mSpins.push_back(_Spin);
-#ifdef SPINXML_EVENTS
-    _Spin->mNode->SetPartAndHint(PART_SPIN,mSpins.size()-1);
-    cout << "Set Hint to " << mSpins.size()-1 <<  endl;
-#endif
+    sigNewSpin(_Spin,mSpins.size()-1);
   } else {
     mSpins.insert(mSpins.begin()+Position,_Spin);
-#ifdef SPINXML_EVENTS
-    _Spin->mNode->SetPartAndHint(PART_SPIN,Position);
-    cout << "'Set Hint to " << Position <<  endl;
-#endif
+    sigNewSpin(_Spin,Position);
   }
 }
 
@@ -161,28 +130,16 @@ void SpinSystem::RemoveSpin(Spin* _Spin) {
   }
 }
 
-ReferenceFrame* SpinSystem::GetRootFrame() const {
-  return mLabFrame;
-}
 
 void SpinSystem::LoadFromFile(const char* filename,ISpinSystemLoader* loader) {
-#ifdef SPINXML_EVENTS
-  PushEventLock();
-#endif
+  sigReloading();
   try {
     loader->LoadFile(this,filename);
   } catch(const runtime_error& e) {
-#ifdef SPINXML_EVENTS
-    PopEventLock();
-    mNode->Change(IEventListener::CHANGE);
-#endif
+    sigReloaded();
     throw e;
   }
-#ifdef SPINXML_EVENTS
-  PopEventLock();
-  mNode->Change(IEventListener::CHANGE);
-#endif
-
+  sigReloaded();
   return;
 }
 
@@ -197,48 +154,28 @@ void SpinSystem::SaveToFile(const char* filename,ISpinSystemLoader* saver) const
 //==============================================================================//
 // Spin
 
-Spin::Spin(SpinSystem* Parent,Vector3 Position,string Label,ReferenceFrame* mFrame,long atomicNumber) 
-  : mParent(Parent),mPosition(Position),mLabel(Label),mElement(atomicNumber) {
-
-#ifdef SPINXML_EVENTS
-  mNode=new EventNode(PART_SPIN,0,wxString(wxT("Spin: ")) << wxString(Label.c_str(),wxConvUTF8));
-  mParent->GetNode()->AddChild(mNode);
-#endif
+Spin::Spin(Vector3 Position,string Label,long atomicNumber) 
+  : mPosition(Position),mLabel(Label),mElement(atomicNumber) {
 }
 
-Spin::Spin(const Spin& s,SpinSystem* ss) :
-  mParent(ss),
+Spin::Spin(const Spin& s) :
   mPosition(s.mPosition),
   mLabel(s.mLabel),
-  mFrame(NULL),
   mElement(s.mElement),
   mIsotopes(s.mIsotopes){
 }
 
 Spin::~Spin() {
-#ifdef SPINXML_EVENTS
-  delete mNode;
-#endif
+  sigDying();
 }
 
-void Spin::Dump() const {
-  cout << "  Dumping class Spin" << endl;
-  cout << "    Label=" << mLabel << endl;
-  cout << "    Position=(" << mPosition.GetX() << "," << mPosition.GetY() << "," << mPosition.GetZ() << ")" << endl;
-  cout << "    Interaction Count=" << GetInteractionCount() << endl;
-}
 
 Vector3& Spin::GetPosition() {
   return mPosition;
 }
 
 void Spin::SetPosition(Vector3 Position) {
-#ifdef SPINXML_EVENTS
-  if(mParent != NULL) {
-    //If the spin has no parent, we probably don't want to emit events anyway.
-    mNode->Change(IEventListener::CHANGE);
-  }
-#endif
+  sigChange();
   mPosition=Position;
 }
 
@@ -248,147 +185,65 @@ void Spin::GetCoordinates(double* _x,double* _y, double* _z) const {
 
 
 void Spin::SetCoordinates(double _x,double _y, double _z) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mPosition.SetCoordinates(_x,_y,_z);
 }
 
 void Spin::SetLabel(string Label) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mLabel=Label;
 }
 
 const char* Spin::GetLabel() const {
   return mLabel.c_str();
 }
-    
-long Spin::GetInteractionCount() const {
-  long count=0;
-  for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
-      count++;
-    }
-  }
-  return count;
-}
-
-Interaction* Spin::GetInteraction(long n) const {
-  long count=0;
-  for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
-      if(count==n) {
-	return mParent->mInteractions[i];
-      }
-      count++;
-    }
-  }
-  return NULL;
-}
-
-vector<Interaction*> Spin::GetInteractions() const {
-  vector<Interaction*> InterPtrs;
-  for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
-      InterPtrs.push_back(mParent->mInteractions[i]);
-    }
-  }
-  return InterPtrs;
-}
 
 void Spin::InsertInteraction(Interaction* _Interaction,long Position) {
-  if(Position==END) {
-    mParent->mInteractions.push_back(_Interaction);
-  } else {
-    long count=0;
-    for(long i=0;i<mParent->mInteractions.size();i++) {
-      if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
-	if(count==Position) {
-	  mParent->mInteractions.insert(mParent->mInteractions.begin()+i,_Interaction);
-	  return;
-	}
-	count++;
-      }
-    }
-  }
+  sigChange();
+  mInteractions.push_back(_Interaction);
 }
 
 void Spin::RemoveInteraction(long Position) {
-  long count=0;
-  for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i]->GetSpin1()==this || mParent->mInteractions[i]->GetSpin2()==this) {
-      if(count==Position) {
-	cout << "Errasing an interaction" << endl;
-	mParent->mInteractions.erase(mParent->mInteractions.begin()+i);
-      }
-      count++;
-    }
-  }
+  mInteractions.erase(mInteractions.begin()+Position);
 }
 
 void Spin::RemoveInteraction(Interaction* _Interaction) {
   if(_Interaction == NULL) {
     return;
   }
-  for(long i=0;i<mParent->mInteractions.size();i++) {
-    if(mParent->mInteractions[i]==_Interaction) {
-      mParent->mInteractions.erase(mParent->mInteractions.begin()+i);
+  for(long i=0;i<mInteractions.size();i++) {
+    if(mInteractions[i]==_Interaction) {
+      mInteractions.erase(mInteractions.begin()+i);
     }
   }
 }
 
 double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
   double total=0.0;
-  long interCount=mParent->mInteractions.size();
+  long interCount=mInteractions.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mParent->mInteractions[i];
+    Interaction* inter=mInteractions[i];
     if(!inter->GetIsLinear()) {
       continue;
     }
-    if(inter->GetSpin1()==this) {
-      //Interaction is relevent
-      if(inter->IsSubType(t)) {
-	total+=inter->GetAsScalar();
-      }
+    if(inter->IsSubType(t)) {
+      total+=inter->GetAsScalar();
     }
   }
   return total;
 }
 
-double Spin::GetBilinearInteractionAsScalar(Spin* OtherSpin,Interaction::SubType t) const {
-  double total=0.0;
-  long interCount=mParent->mInteractions.size();
-  for(long i=0;i < interCount;++i) {
-    Interaction* inter=mParent->mInteractions[i];
-    if(!inter->GetIsBilinear()) {
-      continue;
-    }
-    if((inter->GetSpin1()==this && inter->GetSpin2() == OtherSpin) ||
-       (inter->GetSpin1()==OtherSpin && inter->GetSpin2() == this)) {
-      //Interaction is relevent
-      if(inter->IsSubType(t)) {
-	total+=inter->GetAsScalar();
-      }
-    }
-  }
-  return total;
-}
 
 double Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
   double total=0.0;
-  long interCount=mParent->mInteractions.size();
+  long interCount=mInteractions.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mParent->mInteractions[i];
+    Interaction* inter=mInteractions[i];
     if(!inter->GetIsQuadratic()) {
       continue;
     }
-    if(inter->GetSpin1()==this) {
-      //Interaction is relevent
-      if(inter->IsSubType(t)) {
-	total+=inter->GetAsScalar();
-      }
+    if(inter->IsSubType(t)) {
+      total+=inter->GetAsScalar();
     }
   }
   return total;
@@ -398,57 +253,32 @@ Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
   Matrix3 total=Matrix3(0,0,0,
 			0,0,0,
 			0,0,0);
-  long interCount=mParent->mInteractions.size();
+  long interCount=mInteractions.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mParent->mInteractions[i];
+    Interaction* inter=mInteractions[i];
     if(!inter->GetIsLinear()) {
       continue;
     }
-    if(inter->GetSpin1()==this) {
-      //Interaction is relevent
-      if(inter->IsSubType(t)) {
-	total+=inter->GetAsMatrix();
-      }
+    if(inter->IsSubType(t)) {
+      total+=inter->GetAsMatrix();
     }
   }
   return total;
 }
 
-Matrix3 Spin::GetBilinearInteractionAsMatrix(Spin* OtherSpin,Interaction::SubType t) const {
-  Matrix3 total=Matrix3(0,0,0,
-			0,0,0,
-			0,0,0);
-  long interCount=mParent->mInteractions.size();
-  for(long i=0;i < interCount;++i) {
-    Interaction* inter=mParent->mInteractions[i];
-    if(!inter->GetIsBilinear()) {
-      continue;
-    }
-    if(inter->GetSpin1()==this && inter->GetSpin2()==OtherSpin) {
-      //Interaction is relevent
-      if(inter->IsSubType(t)) {
-	total+=inter->GetAsMatrix();
-      }
-    }
-  }
-  return total;
-}
 
 Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
   Matrix3 total=Matrix3(0,0,0,
 			0,0,0,
 			0,0,0);
-  long interCount=mParent->mInteractions.size();
+  long interCount=mInteractions.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mParent->mInteractions[i];
+    Interaction* inter=mInteractions[i];
     if(!inter->GetIsQuadratic()) {
       continue;
     }
-    if(inter->GetSpin1()==this) {
-      //Interaction is relevent
-      if(inter->IsSubType(t)) {
-	total+=inter->GetAsMatrix();
-      }
+    if(inter->IsSubType(t)) {
+      total+=inter->GetAsMatrix();
     }
   }
   return total;
@@ -460,9 +290,7 @@ Interaction::SubType Interaction::GetSubType() const {
 }
 
 void Interaction::SetSubType(SubType st) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mSubType=st;
 }
 
@@ -502,50 +330,14 @@ bool Interaction::IsSubType(SubType t) const {
   return false;
 }
 
-    
-ReferenceFrame* Spin::GetFrame() const {
-  return mFrame;
-}
 
-void Spin::SetFrame(ReferenceFrame* Frame) {
-  mFrame=Frame;
-}
-
-
-std::vector<Spin*> Spin::GetNearbySpins(double distance) {
-  std::vector<Spin*> result;
-
-  double dist2=distance*distance;
-  double x1,y1,z1;
-  GetCoordinates(&x1,&y1,&z1);
-
-  long spinCount=mParent->mSpins.size();
-  //Skip spins up to this spin in mParent->mSpins
-  long pos;
-  for(pos=0;mParent->mSpins[pos]!=this && pos<spinCount;pos++){}
-
-  
-  for(long i=pos+1;i<spinCount;i++) {
-    double x2,y2,z2;
-    mParent->mSpins[i]->GetCoordinates(&x2,&y2,&z2);
-    double deltaX=(x1-x2);
-    double deltaY=(y1-y2);
-    double deltaZ=(z1-z2);
-    if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ < dist2) {
-      result.push_back(mParent->mSpins[i]);
-    }
-  }
-  return result;
-}
 
 long Spin::GetElement() const {
   return mElement;
 }
 
 void Spin::SetElement(long element) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mElement=element;
 }
 
@@ -565,11 +357,6 @@ vector<long> Spin::GetIsotopes() const {
 // Interaction
 
 Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY),mSpin1(NULL),mSpin2(NULL) {
-#ifdef SPINXML_EVENTS
-  #warning "Interactions do not know their index, so all report as index 0."
-  //Which could cause gui elements to needlessly refresh themselves.
-  mNode=new EventNode(PART_INTERACTION,0,wxString(wxT("Interaction")));
-#endif
 }
 
 Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
@@ -601,9 +388,7 @@ Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
 }
 
 Interaction::~Interaction() {
-#ifdef SPINXML_EVENTS
-  delete mNode;
-#endif
+  sigDying();
 }
 
 void Interaction::Dump() const {
@@ -699,42 +484,20 @@ Interaction::Type Interaction::GetType() const {
 
 
 void Interaction::SetSpin1(Spin* Spin1) {
-#ifdef SPINXML_EVENTS
   if(Spin1==mSpin1) {
     //Nothing happens, return imediately.
     return;
   }
-  if(mSpin1 != NULL && mSpin1 != mSpin2) {
-    //If we have a bilinear inital state, we need to remove mSpin1 as
-    //a parent
-    mNode->RemoveParent(mSpin1->GetNode());
-  }
-  if(Spin1 != NULL && mSpin2 != Spin1 || (mSpin2 == Spin1 && mSpin2 == NULL)) {
-    //If we have a bilinear final state or we're comming from a blank
-    //inital state, we need to add Spin1 as a parent
-    mNode->AddParent(Spin1->GetNode());
-  }
-#endif
+  sigChange();
   mSpin1=Spin1;
 }
 
 void Interaction::SetSpin2(Spin* Spin2) {
-#ifdef SPINXML_EVENTS
   if(Spin2==mSpin2) {
     //Nothing happens, return imediately.
     return;
   }
-  if(mSpin2 != NULL && mSpin2 != mSpin1) {
-    //If we have a bilinear inital state, we need to remove mSpin2 as
-    //a parent
-    mNode->RemoveParent(mSpin2->GetNode());
-  }
-  if(Spin2 != NULL && Spin2 != mSpin1 || (mSpin2 == Spin2 && mSpin2 == NULL)) {
-    //If we have a bilinear final state or we're comming from a blank
-    //inital state, we need to add Spin2 as a parent
-    mNode->AddParent(Spin2->GetNode());
-  }
-#endif
+  sigChange();
   mSpin2=Spin2;
 }
 
@@ -780,25 +543,19 @@ void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientatio
 }
 
 void Interaction::SetScalar(double Scalar) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mType=SCALAR;
   mData.mScalar=Scalar;
 }
 
 void Interaction::SetMatrix(const Matrix3& Matrix) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mType=MATRIX;
   mData.mMatrix=new Matrix3(Matrix);
 }
 
 void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mType=EIGENVALUES;
   mData.mEigenvalues.XX=XX;
   mData.mEigenvalues.YY=YY;
@@ -808,9 +565,7 @@ void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientati
 }
 
 void Interaction::SetAxRhom(double iso,double ax, double rh, const Orientation& Orient) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mType=AXRHOM;
   mData.mAxRhom.iso=iso;
   mData.mAxRhom.ax=ax;
@@ -820,9 +575,7 @@ void Interaction::SetAxRhom(double iso,double ax, double rh, const Orientation& 
 }
 
 void Interaction::SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient) {
-#ifdef SPINXML_EVENTS
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mType=SPANSKEW;
   mData.mSpanSkew.iso=iso;
   mData.mSpanSkew.span= Span;
@@ -911,22 +664,18 @@ Matrix3 Interaction::GetAsMatrix() const {
 }
 
 void Interaction::SetQuadratic() {
-#ifdef SPINXML_EVENTS
-  if(mSpin2 != NULL && mSpin2 != mSpin1) {
-    mNode->RemoveParent(mSpin2->GetNode());
+  if(mSpin1==mSpin2) {
+    return;
   }
-  mNode->Change(IEventListener::CHANGE);
-#endif
+  sigChange();
   mSpin2=mSpin1;
 }
 
 void Interaction::SetLinear() {
-#ifdef SPINXML_EVENTS
-  if(mSpin2 != NULL) {
-    mNode->RemoveParent(mSpin2->GetNode());
-    mNode->Change(IEventListener::CHANGE);
+  if(mSpin2 == NULL) {
+    return;
   }
-#endif
+  sigChange();
   mSpin2=NULL;
 }
 
@@ -943,70 +692,4 @@ bool Interaction::GetIsBilinear() const {
 bool Interaction::GetIsQuadratic() const {
   return mSpin2==mSpin1;
 }
-
-
-//==============================================================================//
-// Reference Frame
-
-ReferenceFrame::ReferenceFrame() : mParent(),mPosition(){
-  
-}
-
-ReferenceFrame::ReferenceFrame(ReferenceFrame* Parent,const Vector3& Position,const Orientation& Orient) :
-  mParent(Parent),mPosition(Position),mOrient(Orient) {
-
-}
-
-ReferenceFrame::~ReferenceFrame() {
-}
-    
-long ReferenceFrame::GetChildCount() const {
-  return mChildren.size();
-}
-
-ReferenceFrame* ReferenceFrame::GetChildFrame(long n) const {
-  return mChildren[n];
-}
-
-vector<ReferenceFrame*> ReferenceFrame::GetChildFrames() const {
-  return mChildren;
-}
-
-void ReferenceFrame::InsertChild(ReferenceFrame* Frame,long Position) {
-  if(Position != END) {
-    mChildren.push_back(Frame);
-  } else {
-    mChildren.insert(mChildren.begin()+Position,Frame);
-  }
-}
-
-void ReferenceFrame::RemoveChild(long Position) {
-  mChildren.erase(mChildren.begin()+Position);
-}
-
-void ReferenceFrame::RemoveChild(ReferenceFrame* Child) {
-  if(Child==NULL) {
-    return;
-  }
-  for(long i=0;i<mChildren.size();i++) {
-    if(mChildren[i]==Child) {
-      mChildren.erase(mChildren.begin()+i);
-      return;
-    }    
-  }
-}
-
-void ReferenceFrame::SetPosition(const Vector3& Position) {
-  mPosition=Position;
-}
-
-Vector3& ReferenceFrame::GetPosition() {
-  return mPosition;
-}
-
-Orientation& ReferenceFrame::GetOrientation() {
-  return mOrient;
-}
-
-    
 

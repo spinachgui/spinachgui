@@ -11,8 +11,6 @@
 #include <GL/glx.h>
 #include <GL/glu.h>
 
-#include <gui/Event.hpp>
-
 #include <list>
 
 using namespace boost;
@@ -75,7 +73,7 @@ private:
 };
 
 
-class Display3D :  public wxGLCanvas, public IEventListener {
+class Display3D :  public wxGLCanvas {
 public:
   Display3D(wxWindow* parent);
   virtual ~Display3D();
@@ -96,7 +94,6 @@ public:
 
   SpinachDC* GetDC();
 
-  void OnChange(const Event& e);
 protected:
   ///Call whenever the size of the viewport changes
   

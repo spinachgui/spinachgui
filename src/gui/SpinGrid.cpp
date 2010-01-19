@@ -74,10 +74,6 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
   :wxGrid(parent,id),mHead(wxGetApp().GetSpinSysManager()->Get()),mUpdating(false) {
-  //Listen for all instances of the spin system changing because this
-  //means we need to redraw the display
-  GetSS()->GetNode()->AddListener(this,0);
-
 
   CreateGrid(0, ColumCount);
 
@@ -109,7 +105,7 @@ void SpinGrid::OnEdit(wxGridEvent& e) {
   if(e.GetRow()==sc) {
     //User is trying to edit the blank line at the bottom of the grid,
     //so create a new spin for them
-    GetSS()->InsertSpin(new Spin(GetSS().get(),Vector3(0,0,0),"New Spin",NULL,1));
+    GetSS()->InsertSpin(new Spin(Vector3(0,0,0),"New Spin",1));
     SetupRow(sc);
     UpdateRow(sc);
     AppendRows(1);
@@ -279,21 +275,6 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
-void SpinGrid::OnChange(const Event& e) {
-  if(e.GetHistory()[0].part==PART_SYSTEM) {
-    //The spin system changed directly. We should reload the grid
-    cout << "I'm about to reload the grid" << endl;
-    RefreshFromSpinSystem();
-  } else {
-    long hint=e.GetHintGivenPart(PART_SPIN);
-    if(hint != -1) {
-      //The system was edited such that at least one row needs
-      //updating
-      cout << "I'm just going to reload row " << hint << endl;
-      UpdateRow(hint);
-    }
-  }
-}
 
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)
 

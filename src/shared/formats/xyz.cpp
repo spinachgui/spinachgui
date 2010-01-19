@@ -23,9 +23,7 @@ void XYZLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 
 
 void XYZLoader::LoadFile(SpinSystem* ss,const char* filename) const {
-#ifdef SPINXML_EVENTS
-  PushEventLock();
-#endif
+
   ss->Clear();
   ifstream fin(filename);
   if(!fin.is_open()) {
@@ -35,10 +33,7 @@ void XYZLoader::LoadFile(SpinSystem* ss,const char* filename) const {
   fin >> size;
   for(long i=0;i<size;i++) {
     if(fin.eof()) {
-#ifdef SPINXML_EVENTS
-      PopEventLock();
-      ss->GetNode()->Change(IEventListener::CHANGE);
-#endif
+      ss->sigReloaded();
       throw runtime_error("Unexpected end of file");
     }
     string el;
@@ -48,12 +43,8 @@ void XYZLoader::LoadFile(SpinSystem* ss,const char* filename) const {
     if(atomicN==-1) {
       throw runtime_error("Unknown Element");
     }
-    ss->InsertSpin(new Spin(ss,Vector3(x,y,z),el,0,atomicN));
+    ss->InsertSpin(new Spin(Vector3(x,y,z),el,atomicN));
   }
-
-#ifdef SPINXML_EVENTS
-  PopEventLock();
-  ss->GetNode()->Change(IEventListener::CHANGE);
-#endif
+  ss->sigReloaded();
 }
 

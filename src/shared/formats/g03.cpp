@@ -60,7 +60,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	  //Create a new spin
 	  string isotopeSymbol(getElementSymbol(atomicNumber));
 	  isotopeSymbol=isotopeSymbol; //We have no clue what the mass number is yet
-	  Spin* s=new Spin(ss,Vector3(x,y,z),string("A Spin")+isotopeSymbol,ss->GetRootFrame(),atomicNumber);
+	  Spin* s=new Spin(Vector3(x,y,z),string("A Spin")+isotopeSymbol,atomicNumber);
 	  ss->InsertSpin(s);
 	}
 	nAtoms++;

@@ -8,11 +8,9 @@
 #include <wx/log.h>
 #include <boost/shared_ptr.hpp>
 
-#include <gui/StdEvents.hpp>
-
 #include <shared/formats/xyz.hpp>
 #include <shared/formats/g03.hpp>
-#include <shared/formats/xml.hpp>
+//#include <shared/formats/xml.hpp>
 
 #include <wx/filename.h>
 
@@ -42,7 +40,7 @@ bool SpinachApp::OnInit() {
   fn.AppendDir(wxT("data"));
   fn.SetFullName(wxT("spinxml_schema.xsd"));
   wxString url(wxString(wxT("file://")) << fn.GetFullPath());
-  mIOFilters.push_back(new XMLLoader(url.char_str()));
+  //mIOFilters.push_back(new XMLLoader(url.char_str()));
   
   //Load the isotopes
 

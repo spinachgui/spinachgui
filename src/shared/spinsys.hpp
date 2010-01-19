@@ -2,11 +2,14 @@
 #ifndef SPINSYS_H;
 #define SPINSYS_H;
 
+//#undef SPINXML_EVENTS
+
 #include <vector>
 #include <string>
 #include <string.h>
 #include <stdexcept>
 #include <shared/mathtypes.hpp>
+#include <boost/signal.hpp>
 
 #ifdef SPINXML_EVENTS
 #include <wx/string.h>
@@ -35,7 +38,6 @@ class SpinSystem;
 class Spin;
 class Orientation;
 class Interaction;
-class ReferenceFrame;
 
 
 
@@ -54,33 +56,6 @@ public:
 };
 
 
-  ///Class representing a reference frame. This class has not been
-  ///properly implimented and should not be used yet.
-class ReferenceFrame {
-  public:
-    ReferenceFrame();
-    ReferenceFrame(ReferenceFrame* Parent,const Vector3& Position,const Orientation& Orient);
-    ~ReferenceFrame();
-    
-    long GetChildCount() const;
-    ReferenceFrame* GetChildFrame(long n) const;
-    std::vector<ReferenceFrame*> GetChildFrames() const;
-    void InsertChild(ReferenceFrame* Frame,long Position=END);
-    void RemoveChild(long Position);
-    void RemoveChild(ReferenceFrame* Child);
-    
-    Vector3& GetPosition();
-    void SetPosition(const Vector3& Position);
-
-    Orientation& GetOrientation();
-    
-  private:
-    ReferenceFrame* mParent;
-    std::vector<ReferenceFrame*> mChildren;
-    
-    Vector3 mPosition;
-    Orientation mOrient;
-};
 
   ///Class representing one of the shielding paramiters such as the
   ///chemical shift or J coupling
@@ -220,6 +195,8 @@ class Interaction {
     double GetAsScalar() const;
   ///Get the interaction as a full matrix
     Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
+  boost::signal<void()> sigChange;
+  boost::signal<void()> sigDying;
 
   private:
     union  {
@@ -249,23 +226,17 @@ class Interaction {
    Spin* mSpin1;
    Spin* mSpin2;
 
-#ifdef SPINXML_EVENTS
-  EventNode* mNode;
-public:
-  EventNode* GetNode() const {return mNode;}
-#endif
 };
 
   ///A class representing a spin in a spin system
 class Spin {
-  friend class SpinSystem;
+private:
+  std::vector<Interaction*> mInteractions;
   public:  
-    Spin(SpinSystem* Parent,Vector3 mPosition,std::string mLabel,ReferenceFrame* mFrame,long atomicNumber=1);
-    Spin(const Spin& s,SpinSystem* newParent=NULL);
+    Spin(Vector3 mPosition,std::string mLabel,long atomicNumber=1);
+    Spin(const Spin& s);
     ~Spin();
   
-    void Dump() const;
-
     Vector3& GetPosition();
     void SetPosition(Vector3 Position);
     void GetCoordinates(double* _x,double* _y, double* _z) const;
@@ -274,19 +245,15 @@ class Spin {
     void SetLabel(std::string Label);
     const char* GetLabel() const;
 
-    long GetInteractionCount() const;
-    Interaction* GetInteraction(long n) const;
-    std::vector<Interaction*> GetInteractions() const;
+    std::vector<Interaction*> GetInteractions() const {return mInteractions;}
     void InsertInteraction(Interaction* _Interaction,long Position=END);
     void RemoveInteraction(long Position);
     void RemoveInteraction(Interaction* _Interaction);
 
     double GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
-    double GetBilinearInteractionAsScalar(Spin* OtherSpin,Interaction::SubType t=Interaction::ST_ANY) const;
     double GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
 
     Matrix3 GetLinearInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
-    Matrix3 GetBilinearInteractionAsMatrix(Spin* OtherSpin,Interaction::SubType t=Interaction::ST_ANY) const;
     Matrix3 GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
 
     long GetElement() const;
@@ -294,25 +261,14 @@ class Spin {
     std::vector<long> GetIsotopes() const;
     void SetIsotopes(std::vector<long> isotopes) const;
 
-
-    ReferenceFrame* GetFrame() const;
-    void SetFrame(ReferenceFrame* Frame);
-
-    std::vector<Spin*> GetNearbySpins(double distance);
+  boost::signal<void()> sigChange;
+  boost::signal<void()> sigDying;
 
   private:
-    SpinSystem* mParent;
     Vector3 mPosition;
     std::string mLabel;
-    ReferenceFrame* mFrame;
     long mElement;
     std::vector<long> mIsotopes;
-
-#ifdef SPINXML_EVENTS
-  EventNode* mNode;
-public:
-  EventNode* GetNode() const {return mNode;}
-#endif
 };
 
 
@@ -340,26 +296,22 @@ class SpinSystem {
     void RemoveSpin(long Position);
     void RemoveSpin(Spin* _Spin);
 
-    ReferenceFrame* GetRootFrame() const;
-
     void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
     void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;
 
     std::vector<Interaction*>& GetInteractions() {return mInteractions;}
+
+  boost::signal<void(Spin*,long)> sigNewSpin;
+  boost::signal<void(Spin*,Spin*)> sigNewBilinear;
+  boost::signal<void()> sigReloading;
+  boost::signal<void()> sigReloaded;
+  boost::signal<void()> sigDying;
   
   private:
     friend class Spin;
 
     std::vector<Spin*> mSpins;
     std::vector<Interaction*> mInteractions;
-    ReferenceFrame* mLabFrame; 
-
-#ifdef SPINXML_EVENTS
-  EventNode* mNode;
-public:
-  EventNode* GetNode() const {return mNode;}
-#endif
-
 };
 
 }; //End Namespace

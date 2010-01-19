@@ -45,14 +45,13 @@ if(WIN32)
 else()
   find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
   find_package(PythonLibs)
-  find_package(Boost REQUIRED program_options)
+  find_package(Boost REQUIRED program_options signals)
   #set(CMAKE_CXX_COMPILER "g++-4.2")
 endif()
 
 ############################################################
 #List of source files for all the targets
 set(guiSources "gui/SpinachApp.cpp")
-set(guiSources ${guiSources} "gui/glDisplay.cpp")
 set(guiSources ${guiSources} "gui/Display3D.cpp")
 set(guiSources ${guiSources} "gui/MolSceneGraph.cpp")
 set(guiSources ${guiSources} "gui/InteractionEdit.cpp")
@@ -63,7 +62,6 @@ set(guiSources ${guiSources} "gui/SpinGrid.cpp")
 set(guiSources ${guiSources} "gui/SpinSysManager.cpp")
 set(guiSources ${guiSources} "gui/RootFrame.cpp")
 set(guiSources ${guiSources} "gui/StdEvents.cpp")
-set(guiSources ${guiSources} "gui/Event.cpp")
 set(guiSources ${guiSources} "gui/RightClickMenu.cpp")
 set(guiSources ${guiSources} "auto/SpinachGUI.cpp")
 
@@ -74,7 +72,7 @@ set(sharedSources ${sharedSources} "auto/spinxml_schema.cpp")
 
 set(formatSources "shared/formats/xyz.cpp")
 set(formatSources ${formatSources} "shared/formats/g03.cpp")
-set(formatSources ${formatSources} "shared/formats/xml.cpp")
+#set(formatSources ${formatSources} "shared/formats/xml.cpp")
 
 set(pySources              "shared/spinsys.cpp")
 set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
@@ -111,7 +109,7 @@ add_definitions(${wxWidgets_DEFINITIONS})
 target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
 target_link_libraries (wxSpinach GL GLEW) 
 target_link_libraries (wxSpinach xerces-c)
-set_property(TARGET wxSpinach PROPERTY COMPILE_DEFINITIONS SPINXML_EVENTS)
+target_link_libraries (wxSpinach ${Boost_LIBRARIES})
 
 #Automatic Tests
 add_executable (event_test gui/Event.cpp commandln/Event_Test.cpp)

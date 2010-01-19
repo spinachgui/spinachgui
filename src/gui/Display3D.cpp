@@ -42,8 +42,6 @@ void SGNode::Draw(const SpinachDC& dc) {
 
 Display3D::Display3D(wxWindow* parent) 
   : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY),mRootNode(NULL){
-  GetSS()->GetNode()->AddListener(this);
-
   mGLContext=NULL;
   mGLEnabled=false;
 
@@ -88,10 +86,6 @@ Display3D::~Display3D() {
   gluDeleteQuadric(mQWireframe);
 }
 
-
-void Display3D::OnChange(const Event& e) {
-  Refresh();
-}
 
 void Display3D::EnableGL() {
   

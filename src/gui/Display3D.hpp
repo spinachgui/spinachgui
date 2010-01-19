@@ -49,12 +49,6 @@ public:
   ///Destruct the SGNode
   ~SGNode();
 
-  ///Attach a child node to the SGNode
-  void Attach(SGNode* node);
-
-  ///Detatch a given node, throw if node not found.
-  void Detach(SGNode* node);
-
   ///Mark this node as dirty, that is, needing to drewdraw its display
   ///list.
   void Dirty() {mDirty=true;}
@@ -78,9 +72,6 @@ private:
 
   bool mUseMaterial;
   const float* mMaterial;
-
-  std::list<SGNode*> mChildren;
-  typedef std::list<SGNode*>::iterator itor;
 };
 
 

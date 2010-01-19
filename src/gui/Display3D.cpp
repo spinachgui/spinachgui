@@ -22,15 +22,6 @@ SGNode::~SGNode() {
   glDeleteLists(mGeomOnlyList,1);
 }
 
-void SGNode::Attach(SGNode* node) {
-  mChildren.push_back(node);
-}
-
-
-void SGNode::Detach(SGNode* node) {
-
-}
-
 void SGNode::SetMaterial(const float material[3],bool use) {
   mMaterial=material;
   mUseMaterial=use;
@@ -41,9 +32,6 @@ void SGNode::Draw(const SpinachDC& dc) {
     glNewList(mList,GL_COMPILE);
     RawDraw(dc);
     glEndList();
-    for(itor i=mChildren.begin();i != mChildren.end();++i) {
-      (*i)->Draw(dc);
-    }
   } 
   glCallList(mList);
 }

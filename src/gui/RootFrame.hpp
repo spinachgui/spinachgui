@@ -3,7 +3,7 @@
 #define ROOT_FRAME_H
 
 #include <auto/SpinachGUI.h>
-#include <gui/3DDisplay.hpp>
+#include <gui/Display3D.hpp>
 #include <gui/SpinGrid.hpp>
 #include <wx/aui/auibook.h>
 

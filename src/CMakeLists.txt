@@ -61,7 +61,6 @@ set(guiSources ${guiSources} "gui/SpinDialog.cpp")
 set(guiSources ${guiSources} "gui/SpinGrid.cpp")
 set(guiSources ${guiSources} "gui/SpinSysManager.cpp")
 set(guiSources ${guiSources} "gui/RootFrame.cpp")
-set(guiSources ${guiSources} "gui/StdEvents.cpp")
 set(guiSources ${guiSources} "gui/RightClickMenu.cpp")
 set(guiSources ${guiSources} "auto/SpinachGUI.cpp")
 
@@ -111,8 +110,5 @@ target_link_libraries (wxSpinach GL GLEW)
 target_link_libraries (wxSpinach xerces-c)
 target_link_libraries (wxSpinach ${Boost_LIBRARIES})
 
-#Automatic Tests
-add_executable (event_test gui/Event.cpp commandln/Event_Test.cpp)
-target_link_libraries (event_test ${wxWidgets_LIBRARIES})
 
 

@@ -2,7 +2,6 @@
 #include <gui/SpinachApp.hpp>
 #include <gui/SpinGrid.hpp>
 #include <shared/nuclear_data.hpp>
-#include <gui/StdEvents.hpp>
 #include <iostream>
 #include <gui/RightClickMenu.hpp>
 
@@ -12,12 +11,6 @@ using namespace SpinXML;
 
 const long ColumCount=10;  
 
-//Event generated whenever the spin system changes
-DECLARE_EVENT_TYPE(EVT_INTER_SELECT, -1)
-DEFINE_EVENT_TYPE(EVT_INTER_SELECT)
-
-DECLARE_EVENT_TYPE(EVT_INTER_UNSELECT, -1)
-DEFINE_EVENT_TYPE(EVT_INTER_UNSELECT)
 
 
 //============================================================//
@@ -245,25 +238,14 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
     e.Skip();
     return;
   }
-
-  if(e.GetCol()==COL_LINEAR || e.GetCol()==COL_BILINEAR || e.GetCol()==COL_QUAD) {
-    wxCommandEvent event(EVT_INTER_SELECT);
-    event.SetEventObject( this );
-    event.SetInt(e.GetRow());
-    ProcessEvent(event);
-
-  } else {
-    wxCommandEvent event(EVT_INTER_UNSELECT);
-    event.SetEventObject( this );
-    ProcessEvent(event);
-  }
+  sigSelect(columns[e.GetCol()].type,GetSS()->GetSpin(e.GetRow()));
   e.Skip();
 }
 
 void SpinGrid::OnRightClick(wxGridEvent& e) {
   RightClickMenu* menu=new RightClickMenu(this);
   if(e.GetRow()<(*mHead)->GetSpinCount()) {
-    menu->OptionDeleteSpin(e.GetRow());
+    menu->OptionDeleteSpin        (GetSS()->GetSpin(e.GetRow()));
     menu->OptionShowSpinProperties(GetSS()->GetSpin(e.GetRow()));
   }
   menu->Build();
@@ -312,24 +294,14 @@ SpinGridPanel::SpinGridPanel(wxWindow* parent,wxWindowID id)
 
   SetSizer(sizer);
 
-  //  mInterEdit->SetSpin(GetSS()->GetSpin(0));
+  mGrid->sigSelect.connect(mem_fun(*this,&SpinGridPanel::OnGridCellSelect));
 }
 
-void SpinGridPanel::OnInterSelect(wxCommandEvent& e) {
-  mInterEdit->Show(true);
-  mInterEdit->SetSpin(GetSS()->GetSpin(e.GetInt()));
+void SpinGridPanel::OnGridCellSelect(SpinGrid::COL_TYPE col,Spin* spin) {
+  mInterEdit->Show(col==SpinGrid::COL_LINEAR   ||
+		   col==SpinGrid::COL_BILINEAR ||
+		   col==SpinGrid::COL_QUAD);
+  mInterEdit->SetSpin(spin);
   Layout();
 }
 
-void SpinGridPanel::OnInterUnSelect(wxCommandEvent& e) {
-  mInterEdit->Show(false);
-  mInterEdit->SetSpin(NULL);
-  Layout();
-}
-
-BEGIN_EVENT_TABLE(SpinGridPanel,wxPanel)
-
-EVT_COMMAND  (wxID_ANY, EVT_INTER_SELECT,   SpinGridPanel::OnInterSelect)
-EVT_COMMAND  (wxID_ANY, EVT_INTER_UNSELECT, SpinGridPanel::OnInterUnSelect)
-
-END_EVENT_TABLE()

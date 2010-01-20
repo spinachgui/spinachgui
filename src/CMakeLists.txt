@@ -92,13 +92,17 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_PATH})
 
 include_directories(SYSTEM ${CodeSynthesisXSD_INCLUDE_DIRS})
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM /usr/include/sigc++-2.0)
+include_directories(SYSTEM /usr/lib/sigc++-2.0/include/)
+
+
 
 link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
 
 #command line exe
 set(spinachSources ${cmdSources} ${sharedSources} ${formatSources})
 add_executable (spinach ${spinachSources})
-target_link_libraries (spinach xerces-c) 
+target_link_libraries (spinach xerces-c -lsigc-2.0) 
 target_link_libraries(spinach ${Boost_LIBRARIES})
 
 #C++ GUI
@@ -107,7 +111,7 @@ add_executable (wxSpinach ${wxSpinachSources})
 add_definitions(${wxWidgets_DEFINITIONS})
 target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
 target_link_libraries (wxSpinach GL GLEW) 
-target_link_libraries (wxSpinach xerces-c)
+target_link_libraries (wxSpinach xerces-c -lsigc-2.0)
 target_link_libraries (wxSpinach ${Boost_LIBRARIES})
 
 

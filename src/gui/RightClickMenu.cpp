@@ -14,13 +14,13 @@ enum {
 
 RightClickMenu::RightClickMenu(wxWindow* parent) : wxMenu(),
 						   mParent(parent),
-						   mOptionDelete(-1),
+						   mOptionDelete(NULL),
 						   mOptionSpinProperties(NULL) {
 
 }
 
 void RightClickMenu::Build() {
-  if(mOptionDelete!=-1) {
+  if(mOptionDelete!=NULL) {
     Append(MENU_SPIN_DELETE, wxT("Delete Spins..."));    
   }
   if (mOptionSpinProperties!=NULL) {

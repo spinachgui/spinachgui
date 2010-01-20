@@ -6,7 +6,8 @@
 #include <shared/spinsys.hpp>
 #include <auto/SpinachGUI.h>
 
-class SpinInterEditPanel : public SpinInterEditPanelBase {
+
+class SpinInterEditPanel : public SpinInterEditPanelBase, public sigc::trackable {
 public:
   SpinInterEditPanel(wxWindow* parent,wxWindowID id= -1);
   ~SpinInterEditPanel();
@@ -15,10 +16,14 @@ public:
 
   void SetSpin(SpinXML::Spin* spin);
 
+  //wx events originating from within
   void OnNewButton(wxCommandEvent& e);
   void OnDeleteButton(wxCommandEvent& e);
-  void OnInteractionChange(wxCommandEvent& e);
   void OnSSChange(wxCommandEvent& e);
+  void OnInteractionChange(wxCommandEvent& e);
+
+  //Slots for use with boost::signals
+  void DirtySelected();
 
   void LoadFromSpin();
 

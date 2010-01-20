@@ -8,7 +8,7 @@
 #include <shared/spinsys.hpp>
 
 #include <gui/DialogCombo.hpp>
-
+#include <sigc++/sigc++.h>
 
 class InterEditPanel : public InterEditPanelBase {
 public:
@@ -25,7 +25,7 @@ public:
   void OnSpin2Change(wxCommandEvent& e);
   void OnOrientChange(wxCommandEvent& e);
 
-
+  sigc::signal<void> sigChange;
 protected:
   DECLARE_EVENT_TABLE();
 

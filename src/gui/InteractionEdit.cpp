@@ -13,7 +13,7 @@
 
 using namespace std;
 using namespace SpinXML;
-using namespace boost;
+using namespace sigc;
 
 //============================================================//
 // InterEditPanel
@@ -34,9 +34,9 @@ const static Interaction::SubType NuclearSTLookup[] =  {Interaction::ST_EXCHANGE
 							Interaction::ST_DIPOLAR,    
 							Interaction::ST_QUADRUPOLAR,
 							Interaction::ST_ZFS,        
-							Interaction::ST_CUSTOM,     
-							Interaction::ST_CUSTOM,     
-							Interaction::ST_CUSTOM};
+							Interaction::ST_CUSTOM_LINEAR,     
+							Interaction::ST_CUSTOM_BILINEAR,     
+							Interaction::ST_CUSTOM_QUADRATIC};
 const static long NuclearSTLookupLen = 10;
 
 const static Interaction::SubType ElectronSTLookup[] = {Interaction::ST_EXCHANGE,   
@@ -46,9 +46,9 @@ const static Interaction::SubType ElectronSTLookup[] = {Interaction::ST_EXCHANGE
 							Interaction::ST_DIPOLAR,    
 							Interaction::ST_QUADRUPOLAR,
 							Interaction::ST_ZFS,        
-							Interaction::ST_CUSTOM,     
-							Interaction::ST_CUSTOM,     
-							Interaction::ST_CUSTOM};
+							Interaction::ST_CUSTOM_LINEAR,     
+							Interaction::ST_CUSTOM_BILINEAR,     
+							Interaction::ST_CUSTOM_QUADRATIC};
 const static long ElectronSTLookupLen = 10;
 
 
@@ -340,19 +340,30 @@ void InterEditPanel::SaveToInter() {
 
 void InterEditPanel::onTextChange(wxCommandEvent& e) {
   if(mLoading) {  //If we are loading from a spin we should ignore
-				  //this event
+		  //this event
     return;
   }
+  sigChange();
   SaveToInter();
   return;
 }
 
 void InterEditPanel::OnSpin2Change(wxCommandEvent& e) {
   mInter->SetSpin2((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpin(mSpin2Combo->GetSelection()));
+  sigChange();
 }
 
 void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
   mInter->SetSubType(NuclearSTLookup[mSubTypeCombo->GetSelection()]);
+  if(mInter->GetIsLinear()) {
+	mSpin2Combo->Enable(false);
+  } else if(mInter->GetIsBilinear()) {
+	mSpin2Combo->Enable(true);
+  } else {
+	//Interaction is quadratic
+	mSpin2Combo->Enable(false);
+  }
+  sigChange();
 }
 
 

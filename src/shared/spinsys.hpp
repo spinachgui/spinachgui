@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdexcept>
 #include <shared/mathtypes.hpp>
-#include <boost/signal.hpp>
+#include <sigc++/sigc++.h>
 
 #ifdef SPINXML_EVENTS
 #include <wx/string.h>
@@ -100,7 +100,9 @@ class Interaction {
       //Interactions relevent to both nmr and epr
       ST_QUADRUPOLAR,
       ST_DIPOLAR,
-      ST_CUSTOM
+      ST_CUSTOM_LINEAR,
+      ST_CUSTOM_BILINEAR,
+      ST_CUSTOM_QUADRATIC
     };
 
   ///Get a human readable name for a member of the enum Type
@@ -153,20 +155,20 @@ class Interaction {
     void SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient);
 
   ///Cache the form of the interaction
-  bool SetLinear()     {return mForm==LINEAR;}
-  bool SetBilinear()  {return mForm==BILINEAR;}
-  bool SetQuadratic() {return mForm==QUADRATIC;}
+  bool SetLinear();   
+  bool SetBilinear(); 
+  bool SetQuadratic();
 
-  bool GetIsLinear()     {return mForm==LINEAR;}
-  bool GetIsBilinear()  {return mForm==BILINEAR;}
-  bool GetIsQuadratic() {return mForm==QUADRATIC;}
+  bool GetIsLinear();   
+  bool GetIsBilinear(); 
+  bool GetIsQuadratic();
 
   ///Get the isotropic value of the interaction
     double GetAsScalar() const;
   ///Get the interaction as a full matrix
     Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
-  boost::signal<void()> sigChange;
-  boost::signal<void()> sigDying;
+  sigc::signal<void> sigChange;
+  sigc::signal<void,Interaction*> sigDying;
 
   private:
     union  {
@@ -191,7 +193,6 @@ class Interaction {
 
   Orientation mOrient;
 
-   Form mForm;
    Type mType;
    SubType mSubType;
 private:
@@ -210,7 +211,6 @@ public:
   ///A class representing a spin in a spin system
 class Spin {
 private:
-  std::vector<Interaction*> mInteractions;
   public:  
     Spin(Vector3 mPosition,std::string mLabel,long atomicNumber=1);
     Spin(const Spin& s);
@@ -224,7 +224,7 @@ private:
     void SetLabel(std::string Label);
     const char* GetLabel() const;
 
-    std::vector<Interaction*> GetInteractions() const {return mInteractions;}
+    std::vector<Interaction*> GetInteractions() const {return mInter;}
     void InsertInteraction(Interaction* _Interaction,long Position=END);
     void RemoveInteraction(long Position);
     void RemoveInteraction(Interaction* _Interaction);
@@ -240,10 +240,11 @@ private:
     std::vector<long> GetIsotopes() const;
     void SetIsotopes(std::vector<long> isotopes) const;
 
-  boost::signal<void()> sigChange;
-  boost::signal<void()> sigDying;
+  sigc::signal<void> sigChange;
+  sigc::signal<void,Spin*> sigDying;
 
   private:
+    std::vector<Interaction*> mInter;
     Vector3 mPosition;
     std::string mLabel;
     long mElement;
@@ -253,7 +254,7 @@ private:
 
 
 
-class SpinSystem {
+class SpinSystem : public sigc::trackable {
   public:
     SpinSystem();
     SpinSystem(const SpinSystem& system);
@@ -278,13 +279,17 @@ class SpinSystem {
     void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
     void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;
 
+  //Event Handlers
+  void OnSpinDeleted(Spin* spin){RemoveSpin(spin);}
+
+
     std::vector<Interaction*>& GetInteractions()  {return mBilinInter;}
 
-  boost::signal<void(Spin*,long)> sigNewSpin;
-  boost::signal<void(Spin*,Spin*)> sigNewBilinear;
-  boost::signal<void()> sigReloading;
-  boost::signal<void()> sigReloaded;
-  boost::signal<void()> sigDying;
+  sigc::signal<void,Spin*,long> sigNewSpin;
+  sigc::signal<void,Spin*,Spin*> sigNewBilinear;
+  sigc::signal<void> sigReloading;
+  sigc::signal<void> sigReloaded;
+  sigc::signal<void> sigDying;
   
   private:
     friend class Spin;

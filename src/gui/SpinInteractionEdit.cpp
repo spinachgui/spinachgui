@@ -33,6 +33,7 @@ SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id)
     mEditMode(EDIT_ALL),
     mDialogMode(true) {
   mInterEdit=new InterEditPanel(this);
+  mInterEdit->sigChange.connect(mem_fun(*this,&SpinInterEditPanel::DirtySelected));
   GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
   Enable(false);
 };
@@ -88,7 +89,8 @@ void SpinInterEditPanel::LoadFromSpin() {
   }
 
   std::vector<Interaction*> oldInteractions=mSpin->GetInteractions(); 
-  for(long i=0;i<oldInteractions.size();i++) {              //Make sure all the interactions here are copies
+  //Make sure all the interactions here are copies
+  for(long i=0;i<oldInteractions.size();i++) {
     ListBoxInteraction lbi;
     lbi.inter=oldInteractions[i];
     lbi.modified=false;
@@ -97,6 +99,11 @@ void SpinInterEditPanel::LoadFromSpin() {
 
   UpdateListBox();
   InteractionChange();
+}
+
+void SpinInterEditPanel::DirtySelected() {
+  mTempInteractions[GetSelectedInterIndex()].modified=true;
+  UpdateListBox();
 }
 
 void SpinInterEditPanel::UpdateListBox() {
@@ -132,17 +139,9 @@ void SpinInterEditPanel::UpdateListBox() {
 }
 
 wxString SpinInterEditPanel::NameInteraction(Interaction* inter) {
-  wxString quadStr;
-  if(inter->GetIsQuadratic()) {
-    quadStr=wxT("Quadratic");
-  } else if (inter->GetIsBilinear()) {
-    quadStr=wxT("Bilinear");
-  } else {
-    quadStr=wxT("Linear");
-  }
   wxString interTitle;
   interTitle << wxString(Interaction::GetSubTypeName(inter->GetSubType()),wxConvUTF8);
-  interTitle << wxT("(") << quadStr << wxT(", ");
+  interTitle << wxT("(");
   interTitle << wxString(Interaction::GetTypeName(inter->GetType()),wxConvUTF8);
   interTitle << wxT(")");
 

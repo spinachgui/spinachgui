@@ -4,10 +4,9 @@
 #include <iostream>
 #include <shared/nuclear_data.hpp>
 
-
 using namespace std;
 using namespace SpinXML;
-
+using namespace sigc;
 
 //==============================================================================//
 // SpinSystem
@@ -115,7 +114,10 @@ void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
     mSpins.insert(mSpins.begin()+Position,_Spin);
     sigNewSpin(_Spin,Position);
   }
+  //Deal with the overloading
+  _Spin->sigDying.connect(mem_fun(*this,&SpinSystem::OnSpinDeleted));
 }
+
 
 void SpinSystem::RemoveSpin(long Position) {
   mSpins.erase(mSpins.begin()+Position);
@@ -166,7 +168,7 @@ Spin::Spin(const Spin& s) :
 }
 
 Spin::~Spin() {
-  sigDying();
+    sigDying(this);
 }
 
 
@@ -199,30 +201,31 @@ const char* Spin::GetLabel() const {
 }
 
 void Spin::InsertInteraction(Interaction* _Interaction,long Position) {
+  
   sigChange();
-  mInteractions.push_back(_Interaction);
+  mInter.push_back(_Interaction);
 }
 
 void Spin::RemoveInteraction(long Position) {
-  mInteractions.erase(mInteractions.begin()+Position);
+  mInter.erase(mInter.begin()+Position);
 }
 
 void Spin::RemoveInteraction(Interaction* _Interaction) {
   if(_Interaction == NULL) {
     return;
   }
-  for(long i=0;i<mInteractions.size();i++) {
-    if(mInteractions[i]==_Interaction) {
-      mInteractions.erase(mInteractions.begin()+i);
+  for(long i=0;i<mInter.size();i++) {
+    if(mInter[i]==_Interaction) {
+      mInter.erase(mInter.begin()+i);
     }
   }
 }
 
 double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
   double total=0.0;
-  long interCount=mInteractions.size();
+  long interCount=mInter.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mInteractions[i];
+    Interaction* inter=mInter[i];
     if(!inter->GetIsLinear()) {
       continue;
     }
@@ -236,9 +239,9 @@ double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
 
 double Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
   double total=0.0;
-  long interCount=mInteractions.size();
+  long interCount=mInter.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mInteractions[i];
+    Interaction* inter=mInter[i];
     if(!inter->GetIsQuadratic()) {
       continue;
     }
@@ -253,9 +256,9 @@ Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
   Matrix3 total=Matrix3(0,0,0,
 			0,0,0,
 			0,0,0);
-  long interCount=mInteractions.size();
+  long interCount=mInter.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mInteractions[i];
+    Interaction* inter=mInter[i];
     if(!inter->GetIsLinear()) {
       continue;
     }
@@ -271,9 +274,9 @@ Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
   Matrix3 total=Matrix3(0,0,0,
 			0,0,0,
 			0,0,0);
-  long interCount=mInteractions.size();
+  long interCount=mInter.size();
   for(long i=0;i < interCount;++i) {
-    Interaction* inter=mInteractions[i];
+    Interaction* inter=mInter[i];
     if(!inter->GetIsQuadratic()) {
       continue;
     }
@@ -306,7 +309,7 @@ vector<long> Spin::GetIsotopes() const {
 //==============================================================================//
 // Interaction
 
- Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY),mForm(ANY_FORM) {
+ Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY) {
 }
 
 Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
@@ -338,7 +341,7 @@ Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
 }
 
 Interaction::~Interaction() {
-  sigDying();
+  sigDying(this);
 }
 
 void Interaction::Dump() const {
@@ -418,7 +421,9 @@ const char* Interaction::GetSubTypeName(SubType st) {
   case ST_DIPOLAR:     return "Dipolar";
   case ST_SHIELDING:   return "Shielding";
   case ST_SCALAR:      return "Scalar";
-  case ST_CUSTOM:      return "Custom";
+  case ST_CUSTOM_LINEAR:     return "Custom (Linear)";
+  case ST_CUSTOM_BILINEAR:   return "Custom (Bilinear)";
+  case ST_CUSTOM_QUADRATIC:  return "Custom (Quadratic)";
   default:
     ostringstream stream;
     stream << "Unknow subtype submited to Interaction::GetSubTypeName() (st=";
@@ -610,7 +615,9 @@ bool Interaction::IsSubType(SubType t) const {
     case ST_EXCHANGE:
     case ST_QUADRUPOLAR:
     case ST_DIPOLAR:
-    case ST_CUSTOM:
+    case ST_CUSTOM_LINEAR:
+    case ST_CUSTOM_BILINEAR:
+    case ST_CUSTOM_QUADRATIC:
       return true;
     default:
       return false;
@@ -622,7 +629,9 @@ bool Interaction::IsSubType(SubType t) const {
     case ST_SCALAR:
     case ST_QUADRUPOLAR:
     case ST_DIPOLAR:
-    case ST_CUSTOM:
+    case ST_CUSTOM_LINEAR:
+    case ST_CUSTOM_BILINEAR:
+    case ST_CUSTOM_QUADRATIC:
       return true;
     default:
       return false;
@@ -632,5 +641,31 @@ bool Interaction::IsSubType(SubType t) const {
     return true;
   }
   return false;
+}
+
+
+ bool Interaction::GetIsLinear()     {
+   return 
+     mSubType==ST_EXCHANGE    ||
+     mSubType==ST_SHIELDING   ||
+     mSubType==ST_G_TENSER    ||
+     mSubType==ST_CUSTOM_LINEAR;
+ }
+
+bool Interaction::GetIsBilinear()  {
+  return
+     mSubType==ST_HFC            ||
+     mSubType==ST_DIPOLAR        ||
+     mSubType==ST_EXCHANGE       ||
+     mSubType==ST_SCALAR         ||
+     mSubType==ST_CUSTOM_BILINEAR;
+
+}
+bool Interaction::GetIsQuadratic() {
+  return 
+     mSubType==ST_ZFS             ||
+     mSubType==ST_QUADRUPOLAR     ||
+     mSubType==ST_CUSTOM_QUADRATIC;
+
 }
 

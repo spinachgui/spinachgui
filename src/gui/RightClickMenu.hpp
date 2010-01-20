@@ -8,14 +8,10 @@
 ///and the required options, call build and show it. The menu should
 ///take care of ensuing the required actions are carried out.
 class RightClickMenu : public wxMenu {
-private:
-  long  mOptionDelete;
-  SpinXML::Spin* mOptionSpinProperties;
-
 public:
   RightClickMenu(wxWindow* parent);
 
-  void OptionDeleteSpin(long n) {mOptionDelete=n;}
+  void OptionDeleteSpin(SpinXML::Spin* spin) {mOptionDelete=spin;}
   void OptionShowSpinProperties(SpinXML::Spin* spin) {mOptionSpinProperties=spin;}
 
   //Event Handlers
@@ -28,6 +24,11 @@ public:
 protected:
   DECLARE_EVENT_TABLE();
   wxWindow* mParent;
+
+  SpinXML::Spin* mOptionDelete;
+  SpinXML::Spin* mOptionSpinProperties;
+
+
 };
 
 

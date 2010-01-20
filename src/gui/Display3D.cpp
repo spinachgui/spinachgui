@@ -202,7 +202,7 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 
     if(mHover>=0) {
       RightClickMenu* menu = new RightClickMenu(this);
-      menu->OptionDeleteSpin(mHover);
+      menu->OptionDeleteSpin(GetSS()->GetSpin(mHover));
       menu->OptionShowSpinProperties(GetSS()->GetSpin(mHover));
       menu->Build();
       PopupMenu(menu);

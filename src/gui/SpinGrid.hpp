@@ -5,13 +5,13 @@
 #include <gui/SpinInteractionEdit.hpp>
 #include <shared/spinsys.hpp>
 #include <boost/shared_ptr.hpp>
+#include <sigc++/sigc++.h>
 #include <wx/grid.h>
 
 
-class SpinGrid : public wxGrid{
+class SpinGrid : public wxGrid, public sigc::trackable {
 public:
   SpinGrid(wxWindow* parent,wxWindowID id= -1);
-
 
   //wx Event Handlers
   void OnEdit(wxGridEvent& e);
@@ -40,6 +40,8 @@ public:
     MENU_NEW_SPIN
   };
 
+  sigc::signal<void,COL_TYPE,SpinXML::Spin*> sigSelect;
+
 protected:
   DECLARE_EVENT_TABLE();
 
@@ -50,7 +52,7 @@ protected:
 
 private:
   struct SpinGridColum {
-    long type;
+    COL_TYPE type;
     const char* name;
     long width;
   };
@@ -60,14 +62,11 @@ private:
   bool mUpdating;
 };
 
-class SpinGridPanel : public wxPanel {
+class SpinGridPanel : public wxPanel, public sigc::trackable {
 public:
   SpinGridPanel(wxWindow* parent,wxWindowID id=-1);
 
-  void OnInterSelect(wxCommandEvent& e);
-  void OnInterUnSelect(wxCommandEvent& e);
-protected:
-  DECLARE_EVENT_TABLE();
+  void OnGridCellSelect(SpinGrid::COL_TYPE col,SpinXML::Spin* spin);
 
 private:
   SpinInterEditPanel* mInterEdit;

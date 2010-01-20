@@ -284,54 +284,6 @@ Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
   return total;
 }
 
-
-Interaction::SubType Interaction::GetSubType() const {
-  return mSubType;
-}
-
-void Interaction::SetSubType(SubType st) {
-  sigChange();
-  mSubType=st;
-}
-
-bool Interaction::IsSubType(SubType t) const {
-  if(t==ST_ANY) {
-    return true;
-  }
-  if(t==ST_EPR) {
-    switch(mSubType) {
-    case ST_HFC:
-    case ST_G_TENSER:
-    case ST_ZFS: 
-    case ST_EXCHANGE:
-    case ST_QUADRUPOLAR:
-    case ST_DIPOLAR:
-    case ST_CUSTOM:
-      return true;
-    default:
-      return false;
-    }
-  }
-  if(t==ST_NMR) {
-    switch(mSubType) {
-    case ST_SHIELDING:
-    case ST_SCALAR:
-    case ST_QUADRUPOLAR:
-    case ST_DIPOLAR:
-    case ST_CUSTOM:
-      return true;
-    default:
-      return false;
-    }
-  }
-  if(t==mSubType) {
-    return true;
-  }
-  return false;
-}
-
-
-
 long Spin::GetElement() const {
   return mElement;
 }
@@ -350,8 +302,6 @@ vector<long> Spin::GetIsotopes() const {
   retVal.push_back(1);
   return retVal;
 }
-
-
 
 //==============================================================================//
 // Interaction
@@ -636,5 +586,51 @@ Matrix3 Interaction::GetAsMatrix() const {
   //Return the zero matrix identity
   Matrix3 zero(0,0,0,0,0,0,0,0,0);
   return zero;
+}
+
+
+Interaction::SubType Interaction::GetSubType() const {
+  return mSubType;
+}
+
+void Interaction::SetSubType(SubType st) {
+  sigChange();
+  mSubType=st;
+}
+
+bool Interaction::IsSubType(SubType t) const {
+  if(t==ST_ANY) {
+    return true;
+  }
+  if(t==ST_EPR) {
+    switch(mSubType) {
+    case ST_HFC:
+    case ST_G_TENSER:
+    case ST_ZFS: 
+    case ST_EXCHANGE:
+    case ST_QUADRUPOLAR:
+    case ST_DIPOLAR:
+    case ST_CUSTOM:
+      return true;
+    default:
+      return false;
+    }
+  }
+  if(t==ST_NMR) {
+    switch(mSubType) {
+    case ST_SHIELDING:
+    case ST_SCALAR:
+    case ST_QUADRUPOLAR:
+    case ST_DIPOLAR:
+    case ST_CUSTOM:
+      return true;
+    default:
+      return false;
+    }
+  }
+  if(t==mSubType) {
+    return true;
+  }
+  return false;
 }
 

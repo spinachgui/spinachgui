@@ -23,7 +23,6 @@ public:
   void onTextChange(wxCommandEvent& e);
   void OnSubTypeChange(wxCommandEvent& e);
   void OnSpin2Change(wxCommandEvent& e);
-  void OnInterFormChange(wxCommandEvent& e);
   void OnOrientChange(wxCommandEvent& e);
 
 
@@ -48,13 +47,6 @@ private:
 
   bool mLoading;
 
-  ///Update SubTypeComboLookup
-  void UpdateSubTypeComboLookup();
-  ///A pointer to an array of valid subtypes given the interaction's
-  ///form
-  const SpinXML::Interaction::SubType* mSubTypeComboLookup;
-  ///The length of SubTypeComboLookup
-  long mSubTypeComboLookupLen;
   ///If in dialog mode do not checkpoint changes and show a star* next
   ///to changed interactions. On by default
   bool mDialogMode;

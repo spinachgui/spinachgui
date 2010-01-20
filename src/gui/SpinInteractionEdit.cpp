@@ -194,6 +194,5 @@ BEGIN_EVENT_TABLE(SpinInterEditPanel,wxPanel)
 EVT_BUTTON     (INTER_ADD   ,SpinInterEditPanel::OnNewButton)
 EVT_BUTTON     (INTER_DELETE,SpinInterEditPanel::OnDeleteButton)
 EVT_LISTBOX    (wxID_ANY,SpinInterEditPanel::OnInteractionChange)
-EVT_COMMAND    (wxID_ANY,EVT_SS_UPDATE,SpinInterEditPanel::OnSSChange)
 
 END_EVENT_TABLE()

@@ -1,7 +1,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <gui/StdEvents.hpp>
 #include <gui/InteractionEdit.hpp>
 #include <gui/SpinachApp.hpp>
 
@@ -28,47 +27,35 @@ enum {
 
 static bool DropDownSetup = false;
 
-const static Interaction::SubType LinearSTLookup[] = {Interaction::ST_HFC,    	    
-						      Interaction::ST_EXCHANGE, 
-						      Interaction::ST_SHIELDING,
-						      Interaction::ST_CUSTOM};
-const static long LinearSTLookupLen = 4;
+const static Interaction::SubType NuclearSTLookup[] =  {Interaction::ST_EXCHANGE,   
+							Interaction::ST_SHIELDING,  
+							Interaction::ST_G_TENSER,   
+							Interaction::ST_HFC,        
+							Interaction::ST_DIPOLAR,    
+							Interaction::ST_QUADRUPOLAR,
+							Interaction::ST_ZFS,        
+							Interaction::ST_CUSTOM,     
+							Interaction::ST_CUSTOM,     
+							Interaction::ST_CUSTOM};
+const static long NuclearSTLookupLen = 10;
 
-const static Interaction::SubType LinearSTLookupE[] = {Interaction::ST_G_TENSER,
-						       Interaction::ST_EXCHANGE,
-						       Interaction::ST_SHIELDING,
-						       Interaction::ST_CUSTOM};
-const static long LinearSTLookupELen = 4;
-
-const static Interaction::SubType BilinearSTLookup[] = {Interaction::ST_SCALAR,
-							Interaction::ST_DIPOLAR,
-							Interaction::ST_CUSTOM}; 
-const static long BilinearSTLookupLen = 3;
-
-const static Interaction::SubType BilinearSTLookupE[] = {Interaction::ST_SCALAR,
-							 Interaction::ST_DIPOLAR,
-							 Interaction::ST_CUSTOM}; 
-const static long BilinearSTLookupELen = 3;
-
-const static Interaction::SubType QuadSTLookup[]  = {Interaction::ST_QUADRUPOLAR,
-						     Interaction::ST_ZFS,
-						     Interaction::ST_CUSTOM};     
-const static long QuadSTLookupLen = 3;
-
-const static Interaction::SubType QuadSTLookupE[]  = {Interaction::ST_QUADRUPOLAR,
-						      Interaction::ST_ZFS,
-						      Interaction::ST_CUSTOM};     
-const static long QuadSTLookupELen = 3;
+const static Interaction::SubType ElectronSTLookup[] = {Interaction::ST_EXCHANGE,   
+							Interaction::ST_SHIELDING,  
+							Interaction::ST_G_TENSER,   
+							Interaction::ST_HFC,        
+							Interaction::ST_DIPOLAR,    
+							Interaction::ST_QUADRUPOLAR,
+							Interaction::ST_ZFS,        
+							Interaction::ST_CUSTOM,     
+							Interaction::ST_CUSTOM,     
+							Interaction::ST_CUSTOM};
+const static long ElectronSTLookupLen = 10;
 
 
 typedef std::map<Interaction::SubType,long> ReverseLookupMap;
 
-static ReverseLookupMap LinearSTRevLookup;   
-static ReverseLookupMap LinearSTRevLookupE;    
-static ReverseLookupMap BilinearSTRevLookup;  
-static ReverseLookupMap BilinearSTRevLookupE;
-static ReverseLookupMap QuadSTRevLookup;        
-static ReverseLookupMap QuadSTRevLookupE;    
+static ReverseLookupMap ElectronSTRevLookup;   
+static ReverseLookupMap NuclearSTRevLookup;    
 
 static bool mDropDownsSetup;
 
@@ -85,39 +72,19 @@ Interaction::Type TypeOrders[]={
 ///the class and does any other global set up that is required.
 
 void InterEditPanel_StaticConstructor() {
-  ReverseLookupMap* maps[] = {&LinearSTRevLookup,   
-			      &LinearSTRevLookupE,  
-			      &BilinearSTRevLookup, 
-			      &BilinearSTRevLookupE,
-			      &QuadSTRevLookup,	    
-			      &QuadSTRevLookupE};   
-  
-  const Interaction::SubType* lookups[] = {LinearSTLookup,   
-					   LinearSTLookupE,  
-					   BilinearSTLookup, 
-					   BilinearSTLookupE,
-					   QuadSTLookup,	    
-					   QuadSTLookupE};
-
-  long lengths[] = {LinearSTLookupLen,
-		    LinearSTLookupELen,
-		    BilinearSTLookupLen,
-		    BilinearSTLookupELen,
-		    QuadSTLookupLen,
-		    QuadSTLookupELen};
-  for(long i=0;i<6;i++) {
-    for(long j=0;j<lengths[i];j++) {
-      (*maps[j])[lookups[i][j]]=j;
-    }
+  for(long j=0;j<NuclearSTLookupLen;j++) {
+    NuclearSTRevLookup[NuclearSTLookup[j]]=j;
   }
+  for(long j=0;j<ElectronSTLookupLen;j++) {
+    ElectronSTRevLookup[ElectronSTLookup[j]]=j;
+  }
+  cout << "st run" << endl;
 }
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   : InterEditPanelBase(parent,id),
     mInter(NULL),
     mLoading(false),
-    mSubTypeComboLookup(NULL),
-    mSubTypeComboLookupLen(0),
     mDialogMode(true) {
 
   Enable(false);
@@ -133,14 +100,14 @@ InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   mSubTypeCombo->SetId(SUBTYPE_COMBO);
   mSpin2Combo->SetId(SPIN2_COMBO);
 
-  if(DropDownSetup) { //Fakes a static constructor
+  if(!DropDownSetup) { //Fakes a static constructor
     DropDownSetup=true;
     InterEditPanel_StaticConstructor();
   }
 
-}
-
-
+  UpdateSubTypeCombo();
+}							     
+							     
 void InterEditPanel::SetInter(Interaction* inter) {
   mInter=inter;
   Enable(inter != NULL);
@@ -203,41 +170,24 @@ void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
   //TODO: We need to test if the spin is an election, because then
   //slightly different options should become avaliable
   mSubTypeCombo->Clear();
-
-  if(mInter->GetIsLinear()) {
-    mSubTypeComboLookupLen = LinearSTLookupLen;
-    mSubTypeComboLookup    = LinearSTLookup;
-  } else if(mInter->GetIsBilinear()) {
-    mSubTypeComboLookupLen = BilinearSTLookupLen;
-    mSubTypeComboLookup    = BilinearSTLookup;
-  } else {
-    mSubTypeComboLookupLen = QuadSTLookupLen;
-    mSubTypeComboLookup    = QuadSTLookup;
+  if(mInter==NULL) {
+    return;
   }
-  for(long i=0;i<mSubTypeComboLookupLen;i++) {
-    mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(mSubTypeComboLookup[i]),wxConvUTF8));
-  }
-
   Interaction::SubType st = mInter->GetSubType();
-  bool found=false;
-  for(long i=0;i<mSubTypeComboLookupLen;i++) {
-	if(st==mSubTypeComboLookup[i]) {
-	  mSubTypeCombo->SetSelection(i);
-	  found=true;
-	  break;
-	}
+  if(true) {//If nucleus
+    for(long i=0;i<NuclearSTLookupLen;i++) {
+      mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(NuclearSTLookup[i]),wxConvUTF8));
+    }
+    mSubTypeCombo->SetSelection(NuclearSTRevLookup[st]);
+  } else { //Else electron
+    for(long i=0;i<ElectronSTLookupLen;i++) {
+      mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(ElectronSTLookup[i]),wxConvUTF8));
+    }
+    mSubTypeCombo->SetSelection(ElectronSTRevLookup[st]);
   }
-  if(!found) {
-	if(subtypeWarning) {
-	  wxString form(mInter->GetIsLinear() ? wxT("linear") : (mInter->GetIsBilinear() ? wxT("bilinear") : wxT("quadratic")));
-	  wxLogError(wxString() << wxT("Warning, interaction has an invalid type (") 
-				 << wxString(Interaction::GetSubTypeName(st),wxConvUTF8)
-				 << wxT(") for its algebrate form (")
-				 << form << wxT(")"));
-	} else {
-	  mSubTypeCombo->SetSelection(0);
-	}
-  }
+
+
+
 }
 
 void InterEditPanel::LoadFromInter() {
@@ -248,14 +198,11 @@ void InterEditPanel::LoadFromInter() {
 
   if(mInter->GetIsLinear()) {
 	mSpin2Combo->Enable(false);
-	mFormBox->SetSelection(0);
   } else if(mInter->GetIsBilinear()) {
 	mSpin2Combo->Enable(true);
-	mFormBox->SetSelection(1);
   } else {
 	//Interaction is quadratic
 	mSpin2Combo->Enable(false);
-	mFormBox->SetSelection(2);
   }
 
   //Populate the spin 2 combobox with every other spin
@@ -397,58 +344,17 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
     return;
   }
   SaveToInter();
-
-  wxCommandEvent event(EVT_SS_UPDATE,GetId());
-  event.SetEventObject(this);
-  GetEventHandler()->ProcessEvent(event);
-
   return;
 }
 
 void InterEditPanel::OnSpin2Change(wxCommandEvent& e) {
   mInter->SetSpin2((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpin(mSpin2Combo->GetSelection()));
-  wxCommandEvent event(EVT_SS_UPDATE,GetId());
-  event.SetEventObject(this);
-  GetEventHandler()->ProcessEvent(event);
 }
 
 void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
-  if(mSubTypeComboLookup==NULL) {
-	wxLogError(wxT("mSubTypeComboLookup was null"));
-	throw logic_error("mSubTypeComboLookup was null");
-  }
-
-  mInter->SetSubType(mSubTypeComboLookup[mSubTypeCombo->GetSelection()]);
-
-  wxCommandEvent event(EVT_SS_UPDATE,GetId());
-  event.SetEventObject(this);
-  GetEventHandler()->ProcessEvent(event);
+  mInter->SetSubType(NuclearSTLookup[mSubTypeCombo->GetSelection()]);
 }
 
-void InterEditPanel::OnInterFormChange(wxCommandEvent& e) {
-  long selection=mFormBox->GetSelection();
-
-  if(selection==0) { 
-	//User set the interaction to linear
-	mInter->SetLinear();
-	mSpin2Combo->Enable(false);
-  } else if (selection==2) {
-	//User set the interaction to quadratic
-	mInter->SetQuadratic();
-	mSpin2Combo->Enable(false);
-  } else {
-	//User set the interaction to bilinear
-	mInter->SetSpin2((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpin(0));
-	mSpin2Combo->SetSelection(0);
-	mSpin2Combo->Enable(true);
-  }
-
-  UpdateSubTypeCombo(false);
-
-  wxCommandEvent event(EVT_SS_UPDATE,GetId());
-  event.SetEventObject(this);
-  GetEventHandler()->ProcessEvent(event);
-}
 
 void InterEditPanel::OnOrientChange(wxCommandEvent& e){
   SaveToInter();
@@ -461,7 +367,6 @@ EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,     InterEditPanel::OnPageChange)
 EVT_CHOICE                 (SUBTYPE_COMBO,InterEditPanel::OnSubTypeChange)
 EVT_CHOICE                 (SPIN2_COMBO,  InterEditPanel::OnSpin2Change)
 EVT_TEXT                   (wxID_ANY,     InterEditPanel::onTextChange)
-EVT_RADIOBOX               (wxID_ANY,     InterEditPanel::OnInterFormChange)
 EVT_COMMAND                (wxID_ANY,EVT_ORIENT_EDIT,InterEditPanel::OnOrientChange)
 
 END_EVENT_TABLE()

@@ -4,14 +4,13 @@
 #include <shared/nuclear_data.hpp>
 #include <iostream>
 #include <gui/RightClickMenu.hpp>
+#include <wx/debug.h>
 
 using namespace std;
 
 using namespace SpinXML;
 
 const long ColumCount=10;  
-
-
 
 //============================================================//
 // Utility functions.
@@ -25,7 +24,7 @@ enum AlgebrakeForm {
 };
 
 //Write a string representing the interactions acting on a spin
-wxString FormatLinearInteractions(Spin* spin,AlgebrakeForm form=ALL) {
+wxString FormatInteractions(Spin* spin,AlgebrakeForm form=ALL) {
   wxString str;
   vector<Interaction*> Interactions=spin->GetInteractions();
   long count=Interactions.size();
@@ -46,6 +45,78 @@ wxString FormatLinearInteractions(Spin* spin,AlgebrakeForm form=ALL) {
   }
   return str;
 }
+
+
+class SpinGridRow : public sigc::trackable {
+public:
+  SpinGridRow(SpinGrid* parent,Spin* spin,long row) 
+    : mParent(parent),
+      mSpin(spin),
+      rowNumber(row) {
+    parent->sigDying.connect(mem_fun(*this,&SpinGridRow::OnGridDying));
+    parent->sigClearing.connect(mem_fun(*this,&SpinGridRow::OnGridDying));
+
+    spin->sigDying.connect(mem_fun(*this,&SpinGridRow::OnSpinDying));
+    UpdateRow();
+  }
+
+  void ChangeRow(long newRow) {
+    if(rowNumber<0 || rowNumber>=GetSS()->GetSpinCount()) {
+      return;
+    }
+    rowNumber=newRow;
+    UpdateRow();
+  }
+
+  void OtherRowsDeleted(int pos,int number) {
+    if(pos<rowNumber) {
+      rowNumber-=number;
+    }
+  }
+  void UpdateRow() {
+    double x,y,z;
+    mSpin->GetCoordinates(&x,&y,&z);
+
+    //Setup the label and the element columns
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(mSpin->GetLabel(),wxConvUTF8));
+
+    //Setup the x,y,z coordinates
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y);
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z);
+
+    //Set the element and isotope
+    long element=mSpin->GetElement();
+    wxString str(getElementSymbol(element),wxConvUTF8);
+    str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
+
+    //Set the interactions
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_LINEAR     ,FormatInteractions(mSpin,LINEAR));
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_BILINEAR   ,FormatInteractions(mSpin,BILINEAR));
+    mParent->SetCellValue(rowNumber,SpinGrid::COL_QUAD,       FormatInteractions(mSpin,QUAD));
+  }
+  
+  void OnSpinChange() {
+    UpdateRow();
+  }
+  void OnSpinDying(Spin* /*unused*/) {
+    cout << "A gird row knows a spin" <<  rowNumber << " just died" << endl;
+    if(mParent->DeleteRows(rowNumber,1)) {
+      cerr << "Error deleting grid row" << endl;
+    }
+    delete this;
+  }
+  void OnGridDying() {
+    delete this;
+  }
+
+private:
+  long rowNumber;
+  Spin* mSpin;
+  SpinGrid* mParent;
+};
+
 
 //============================================================//
 // SpinGrid
@@ -99,13 +170,20 @@ void SpinGrid::OnEdit(wxGridEvent& e) {
     //User is trying to edit the blank line at the bottom of the grid,
     //so create a new spin for them
     GetSS()->InsertSpin(new Spin(Vector3(0,0,0),"New Spin",1));
-    SetupRow(sc);
-    UpdateRow(sc);
-    AppendRows(1);
   }
-  if (e.GetCol()==COL_LINEAR || e.GetCol()==COL_QUAD) {
-    cout << "OnEdit" << endl;
-  }
+}
+
+void SpinGrid::OnNewSpin(Spin* newSpin,long number) {
+  //Somehow, somewhere a new spin has been created, so create a new
+  //row for it at the end of the grid
+  long sc=GetSS()->GetSpinCount();
+  SetupRow(sc);
+  AppendRows(1);
+  sigRowDelete.connect(mem_fun(
+			       new SpinGridRow(this,GetSS()->GetSpin(i),i),
+			       &SpinGridRow::OtherRowsDeleted
+			       ));
+
 }
 
 void SpinGrid::OnEndEdit(wxGridEvent& e) {
@@ -114,20 +192,32 @@ void SpinGrid::OnEndEdit(wxGridEvent& e) {
   }
 }
 
+bool SpinGrid::DeleteRows(int pos,int numRows,bool updateLables) {
+  bool r=wxGrid::DeleteRows(pos,numRows,updateLables);
+  sigRowDelete(pos,numRows);
+  return r;
+}
 
 void SpinGrid::RefreshFromSpinSystem() {
-  cout << "SpinGrid::RefreshFromSpinSystem()" << endl;
   mUpdating=true;
+  sigClearing();
 
   if(GetNumberRows()) {
     //Clear grid only clears the underlying data rather. The cells
     //remain and are black. wxGrid::DeleteRows solves this
     DeleteRows(0,GetNumberRows());
   }
-  AppendRows(GetSS()->GetSpinCount()+1);
-  for (long i=0; i < GetSS()->GetSpinCount()+1; i++) {
+  long count=GetSS()->GetSpinCount()+1;
+  AppendRows(count);
+  for (long i=0; i < count; i++) {
     SetupRow(i);
-    UpdateRow(i);
+    if(i<count-1) {
+	sigRowDelete.connect(mem_fun(
+				     new SpinGridRow(this,GetSS()->GetSpin(i),i),
+				     &SpinGridRow::OtherRowsDeleted
+				     ));
+	
+    }
   }
   mUpdating=false;
 }
@@ -158,34 +248,6 @@ void SpinGrid::SetupRow(long rowNumber) {
   SetReadOnly(rowNumber,COL_LINEAR);
   SetReadOnly(rowNumber,COL_BILINEAR);
   SetReadOnly(rowNumber,COL_QUAD);
-}
-
-void SpinGrid::UpdateRow(long rowNumber) {
-  if(rowNumber<0 || rowNumber>=GetSS()->GetSpinCount()) {
-    return;
-  }
-  Spin* thisSpin = (*mHead)->GetSpin(rowNumber);
-  double x,y,z;
-  thisSpin->GetCoordinates(&x,&y,&z);
-
-  //Setup the label and the element columns
-  SetCellValue(rowNumber,COL_LABEL,wxString(thisSpin->GetLabel(),wxConvUTF8));
-
-  //Setup the x,y,z coordinates
-  SetCellValue(rowNumber,COL_X,wxString() << x);
-  SetCellValue(rowNumber,COL_Y,wxString() << y);
-  SetCellValue(rowNumber,COL_Z,wxString() << z);
-
-  //Set the element and isotope
-  long element=thisSpin->GetElement();
-  wxString str(getElementSymbol(element),wxConvUTF8);
-  str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
-  SetCellValue(rowNumber,COL_ELEMENT,str);
-
-  //Set the interactions
-  SetCellValue(rowNumber,COL_LINEAR     ,FormatLinearInteractions(thisSpin,LINEAR));
-  SetCellValue(rowNumber,COL_BILINEAR   ,FormatLinearInteractions(thisSpin,BILINEAR));
-  SetCellValue(rowNumber,COL_QUAD,FormatLinearInteractions(thisSpin,QUAD));
 }
 
 void SpinGrid::OnCellChange(wxGridEvent& e) {
@@ -251,7 +313,6 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
   menu->Build();
   PopupMenu(menu);
   delete menu;
-
 }
 
 void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {

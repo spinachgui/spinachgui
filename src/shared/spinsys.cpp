@@ -11,7 +11,7 @@ using namespace sigc;
 //==============================================================================//
 // SpinSystem
 
-SpinSystem::SpinSystem()  {
+SpinSystem::SpinSystem() : mIgnoreSpinKill(NULL), mIgnoreInterKill(NULL) {
 }
 
 
@@ -59,9 +59,11 @@ void SpinSystem::Clear() {
   sigReloading();
 
   for(long i=0;i<mBilinInter.size();i++) {
+    mIgnoreInterKill=mBilinInter[i];
     delete mBilinInter[i];
   }
   for(long i=0;i<mSpins.size();i++) {
+    mIgnoreSpinKill=mSpins[i];
     delete mSpins[i];
   }
   mSpins.resize(0);
@@ -107,6 +109,7 @@ vector<Spin*> SpinSystem::GetSpins() const {
 }
 
 void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
+
   if(Position==END) {
     mSpins.push_back(_Spin);
     sigNewSpin(_Spin,mSpins.size()-1);
@@ -114,7 +117,7 @@ void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
     mSpins.insert(mSpins.begin()+Position,_Spin);
     sigNewSpin(_Spin,Position);
   }
-  //Deal with the overloading
+
   _Spin->sigDying.connect(mem_fun(*this,&SpinSystem::OnSpinDeleted));
 }
 
@@ -124,6 +127,10 @@ void SpinSystem::RemoveSpin(long Position) {
 }
 
 void SpinSystem::RemoveSpin(Spin* _Spin) {
+  if(_Spin==mIgnoreSpinKill) {
+    mIgnoreSpinKill=NULL;
+    return;
+  }
   for(long i=0;i<mSpins.size();i++) {
     if(mSpins[i]==_Spin) {
       mSpins.erase(mSpins.begin()+i);
@@ -168,9 +175,9 @@ Spin::Spin(const Spin& s) :
 }
 
 Spin::~Spin() {
+  cout << "About to kill a spin" << endl;
     sigDying(this);
 }
-
 
 Vector3& Spin::GetPosition() {
   return mPosition;

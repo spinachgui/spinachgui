@@ -9,9 +9,11 @@
 #include <wx/grid.h>
 
 
+
 class SpinGrid : public wxGrid, public sigc::trackable {
 public:
   SpinGrid(wxWindow* parent,wxWindowID id= -1);
+  ~SpinGrid() {sigDying();}
 
   //wx Event Handlers
   void OnEdit(wxGridEvent& e);
@@ -20,6 +22,11 @@ public:
   void OnCellSelect(wxGridEvent& e);
   void OnRightClick(wxGridEvent& e);
   void OnDeleteSpinHover(wxCommandEvent& e);
+  
+  void OnNewSpin(Spin* newSpin,long number) {
+
+  //Overridden in order to emit a signal
+  bool DeleteRows(int pos=0,int numRows=1,bool updateLables=true);
 
   enum COL_TYPE {
     COL_SELECTED,   
@@ -41,12 +48,13 @@ public:
   };
 
   sigc::signal<void,COL_TYPE,SpinXML::Spin*> sigSelect;
-
+  sigc::signal<void> sigDying;
+  sigc::signal<void> sigClearing;
+  sigc::signal<void,int,int> sigRowDelete;
 protected:
   DECLARE_EVENT_TABLE();
 
   void RefreshFromSpinSystem();
-  void UpdateRow(long rowNumber);
   void UpdateRowIsotopes(long row);
   void SetupRow(long rowNumber);
 
@@ -60,6 +68,7 @@ private:
 
   const SpinSysPtr* mHead;
   bool mUpdating;
+
 };
 
 class SpinGridPanel : public wxPanel, public sigc::trackable {

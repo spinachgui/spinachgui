@@ -18,6 +18,7 @@
 
 namespace SpinXML {
 
+
 void SetSchemaLocation(const char* loc);
 
 const long END=-1;
@@ -283,7 +284,7 @@ class SpinSystem : public sigc::trackable {
   void OnSpinDeleted(Spin* spin){RemoveSpin(spin);}
 
 
-    std::vector<Interaction*>& GetInteractions()  {return mBilinInter;}
+  std::vector<Interaction*>& GetInteractions()  {return mBilinInter;}
 
   sigc::signal<void,Spin*,long> sigNewSpin;
   sigc::signal<void,Spin*,Spin*> sigNewBilinear;
@@ -294,8 +295,12 @@ class SpinSystem : public sigc::trackable {
   private:
     friend class Spin;
 
-    std::vector<Spin*> mSpins;
-    std::vector<Interaction*> mBilinInter;
+  //Set just before deleting a spin
+  Spin* mIgnoreSpinKill;
+  std::vector<Spin*> mSpins;
+  //Set just before deleting an interaction
+  Interaction* mIgnoreInterKill;
+  std::vector<Interaction*> mBilinInter;
 };
 
 }; //End Namespace

@@ -35,7 +35,7 @@ void RightClickMenu::OnShowSpinProperties(wxCommandEvent& e) {
 
 void RightClickMenu::OnDeleteSpin(wxCommandEvent& e) {
   Chkpoint(wxT("Delete Spin"));
-  GetSS()->RemoveSpin(mOptionDelete);
+  delete mOptionDelete;
 }
 
 

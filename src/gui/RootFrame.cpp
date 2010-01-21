@@ -24,18 +24,23 @@ wxString GetExtension(const wxString& filename) {
 // RootFrame
 
 void RootFrame::InitFrame() {
-  mNotebook=new wxAuiNotebook(mAuiPanel);
+  //mNotebook=new wxAuiNotebook(mAuiPanel);
+  mSplitter = new wxSplitterWindow(this);
 
-  mSpinGridPanel=new SpinGridPanel(mNotebook);
+  mSpinGridPanel=new SpinGridPanel(mSplitter);
 
-  mDisplay3D=new Display3D(mNotebook);
+  mDisplay3D=new Display3D(mSplitter);
   mDisplay3D->SetRootSGNode(new MoleculeNode(NULL));
 
   // add the panes to the manager
-  mNotebook->AddPage(mDisplay3D, wxT("3D View"));
-  mNotebook->AddPage(mSpinGridPanel, wxT("Grid View"));
+  //mNotebook->AddPage(mDisplay3D, wxT("3D View"));
+  //mNotebook->AddPage(mSpinGridPanel, wxT("Grid View"));
 
-  mAuiPanel->GetSizer()->Add(mNotebook,1,wxEXPAND);
+  mSplitter->Initialize(mSpinGridPanel);
+  mSplitter->Initialize(mDisplay3D);
+  mSplitter->SplitVertically(mSpinGridPanel,mDisplay3D);
+
+  mAuiPanel->GetSizer()->Add(mSplitter,1,wxEXPAND);
 
   //Grey the undo and redo menu ideams. They can be ungreyed when
   //there is an undo history

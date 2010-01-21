@@ -6,7 +6,7 @@
 #include <gui/Display3D.hpp>
 #include <gui/SpinGrid.hpp>
 #include <wx/aui/auibook.h>
-
+#include <wx/splitter.h>
 
 class RootFrame : public RootFrameBase {
 public:
@@ -46,7 +46,8 @@ public:
 private:
   void UpdateTitle();
 
-  wxAuiNotebook* mNotebook;
+  wxAuiNotebook* mNotebook; //Buggy under GTK+, don't use
+  wxSplitterWindow* mSplitter;
   SpinGridPanel* mSpinGridPanel;
   Display3D* mDisplay3D;
   ISpinSystemLoader* mSaver;

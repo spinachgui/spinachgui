@@ -14,7 +14,8 @@ SGNode::SGNode()
     mUseMaterial(false),
     mMaterial(defaultMaterial),
     mList(glGenLists(1)),
-    mGeomOnlyList(glGenLists(1)) {
+    mGeomOnlyList(glGenLists(1)),
+    mIdentity(true) {
 }
 
 SGNode::~SGNode() {
@@ -42,12 +43,26 @@ void SGNode::SetMaterial(const float material[3],bool use) {
   mUseMaterial=use;
 }
 
+void SGNode::SetTranslation(const Vector3& v) {
+  mat[0 ]=1;  mat[1 ]=0;  mat[2 ]=0;  mat[3 ]=v.GetX();
+  mat[4 ]=0;  mat[5 ]=1;  mat[6 ]=0;  mat[7 ]=v.GetY();
+  mat[8 ]=0;  mat[9 ]=0;  mat[10]=1;  mat[11]=v.GetZ();
+  mat[12]=0;  mat[13]=0;  mat[14]=0;  mat[15]=1;
+}
+
 void SGNode::Draw(const SpinachDC& dc) {
   if(mDirty) {
     glNewList(mList,GL_COMPILE);
+    if(!mIdentity) {
+      glPushMatrix();
+      glMultMatrixf(mat);
+    }
     RawDraw(dc);
     for(itor i=mChildren.begin();i!=mChildren.end();++i) {
       (*i)->Draw(dc);
+    }
+    if(!mIdentity) {
+      glPopMatrix();
     }
     glEndList();
   } 

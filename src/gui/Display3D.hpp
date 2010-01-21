@@ -66,6 +66,9 @@ public:
   ///Removes a child node
   void RemoveNode(SGNode* node);
 
+  void SetTranslation(const Vector3& v);
+  void SetIdentity() {mIdentity=true;}
+
   sigc::signal<void,SGNode*> sigDying;
 private:
   ///Make whatever openGL calls are needed to draw the node.
@@ -80,6 +83,10 @@ private:
 
   bool mUseMaterial;
   const float* mMaterial;
+  
+  ///If true, skip the transform step
+  bool mIdentity;
+  GLfloat mat[16];
 
   std::list<SGNode*> mChildren;
   typedef std::list<SGNode*>::iterator itor;

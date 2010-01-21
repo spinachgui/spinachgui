@@ -23,7 +23,7 @@ public:
   void OnRightClick(wxGridEvent& e);
   void OnDeleteSpinHover(wxCommandEvent& e);
   
-  void OnNewSpin(Spin* newSpin,long number) {
+  void OnNewSpin(SpinXML::Spin* newSpin,long number);
 
   //Overridden in order to emit a signal
   bool DeleteRows(int pos=0,int numRows=1,bool updateLables=true);

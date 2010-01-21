@@ -180,7 +180,7 @@ void SpinGrid::OnNewSpin(Spin* newSpin,long number) {
   SetupRow(sc);
   AppendRows(1);
   sigRowDelete.connect(mem_fun(
-			       new SpinGridRow(this,GetSS()->GetSpin(i),i),
+			       new SpinGridRow(this,GetSS()->GetSpin(sc-1),sc-1),
 			       &SpinGridRow::OtherRowsDeleted
 			       ));
 
@@ -201,6 +201,8 @@ bool SpinGrid::DeleteRows(int pos,int numRows,bool updateLables) {
 void SpinGrid::RefreshFromSpinSystem() {
   mUpdating=true;
   sigClearing();
+
+  GetSS()->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
 
   if(GetNumberRows()) {
     //Clear grid only clears the underlying data rather. The cells

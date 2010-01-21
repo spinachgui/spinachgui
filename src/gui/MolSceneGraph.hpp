@@ -18,6 +18,19 @@ private:
   virtual void RawDraw(const SpinachDC& dc);
 };
 
+class InterNode : public SGNode {
+public:
+  InterNode(Interaction* inter);
+  void OnInterDying(Interaction*) {delete this;}
+  void LoadInteractionMatrix();
+private:
+  Interaction* mInter;
+  void SetMatrix(const Matrix3& mat);
+  virtual void RawDraw(const SpinachDC& dc);
+  float mat[16];
+};
+
+
 ///Scene graph node that draws a cylinder between two points
 class CyclinderNode : public SGNode {
   ///Create a node that draws a cyclinder of unit radius between
@@ -39,19 +52,6 @@ private:
   Vector3 mR2;
 };
 
-class EllipsoidNode : public SGNode {
-  ///Create a node that draws an wireframe unit sphere at the origin
-  EllipsoidNode();
-  ///Create a node that draws an wireframe ellipsoid based on matrix A
-  EllipsoidNode(const Matrix3& mat);
-  ///Change the matrix transform performed
-  void SetMatrix(const Matrix3& mat);
-private:
-  virtual void RawDraw(const SpinachDC& dc);
-  ///Unpack a 3x3 matrix into a 4x4 opengl matrix
-  void Unpack(const Matrix3& mat);
-  float mat[16];
-};
 
 class MoleculeNode : public SGNode, public sigc::trackable {
 public:

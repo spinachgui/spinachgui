@@ -13,6 +13,10 @@ SpinNode::SpinNode(Spin* spin)
   : mSpin(spin) {
   mSpin->sigDying.connect(mem_fun(this,&SpinNode::OnSpinDying));
   SetTranslation(mSpin->GetPosition());
+  Interaction* inter=new Interaction;
+  inter->SetSubType(Interaction::ST_HFC);
+  inter->SetScalar(10.0);
+  AddNode(new InterNode(inter));
 }
 
 
@@ -31,6 +35,108 @@ void SpinNode::RawDraw(const SpinachDC& dc) {
   gluSphere(dc.GetSolidQuadric(),0.2,14,14);
 }
 
+InterNode::InterNode(Interaction* inter) 
+  : mInter(inter) {
+  mInter->sigDying.connect(mem_fun(this,&InterNode::OnInterDying));
+  mat[3 ]=0;
+  mat[7 ]=0;
+  mat[11]=0;
+  mat[12]=0;
+  mat[13]=0;
+  mat[14]=0;
+  mat[15]=1;
+  LoadInteractionMatrix();
+}
+
+void InterNode::LoadInteractionMatrix() {
+  //Set the elements of the matrix that matter (others will have been
+  //set to 0 in the constructor, so there isn't any need to set them
+  //again) 
+
+  //TODO: This would be a great place to calculate the eigenvalues
+  Matrix3 mat3=mInter->GetAsMatrix();
+  mat[0 ]=abs(mat3.Get(0,0));
+  mat[1 ]=abs(mat3.Get(0,1));
+  mat[2 ]=abs(mat3.Get(0,2));
+			
+  mat[4 ]=abs(mat3.Get(1,0));
+  mat[5 ]=abs(mat3.Get(1,1));
+  mat[6 ]=abs(mat3.Get(1,2));
+			
+  mat[8 ]=abs(mat3.Get(2,0));
+  mat[9 ]=abs(mat3.Get(2,1));
+  mat[10]=abs(mat3.Get(2,2));
+}
+
+
+void InterNode::RawDraw(const SpinachDC& dc) {
+  const static GLfloat white[3]={0.5f,0.5f,0.5f};
+  const static GLfloat blue[3]={0.0,0.0,0.5};
+
+  switch(mInter->GetSubType()) {
+    //Draw as a ellipsoid around a nucleus
+  case Interaction::ST_HFC:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto nuclear_centred_drawing;  //I know, I know, see http://xkcd.com/292/
+  case Interaction::ST_CUSTOM_LINEAR:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto nuclear_centred_drawing;
+  case Interaction::ST_CUSTOM_QUADRATIC:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto nuclear_centred_drawing;
+  case Interaction::ST_QUADRUPOLAR:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+  nuclear_centred_drawing:
+    //Apply the transformation matrix to warp the sphere
+    glPushMatrix(); {
+      glPushMatrix(); {
+	glMultMatrixf(mat);
+	glScalef(0.04,0.04,0.04);
+	gluSphere(dc.GetWireQuadric(),1.0,14,14);
+      } glPopMatrix();
+    } glPopMatrix();
+    break;
+    //Draw as a cyclinder
+  case Interaction::ST_EXCHANGE:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto cyclinder_drawing;
+  case Interaction::ST_SHIELDING:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto cyclinder_drawing;
+  case Interaction::ST_SCALAR:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto cyclinder_drawing;
+  case Interaction::ST_DIPOLAR:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto cyclinder_drawing;
+  case Interaction::ST_CUSTOM_BILINEAR:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+  cyclinder_drawing:
+    
+    break;
+    //EPR electron type interactions
+  case Interaction::ST_ZFS:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    goto electron_cenred_drawing;
+  case Interaction::ST_G_TENSER:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+  electron_cenred_drawing:
+    break;
+  }
+}
+
+
 
 void CyclinderNode::RawDraw(const SpinachDC& dc) {
   double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
@@ -48,86 +154,9 @@ void CyclinderNode::RawDraw(const SpinachDC& dc) {
 }
 
 
-EllipsoidNode::EllipsoidNode() {
-  mat[0 ]=1;  mat[1 ]=0;  mat[2 ]=0;  mat[3 ]=0;
-  mat[4 ]=0;  mat[5 ]=1;  mat[6 ]=0;  mat[7 ]=0;
-  mat[8 ]=0;  mat[9 ]=0;  mat[10]=1;  mat[11]=0;
-  mat[12]=0;  mat[13]=0;  mat[14]=0;  mat[15]=1;
-}
 
-EllipsoidNode::EllipsoidNode(const Matrix3& mat3) {
-  //Some elements of this matrix will always be set to specific
-  //values, so we might as well keep them
-  mat[3 ]=0;
-  mat[7 ]=0;
-  mat[11]=0;
-  mat[12]=0;
-  mat[13]=0;
-  mat[14]=0;
-  mat[15]=1;
 
-  SetMatrix(mat3);
-}
 
-void EllipsoidNode::SetMatrix(const Matrix3& mat3) {
-  //Set the elements of the matrix that matter (others will have been
-  //set to 0 in the constructor, so there isn't any need to set them
-  //again) 
-
-  //TODO: This would be a great place to calculate the eigenvalues
-  mat[0 ]=abs(mat3.Get(0,0));
-  mat[1 ]=abs(mat3.Get(0,1));
-  mat[2 ]=abs(mat3.Get(0,2));
-			
-  mat[4 ]=abs(mat3.Get(1,0));
-  mat[5 ]=abs(mat3.Get(1,1));
-  mat[6 ]=abs(mat3.Get(1,2));
-			
-  mat[8 ]=abs(mat3.Get(2,0));
-  mat[9 ]=abs(mat3.Get(2,1));
-  mat[10]=abs(mat3.Get(2,2));
-}
-
-void EllipsoidNode::RawDraw(const SpinachDC& dc) {
-  ///Unpack a 3x3 matrix into a 4x4 opengl matrix
-  //Apply the transformation matrix to warp the sphere
-  glPushMatrix(); {
-    glPushMatrix(); {
-      glMultMatrixf(mat);
-      glScalef(0.04,0.04,0.04);
-      gluSphere(dc.GetWireQuadric(),1.0,14,14);
-    } glPopMatrix();
-			
-    double eValX=1;//self.ss.getEigenValX(i).real;
-    double eValY=1;//self.ss.getEigenValY(i).real;
-    double eValZ=1;//self.ss.getEigenValZ(i).real;
-			
-    float eVecX[]={1,0,0};
-    float eVecY[]={0,1,0};
-    float eVecZ[]={0,0,1};
-			
-    //Draw the three eigenvectors of the interactionx
-    glBegin(GL_LINES); {
-      glVertex3f(0,0,0);
-      glVertex3f(eVecX[0]*eValX,eVecX[1]*eValX,eVecX[2]*eValX);
-    }glEnd();
-			
-    glBegin(GL_LINES); {
-      glVertex3f(0,0,0);
-      glVertex3f(eVecY[0]*eValY,eVecY[1]*eValY,eVecY[2]*eValY);
-    } glEnd();
-			
-    glBegin(GL_LINES); {
-      glVertex3f(0,0,0);
-      glVertex3f(eVecZ[0]*eValZ,eVecZ[1]*eValZ,eVecZ[2]*eValZ);
-    } glEnd();
-			
-  } glPopMatrix();
-
-  float mMat[16];
-}
-
-GLfloat white[] = {0.5, 0.5,  0.5}; 
 
 MoleculeNode::MoleculeNode(SpinSystem* ss) 
   : mSS(ss) {
@@ -147,7 +176,7 @@ void MoleculeNode::OnNewSpin(Spin* newSpin,long number) {
 void MoleculeNode::RawDraw(const SpinachDC& dc) {
   glEnable(GL_COLOR_MATERIAL);
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
+  static const GLfloat white[] = {0.5, 0.5,  0.5}; 
   glMaterialfv(GL_FRONT, GL_SPECULAR, white);
 			
   //Draw some coordiante axese

@@ -12,29 +12,23 @@ const double pi=3.141592654;
 SpinNode::SpinNode(Spin* spin) 
   : mSpin(spin) {
   mSpin->sigDying.connect(mem_fun(this,&SpinNode::OnSpinDying));
+  SetTranslation(mSpin->GetPosition());
 }
 
 
 void SpinNode::RawDraw(const SpinachDC& dc) {
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
   const static GLfloat blue[3]={0.0,0.0,0.5};
-  double x,y,z;
-  mSpin->GetCoordinates(&x,&y,&z);
-		
-  glPushMatrix(); {
-    glTranslatef(x,y,z);
+  if(true) {
+    GLfloat material[3];
+    material[0] = getElementR(mSpin->GetElement());
+    material[1] = getElementG(mSpin->GetElement());
+    material[2] = getElementB(mSpin->GetElement());
 
-    if(true) {
-      GLfloat material[3];
-      material[0] = getElementR(mSpin->GetElement());
-      material[1] = getElementG(mSpin->GetElement());
-      material[2] = getElementB(mSpin->GetElement());
-
-      glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-      glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-    }
-    gluSphere(dc.GetSolidQuadric(),0.2,14,14);
-  } glPopMatrix();
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+  }
+  gluSphere(dc.GetSolidQuadric(),0.2,14,14);
 }
 
 

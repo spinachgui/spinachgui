@@ -44,10 +44,11 @@ void SGNode::SetMaterial(const float material[3],bool use) {
 }
 
 void SGNode::SetTranslation(const Vector3& v) {
-  mat[0 ]=1;  mat[1 ]=0;  mat[2 ]=0;  mat[3 ]=v.GetX();
-  mat[4 ]=0;  mat[5 ]=1;  mat[6 ]=0;  mat[7 ]=v.GetY();
-  mat[8 ]=0;  mat[9 ]=0;  mat[10]=1;  mat[11]=v.GetZ();
-  mat[12]=0;  mat[13]=0;  mat[14]=0;  mat[15]=1;
+  mIdentity=false;
+  mat[0 ]=1;  mat[4 ]=0;  mat[8 ]=0;  mat[12]=v.GetX();
+  mat[1 ]=0;  mat[5 ]=1;  mat[9 ]=0;  mat[13]=v.GetY();
+  mat[2 ]=0;  mat[6 ]=0;  mat[10]=1;  mat[14]=v.GetZ();
+  mat[3 ]=0;  mat[7 ]=0;  mat[11]=0;  mat[15]=1;
 }
 
 void SGNode::Draw(const SpinachDC& dc) {

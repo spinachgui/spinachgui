@@ -1,12 +1,39 @@
 
 #include <gui/MolSceneGraph.hpp>
+#include <shared/nuclear_data.hpp>
 #include <cmath>
+#include <iostream>
+using namespace std;
 
 const double pi=3.141592654;
 
-void SphereNode::RawDraw(const SpinachDC& dc) {
-  gluSphere(dc.GetSolidQuadric(),mRadius,14,14);
+///Scenegraph node that draws a spin
+SpinNode::SpinNode(Spin* spin) 
+  : mSpin(spin) {
 }
+
+void SpinNode::RawDraw(const SpinachDC& dc) {
+  const static GLfloat white[3]={0.5f,0.5f,0.5f};
+  const static GLfloat blue[3]={0.0,0.0,0.5};
+  double x,y,z;
+  mSpin->GetCoordinates(&x,&y,&z);
+		
+  glPushMatrix(); {
+    glTranslatef(x,y,z);
+
+    if(true) {
+      GLfloat material[3];
+      material[0] = getElementR(mSpin->GetElement());
+      material[1] = getElementG(mSpin->GetElement());
+      material[2] = getElementB(mSpin->GetElement());
+
+      glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+      glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    }
+    gluSphere(dc.GetSolidQuadric(),0.2,14,14);
+  } glPopMatrix();
+}
+
 
 void CyclinderNode::RawDraw(const SpinachDC& dc) {
   double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
@@ -105,36 +132,34 @@ void EllipsoidNode::RawDraw(const SpinachDC& dc) {
 
 GLfloat white[] = {0.5, 0.5,  0.5}; 
 
-
+MoleculeNode::MoleculeNode(SpinSystem* ss) 
+  : mSS(ss) {
+  long count=ss->GetSpinCount();
+  for(long i=0;i<count;i++) {
+    AddNode(new SpinNode(ss->GetSpin(i)));
+  }
+}
 
 void MoleculeNode::RawDraw(const SpinachDC& dc) {
   glEnable(GL_COLOR_MATERIAL);
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
   glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-
-  double eValX=1;//self.ss.getEigenValX(i).real;
-  double eValY=1;//self.ss.getEigenValY(i).real;
-  double eValZ=1;//self.ss.getEigenValZ(i).real;
 			
-  float eVecX[]={1,0,0};
-  float eVecY[]={0,1,0};
-  float eVecZ[]={0,0,1};
-			
-  //Draw the three eigenvectors of the interactionx
+  //Draw some coordiante axese
   glBegin(GL_LINES); {
     glVertex3f(0,0,0);
-    glVertex3f(eVecX[0]*eValX,eVecX[1]*eValX,eVecX[2]*eValX);
+    glVertex3f(5,0,0);
   }glEnd();
 			
   glBegin(GL_LINES); {
     glVertex3f(0,0,0);
-    glVertex3f(eVecY[0]*eValY,eVecY[1]*eValY,eVecY[2]*eValY);
+    glVertex3f(0,5,0);
   } glEnd();
 			
   glBegin(GL_LINES); {
     glVertex3f(0,0,0);
-    glVertex3f(eVecZ[0]*eValZ,eVecZ[1]*eValZ,eVecZ[2]*eValZ);
+    glVertex3f(0,0,5);
   } glEnd();
 }
 

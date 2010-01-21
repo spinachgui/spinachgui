@@ -10,6 +10,7 @@
 
 #include <GL/glx.h>
 #include <GL/glu.h>
+#include <sigc++/sigc++.h>
 
 #include <list>
 
@@ -39,7 +40,7 @@ public:
   }
 };
 
-class SGNode {
+class SGNode : public sigc::trackable {
 public:
   ///Construct a dirty SGNode
   SGNode();
@@ -55,8 +56,17 @@ public:
   ///one exists.
   void Draw(const SpinachDC& dc);
 
+  ///Add a node to the scenegraph. To remove it, just make sure its
+  ///destructor is called.
+  void AddNode(SGNode* node);
+
   ///
   void SetMaterial(const float material[3],bool use=true);
+
+  ///Removes a child node
+  void RemoveNode(SGNode* node);
+
+  sigc::signal<void,SGNode*> sigDying;
 private:
   ///Make whatever openGL calls are needed to draw the node.
   virtual void RawDraw(const SpinachDC& dc)=0;
@@ -70,10 +80,13 @@ private:
 
   bool mUseMaterial;
   const float* mMaterial;
+
+  std::list<SGNode*> mChildren;
+  typedef std::list<SGNode*>::iterator itor;
 };
 
 
-class Display3D :  public wxGLCanvas {
+class Display3D :  public wxGLCanvas, sigc::trackable {
 public:
   Display3D(wxWindow* parent);
   virtual ~Display3D();
@@ -89,12 +102,10 @@ public:
   void SetRootSGNode(SGNode* node) {
     if(mRootNode) delete mRootNode; mRootNode=node;
   }
-
+  SpinachDC& GetDC() {return mDC;}
+protected:
   DECLARE_EVENT_TABLE();
 
-  SpinachDC* GetDC();
-
-protected:
   ///Call whenever the size of the viewport changes
   
 

@@ -20,6 +20,21 @@ SGNode::SGNode()
 SGNode::~SGNode() {
   glDeleteLists(mList,1);
   glDeleteLists(mGeomOnlyList,1);
+  sigDying(this);
+}
+
+void SGNode::AddNode(SGNode* node) {
+  mChildren.push_back(node);
+  node->sigDying.connect(mem_fun(this,&SGNode::RemoveNode));
+}
+
+void SGNode::RemoveNode(SGNode* node) {
+  for(itor i=mChildren.begin();i!=mChildren.end();++i) {
+    if(*(i)==node) {
+      mChildren.erase(i);
+      break;
+    }
+  }
 }
 
 void SGNode::SetMaterial(const float material[3],bool use) {
@@ -31,6 +46,9 @@ void SGNode::Draw(const SpinachDC& dc) {
   if(mDirty) {
     glNewList(mList,GL_COMPILE);
     RawDraw(dc);
+    for(itor i=mChildren.begin();i!=mChildren.end();++i) {
+      (*i)->Draw(dc);
+    }
     glEndList();
   } 
   glCallList(mList);
@@ -41,7 +59,9 @@ void SGNode::Draw(const SpinachDC& dc) {
 // Display3D class
 
 Display3D::Display3D(wxWindow* parent) 
-  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY),mRootNode(NULL){
+  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY),
+    mRootNode(NULL),
+    mDC() {
   mGLContext=NULL;
   mGLEnabled=false;
 
@@ -133,9 +153,6 @@ void Display3D::EnableGL() {
   glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
   glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
   glLightfv(GL_LIGHT1, GL_POSITION, position1);
-	
-  //glEnable(GL_COLOR_MATERIAL);
-  //glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	
   //Create a dictionary of colours
   glMatrixMode(GL_MODELVIEW);
@@ -275,13 +292,14 @@ void Display3D::OnPaint(wxPaintEvent& e) {
   glLoadIdentity();
   gluLookAt(mCamX,mCamY,mCamZ,0,0,-1,0,1,0);
   glMultMatrixf(mRotationMatrix);
-	
+
+  glEnable(GL_DEPTH_TEST);	
+
+  glClear(GL_DEPTH_BUFFER_BIT);
   glEnable(GL_LIGHTING);{
     glClear(GL_COLOR_BUFFER_BIT);
     if(mRootNode) {
-      //TODO the DC should be a member
-      SpinachDC dc;
-      mRootNode->Draw(dc);
+      mRootNode->Draw(mDC);
     }
   } glDisable(GL_LIGHTING);   
 	

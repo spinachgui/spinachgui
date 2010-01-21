@@ -30,7 +30,8 @@ void RootFrame::InitFrame() {
   mSpinGridPanel=new SpinGridPanel(mSplitter);
 
   mDisplay3D=new Display3D(mSplitter);
-  mDisplay3D->SetRootSGNode(new MoleculeNode(NULL));
+  mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS().get()));
+  mDisplay3D->GetDC().depthOnly=false;
 
   // add the panes to the manager
   //mNotebook->AddPage(mDisplay3D, wxT("3D View"));

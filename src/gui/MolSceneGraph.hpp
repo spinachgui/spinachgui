@@ -5,17 +5,15 @@
 #include <gui/Display3D.hpp>
 
 
-///Scene graph node that draws a sphere at the origin
-class SphereNode : public SGNode {
-  ///Create a node that draws a sphere of unit radius
-  SphereNode() : mRadius(1.0f) {}
-  ///Create a node that draws a sphere a given radius
-  SphereNode(float radius) : mRadius(radius) {}
-  ///Change the radius of the sphere
-  void SetRadius(float radius){mRadius=radius; Dirty();}
+///Scenegraph node that draws a spin
+class SpinNode : public SGNode {
+public:
+  SpinNode(Spin* spin);
 private:
+  SpinNode();
+
+  Spin* mSpin;
   virtual void RawDraw(const SpinachDC& dc);
-  float mRadius;
 };
 
 ///Scene graph node that draws a cylinder between two points
@@ -55,7 +53,7 @@ private:
 
 class MoleculeNode : public SGNode {
 public:
-  MoleculeNode(SpinSystem* ss) : mSS(ss) {}
+  MoleculeNode(SpinSystem* ss);
 private:
   virtual void RawDraw(const SpinachDC& dc);
   SpinSystem* mSS;

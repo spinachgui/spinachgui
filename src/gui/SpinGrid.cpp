@@ -53,11 +53,11 @@ public:
     : mParent(parent),
       mSpin(spin),
       rowNumber(row) {
-    parent->sigDying.connect(mem_fun(*this,&SpinGridRow::OnGridDying));
-    parent->sigClearing.connect(mem_fun(*this,&SpinGridRow::OnGridDying));
+    parent->sigDying.connect(mem_fun(this,&SpinGridRow::OnGridDying));
+    parent->sigClearing.connect(mem_fun(this,&SpinGridRow::OnGridDying));
 
-    spin->sigChange.connect(mem_fun(*this,&SpinGridRow::UpdateRow));
-    spin->sigDying.connect(mem_fun(*this,&SpinGridRow::OnSpinDying));
+    spin->sigChange.connect(mem_fun(this,&SpinGridRow::UpdateRow));
+    spin->sigDying.connect(mem_fun(this,&SpinGridRow::OnSpinDying));
     UpdateRow();
   }
 

@@ -3,6 +3,7 @@
 #include <shared/nuclear_data.hpp>
 #include <cmath>
 #include <iostream>
+
 using namespace std;
 
 const double pi=3.141592654;
@@ -10,7 +11,9 @@ const double pi=3.141592654;
 ///Scenegraph node that draws a spin
 SpinNode::SpinNode(Spin* spin) 
   : mSpin(spin) {
+  mSpin->sigDying.connect(mem_fun(this,&SpinNode::OnSpinDying));
 }
+
 
 void SpinNode::RawDraw(const SpinachDC& dc) {
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
@@ -139,6 +142,13 @@ MoleculeNode::MoleculeNode(SpinSystem* ss)
     AddNode(new SpinNode(ss->GetSpin(i)));
   }
 }
+
+void MoleculeNode::OnNewSpin(Spin* newSpin,long number) {
+  //Somehow, somewhere a new spin has been created, so create a new
+  //spin renderer
+  AddNode(new SpinNode(newSpin));
+}
+
 
 void MoleculeNode::RawDraw(const SpinachDC& dc) {
   glEnable(GL_COLOR_MATERIAL);

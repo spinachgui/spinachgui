@@ -2,6 +2,7 @@
 #ifndef _MOL_SCENE_GRAPH_H_
 #define _MOL_SCENE_GRAPH_H_
 
+#include <sigc++/sigc++.h>
 #include <gui/Display3D.hpp>
 
 
@@ -9,6 +10,7 @@
 class SpinNode : public SGNode {
 public:
   SpinNode(Spin* spin);
+  void OnSpinDying(Spin*) {delete this;} //Arguments are usused
 private:
   SpinNode();
 
@@ -51,9 +53,12 @@ private:
   float mat[16];
 };
 
-class MoleculeNode : public SGNode {
+class MoleculeNode : public SGNode, public sigc::trackable {
 public:
   MoleculeNode(SpinSystem* ss);
+
+  void OnNewSpin(SpinXML::Spin* newSpin,long number);
+
 private:
   virtual void RawDraw(const SpinachDC& dc);
   SpinSystem* mSS;

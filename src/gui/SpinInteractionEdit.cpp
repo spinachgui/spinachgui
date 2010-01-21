@@ -1,6 +1,5 @@
 
 #include <gui/SpinInteractionEdit.hpp>
-#include <gui/StdEvents.hpp>
 #include <gui/SpinachApp.hpp>
 
 using namespace SpinXML;

@@ -6,8 +6,6 @@ using namespace boost;
 using namespace SpinXML;
 using namespace std;
 
-#include <gui/StdEvents.hpp>
-
 SpinSysManager::SpinSysManager(SpinSysPtr system) {
   HistoryItem hi;
   hi.state=SpinSysPtr(system);

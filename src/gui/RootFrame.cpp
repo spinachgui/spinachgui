@@ -1,7 +1,6 @@
 
 #include <gui/RootFrame.hpp>
 #include <gui/SpinachApp.hpp>
-#include <gui/StdEvents.hpp>
 #include <gui/MolSceneGraph.hpp>
 #include <stdexcept>
 #include <wx/log.h>

@@ -2,8 +2,6 @@
 #ifndef SPINSYS_H;
 #define SPINSYS_H;
 
-//#undef SPINXML_EVENTS
-
 #include <vector>
 #include <string>
 #include <string.h>
@@ -11,10 +9,6 @@
 #include <shared/mathtypes.hpp>
 #include <sigc++/sigc++.h>
 
-#ifdef SPINXML_EVENTS
-#include <wx/string.h>
-#include <gui/Event.hpp>
-#endif
 
 namespace SpinXML {
 

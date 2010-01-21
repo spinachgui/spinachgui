@@ -2,7 +2,6 @@
 #include <gui/RightClickMenu.hpp>
 #include <gui/SpinDialog.hpp>
 #include <gui/SpinachApp.hpp>
-#include <gui/StdEvents.hpp>
 
 //============================================================//
 // PopupMenu

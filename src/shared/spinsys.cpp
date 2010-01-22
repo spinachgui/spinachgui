@@ -600,7 +600,7 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
     }
   } else  if(looseSpin1) {
     cout << "Replace 1" << endl;
-    sigRemoveSpin(this,mSpin2);
+    sigRemoveSpin(this,mSpin1);
     mConnect2.disconnect();
     //We're keeping mSpin2. But is it spin1 or spin2 that replaces mSpin1
     if(spin1==mSpin2) {
@@ -612,7 +612,7 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
       cout << mSpin2 << " -> " << spin1 << endl;
       mSpin1=spin1;
     }
-    if(mSpin2){
+    if(mSpin1){
       cout << "Inserted mSpin2" << endl;
       mSpin1->InsertInteraction(this);
       mConnect1=sigRemoveSpin.connect(mem_fun(mSpin1,&Spin::OnRemoveInteraction));
@@ -620,7 +620,7 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
   } else if (looseSpin2) {
     //We're keeping mSpin1. But is it spin1 or spin2 that replaces mSpin2
     cout << "Replace 2" << endl;
-    sigRemoveSpin(this,mSpin1);
+    sigRemoveSpin(this,mSpin2);
     mConnect1.disconnect();
     if(spin1==mSpin1) {
       //Replace with spin2
@@ -631,7 +631,7 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
       cout << mSpin1 << " -> " << spin1 << endl;
       mSpin2=spin1;
     }
-    if(mSpin1) {
+    if(mSpin2) {
       cout << "Inserted mSpin1" << endl;
       mSpin2->InsertInteraction(this);
       mConnect2=sigRemoveSpin.connect(mem_fun(mSpin2,&Spin::OnRemoveInteraction));

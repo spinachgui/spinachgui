@@ -55,8 +55,6 @@ class Interaction : public sigc::trackable {
 
   //TODO: This function should probably assert that it's a HFC, linear or quadratic
   void OnSpinDying(Spin*) {delete this;}
-  //TODO: This function should probably assert that it's from a bilinear interaction
-  void OnSpinSystemDying() {delete this;}
     
   ///Print the interaction to the strandard output in a human readable
   ///form.
@@ -210,8 +208,10 @@ public:
 private:
   Spin* mSpin1;
   sigc::connection mConnect1;
+  sigc::connection mDyingConnect1;
   Spin* mSpin2;
   sigc::connection mConnect2;
+  sigc::connection mDyingConnect2;
 private:
 };
 

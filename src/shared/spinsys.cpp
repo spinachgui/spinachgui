@@ -612,7 +612,7 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
       cout << mSpin2 << " -> " << spin1 << endl;
       mSpin1=spin1;
     }
-    if(mSpin1){
+    if(mSpin1!=NULL){
       cout << "Inserted mSpin2" << endl;
       mSpin1->InsertInteraction(this);
       mConnect1=sigRemoveSpin.connect(mem_fun(mSpin1,&Spin::OnRemoveInteraction));
@@ -631,7 +631,7 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
       cout << mSpin1 << " -> " << spin1 << endl;
       mSpin2=spin1;
     }
-    if(mSpin2) {
+    if(mSpin2!=NULL) {
       cout << "Inserted mSpin1" << endl;
       mSpin2->InsertInteraction(this);
       mConnect2=sigRemoveSpin.connect(mem_fun(mSpin2,&Spin::OnRemoveInteraction));

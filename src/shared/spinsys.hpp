@@ -240,6 +240,7 @@ private:
       RemoveInteraction(inter);
     }
   }
+  void OnInteractionChange() {sigChange();}
 
     double GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
     double GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;

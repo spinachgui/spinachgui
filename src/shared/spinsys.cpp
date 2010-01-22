@@ -174,6 +174,7 @@ const char* Spin::GetLabel() const {
 void Spin::InsertInteraction(Interaction* _Interaction,long Position) {
   sigChange();
   mInter.push_back(_Interaction);
+  _Interaction->sigChange.connect(mem_fun(this,&Spin::OnInteractionChange));
   _Interaction->sigDying.connect(mem_fun(this,&Spin::RemoveInteraction));
 }
 

@@ -264,6 +264,7 @@ void InterEditPanel::LoadFromInter() {
 }
 
 void InterEditPanel::SaveToInter() {
+  interChangeConnect.block();
   Interaction::Type type = TypeOrders[mTypeChoiceBook->GetSelection()];
   if(type==Interaction::SCALAR) {
     double scalar;
@@ -315,6 +316,7 @@ void InterEditPanel::SaveToInter() {
 
     mInter->SetSpanSkew(span,skew,iso,mOrientSpanSkewCtrl->GetOrient());
   }
+  interChangeConnect.unblock();
 }
 
 

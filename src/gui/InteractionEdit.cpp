@@ -25,39 +25,28 @@ enum {
   SPIN2_COMBO
 };
 
-static bool DropDownSetup = false;
+const Interaction::SubType NuclearST[] =
+  {Interaction::ST_EXCHANGE,   
+   Interaction::ST_SHIELDING,  
+   Interaction::ST_HFC,        
+   Interaction::ST_DIPOLAR,    
+   Interaction::ST_QUADRUPOLAR,
+   Interaction::ST_CUSTOM_LINEAR,     
+   Interaction::ST_CUSTOM_BILINEAR,     
+   Interaction::ST_CUSTOM_QUADRATIC};
+const long NuclearSTLen = 8;
 
-const static Interaction::SubType NuclearSTLookup[] =  {Interaction::ST_EXCHANGE,   
-							Interaction::ST_SHIELDING,  
-							Interaction::ST_G_TENSER,   
-							Interaction::ST_HFC,        
-							Interaction::ST_DIPOLAR,    
-							Interaction::ST_QUADRUPOLAR,
-							Interaction::ST_ZFS,        
-							Interaction::ST_CUSTOM_LINEAR,     
-							Interaction::ST_CUSTOM_BILINEAR,     
-							Interaction::ST_CUSTOM_QUADRATIC};
-const static long NuclearSTLookupLen = 10;
+const Interaction::SubType ElectronST[] = 
+  {Interaction::ST_EXCHANGE,   
+   Interaction::ST_G_TENSER,   
+   Interaction::ST_DIPOLAR,    
+   Interaction::ST_QUADRUPOLAR,
+   Interaction::ST_ZFS,        
+   Interaction::ST_CUSTOM_LINEAR,     
+   Interaction::ST_CUSTOM_BILINEAR,     
+   Interaction::ST_CUSTOM_QUADRATIC};
+const long ElectronSTLen = 8;
 
-const static Interaction::SubType ElectronSTLookup[] = {Interaction::ST_EXCHANGE,   
-							Interaction::ST_SHIELDING,  
-							Interaction::ST_G_TENSER,   
-							Interaction::ST_HFC,        
-							Interaction::ST_DIPOLAR,    
-							Interaction::ST_QUADRUPOLAR,
-							Interaction::ST_ZFS,        
-							Interaction::ST_CUSTOM_LINEAR,     
-							Interaction::ST_CUSTOM_BILINEAR,     
-							Interaction::ST_CUSTOM_QUADRATIC};
-const static long ElectronSTLookupLen = 10;
-
-
-typedef std::map<Interaction::SubType,long> ReverseLookupMap;
-
-static ReverseLookupMap ElectronSTRevLookup;   
-static ReverseLookupMap NuclearSTRevLookup;    
-
-static bool mDropDownsSetup;
 
 Interaction::Type TypeOrders[]={
   Interaction::SCALAR,
@@ -67,19 +56,15 @@ Interaction::Type TypeOrders[]={
   Interaction::SPANSKEW
 };
 
-///Private function called once the first time an interaction edit
-///panel is created. Initalises the static variables assocated with
-///the class and does any other global set up that is required.
-
-void InterEditPanel_StaticConstructor() {
-  for(long j=0;j<NuclearSTLookupLen;j++) {
-    NuclearSTRevLookup[NuclearSTLookup[j]]=j;
+class STClientData : public wxClientData {
+public:
+  STClientData(Interaction::SubType st) 
+    : mST(st){
   }
-  for(long j=0;j<ElectronSTLookupLen;j++) {
-    ElectronSTRevLookup[ElectronSTLookup[j]]=j;
-  }
-  cout << "st run" << endl;
-}
+  Interaction::SubType GetData() {return mST;}
+  private:
+  Interaction::SubType mST;
+};
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   : InterEditPanelBase(parent,id),
@@ -100,19 +85,16 @@ InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   mSubTypeCombo->SetId(SUBTYPE_COMBO);
   mSpin2Combo->SetId(SPIN2_COMBO);
 
-  if(!DropDownSetup) { //Fakes a static constructor
-    DropDownSetup=true;
-    InterEditPanel_StaticConstructor();
-  }
-
   UpdateSubTypeCombo();
 }							     
 							     
 void InterEditPanel::SetInter(Interaction* inter,Spin* withRespectTo) {
+  interChangeConnect.disconnect();
   mWithRespectTo=withRespectTo;
   mInter=inter;
   Enable(inter != NULL);
   if(inter != NULL) {
+    interChangeConnect=mInter->sigChange.connect(mem_fun(this,&InterEditPanel::OnInterChange));
     LoadFromInter();
   }
 }
@@ -176,26 +158,21 @@ void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
   }
   Interaction::SubType st = mInter->GetSubType();
   if(true) {//If nucleus
-    for(long i=0;i<NuclearSTLookupLen;i++) {
-      mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(NuclearSTLookup[i]),wxConvUTF8));
+    for(long i=0;i<NuclearSTLen;i++) {
+      mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(NuclearST[i]),wxConvUTF8),new STClientData(NuclearST[i]));
     }
-    mSubTypeCombo->SetSelection(NuclearSTRevLookup[st]);
   } else { //Else electron
-    for(long i=0;i<ElectronSTLookupLen;i++) {
-      mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(ElectronSTLookup[i]),wxConvUTF8));
+    for(long i=0;i<ElectronSTLen;i++) {
+      mSubTypeCombo->Append(wxString(Interaction::GetSubTypeName(ElectronST[i]),wxConvUTF8),new STClientData(ElectronST[i]));
     }
-    mSubTypeCombo->SetSelection(ElectronSTRevLookup[st]);
   }
-
-
-
+  SetSubTypeSelection(st);
+  STClientData* data=dynamic_cast<STClientData*>(mSubTypeCombo->GetClientObject(0));
+  cout << Interaction::GetSubTypeName(data->GetData()) << endl;
 }
 
 void InterEditPanel::LoadFromInter() {
   mLoading=true;
-
-
-  UpdateSubTypeCombo();
 
   if(mInter->GetIsLinear()) {
 	mSpin2Combo->Enable(false);
@@ -205,6 +182,7 @@ void InterEditPanel::LoadFromInter() {
 	//Interaction is quadratic
 	mSpin2Combo->Enable(false);
   }
+  UpdateSubTypeCombo();
 
   //Populate the spin 2 combobox with every other spin
   mSpin2Combo->Clear();
@@ -215,7 +193,8 @@ void InterEditPanel::LoadFromInter() {
   long spinCount=(*head)->GetSpinCount();
 
   for(long i=0;i<spinCount;i++) {
-    mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString((*head)->GetSpin(i)->GetLabel(),wxConvUTF8));
+    Spin* spin=(*head)->GetSpin(i);
+    mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(spin->GetLabel(),wxConvUTF8),(void*)spin);
   }
   if(mInter->GetIsBilinear()) {
     long Spin2Number=GetSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
@@ -351,23 +330,31 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
 
 
 void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
-  long selection=mSubTypeCombo->GetSelection();
-  if(selection=-1) {
-    selection=0;
-    mSubTypeCombo->SetSelection(0);
+  STClientData* data=dynamic_cast<STClientData*>(mSubTypeCombo->GetClientObject(mSubTypeCombo->GetSelection()));
+  if(data==NULL) {
+    cerr << "data==NULL" << endl;
+    return;
   }
-  Interaction::SubType st=NuclearSTLookup[selection];
+  Interaction::SubType st=data->GetData();
   Interaction::Form f=Interaction::GetFormFromSubType(st);
+
   if(f==Interaction::LINEAR || f==Interaction::QUADRATIC) {
     mInter->SetSubType(st,mWithRespectTo,NULL);
-    mSpin2Combo->Enable(false);
   } else {
-    mInter->SetSubType(st,mWithRespectTo,GetSS()->GetSpin(selection));
-    mSpin2Combo->Enable(true);
+    mInter->SetSubType(st,mWithRespectTo,(Spin*)mSpin2Combo->GetClientData());
   }
+
   sigChange();
 }
 
+
+void InterEditPanel::SetSubTypeSelection(SpinXML::Interaction::SubType st) {
+  for(long i=0;i<NuclearSTLen;i++) {
+    if(st==NuclearST[i]) {
+      mSubTypeCombo->SetSelection(i);
+    }
+  }
+}
 
 void InterEditPanel::OnOrientChange(wxCommandEvent& e){
   SaveToInter();

@@ -25,9 +25,14 @@ public:
   void OnSpin2Change(wxCommandEvent& e);
   void OnOrientChange(wxCommandEvent& e);
 
+  void OnInterChange() {LoadFromInter();}
+
   sigc::signal<void> sigChange;
 protected:
   DECLARE_EVENT_TABLE();
+  sigc::connection interChangeConnect;
+
+  void SetSubTypeSelection(SpinXML::Interaction::SubType st);
 
 
 private:

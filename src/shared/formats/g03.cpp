@@ -165,10 +165,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	    stream >> JCoupling;
 	    Interaction* inter=new Interaction();
             inter->SetScalar(JCoupling);
-	    inter->SetSubType(Interaction::ST_SCALAR);
-	    inter->SetSpin1(ss->GetSpin(j+1));
-            inter->SetSpin2(ss->GetSpin(i*5+k+1));
-	    ss->GetSpin(j+1)->InsertInteraction(new Interaction());
+	    inter->SetSubType(Interaction::ST_SCALAR,ss->GetSpin(j+1),ss->GetSpin(i*5+k+1));
 	  }
 	}
       }
@@ -187,9 +184,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
         
         Interaction* inter=new Interaction();
         inter->SetScalar(isoCoupling);
-	inter->SetSubType(Interaction::ST_HFC);
-	inter->SetSpin1(ss->GetSpin(i));
-	ss->GetSpin(i)->InsertInteraction(inter);
+	inter->SetSubType(Interaction::ST_HFC,ss->GetSpin(i),NULL);
       }          
     }
     if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
@@ -221,10 +216,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 
 	Interaction* inter=new Interaction(); //Last paramiter is reference frame, which is always lab
 	inter->SetEigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05,o);
-	inter->SetSubType(Interaction::ST_HFC);
-	inter->SetSpin1(ss->GetSpin(i));
-	
-	ss->GetSpin(i)->InsertInteraction(inter);
+	inter->SetSubType(Interaction::ST_HFC,ss->GetSpin(i),NULL);
       }
     }
   }

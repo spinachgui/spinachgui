@@ -42,7 +42,8 @@ public:
 
   ///Class representing one of the shielding paramiters such as the
   ///chemical shift or J coupling
-class Interaction {
+class Interaction : public sigc::trackable {
+  friend class SpinSystem;
   public:
   ///Constructs an undefined interaction. The type are returned by
   ///GetType() is null UNDEFINED.
@@ -51,6 +52,11 @@ class Interaction {
     Interaction(const Interaction& inter, SpinSystem* newSystem=NULL);
   ///Destructor
     ~Interaction();
+
+  //TODO: This function should probably assert that it's a HFC, linear or quadratic
+  void OnSpinDying(Spin*) {delete this;}
+  //TODO: This function should probably assert that it's from a bilinear interaction
+  void OnSpinSystemDying() {delete this;}
     
   ///Print the interaction to the strandard output in a human readable
   ///form.
@@ -104,13 +110,14 @@ class Interaction {
     static const char* GetTypeName(Type t);
   ///Get a human readable name for a member of the enum SubType
     static const char* GetSubTypeName(SubType st);
+  static Form GetFormFromSubType(SubType st);
 
   ///Get the storage convention being used
     Type GetType() const;
   ///Get the physical source of this interaction
     SubType GetSubType() const;
   ///Set a flag indicating the physical source of this interaction.
-    void SetSubType(SubType st);
+  void SetSubType(SubType st, Spin* spin1, Spin* spin2=NULL);
   ///Returns true if the physical source of this interaction is t. The
   ///members ST_NMR, ST_EPR and ST_ANY may be used here and will be
   ///interpreted coorectly. For example, if inter is of SubType
@@ -164,6 +171,10 @@ class Interaction {
     Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
   sigc::signal<void> sigChange;
   sigc::signal<void,Interaction*> sigDying;
+  ///This signal is emited whenever one of the spins this interaction
+  ///referes to changes. The first argument is a pointer to the old
+  ///spin
+  sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
 
   private:
     union  {
@@ -190,21 +201,22 @@ class Interaction {
 
    Type mType;
    SubType mSubType;
-private:
-  Spin* mSpin1;
-  Spin* mSpin2;
+
 public:
   Spin* GetSpin1() const {return mSpin1;}
   Spin* GetSpin2() const {return mSpin2;}
-
-  void SetSpin1(Spin* s1) {sigChange();mSpin1=s1;}
-  void SetSpin2(Spin* s2) {sigChange();mSpin2=s2;}
-
-
+  Spin* GetOtherSpin(Spin* spin) const {return (mSpin1==spin ? mSpin2 : 
+						(mSpin2==spin ? mSpin1 : NULL));}
+private:
+  Spin* mSpin1;
+  sigc::connection mConnect1;
+  Spin* mSpin2;
+  sigc::connection mConnect2;
+private:
 };
 
   ///A class representing a spin in a spin system
-class Spin {
+class Spin : public sigc::trackable {
 private:
   public:  
     Spin(Vector3 mPosition,std::string mLabel,long atomicNumber=1);
@@ -220,9 +232,14 @@ private:
     const char* GetLabel() const;
 
     std::vector<Interaction*> GetInteractions() const {return mInter;}
+
     void InsertInteraction(Interaction* _Interaction,long Position=END);
-    void RemoveInteraction(long Position);
     void RemoveInteraction(Interaction* _Interaction);
+  void OnRemoveInteraction(Interaction* inter,Spin* spin) {
+    if(spin==this){
+      RemoveInteraction(inter);
+    }
+  }
 
     double GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
     double GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
@@ -277,11 +294,7 @@ class SpinSystem : public sigc::trackable {
   //Event Handlers
   void OnSpinDeleted(Spin* spin){RemoveSpin(spin);}
 
-
-  std::vector<Interaction*>& GetInteractions()  {return mBilinInter;}
-
   sigc::signal<void,Spin*,long> sigNewSpin;
-  sigc::signal<void,Spin*,Spin*> sigNewBilinear;
   sigc::signal<void> sigReloading;
   sigc::signal<void> sigReloaded;
   sigc::signal<void> sigDying;
@@ -292,9 +305,6 @@ class SpinSystem : public sigc::trackable {
   //Set just before deleting a spin
   Spin* mIgnoreSpinKill;
   std::vector<Spin*> mSpins;
-  //Set just before deleting an interaction
-  Interaction* mIgnoreInterKill;
-  std::vector<Interaction*> mBilinInter;
 };
 
 }; //End Namespace

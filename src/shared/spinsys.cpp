@@ -11,42 +11,20 @@ using namespace sigc;
 //==============================================================================//
 // SpinSystem
 
-SpinSystem::SpinSystem() : mIgnoreSpinKill(NULL), mIgnoreInterKill(NULL) {
+SpinSystem::SpinSystem() : mIgnoreSpinKill(NULL) {
 }
 
 
 SpinSystem::SpinSystem(const SpinSystem& system)  {
   long spinCount=system.mSpins.size();
-  long interCount=system.mBilinInter.size();
 
   mSpins.resize(spinCount);
-  mBilinInter.resize(interCount);
 
   for(long i=0;i<spinCount;i++) {
     mSpins[i]=new Spin(*system.mSpins[i]);
   }
-  for(long i=0;i<interCount;i++) {
-    mBilinInter[i]=new Interaction(*system.mBilinInter[i]);
-    //Problem, mSpin1 and mSpin2 will still point to the spins in the
-    //old SpinSystemn
-    Spin* Spin1=system.mBilinInter[i]->GetSpin1();
-    Spin* Spin2=system.mBilinInter[i]->GetSpin2();
-    int found=0;
-    for(long j=0;j<spinCount;j++) {
-      if(Spin1==system.mSpins[j]) {
-	mBilinInter[i]->SetSpin1(mSpins[j]);
-	found++;
-      }
-      if(Spin2==system.mSpins[j]) {
-	mBilinInter[i]->SetSpin2(mSpins[j]);
-	found++;
-      }
-      if(found==2) {
-	break;
-      }
-    }
-  }
 }
+
 
 SpinSystem::~SpinSystem() {
   Clear();
@@ -58,16 +36,11 @@ void SpinSystem::Clear() {
   //the spins have interactions as their children. 
   sigReloading();
 
-  for(long i=0;i<mBilinInter.size();i++) {
-    mIgnoreInterKill=mBilinInter[i];
-    delete mBilinInter[i];
-  }
   for(long i=0;i<mSpins.size();i++) {
     mIgnoreSpinKill=mSpins[i];
     delete mSpins[i];
   }
   mSpins.resize(0);
-  mBilinInter.resize(0);
  
   sigReloaded();
 }
@@ -75,7 +48,6 @@ void SpinSystem::Clear() {
 void SpinSystem::Dump() const {
   cout << "Dumping SpinSystem:" << endl;
   cout << " Spin count=" << mSpins.size() << endl;
-  cout << " Bilinear Interaction count=" << mBilinInter.size() << endl;
   cout << endl;
 }
     
@@ -94,14 +66,6 @@ long SpinSystem::GetSpinNumber(Spin* spin) const {
     }
   }
   return -1;
-}
-
-long SpinSystem::GetInteractionCount() const {
-  return mBilinInter.size();
-}
-
-Interaction* SpinSystem::GetInteraction(long n) const {
-  return mBilinInter[n];
 }
 
 vector<Spin*> SpinSystem::GetSpins() const {
@@ -208,14 +172,11 @@ const char* Spin::GetLabel() const {
 }
 
 void Spin::InsertInteraction(Interaction* _Interaction,long Position) {
-  
   sigChange();
   mInter.push_back(_Interaction);
+  _Interaction->sigDying.connect(mem_fun(this,&Spin::RemoveInteraction));
 }
 
-void Spin::RemoveInteraction(long Position) {
-  mInter.erase(mInter.begin()+Position);
-}
 
 void Spin::RemoveInteraction(Interaction* _Interaction) {
   if(_Interaction == NULL) {
@@ -313,10 +274,14 @@ vector<long> Spin::GetIsotopes() const {
   return retVal;
 }
 
+
+
+
 //==============================================================================//
 // Interaction
 
- Interaction::Interaction() : mType(UNDEFINED),mSubType(ST_ANY) {
+Interaction::Interaction() 
+  : mType(UNDEFINED),mSubType(ST_ANY),mSpin1(NULL),mSpin2(NULL) {
 }
 
 Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
@@ -605,9 +570,91 @@ Interaction::SubType Interaction::GetSubType() const {
   return mSubType;
 }
 
-void Interaction::SetSubType(SubType st) {
-  sigChange();
+void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
+  cout << "Interaction::SetSubType";
+  cout << "(" << spin1 << "," << spin2 << ")" << endl;
+  cout << "(" << mSpin1 << "," << mSpin2 << ")" << endl;
   mSubType=st;
+  //true if mSpin1 is not mentioned and thus will not be kept.
+  bool looseSpin1=mSpin1!=spin1 && mSpin1!=spin2;
+  //ture if mSpin2 is not mentioned and thus will not be kept.
+  bool looseSpin2=mSpin2!=spin1 && mSpin2!=spin2;
+  cout << "looseSpin1=" << looseSpin1 << " looseSpin2=" << looseSpin2 << endl;
+  if(looseSpin1 && looseSpin2 || (mSpin1==NULL && mSpin2==NULL)) {
+    //Easyest case, we're replacing both spins
+    cout << "Replace both" << endl;
+    sigRemoveSpin(this,mSpin1);
+    mConnect1.disconnect();
+    sigRemoveSpin(this,mSpin2);
+    mConnect2.disconnect();
+    mSpin1=spin1;
+    if(spin1) {
+      mSpin1->InsertInteraction(this);
+      mConnect1=sigRemoveSpin.connect(mem_fun(mSpin1,&Spin::OnRemoveInteraction));
+    }
+    mSpin2=spin2;
+    if(spin2){
+      mSpin2->InsertInteraction(this);
+      mConnect2=sigRemoveSpin.connect(mem_fun(mSpin2,&Spin::OnRemoveInteraction));
+    }
+  } else  if(looseSpin1) {
+    cout << "Replace 2" << endl;
+    sigRemoveSpin(this,mSpin2);
+    mConnect2.disconnect();
+    //We're keeping mSpin1. But is it spin1 or spin2 that replaces mSpin2
+    if(spin1==mSpin1) {
+      //Replace with spin2
+      mSpin2=spin2;
+    } else {
+      //Replace with spin1
+      mSpin2=spin1;
+    }
+    if(mSpin2){
+      cout << "Inserted mSpin2" << endl;
+      mSpin2->InsertInteraction(this);
+      mConnect2=sigRemoveSpin.connect(mem_fun(mSpin2,&Spin::OnRemoveInteraction));
+    }
+  } else if (looseSpin2) {
+    //We're keeping mSpin2. But is it spin1 or spin2 that replaces mSpin2
+    cout << "Replace 1" << endl;
+    sigRemoveSpin(this,mSpin1);
+    mConnect1.disconnect();
+    if(spin1==mSpin2) {
+      //Replace with spin2
+      mSpin1=spin2;
+    } else {
+      //Replace with spin1
+      mSpin1=spin1;
+    }
+    if(mSpin1) {
+      cout << "Inserted mSpin1" << endl;
+      mSpin1->InsertInteraction(this);
+      mConnect1=sigRemoveSpin.connect(mem_fun(mSpin1,&Spin::OnRemoveInteraction));
+    }
+  }
+  sigChange();
+}
+
+Interaction::Form Interaction::GetFormFromSubType(SubType st) {
+  switch(st) {
+    case ST_CUSTOM_LINEAR:
+    case ST_SHIELDING:
+    case ST_G_TENSER:
+      return LINEAR;
+
+    case ST_CUSTOM_BILINEAR:
+    case ST_SCALAR:
+    case ST_DIPOLAR:
+    case ST_HFC:
+    case ST_EXCHANGE:
+      return BILINEAR;
+
+    case ST_ZFS: 
+    case ST_QUADRUPOLAR:
+    case ST_CUSTOM_QUADRATIC:
+      return QUADRATIC;
+  }
+  throw logic_error("Unknown type in GetFromFromSubType");
 }
 
 bool Interaction::IsSubType(SubType t) const {
@@ -675,4 +722,5 @@ bool Interaction::GetIsQuadratic() {
      mSubType==ST_CUSTOM_QUADRATIC;
 
 }
+
 

@@ -13,10 +13,10 @@ SpinNode::SpinNode(Spin* spin)
   : mSpin(spin) {
   mSpin->sigDying.connect(mem_fun(this,&SpinNode::OnSpinDying));
   SetTranslation(mSpin->GetPosition());
-  Interaction* inter=new Interaction;
-  inter->SetSubType(Interaction::ST_HFC);
-  inter->SetScalar(10.0);
-  AddNode(new InterNode(inter));
+  std::vector<Interaction*> mInters=mSpin->GetInteractions();
+  for(long i=0;i<mInters.size();i++) {
+    AddNode(new InterNode(mInters[i]));
+  }
 }
 
 

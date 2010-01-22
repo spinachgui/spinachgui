@@ -108,7 +108,8 @@ InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
   UpdateSubTypeCombo();
 }							     
 							     
-void InterEditPanel::SetInter(Interaction* inter) {
+void InterEditPanel::SetInter(Interaction* inter,Spin* withRespectTo) {
+  mWithRespectTo=withRespectTo;
   mInter=inter;
   Enable(inter != NULL);
   if(inter != NULL) {
@@ -217,7 +218,7 @@ void InterEditPanel::LoadFromInter() {
     mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString((*head)->GetSpin(i)->GetLabel(),wxConvUTF8));
   }
   if(mInter->GetIsBilinear()) {
-    long Spin2Number=GetSS()->GetSpinNumber(mInter->GetSpin2());
+    long Spin2Number=GetSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
     mSpin2Combo->SetSelection(Spin2Number);
   }
 
@@ -348,20 +349,21 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
   return;
 }
 
-void InterEditPanel::OnSpin2Change(wxCommandEvent& e) {
-  mInter->SetSpin2((*(wxGetApp().GetSpinSysManager()->Get()))->GetSpin(mSpin2Combo->GetSelection()));
-  sigChange();
-}
 
 void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
-  mInter->SetSubType(NuclearSTLookup[mSubTypeCombo->GetSelection()]);
-  if(mInter->GetIsLinear()) {
-	mSpin2Combo->Enable(false);
-  } else if(mInter->GetIsBilinear()) {
-	mSpin2Combo->Enable(true);
+  long selection=mSubTypeCombo->GetSelection();
+  if(selection=-1) {
+    selection=0;
+    mSubTypeCombo->SetSelection(0);
+  }
+  Interaction::SubType st=NuclearSTLookup[selection];
+  Interaction::Form f=Interaction::GetFormFromSubType(st);
+  if(f==Interaction::LINEAR || f==Interaction::QUADRATIC) {
+    mInter->SetSubType(st,mWithRespectTo,NULL);
+    mSpin2Combo->Enable(false);
   } else {
-	//Interaction is quadratic
-	mSpin2Combo->Enable(false);
+    mInter->SetSubType(st,mWithRespectTo,GetSS()->GetSpin(selection));
+    mSpin2Combo->Enable(true);
   }
   sigChange();
 }
@@ -376,7 +378,7 @@ BEGIN_EVENT_TABLE(InterEditPanel,wxPanel)
 
 EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,     InterEditPanel::OnPageChange)
 EVT_CHOICE                 (SUBTYPE_COMBO,InterEditPanel::OnSubTypeChange)
-EVT_CHOICE                 (SPIN2_COMBO,  InterEditPanel::OnSpin2Change)
+EVT_CHOICE                 (SPIN2_COMBO,  InterEditPanel::OnSubTypeChange)
 EVT_TEXT                   (wxID_ANY,     InterEditPanel::onTextChange)
 EVT_COMMAND                (wxID_ANY,EVT_ORIENT_EDIT,InterEditPanel::OnOrientChange)
 

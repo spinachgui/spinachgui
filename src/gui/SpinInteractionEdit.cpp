@@ -54,8 +54,7 @@ void SpinInterEditPanel::Clear() {
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
   Interaction* inter=new Interaction();
   inter->SetScalar(0.0);
-  inter->SetSpin1(mSpin);
-  inter->SetSubType(Interaction::ST_SHIELDING);
+  inter->SetSubType(Interaction::ST_SHIELDING,mSpin);
   mSpin->InsertInteraction(inter);
 
   ListBoxInteraction lbi;
@@ -66,7 +65,7 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 
   UpdateListBox();
   mInterListBox->SetSelection(mInterListBox->GetCount()-1);
-  mInterEdit->SetInter(inter);
+  mInterEdit->SetInter(inter,mSpin);
   InteractionChange();
 }
 
@@ -75,7 +74,7 @@ void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
   mSpin->RemoveInteraction(mTempInteractions[n].inter);
   mTempInteractions.erase(mTempInteractions.begin() + n);
   UpdateListBox();
-  mInterEdit->SetInter(NULL);
+  mInterEdit->SetInter(NULL,NULL);
   InteractionChange();
 }
 
@@ -158,9 +157,9 @@ void SpinInterEditPanel::InteractionChange() {
   long selected=GetSelectedInterIndex();
   if(selected >-1) {
     Interaction* inter=mTempInteractions[selected].inter;
-    mInterEdit->SetInter(inter);
+    mInterEdit->SetInter(inter,mSpin);
   } else {
-    mInterEdit->SetInter(NULL);
+    mInterEdit->SetInter(NULL,NULL);
   }
 }
 

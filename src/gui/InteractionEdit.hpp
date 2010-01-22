@@ -13,8 +13,8 @@
 class InterEditPanel : public InterEditPanelBase {
 public:
   InterEditPanel(wxWindow* parent, wxWindowID id=-1);
-
-  void SetInter(SpinXML::Interaction* inter);
+  
+  void SetInter(SpinXML::Interaction* inter,SpinXML::Spin* withRespectTo);
   void SetDialogMode(bool dialogMode=true) {mDialogMode=dialogMode;}
 
   void OnPageChange(wxChoicebookEvent& e);
@@ -36,6 +36,7 @@ private:
   OrientDialogCombo* mOrientAxRhomCtrl;
   OrientDialogCombo* mOrientSpanSkewCtrl;
 
+  SpinXML::Spin* mWithRespectTo;
   SpinXML::Interaction* mInter;
 
   ///Update the interaction subtype drop down box. If subtypeWarning

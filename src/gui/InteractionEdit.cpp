@@ -338,12 +338,16 @@ void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
     return;
   }
   Interaction::SubType st=data->GetData();
+  cout << "OnSubTypeChange, st=" << Interaction::GetSubTypeName(st) << endl;
   Interaction::Form f=Interaction::GetFormFromSubType(st);
 
   if(f==Interaction::LINEAR || f==Interaction::QUADRATIC) {
     mInter->SetSubType(st,mWithRespectTo,NULL);
+    cout << "setting subtype to a linear or quadratic form" << endl;
   } else {
-    mInter->SetSubType(st,mWithRespectTo,(Spin*)mSpin2Combo->GetClientData());
+    Spin* spin=(Spin*)mSpin2Combo->GetClientData(mSpin2Combo->GetSelection());
+    cout << "setting spin 2 to " << spin << endl;
+    mInter->SetSubType(st,mWithRespectTo,spin);
   }
 
   sigChange();

@@ -38,6 +38,8 @@ public:
     gluQuadricDrawStyle(mWireQuadric,GLU_LINE);
     gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
   }
+  int width,height;
+  const float* mRotationMatrix;
 };
 
 class SGNode : public sigc::trackable {
@@ -109,6 +111,9 @@ public:
   void SetRootSGNode(SGNode* node) {
     if(mRootNode) delete mRootNode; mRootNode=node;
   }
+  void SetRootFGNode(SGNode* node) {
+    if(mForgroundNode) delete mForgroundNode; mForgroundNode=node;
+  }
   SpinachDC& GetDC() {return mDC;}
 protected:
   DECLARE_EVENT_TABLE();
@@ -121,7 +126,9 @@ protected:
 
 private:
 
+  //These nodes can be rotated and translated  with the mouse
   SGNode* mRootNode;
+  //This nodes stay fixed on the screne
   SGNode* mForgroundNode;
 
   SpinachDC mDC;

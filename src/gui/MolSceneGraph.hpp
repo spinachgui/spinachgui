@@ -55,7 +55,7 @@ private:
 };
 
 
-class MoleculeNode : public SGNode, public sigc::trackable {
+class MoleculeNode : public SGNode {
 public:
   MoleculeNode(SpinSystem* ss);
 
@@ -66,5 +66,15 @@ private:
   SpinSystem* mSS;
 };
 
+class MoleculeFG : public SGNode {
+public:
+  MoleculeFG(SpinSystem* ss);
+
+  void OnNewElectron(SpinXML::Spin* newSpin,long number);
+
+private:
+virtual void RawDraw(const SpinachDC& dc) {}
+  SpinSystem* mSS;
+};
 
 #endif

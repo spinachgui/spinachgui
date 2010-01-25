@@ -12,7 +12,10 @@ const double pi=3.141592654;
 SpinNode::SpinNode(Spin* spin) 
   : mSpin(spin) {
   mSpin->sigDying.connect(mem_fun(this,&SpinNode::OnSpinDying));
-  SetTranslation(mSpin->GetPosition());
+  if(spin->GetElement() != 0) {
+    //Electrons are placed at (0,0,0)
+    SetTranslation(mSpin->GetPosition());
+  }
   std::vector<Interaction*> mInters=mSpin->GetInteractions();
 
   static const Interaction::SubType NuclearCentredInterTypes[]=
@@ -43,7 +46,13 @@ void SpinNode::RawDraw(const SpinachDC& dc) {
     glMaterialfv(GL_FRONT, GL_SPECULAR, material);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
   }
-  gluSphere(dc.GetSolidQuadric(),0.1,14,14);
+  if(mSpin->GetElement()==0) {
+    glTranslatef(40,dc.height-40,0);
+    glMultMatrixf(dc.mRotationMatrix);
+    gluSphere(dc.GetSolidQuadric(),9,14,14);
+  } else {
+    gluSphere(dc.GetSolidQuadric(),0.1,14,14);
+  }
 }
 
 InterNode::InterNode(SpinXML::Spin* spin, SpinXML::Interaction::SubType st) 
@@ -216,3 +225,15 @@ void MoleculeNode::RawDraw(const SpinachDC& dc) {
 
 
 
+MoleculeFG::MoleculeFG(SpinSystem* ss) 
+  : mSS(ss) {
+  long count=ss->GetSpinCount();
+  for(long i=0;i<count;i++) {
+    Spin* spin=ss->GetSpin(i);
+    if(spin->GetElement() == 0) {
+      //Now we are only drawing electrons
+      cout << "Added an electron to the forground" << endl;
+      AddNode(new SpinNode(spin));
+    }
+  }
+}

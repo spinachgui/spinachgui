@@ -187,7 +187,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
         
         Interaction* inter=new Interaction();
         inter->SetScalar(isoCoupling);
-	inter->SetSubType(Interaction::ST_HFC,ss->GetSpin(i),ss->GetSpin(4));
+	inter->SetSubType(Interaction::ST_HFC,ss->GetSpin(i),ss->GetSpin(0));
       }          
     }
     if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
@@ -219,7 +219,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 
 	Interaction* inter=new Interaction(); //Last paramiter is reference frame, which is always lab
 	inter->SetEigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05,o);
-	inter->SetSubType(Interaction::ST_HFC,ss->GetSpin(i),NULL);
+	inter->SetSubType(Interaction::ST_HFC,ss->GetSpin(i),ss->GetSpin(0));
       }
     }
   }

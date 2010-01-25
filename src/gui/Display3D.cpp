@@ -53,7 +53,7 @@ void SGNode::SetTranslation(const Vector3& v) {
 
 void SGNode::Draw(const SpinachDC& dc) {
   if(mDirty) {
-    //glNewList(mList,GL_COMPILE);
+    glNewList(mList,GL_COMPILE);
     if(!mIdentity) {
       glPushMatrix();
       glMultMatrixf(mat);
@@ -68,9 +68,9 @@ void SGNode::Draw(const SpinachDC& dc) {
     if(!mIdentity) {
       glPopMatrix();
     }
-    //glEndList();
+    glEndList();
   } 
-  //glCallList(mList);
+  glCallList(mList);
 }
 
 
@@ -283,6 +283,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
   int width,height;
   GetClientSize(&width,&height);
+  mDC.width=width; mDC.height=height;
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -312,6 +313,8 @@ void Display3D::OnPaint(wxPaintEvent& e) {
   gluLookAt(mCamX,mCamY,mCamZ,0,0,-1,0,1,0);
   glMultMatrixf(mRotationMatrix);
 
+  mDC.mRotationMatrix=mRotationMatrix;
+
   glEnable(GL_DEPTH_TEST);	
 
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -325,15 +328,11 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     //Now draw the forground objects
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0,mWidth,mHeight,0,-10,10);
+    glOrtho(0,mWidth,mHeight,0,-50,50);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    glTranslatef(20,mHeight-20,0);
-    gluSphere(mDC.GetSolidQuadric(),10,17,9);
-
-    //glMultMatrixf(mRotationMatrix);
+    mForgroundNode->Draw(mDC);
   } glDisable(GL_LIGHTING);   
   SwapBuffers();
 }

@@ -16,6 +16,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
     c style I/O
   */
   ss->Clear();
+  Spin* s=new Spin(Vector3(0,0,0),string("Unpaired Electron"),0);
+  ss->InsertSpin(s);
+
   ifstream fin(filename);
   cout << "Opening a g03 file:" << filename << endl;
   if(!fin.is_open()) {

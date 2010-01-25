@@ -173,7 +173,12 @@ MoleculeNode::MoleculeNode(SpinSystem* ss)
   : mSS(ss) {
   long count=ss->GetSpinCount();
   for(long i=0;i<count;i++) {
-    AddNode(new SpinNode(ss->GetSpin(i)));
+    Spin* spin=ss->GetSpin(i);
+    if(spin->GetElement() != 0) {
+      //If the spin is an electron, it should be drawn outside of the
+      //molecule
+      AddNode(new SpinNode(spin));
+    }
   }
 }
 

@@ -328,7 +328,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     //Now draw the forground objects
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0,mWidth,mHeight,0,-50,50);
+    glOrtho(0,mWidth,0,mHeight,-50,50);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

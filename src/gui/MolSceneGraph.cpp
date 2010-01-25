@@ -114,9 +114,14 @@ void InterNode::RawDraw(const SpinachDC& dc) {
     //Apply the transformation matrix to warp the sphere
     glPushMatrix(); {
       glPushMatrix(); {
-	glMultMatrixf(mat);
-	glScalef(0.04,0.04,0.04);
-	gluSphere(dc.GetWireQuadric(),1.0,8,8);
+	if(mSpin->GetElement()==0) {
+	  glMultMatrixf(mat);
+	  gluSphere(dc.GetWireQuadric(),0.5,9,17);
+	} else {
+	  glMultMatrixf(mat);
+	  glScalef(0.04,0.04,0.04);
+	  gluSphere(dc.GetWireQuadric(),1.0,9,17);
+	}
       } glPopMatrix();
     } glPopMatrix();
     break;

@@ -122,6 +122,7 @@ protected:
 private:
 
   SGNode* mRootNode;
+  SGNode* mForgroundNode;
 
   SpinachDC mDC;
 
@@ -138,6 +139,7 @@ private:
   double mHoverDist;
   long mMouseX,mMouseY;
   double mZoom;
+  int mWidth,mHeight;
 
   //Quadrics
   GLUquadric* mQFilled;

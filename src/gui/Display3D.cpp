@@ -180,13 +180,8 @@ void Display3D::EnableGL() {
 
 
 void Display3D::ChangeViewport() {
-
-  int width,height;
-  GetClientSize(&width,&height);
-	
-
-  GetClientSize(&width,&height);
-  glViewport(0,0,width,height);
+  GetClientSize(&mWidth,&mHeight);
+  glViewport(0,0,mWidth,mHeight);
 	
   //From the documentation:
   //glDeleteTextures silently ignores 0's and names that do not correspond to existing textures.
@@ -201,7 +196,7 @@ void Display3D::ChangeViewport() {
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	
   glTexImage2D(GL_PROXY_TEXTURE_2D,0,GL_RGBA,
-	       height,width,
+	       mHeight,mWidth,
 	       0,GL_RGBA,GL_UNSIGNED_BYTE,NULL);
 
 }
@@ -321,8 +316,21 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     if(mRootNode) {
       mRootNode->Draw(mDC);
     }
-  } glDisable(GL_LIGHTING);   
+
 	
+    //Now draw the forground objects
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0,mWidth,mHeight,0,-10,10);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glTranslatef(20,mHeight-20,0);
+    gluSphere(mDC.GetSolidQuadric(),10,17,9);
+
+    //glMultMatrixf(mRotationMatrix);
+  } glDisable(GL_LIGHTING);   
   SwapBuffers();
 }
 

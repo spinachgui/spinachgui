@@ -76,9 +76,13 @@ void SGNode::Draw(const SpinachDC& dc) {
 
 //============================================================//
 // Display3D class
+int gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 24, 0};
 
 Display3D::Display3D(wxWindow* parent) 
-  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY,wxDefaultPosition,wxDefaultSize,WX_GL_DOUBLEBUFFER),
+  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY,
+	       wxDefaultPosition,wxDefaultSize,
+	       0,wxT("Display3D"),
+	       gl_attribs),
     mRootNode(NULL),
     mDC() {
   mGLContext=NULL;

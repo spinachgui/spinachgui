@@ -248,6 +248,9 @@ private:
     Matrix3 GetLinearInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
     Matrix3 GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
 
+  bool GetHasInteractionOfType(Interaction::SubType t) const;
+  Matrix3 GetTotalInteraction(Interaction::SubType t) const;
+
     long GetElement() const;
     void SetElement(long element);
     std::vector<long> GetIsotopes() const;

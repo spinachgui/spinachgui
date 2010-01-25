@@ -20,11 +20,13 @@ private:
 
 class InterNode : public SGNode {
 public:
-  InterNode(Interaction* inter);
-  void OnInterDying(Interaction*) {delete this;}
+  InterNode(SpinXML::Spin* spin, SpinXML::Interaction::SubType st);
+  void OnSpinDying(Spin*) {delete this;}
   void LoadInteractionMatrix();
 private:
-  Interaction* mInter;
+  SpinXML::Spin* mSpin;
+  SpinXML::Interaction::SubType mType;
+
   void SetMatrix(const Matrix3& mat);
   virtual void RawDraw(const SpinachDC& dc);
   float mat[16];

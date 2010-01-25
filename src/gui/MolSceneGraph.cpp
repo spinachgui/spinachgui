@@ -14,8 +14,20 @@ SpinNode::SpinNode(Spin* spin)
   mSpin->sigDying.connect(mem_fun(this,&SpinNode::OnSpinDying));
   SetTranslation(mSpin->GetPosition());
   std::vector<Interaction*> mInters=mSpin->GetInteractions();
-  for(long i=0;i<mInters.size();i++) {
-    AddNode(new InterNode(mInters[i]));
+
+  static const Interaction::SubType NuclearCentredInterTypes[]=
+    {Interaction::ST_HFC,
+     Interaction::ST_G_TENSER,
+     Interaction::ST_ZFS,
+     Interaction::ST_SHIELDING,
+     Interaction::ST_QUADRUPOLAR, 
+     Interaction::ST_CUSTOM_LINEAR,
+     Interaction::ST_CUSTOM_QUADRATIC};
+
+  for(long i=0;i<7;i++) {
+    if(mSpin->GetHasInteractionOfType(NuclearCentredInterTypes[i])) {
+      AddNode(new InterNode(spin,NuclearCentredInterTypes[i]));
+    }
   }
 }
 
@@ -34,9 +46,9 @@ void SpinNode::RawDraw(const SpinachDC& dc) {
   gluSphere(dc.GetSolidQuadric(),0.1,14,14);
 }
 
-InterNode::InterNode(Interaction* inter) 
-  : mInter(inter) {
-  mInter->sigDying.connect(mem_fun(this,&InterNode::OnInterDying));
+InterNode::InterNode(SpinXML::Spin* spin, SpinXML::Interaction::SubType st) 
+  : mSpin(spin),mType(st) {
+  mSpin->sigDying.connect(mem_fun(this,&InterNode::OnSpinDying));
   mat[3 ]=0;
   mat[7 ]=0;
   mat[11]=0;
@@ -53,7 +65,7 @@ void InterNode::LoadInteractionMatrix() {
   //again) 
 
   //TODO: This would be a great place to calculate the eigenvalues
-  Matrix3 mat3=mInter->GetAsMatrix();
+  Matrix3 mat3=mSpin->GetTotalInteraction(mType);
   mat[0 ]=abs(mat3.Get(0,0));
   mat[1 ]=abs(mat3.Get(0,1));
   mat[2 ]=abs(mat3.Get(0,2));
@@ -72,7 +84,7 @@ void InterNode::RawDraw(const SpinachDC& dc) {
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
   const static GLfloat blue[3]={0.0,0.0,0.5};
 
-  switch(mInter->GetSubType()) {
+  switch(mType) {
     //Draw as a ellipsoid around a nucleus
   case Interaction::ST_HFC:
     glMaterialfv(GL_FRONT, GL_SPECULAR, blue);

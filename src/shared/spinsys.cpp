@@ -191,6 +191,33 @@ void Spin::RemoveInteraction(Interaction* _Interaction) {
   sigChange();
 }
 
+Matrix3 Spin::GetTotalInteraction(Interaction::SubType t) const {
+  Matrix3 total=Matrix3(0,0,0,
+			0,0,0,
+			0,0,0);
+  long interCount=mInter.size();
+  for(long i=0;i < interCount;++i) {
+    Interaction* inter=mInter[i];
+    if(!inter->IsSubType(t)) {
+      continue;
+    }
+    if(inter->IsSubType(t)) {
+      total+=inter->GetAsMatrix();
+    }
+  }
+  return total;
+}
+
+bool Spin::GetHasInteractionOfType(Interaction::SubType t) const {
+  long interCount=mInter.size();
+  for(long i=0;i < interCount;++i) {
+    if(mInter[i]->IsSubType(t)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
   double total=0.0;
   long interCount=mInter.size();

@@ -22,17 +22,16 @@ SpinNode::SpinNode(Spin* spin)
 
 void SpinNode::RawDraw(const SpinachDC& dc) {
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
-  const static GLfloat blue[3]={0.0,0.0,0.5};
   if(true) {
     GLfloat material[3];
     material[0] = getElementR(mSpin->GetElement());
     material[1] = getElementG(mSpin->GetElement());
     material[2] = getElementB(mSpin->GetElement());
 
-    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, material);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
   }
-  gluSphere(dc.GetSolidQuadric(),0.2,14,14);
+  gluSphere(dc.GetSolidQuadric(),0.1,14,14);
 }
 
 InterNode::InterNode(Interaction* inter) 
@@ -76,7 +75,7 @@ void InterNode::RawDraw(const SpinachDC& dc) {
   switch(mInter->GetSubType()) {
     //Draw as a ellipsoid around a nucleus
   case Interaction::ST_HFC:
-    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, blue);
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
     goto nuclear_centred_drawing;  //I know, I know, see http://xkcd.com/292/
   case Interaction::ST_CUSTOM_LINEAR:
@@ -96,7 +95,7 @@ void InterNode::RawDraw(const SpinachDC& dc) {
       glPushMatrix(); {
 	glMultMatrixf(mat);
 	glScalef(0.04,0.04,0.04);
-	gluSphere(dc.GetWireQuadric(),1.0,14,14);
+	gluSphere(dc.GetWireQuadric(),1.0,8,8);
       } glPopMatrix();
     } glPopMatrix();
     break;
@@ -174,10 +173,12 @@ void MoleculeNode::OnNewSpin(Spin* newSpin,long number) {
 
 
 void MoleculeNode::RawDraw(const SpinachDC& dc) {
-  glEnable(GL_COLOR_MATERIAL);
-  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-  static const GLfloat white[] = {0.5, 0.5,  0.5}; 
-  glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+
+  static const GLfloat darkgreen[] = {0.0, 0.9,  0.0}; 
+  static const GLfloat lightgreen[] = {0.0, 0.9,  0.0}; 
+  glMaterialfv(GL_FRONT, GL_AMBIENT, lightgreen);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, darkgreen);
+
 			
   //Draw some coordiante axese
   glBegin(GL_LINES); {

@@ -53,10 +53,13 @@ void SGNode::SetTranslation(const Vector3& v) {
 
 void SGNode::Draw(const SpinachDC& dc) {
   if(mDirty) {
-    glNewList(mList,GL_COMPILE);
+    //glNewList(mList,GL_COMPILE);
     if(!mIdentity) {
       glPushMatrix();
       glMultMatrixf(mat);
+    }
+    if(mUseMaterial) {
+      glMaterialfv(GL_FRONT,GL_SPECULAR,mMaterial);
     }
     RawDraw(dc);
     for(itor i=mChildren.begin();i!=mChildren.end();++i) {
@@ -65,9 +68,9 @@ void SGNode::Draw(const SpinachDC& dc) {
     if(!mIdentity) {
       glPopMatrix();
     }
-    glEndList();
+    //glEndList();
   } 
-  glCallList(mList);
+  //glCallList(mList);
 }
 
 
@@ -75,7 +78,7 @@ void SGNode::Draw(const SpinachDC& dc) {
 // Display3D class
 
 Display3D::Display3D(wxWindow* parent) 
-  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY),
+  : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY,wxDefaultPosition,wxDefaultSize,WX_GL_DOUBLEBUFFER),
     mRootNode(NULL),
     mDC() {
   mGLContext=NULL;
@@ -142,7 +145,8 @@ void Display3D::EnableGL() {
   // on the left side of the model (x = -1.5f) and emits white light. The
   // second light source is located on the right side of the model (x = 1.5f)
   // emitting red light.
-	
+
+  glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);     
   glEnable(GL_LIGHT1);
 

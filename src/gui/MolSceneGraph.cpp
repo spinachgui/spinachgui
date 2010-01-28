@@ -50,6 +50,7 @@ void SpinNode::RawDraw(const SpinachDC& dc) {
     glTranslatef(40,dc.height-40,0);
     glMultMatrixf(dc.mRotationMatrix);
     gluSphere(dc.GetSolidQuadric(),9,14,14);
+
   } else {
     gluSphere(dc.GetSolidQuadric(),0.1,14,14);
   }
@@ -192,6 +193,7 @@ MoleculeNode::MoleculeNode(SpinSystem* ss)
       //If the spin is an electron, it should be drawn outside of the
       //molecule
       AddNode(new SpinNode(spin));
+      
     }
   }
 }
@@ -226,6 +228,43 @@ void MoleculeNode::RawDraw(const SpinachDC& dc) {
     glVertex3f(0,0,0);
     glVertex3f(0,0,5);
   } glEnd();
+
+  GLfloat whiteMaterial[] = {0.5, 0.5,  0.5}; 
+  GLfloat blueMaterial[]  = {0.06,0.06, 0.4}; 
+  glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
+  glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
+
+#warning "This version contains really dump bond drawing code! Replace as soon as feasable"
+  long count=mSS->GetSpinCount();
+  for(long i=0;i<count;i++) {
+    Spin* spin=mSS->GetSpin(i);
+    if(spin->GetElement() == 0) {
+      continue;
+    }
+    //If the spin is an electron, it should be drawn outside of the
+    //molecule
+    vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8,spin);
+    for(long j=0;j<nearby.size();j++) {
+      if(nearby[j]->GetElement()==0) {
+	continue;
+      }
+      Vector3 mR1=spin->GetPosition();
+      Vector3 mR2=nearby[j]->GetPosition();
+
+      double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
+      double x2=mR2.GetX(),y2=mR2.GetY(),z2=mR2.GetZ();
+
+      double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+			
+      //Now we need to find the rotation between the z axis
+      double angle=acos((z2-z1)/length);
+      glPushMatrix(); {
+	glTranslatef(x1,y1,z1);
+	glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
+	gluCylinder(dc.GetSolidQuadric(),0.04,0.04,length,7,7);
+      } glPopMatrix();
+    }
+  }
 }
 
 

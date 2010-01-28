@@ -141,35 +141,35 @@ void glDisplay::EnableGL() {
 //============================================================//
 // Display List Construction
 void glDisplay::CreateBondList() {
-	glNewList(mDLBonds,GL_COMPILE);
+  glNewList(mDLBonds,GL_COMPILE);
 	
-	for(long i=0;i<(*mSS)->GetSpinCount();i++) {   //Draw the spins and the bonds
-		Spin* thisSpin=(*mSS)->GetSpin(i);
-		double x1,y1,z1;
-		thisSpin->GetCoordinates(&x1,&y1,&z1);
+  for(long i=0;i<(*mSS)->GetSpinCount();i++) {   //Draw the spins and the bonds
+    Spin* thisSpin=(*mSS)->GetSpin(i);
+    double x1,y1,z1;
+    thisSpin->GetCoordinates(&x1,&y1,&z1);
 		
-		//draw in bonds to nearby atoms
+    //draw in bonds to nearby atoms
 		
-		glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
-		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
-		vector<Spin*> nearby=thisSpin->GetNearbySpins(1.8);
-		glColor3f(1.0, 0.0, 0.0);
-		for(long j=0;j<nearby.size();j++) {
-			Spin* nearbySpin=nearby[j];
-			double x2,y2,z2;
-			nearbySpin->GetCoordinates(&x2,&y2,&z2);
-			double bondLength=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+    glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
+    vector<Spin*> nearby=thisSpin->GetNearbySpins(1.8);
+    glColor3f(1.0, 0.0, 0.0);
+    for(long j=0;j<nearby.size();j++) {
+      Spin* nearbySpin=nearby[j];
+      double x2,y2,z2;
+      nearbySpin->GetCoordinates(&x2,&y2,&z2);
+      double bondLength=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
-			//Now we need to find the rotation between the z axis
-			double angle=acos((z2-z1)/bondLength);
-			glPushMatrix();
-			glTranslatef(x1,y1,z1);
-			glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-			gluCylinder(mQFilled,0.1,0.1,bondLength,7,7);
-			glPopMatrix();
-		}
-	}
-	glEndList();
+      //Now we need to find the rotation between the z axis
+      double angle=acos((z2-z1)/bondLength);
+      glPushMatrix();
+      glTranslatef(x1,y1,z1);
+      glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
+      gluCylinder(mQFilled,0.1,0.1,bondLength,7,7);
+      glPopMatrix();
+    }
+  }
+  glEndList();
 }
 
 //============================================================//

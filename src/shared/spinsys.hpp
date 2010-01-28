@@ -295,6 +295,10 @@ class SpinSystem : public sigc::trackable {
     void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
     void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;
 
+  ///Return all spins withing distance of point pos. Do not return
+  ///skip all spins below Ignore
+  std::vector<Spin*> GetNearbySpins(Vector3 pos,double distance,Spin* Ignore=NULL);
+
   //Event Handlers
   void OnSpinDeleted(Spin* spin){RemoveSpin(spin);}
 

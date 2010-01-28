@@ -68,7 +68,32 @@ long SpinSystem::GetSpinNumber(Spin* spin) const {
   return -1;
 }
 
-vector<Spin*> SpinSystem::GetSpins() const {
+vector<Spin*> SpinSystem::GetNearbySpins(Vector3 pos,double distance,Spin* Ignore) {
+  std::vector<Spin*> result;
+  double dist2=distance*distance;
+  double x1=pos.GetX();
+  double y1=pos.GetY();
+  double z1=pos.GetZ();
+
+  long spinCount=mSpins.size();
+
+  long skipped;
+  for(skipped=0;mSpins[skipped]!=Ignore && skipped<spinCount;skipped++){}
+
+  
+  for(long i=skipped+1;i<spinCount;i++) {
+    double x2,y2,z2;
+    mSpins[i]->GetCoordinates(&x2,&y2,&z2);
+    double deltaX=(x1-x2);
+    double deltaY=(y1-y2);
+    double deltaZ=(z1-z2);
+    if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ < dist2) {
+      result.push_back(mSpins[i]);
+    }
+  }
+  return result;
+}
+const vector<Spin*>& SpinSystem::GetSpins() const {
   return mSpins;
 }
 

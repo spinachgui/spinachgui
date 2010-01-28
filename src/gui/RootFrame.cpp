@@ -29,8 +29,9 @@ void RootFrame::InitFrame() {
   mSpinGridPanel=new SpinGridPanel(mSplitter);
 
   mDisplay3D=new Display3D(mSplitter);
-  mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS().get()));
-  mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS().get()));
+  mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));
+  //mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
+  mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));
 
   mDisplay3D->GetDC().depthOnly=false;
 

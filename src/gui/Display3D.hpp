@@ -95,6 +95,19 @@ private:
 };
 
 
+class OpenGLText : public SGNode {
+public:
+  OpenGLText(const wxString& str)  {UpdateString(str);}
+  void SetStr(const wxString& str) {UpdateString(str);}
+  
+private:
+  virtual void RawDraw(const SpinachDC& dc);
+  void UpdateString(const wxString& str);
+  GLuint texName;
+  int w,h;
+};
+
+
 class Display3D :  public wxGLCanvas, sigc::trackable {
 public:
   Display3D(wxWindow* parent);

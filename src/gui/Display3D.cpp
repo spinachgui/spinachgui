@@ -3,9 +3,85 @@
 #include <gui/SpinachApp.hpp>
 #include <gui/RightClickMenu.hpp>
 #include <wx/dcclient.h>
+#include <wx/image.h>
+#include <wx/dcmemory.h>
+#include <iostream>
+
+using namespace std;
 
 //============================================================//
 // Scene graphs
+
+void OpenGLText::RawDraw(const SpinachDC& dc) {
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_TEXTURE_2D); {
+    glDisable(GL_LIGHTING);
+    glTranslatef(40,dc.height-40,0);
+    glBindTexture(GL_TEXTURE_2D,texName);
+    glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+    glBegin(GL_QUADS); {
+      glTexCoord2f(0,0); glVertex2f(0,0);
+      glTexCoord2f(1,0); glVertex2f(w,0);
+      glTexCoord2f(1,1); glVertex2f(w,h);
+      glTexCoord2f(0,1); glVertex2f(0,h);
+    } glEnd();
+  } glDisable(GL_TEXTURE_2D);
+}
+
+void OpenGLText::UpdateString(const wxString& str) {
+  wxMemoryDC memDC;
+  wxSize s=memDC.GetTextExtent(str);
+      
+  w=s.GetWidth();
+  h=s.GetHeight();
+
+  wxBitmap bit(w,h); 
+  memDC.SelectObject(bit);
+  memDC.SetTextForeground(wxColor(255,255,255));
+  memDC.SetTextBackground(wxColor(0,0,0));
+  memDC.DrawText(str,0,0);
+  wxImage img(bit.ConvertToImage());
+  img.AddHandler(new wxPNGHandler);
+  img.SaveFile(wxT("TextImg.png"), wxBITMAP_TYPE_PNG);
+  unsigned char* raw=img.GetData();
+
+  raw[0]=254;
+  raw[1]=0;
+  raw[2]=0;
+  raw[3]=254;
+  raw[4]=0;
+  raw[5]=0;
+  raw[6]=254;
+  raw[7]=0;
+  raw[8]=0;
+  raw[9]=254;
+  raw[10]=0;
+  raw[11]=0;
+
+  //openGL stuff
+  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+  glEnable(GL_TEXTURE_2D);
+  glGenTextures(1,&texName);
+  glBindTexture(GL_TEXTURE_2D,texName);
+
+  // when texture area is small, bilinear filter the closest mipmap
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                     GL_LINEAR_MIPMAP_NEAREST );
+    // when texture area is large, bilinear filter the first mipmap
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    // if wrap is true, the texture wraps over at the edges (repeat)
+    //       ... false, the texture ends at the edges (clamp)
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT);
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT);
+    /*glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);*/
+  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,w,h,0,GL_RGB,GL_UNSIGNED_BYTE,raw);
+  //gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB, w, h,GL_RGB, GL_UNSIGNED_BYTE, raw);
+}
+
 
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5}; 
 

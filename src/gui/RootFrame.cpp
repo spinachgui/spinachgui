@@ -54,11 +54,11 @@ void RootFrame::InitFrame() {
 
 
 void RootFrame::OnUndo(wxCommandEvent& e) {
-  wxGetApp().GetSpinSysManager()->Undo();
+
 }
 
 void RootFrame::OnRedo(wxCommandEvent& e) {
-  wxGetApp().GetSpinSysManager()->Redo();
+
 }
 
 void RootFrame::OnNew(wxCommandEvent& e) {
@@ -127,7 +127,6 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
     }
     Chkpoint(wxT("Load File"));
     UpdateTitle();
-    GetSSMgr().ClearHistory();
   }
 }
 

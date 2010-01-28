@@ -287,7 +287,7 @@ class SpinSystem : public sigc::trackable {
     long GetInteractionCount() const;
     Interaction* GetInteraction(long n) const;
 
-    std::vector<Spin*> GetSpins() const;
+    const std::vector<Spin*>& GetSpins() const;
     void InsertSpin(Spin* _Spin,long Position=END);
     void RemoveSpin(long Position);
     void RemoveSpin(Spin* _Spin);

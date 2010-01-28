@@ -11,10 +11,10 @@ class SpinachApp : public wxApp {
 public:
   ~SpinachApp();
   virtual bool OnInit();
-  SpinSysManager* GetSpinSysManager() const {return mSSMgr;}
+  SpinXML::SpinSystem* GetSS() const {return mSS;}
   const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
 private:
-  SpinSysManager* mSSMgr;
+  SpinXML::SpinSystem* mSS;
   std::vector<SpinXML::ISpinSystemLoader*> mIOFilters;
 };
 
@@ -23,8 +23,7 @@ private:
 DECLARE_APP(SpinachApp);
 
 //Define macros for accessing the most up to date spin system
-#define GetSSMgr() (*(wxGetApp().GetSpinSysManager()))
-#define GetSS() (*(wxGetApp().GetSpinSysManager()->Get()))
-#define Chkpoint(x) wxGetApp().GetSpinSysManager()->Checkpoint((x));
+#define GetSS() (wxGetApp().GetSS())
+#define Chkpoint(x) 
 
 #endif

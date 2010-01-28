@@ -187,13 +187,11 @@ void InterEditPanel::LoadFromInter() {
   //Populate the spin 2 combobox with every other spin
   mSpin2Combo->Clear();
   
-  SpinSysManager* SSMgr=wxGetApp().GetSpinSysManager();
-  const SpinSysPtr* head=SSMgr->Get();
-
-  long spinCount=(*head)->GetSpinCount();
+  SpinSystem* ss=GetSS();
+  long spinCount=ss->GetSpinCount();
 
   for(long i=0;i<spinCount;i++) {
-    Spin* spin=(*head)->GetSpin(i);
+    Spin* spin=ss->GetSpin(i);
     mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(spin->GetLabel(),wxConvUTF8),(void*)spin);
   }
   if(mInter->GetIsBilinear()) {

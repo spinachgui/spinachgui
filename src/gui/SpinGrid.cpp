@@ -138,7 +138,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 
 SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
-  :wxGrid(parent,id),mHead(wxGetApp().GetSpinSysManager()->Get()),mUpdating(false) {
+  :wxGrid(parent,id),mUpdating(false),mSS(GetSS()) {
 
   CreateGrid(0, ColumCount);
 
@@ -161,6 +161,7 @@ SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
   SetRowLabelSize(40);
   SetRowLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
 
+  mSS->sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
   RefreshFromSpinSystem();
 }
     
@@ -201,7 +202,6 @@ bool SpinGrid::DeleteRows(int pos,int numRows,bool updateLables) {
 
 void SpinGrid::RefreshFromSpinSystem() {
   mUpdating=true;
-  sigClearing();
 
   GetSS()->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
 
@@ -261,17 +261,17 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     double x;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
     Chkpoint(wxT("Spin Coordinates"));
-    (*mHead)->GetSpin(e.GetRow())->GetPosition().SetX(x);
+    mSS->GetSpin(e.GetRow())->GetPosition().SetX(x);
   } else if(e.GetCol()==COL_Y) {
     double y;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&y);
     Chkpoint(wxT("Spin Coordinates"));
-    (*mHead)->GetSpin(e.GetRow())->GetPosition().SetY(y);
+    mSS->GetSpin(e.GetRow())->GetPosition().SetY(y);
   } else if(e.GetCol()==COL_Z) {
     double z;
     GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
     Chkpoint(wxT("Spin Coordinates"));
-    (*mHead)->GetSpin(e.GetRow())->GetPosition().SetZ(z);
+    mSS->GetSpin(e.GetRow())->GetPosition().SetZ(z);
   } else if(e.GetCol()==COL_ELEMENT) {
     wxString content=GetCellValue(e.GetRow(),e.GetCol());
     long space=content.Find(wxT(" "));
@@ -282,7 +282,7 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     } else {
       UpdateRowIsotopes(e.GetRow());
       Chkpoint(wxT("Spin Element"));
-      (*mHead)->GetSpin(e.GetRow())->SetElement(element);
+      mSS->GetSpin(e.GetRow())->SetElement(element);
     }
     cout << space << " " << symbol.char_str() << endl;
   } else if(e.GetCol()==COL_LABEL) {
@@ -309,7 +309,7 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
 
 void SpinGrid::OnRightClick(wxGridEvent& e) {
   RightClickMenu* menu=new RightClickMenu(this);
-  if(e.GetRow()<(*mHead)->GetSpinCount()) {
+  if(e.GetRow()<mSS->GetSpinCount()) {
     menu->OptionDeleteSpin        (GetSS()->GetSpin(e.GetRow()));
     menu->OptionShowSpinProperties(GetSS()->GetSpin(e.GetRow()));
   }

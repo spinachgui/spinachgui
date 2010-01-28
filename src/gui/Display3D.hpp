@@ -149,7 +149,7 @@ private:
   bool mGLEnabled;
   wxGLContext* mGLContext;
 
-  const SpinSysPtr* mSS;
+  SpinXML::SpinSystem* mSS;
 
   //Textures
   GLuint mTexDepth;

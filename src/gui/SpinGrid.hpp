@@ -4,7 +4,6 @@
 
 #include <gui/SpinInteractionEdit.hpp>
 #include <shared/spinsys.hpp>
-#include <boost/shared_ptr.hpp>
 #include <sigc++/sigc++.h>
 #include <wx/grid.h>
 
@@ -65,8 +64,7 @@ private:
     long width;
   };
   const static SpinGridColum columns[];
-
-  const SpinSysPtr* mHead;
+  SpinXML::SpinSystem* mSS;
   bool mUpdating;
 
 };

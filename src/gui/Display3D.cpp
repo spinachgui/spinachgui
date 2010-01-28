@@ -129,7 +129,7 @@ void SGNode::SetTranslation(const Vector3& v) {
 
 void SGNode::Draw(const SpinachDC& dc) {
   if(mDirty) {
-    glNewList(mList,GL_COMPILE);
+    //glNewList(mList,GL_COMPILE);
     if(!mIdentity) {
       glPushMatrix();
       glMultMatrixf(mat);
@@ -144,9 +144,9 @@ void SGNode::Draw(const SpinachDC& dc) {
     if(!mIdentity) {
       glPopMatrix();
     }
-    glEndList();
+    //glEndList();
   } 
-  glCallList(mList);
+  //glCallList(mList);
 }
 
 
@@ -164,7 +164,7 @@ Display3D::Display3D(wxWindow* parent)
   mGLContext=NULL;
   mGLEnabled=false;
 
-  mSS=wxGetApp().GetSpinSysManager()->Get();
+  mSS=GetSS();
 
   mZoom=0.01;
   mCamX=0.0;
@@ -213,13 +213,14 @@ void Display3D::EnableGL() {
   }
   this->SetCurrent(*mGLContext);
 	
-  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glClearColor(1.0, 1.0, 1.0, 0.0);
   glClearDepth(1.0);
 	
-  //glShadeModel(GL_SMOOTH);
+  glShadeModel(GL_SMOOTH);
   //Adpated from a detailed tutorail on opengl lighting located at
   //http://www.falloutsoftware.com/tutorials/gl/gl8.htm
 	
+  glEnable(GL_TEXTURE_2D);
 	
   // We're setting up two light sources. One of them is located
   // on the left side of the model (x = -1.5f) and emits white light. The
@@ -342,11 +343,6 @@ void Display3D::OnResize(wxSizeEvent& e) {
 
 
 void Display3D::OnDeleteSpinHover(wxCommandEvent& e) {
-  if(mHover>-1) {
-    Chkpoint(wxT("Delete Spin"));
-    GetSS()->RemoveSpin(mHover);
-    Refresh();
-  }
 }
 
 void Display3D::OnPaint(wxPaintEvent& e) {
@@ -409,7 +405,9 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     mForgroundNode->Draw(mDC);
-  } glDisable(GL_LIGHTING);   
+  } glDisable(GL_LIGHTING);
+
+
   SwapBuffers();
 }
 

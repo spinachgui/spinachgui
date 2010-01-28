@@ -6,16 +6,12 @@
 #include <shared/nuclear_data.hpp>
 #include <gui/RootFrame.hpp>
 #include <wx/log.h>
-#include <boost/shared_ptr.hpp>
 
 #include <shared/formats/xyz.hpp>
 #include <shared/formats/g03.hpp>
 //#include <shared/formats/xml.hpp>
 
 #include <wx/filename.h>
-
-using boost::shared_ptr;
-using boost::shared_ptr;
 
 
 
@@ -56,12 +52,11 @@ bool SpinachApp::OnInit() {
   }
 
 
-  shared_ptr<SpinSystem> SS = shared_ptr<SpinSystem>(new SpinSystem);
+  mSS = new SpinSystem;
   //SS->LoadFromG03File("data/tryosine.log");
   G03Loader* loader= new G03Loader();
-  SS->LoadFromFile("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log",loader);
+  mSS->LoadFromFile("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log",loader);
   delete loader;
-  mSSMgr = new SpinSysManager(SS);
 
   RootFrame* frame = new RootFrame(NULL);
   frame->Show();

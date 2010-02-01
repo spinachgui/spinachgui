@@ -218,7 +218,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	o.SetEigenSystem(Vector3(x1,y1,z1),Vector3(x2,y2,z2),Vector3(x3,y3,z3));
 
 	Interaction* inter=new Interaction(); //Last paramiter is reference frame, which is always lab
-	inter->SetEigenvalues(eigenvalue1*0.05,eigenvalue2*0.05,eigenvalue3*0.05,o);
+	inter->SetEigenvalues(eigenvalue1,eigenvalue2,eigenvalue3,o);
 	inter->SetSubType(Interaction::ST_HFC,ss->GetSpin(i),ss->GetSpin(0));
       }
     }

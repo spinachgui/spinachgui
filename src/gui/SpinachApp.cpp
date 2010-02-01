@@ -53,10 +53,9 @@ bool SpinachApp::OnInit() {
 
 
   mSS = new SpinSystem;
-  //SS->LoadFromG03File("data/tryosine.log");
   G03Loader* loader= new G03Loader();
-  //mSS->LoadFromFile("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log",loader);
-  mSS->LoadFromFile("data/tryosine.log",loader);
+  mSS->LoadFromFile("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log",loader);
+  //mSS->LoadFromFile("data/tryosine.log",loader);
   delete loader;
 
   RootFrame* frame = new RootFrame(NULL);

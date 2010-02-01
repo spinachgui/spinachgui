@@ -638,18 +638,14 @@ Interaction::SubType Interaction::GetSubType() const {
 }
 
 void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
-  cout << "Interaction::SetSubType";
-  cout << "(" << spin1 << "," << spin2 << ")" << endl;
-  cout << "(" << mSpin1 << "," << mSpin2 << ")" << endl;
   mSubType=st;
   //true if mSpin1 is not mentioned and thus will not be kept.
-  bool looseSpin1=mSpin1!=spin1 && mSpin1!=spin2;
+  bool loseSpin1=mSpin1!=spin1 && mSpin1!=spin2;
   //ture if mSpin2 is not mentioned and thus will not be kept.
-  bool looseSpin2=mSpin2!=spin1 && mSpin2!=spin2;
-  cout << "looseSpin1=" << looseSpin1 << " looseSpin2=" << looseSpin2 << endl;
-  if(looseSpin1 && looseSpin2 || (mSpin1==mSpin2)) {
+  bool loseSpin2=mSpin2!=spin1 && mSpin2!=spin2;
+
+  if(loseSpin1 && loseSpin2 || (mSpin1==mSpin2)) {
     //Easyest case, we're replacing both spins
-    cout << "Replace both" << endl;
     sigRemoveSpin(this,mSpin1);
     mConnect1.disconnect();
     mDyingConnect1.disconnect();
@@ -668,44 +664,36 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
       mConnect2=sigRemoveSpin.connect(mem_fun(mSpin2,&Spin::OnRemoveInteraction));
       mDyingConnect2=mSpin2->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
     }
-  } else  if(looseSpin1) {
-    cout << "Replace 1" << endl;
+  } else  if(loseSpin1) {
     sigRemoveSpin(this,mSpin1);
     mConnect2.disconnect();
     mDyingConnect2.disconnect();
     //We're keeping mSpin2. But is it spin1 or spin2 that replaces mSpin1
     if(spin1==mSpin2) {
       //Replace with spin2
-      cout << mSpin2 << " -> " << spin2 << endl;
       mSpin1=spin2;
     } else {
       //Replace with spin1
-      cout << mSpin2 << " -> " << spin1 << endl;
       mSpin1=spin1;
     }
     if(mSpin1!=NULL){
-      cout << "Inserted mSpin2" << endl;
       mSpin1->InsertInteraction(this);
       mConnect1=sigRemoveSpin.connect(mem_fun(mSpin1,&Spin::OnRemoveInteraction));
       mDyingConnect1=mSpin1->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
     }
-  } else if (looseSpin2) {
+  } else if (loseSpin2) {
     //We're keeping mSpin1. But is it spin1 or spin2 that replaces mSpin2
-    cout << "Replace 2" << endl;
     sigRemoveSpin(this,mSpin2);
     mConnect1.disconnect();
     mDyingConnect1.disconnect();
     if(spin1==mSpin1) {
       //Replace with spin2
-      cout << mSpin2 << " -> " << spin2 << endl;
       mSpin2=spin2;
     } else {
       //Replace with spin1
-      cout << mSpin1 << " -> " << spin1 << endl;
       mSpin2=spin1;
     }
     if(mSpin2!=NULL) {
-      cout << "Inserted mSpin1" << endl;
       mSpin2->InsertInteraction(this);
       mConnect2=sigRemoveSpin.connect(mem_fun(mSpin2,&Spin::OnRemoveInteraction));
       mDyingConnect2=mSpin2->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));

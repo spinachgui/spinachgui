@@ -228,7 +228,7 @@ void Display3D::EnableGL() {
   }
   this->SetCurrent(*mGLContext);
 	
-  glClearColor(1.0, 1.0, 1.0, 0.0);
+  glClearColor(0.0, 0.0, 0.2, 0.0);
   glClearDepth(1.0);
 	
   glShadeModel(GL_SMOOTH);

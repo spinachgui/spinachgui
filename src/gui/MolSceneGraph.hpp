@@ -16,6 +16,7 @@ private:
 
   Spin* mSpin;
   virtual void RawDraw(const SpinachDC& dc);
+  virtual void ToPovRay(wxString& src);
 };
 
 class InterNode : public SGNode {
@@ -29,6 +30,7 @@ private:
 
   void SetMatrix(const Matrix3& mat);
   virtual void RawDraw(const SpinachDC& dc);
+  virtual void ToPovRay(wxString& src);
   float mat[16];
 };
 
@@ -49,6 +51,7 @@ class CyclinderNode : public SGNode {
   }
 private:
   virtual void RawDraw(const SpinachDC& dc);
+  virtual void ToPovRay(wxString& src) {/*TODO*/}
   float mRadius;
   Vector3 mR1;
   Vector3 mR2;
@@ -64,6 +67,7 @@ public:
 private:
   virtual void RawDraw(const SpinachDC& dc);
   SpinSystem* mSS;
+  virtual void ToPovRay(wxString& src);
 };
 
 class MoleculeFG : public SGNode {
@@ -73,7 +77,8 @@ public:
   void OnNewElectron(SpinXML::Spin* newSpin,long number);
 
 private:
-virtual void RawDraw(const SpinachDC& dc) {}
+  virtual void RawDraw(const SpinachDC& dc) {}
+  virtual void ToPovRay(wxString& src) {}
   SpinSystem* mSS;
 };
 

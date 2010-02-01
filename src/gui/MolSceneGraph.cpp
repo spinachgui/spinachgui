@@ -56,6 +56,26 @@ void SpinNode::RawDraw(const SpinachDC& dc) {
   }
 }
 
+void SpinNode::ToPovRay(wxString& src) {
+  if(mSpin->GetElement()!=0) {
+    GLfloat material[3];
+    material[0] = getElementR(mSpin->GetElement());
+    material[1] = getElementG(mSpin->GetElement());
+    material[2] = getElementB(mSpin->GetElement());
+
+    Vector3 pos=mSpin->GetPosition();
+
+    src << wxT("sphere{\n<") 
+	<< pos.GetX() << wxT(",")
+	<< pos.GetY() << wxT(",")
+	<< pos.GetZ() << wxT(">, 0.1 \npigment {color rgb <") 
+	<< getElementR(mSpin->GetElement()) << wxT(",")
+	<< getElementG(mSpin->GetElement()) << wxT(",")
+	<< getElementG(mSpin->GetElement()) << wxT(">\n")
+	<< wxT("}\n}\n");
+  }
+}
+
 InterNode::InterNode(SpinXML::Spin* spin, SpinXML::Interaction::SubType st) 
   : mSpin(spin),mType(st) {
   mSpin->sigDying.connect(mem_fun(this,&InterNode::OnSpinDying));
@@ -161,6 +181,8 @@ void InterNode::RawDraw(const SpinachDC& dc) {
     break;
   }
 }
+void InterNode::ToPovRay(wxString& src) {
+}
 
 
 
@@ -204,6 +226,39 @@ void MoleculeNode::OnNewSpin(Spin* newSpin,long number) {
   AddNode(new SpinNode(newSpin));
 }
 
+void MoleculeNode::ToPovRay(wxString& src) {
+  long count=mSS->GetSpinCount();
+  for(long i=0;i<count;i++) {
+    Spin* spin=mSS->GetSpin(i);
+    if(spin->GetElement() == 0) {
+      continue;
+    }
+    //If the spin is an electron, it should be drawn outside of the
+    //molecule
+    vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8,spin);
+    for(long j=0;j<nearby.size();j++) {
+      if(nearby[j]->GetElement()==0) {
+	continue;
+      }
+      Vector3 mR1=spin->GetPosition();
+      Vector3 mR2=nearby[j]->GetPosition();
+
+      double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
+      double x2=mR2.GetX(),y2=mR2.GetY(),z2=mR2.GetZ();
+
+      double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+			
+      //Now we need to find the rotation between the z axis
+      double angle=acos((z2-z1)/length);
+      glPushMatrix(); {
+	glTranslatef(x1,y1,z1);
+	glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
+	gluCylinder(dc.GetSolidQuadric(),0.04,0.04,length,7,7);
+      } glPopMatrix();
+    }
+  }
+
+}
 
 void MoleculeNode::RawDraw(const SpinachDC& dc) {
 

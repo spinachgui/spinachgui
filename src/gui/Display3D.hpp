@@ -71,10 +71,19 @@ public:
   void SetTranslation(const Vector3& v);
   void SetIdentity() {mIdentity=true;}
 
+  void GetPovRayString(wxString& str) {
+    ToPovRay(str);
+    for(itor i=mChildren.begin();i!=mChildren.end();++i) {
+      (*i)->GetPovRayString(str);
+    }
+  }
+
   sigc::signal<void,SGNode*> sigDying;
 private:
   ///Make whatever openGL calls are needed to draw the node.
   virtual void RawDraw(const SpinachDC& dc)=0;
+
+  virtual void ToPovRay(wxString& src)=0;
 
   bool mDirty;
   ///Stores an openGL display list for rendering the node
@@ -102,6 +111,7 @@ public:
   
 private:
   virtual void RawDraw(const SpinachDC& dc);
+  virtual void ToPovRay(wxString& src) {}
   void UpdateString(const wxString& str);
   GLuint texName;
   int w,h;

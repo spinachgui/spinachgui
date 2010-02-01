@@ -6,6 +6,7 @@
 #include <wx/image.h>
 #include <wx/dcmemory.h>
 #include <iostream>
+#include <wx/file.h>
 
 using namespace std;
 
@@ -350,6 +351,20 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     mGLEnabled=true;
     EnableGL();
   }
+
+  wxString povray;
+
+  povray << wxT("camera {\n  location <")
+	 << mCamX << wxT(",") 
+	 << mCamY << wxT(",")
+	 << mCamZ << wxT(">\n  look_at <0,0,0>\n}\n");
+  povray << wxT("light_source {\n<0,0,0>\ncolor rgb <1,1,1>\n}");
+  povray << wxT("background{rgb<1,1,1>}");
+
+  mRootNode->GetPovRayString(povray);
+  wxFile f(wxT("povray.pov"),wxFile::write);
+  f.Write(povray);
+  f.Close();
 
   wxPaintDC dc(this);
 

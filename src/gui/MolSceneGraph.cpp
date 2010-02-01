@@ -71,8 +71,8 @@ void SpinNode::ToPovRay(wxString& src) {
 	<< pos.GetZ() << wxT(">, 0.1 \npigment {color rgb <") 
 	<< getElementR(mSpin->GetElement()) << wxT(",")
 	<< getElementG(mSpin->GetElement()) << wxT(",")
-	<< getElementG(mSpin->GetElement()) << wxT(">\n")
-	<< wxT("}\n}\n");
+	<< getElementG(mSpin->GetElement()) << wxT(">}\n")
+	<< wxT("\n}\n");
   }
 }
 
@@ -134,16 +134,14 @@ void InterNode::RawDraw(const SpinachDC& dc) {
   nuclear_centred_drawing:
     //Apply the transformation matrix to warp the sphere
     glPushMatrix(); {
-      glPushMatrix(); {
-	if(mSpin->GetElement()==0) {
-	  glMultMatrixf(mat);
-	  gluSphere(dc.GetWireQuadric(),0.5,9,17);
-	} else {
-	  glMultMatrixf(mat);
-	  glScalef(0.04,0.04,0.04);
-	  gluSphere(dc.GetWireQuadric(),1.0,9,17);
-	}
-      } glPopMatrix();
+      if(mSpin->GetElement()==0) {
+	glMultMatrixf(mat);
+	gluSphere(dc.GetWireQuadric(),0.5,9,17);
+      } else {
+	glMultMatrixf(mat);
+	glScalef(0.04,0.04,0.04);
+	gluSphere(dc.GetWireQuadric(),1.0,9,17);
+      }
     } glPopMatrix();
     break;
     //Draw as a cyclinder
@@ -181,7 +179,22 @@ void InterNode::RawDraw(const SpinachDC& dc) {
     break;
   }
 }
-void InterNode::ToPovRay(wxString& src) {
+void InterNode::ToPovRay(wxString& str) {
+  if(mSpin->GetElement()==0) {
+    /* Do nothing, for now */
+  } else {
+    str << wxT("sphere {<0,0,0> 0.04\n");
+    str << wxT("matrix<")
+	<< mat[0 ] << wxT(",") << mat[1 ] << wxT(",") << mat[2 ]
+	<< mat[4 ] << wxT(",") << mat[5 ] << wxT(",") << mat[6 ]
+	<< mat[8 ] << wxT(",") << mat[9 ] << wxT(",") << mat[10]
+	<< mat[12] << wxT(",") << mat[13] << wxT(",") << mat[14]
+	<< wxT(">\n");
+    str << wxT("pigment {color rgbf <0.8,0.8,0.8,.8>}\n");
+    str << wxT("finish {reflection 0.1 refraction 0.9 phong 1.0}\n");
+    str << wxT("}\n");
+  }
+
 }
 
 
@@ -226,7 +239,7 @@ void MoleculeNode::OnNewSpin(Spin* newSpin,long number) {
   AddNode(new SpinNode(newSpin));
 }
 
-void MoleculeNode::ToPovRay(wxString& src) {
+void MoleculeNode::ToPovRay(wxString& str) {
   long count=mSS->GetSpinCount();
   for(long i=0;i<count;i++) {
     Spin* spin=mSS->GetSpin(i);
@@ -246,15 +259,12 @@ void MoleculeNode::ToPovRay(wxString& src) {
       double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
       double x2=mR2.GetX(),y2=mR2.GetY(),z2=mR2.GetZ();
 
-      double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
       //Now we need to find the rotation between the z axis
-      double angle=acos((z2-z1)/length);
-      glPushMatrix(); {
-	glTranslatef(x1,y1,z1);
-	glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-	gluCylinder(dc.GetSolidQuadric(),0.04,0.04,length,7,7);
-      } glPopMatrix();
+      str << wxT("cylinder {")
+	  << wxT("<") << x1 << wxT(",") << y1 << wxT(",") << z1 << wxT(",") wxT(">")
+	  << wxT("<") << x2 << wxT(",") << y2 << wxT(",") << z2 << wxT(",") wxT(">") 
+	  << 0.04 << wxT(" \npigment{color rgb <0.0,0.0,0.7>}\n}\n");
     }
   }
 

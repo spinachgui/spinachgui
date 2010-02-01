@@ -71,12 +71,7 @@ public:
   void SetTranslation(const Vector3& v);
   void SetIdentity() {mIdentity=true;}
 
-  void GetPovRayString(wxString& str) {
-    ToPovRay(str);
-    for(itor i=mChildren.begin();i!=mChildren.end();++i) {
-      (*i)->GetPovRayString(str);
-    }
-  }
+  void GetPovRayString(wxString& str);
 
   sigc::signal<void,SGNode*> sigDying;
 private:

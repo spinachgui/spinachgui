@@ -150,6 +150,20 @@ void SGNode::Draw(const SpinachDC& dc) {
   //glCallList(mList);
 }
 
+void SGNode::GetPovRayString(wxString& str) {
+  ToPovRay(str);
+  str << wxT("union{ \n");
+  for(itor i=mChildren.begin();i!=mChildren.end();++i) {
+    (*i)->GetPovRayString(str);
+  }
+  str << wxT("matrix<")
+      << mat[0 ] << wxT(",") << mat[1 ] << wxT(",") << mat[2 ] << wxT(",\n")
+      << mat[4 ] << wxT(",") << mat[5 ] << wxT(",") << mat[6 ] << wxT(",\n")
+      << mat[8 ] << wxT(",") << mat[9 ] << wxT(",") << mat[10] << wxT(",\n")
+      << mat[12] << wxT(",") << mat[13] << wxT(",") << mat[14]
+      << wxT(">\n");
+  str << wxT("}\n");
+}
 
 //============================================================//
 // Display3D class
@@ -358,8 +372,10 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 	 << mCamX << wxT(",") 
 	 << mCamY << wxT(",")
 	 << mCamZ << wxT(">\n  look_at <0,0,0>\n}\n");
-  povray << wxT("light_source {\n<0,0,0>\ncolor rgb <1,1,1>\n}");
-  povray << wxT("background{rgb<1,1,1>}");
+  povray << wxT("light_source {\n<1,0,0>\ncolor rgb <1,1,1>\n}\n");
+  povray << wxT("light_source {\n<0,1,0>\ncolor rgb <1,1,1>\n}\n");
+  povray << wxT("light_source {\n<0,0,1>\ncolor rgb <1,1,1>\n}\n");
+  //povray << wxT("background{rgb<1,1,1>}\n\n");
 
   mRootNode->GetPovRayString(povray);
   wxFile f(wxT("povray.pov"),wxFile::write);

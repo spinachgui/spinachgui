@@ -29,7 +29,7 @@ SpinNode::SpinNode(Spin* spin)
 
   for(long i=0;i<7;i++) {
     if(mSpin->GetHasInteractionOfType(NuclearCentredInterTypes[i])) {
-      AddNode(new InterNode(spin,NuclearCentredInterTypes[i]));
+      AddNode(new InterNode(mSpin,NuclearCentredInterTypes[i]));
     }
   }
 }

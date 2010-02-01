@@ -196,6 +196,19 @@ const char* Spin::GetLabel() const {
   return mLabel.c_str();
 }
 
+vector<Interaction*> Spin::GetInteractionsOnce() const {
+  vector<Interaction*> retVal;
+  for(long i=0;mInter.size();i++) {
+    if(mInter[i]->GetIsBilinear()) {
+      if(mInter[i]->GetOtherSpin(this) < this) {
+	retVal.push_back(mInter[i]);
+      }
+    } else {
+      retVal.push_back(mInter[i]);
+    }
+  }
+}
+
 void Spin::InsertInteraction(Interaction* _Interaction,long Position) {
   mInter.push_back(_Interaction);
   _Interaction->sigChange.connect(mem_fun(this,&Spin::OnInteractionChange));

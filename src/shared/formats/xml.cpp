@@ -30,7 +30,9 @@ type::value GetXSDTypeFromSpinXMLType(SpinXML::Interaction::SubType subtype) {
     return type::quadrupolar;
   case SpinXML::Interaction::ST_DIPOLAR:
     return type::dipolar;
-  case SpinXML::Interaction::ST_CUSTOM:
+  case SpinXML::Interaction::ST_CUSTOM_LINEAR:
+  case SpinXML::Interaction::ST_CUSTOM_BILINEAR:
+  case SpinXML::Interaction::ST_CUSTOM_QUADRATIC:
     return type::custem;
   default:
     throw std::runtime_error("Unknown sub type when outputing to an XML file");
@@ -56,7 +58,7 @@ SpinXML::Interaction::SubType GetSpinXMLTypeFromXSDType(type::value subtype) {
   case type::dipolar:
     return SpinXML::Interaction::ST_DIPOLAR;
   case type::custem:
-    return SpinXML::Interaction::ST_CUSTOM;
+    return SpinXML::Interaction::ST_CUSTOM_LINEAR;
   default:
     throw std::runtime_error("Unknown sub type when when reading an XML file. Is the right schema loaded?");
   }
@@ -179,9 +181,9 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
 
     SpinXML::Spin* newSpin;
     if(xsdSpin.label().present()) {
-      newSpin=new SpinXML::Spin(libss,Vector3(x,y,z),xsdSpin.label().get(),libss->GetRootFrame());
+      newSpin=new SpinXML::Spin(Vector3(x,y,z),xsdSpin.label().get());
     } else {
-      newSpin=new SpinXML::Spin(libss,Vector3(x,y,z),"",libss->GetRootFrame());
+      newSpin=new SpinXML::Spin(Vector3(x,y,z),"");
     }
     newSpin->SetElement(getElementBySymbol(xsdSpin.element().c_str()));
 
@@ -195,13 +197,13 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
     SpinXML::Interaction* thisInter=new SpinXML::Interaction;
     interaction xsdInter=inters[i];
 
-    thisInter->SetSubType(GetSpinXMLTypeFromXSDType(xsdInter.type()));
+    Interaction::SubType st=GetSpinXMLTypeFromXSDType(xsdInter.type());
     //TODO: Decide how to handle units
     long spinNumber=xsdInter.spin_1();
+    long spinNumber2=-1;
     if(spinNumber <0 || spinNumber >= spinCount) {
       throw std::runtime_error("Spin index in interaction out of range");
     }
-    thisInter->SetSpin1(libss->GetSpin(spinNumber));
     libss->GetSpin(spinNumber)->InsertInteraction(thisInter);
 
     if(xsdInter.spin_2().present()) {
@@ -209,10 +211,20 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
       if(spinNumber2 < 0 || spinNumber2 > spinCount) {
 	throw std::runtime_error("Spin index in interaction out of range");
       }
-      thisInter->SetSpin2(libss->GetSpin(spinNumber2));
-
-    } else {
-      thisInter->SetSpin2(NULL);      
+    }
+    if(st==SpinXML::Interaction::ST_CUSTOM_LINEAR)
+      if(spinNumber2 != -1) {
+	thisInter->SetSubType(SpinXML::Interaction::ST_CUSTOM_LINEAR,
+			      libss->GetSpin(spinNumber));
+      } else if(spinNumber2!=spinNumber) {
+	thisInter->SetSubType(SpinXML::Interaction::ST_CUSTOM_BILINEAR,
+			      libss->GetSpin(spinNumber),
+			      libss->GetSpin(spinNumber2));
+      } else {
+	thisInter->SetSubType(SpinXML::Interaction::ST_CUSTOM_QUADRATIC,
+			      libss->GetSpin(spinNumber),
+			      libss->GetSpin(spinNumber));{
+      }
     }
 
 
@@ -276,78 +288,82 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
   ss.spin(spins);
 
   spin_system::interaction_sequence inters;
-  for(long i=0;i<libss->GetInteractionCount();i++) {
-    SpinXML::Interaction* thisInter=libss->GetInteraction(i);
+  for(long i=0;i<libss->GetSpinCount();i++) {
+    SpinXML::Spin* spin=libss->GetSpin(i);
+    std::vector<Interaction*> thisInters=spin->GetInteractionsOnce();
+    for(long j=0;j<inters.size();j++) {
+      SpinXML::Interaction* thisInter=thisInters[j];
 
-    interaction1 inter(GetXSDTypeFromSpinXMLType(thisInter->GetSubType()),
-		       "MHz",
-		       libss->GetSpinNumber(thisInter->GetSpin1()),
-		       0);
+      interaction1 inter(GetXSDTypeFromSpinXMLType(thisInter->GetSubType()),
+			 "MHz",
+			 libss->GetSpinNumber(thisInter->GetSpin1()),
+			 0);
 
-    if(thisInter->GetSpin2() != NULL) {
-      inter.spin_2(libss->GetSpinNumber(thisInter->GetSpin2()));
-    }
+      if(thisInter->GetSpin2() != NULL) {
+	inter.spin_2(libss->GetSpinNumber(thisInter->GetSpin2()));
+      }
 
-    switch(thisInter->GetType()) {
-    case SpinXML::Interaction::SCALAR: {
-      double scalar;
-      thisInter->GetScalar(&scalar);
-      inter.scalar(scalar);
-      break;
-    }
-    case SpinXML::Interaction::MATRIX: {
-      SpinXML::Matrix3 mat;
-      thisInter->GetMatrix(&mat);
-      matrix::element_sequence eseq;
-      eseq.resize(9);  //Yes we need to do this. Codesynthsis doesn't
-		       //do it for us
-      eseq[0]=mat(0,0);
-      eseq[1]=mat(1,0);
-      eseq[2]=mat(2,0);
+      switch(thisInter->GetType()) {
+      case SpinXML::Interaction::SCALAR: {
+	double scalar;
+	thisInter->GetScalar(&scalar);
+	inter.scalar(scalar);
+	break;
+      }
+      case SpinXML::Interaction::MATRIX: {
+	SpinXML::Matrix3 mat;
+	thisInter->GetMatrix(&mat);
+	matrix::element_sequence eseq;
+	eseq.resize(9);  //Yes we need to do this. Codesynthsis doesn't
+	//do it for us
+	eseq[0]=mat(0,0);
+	eseq[1]=mat(1,0);
+	eseq[2]=mat(2,0);
 
-      eseq[3]=mat(0,1);
-      eseq[4]=mat(1,1);
-      eseq[5]=mat(2,1);
+	eseq[3]=mat(0,1);
+	eseq[4]=mat(1,1);
+	eseq[5]=mat(2,1);
 
-      eseq[6]=mat(0,2);
-      eseq[7]=mat(1,2);
-      eseq[8]=mat(2,2);
-      matrix xsdmat;
-      xsdmat.element(eseq);
-      inter.matrix(xsdmat);
-      break;
+	eseq[6]=mat(0,2);
+	eseq[7]=mat(1,2);
+	eseq[8]=mat(2,2);
+	matrix xsdmat;
+	xsdmat.element(eseq);
+	inter.matrix(xsdmat);
+	break;
+      }
+      case SpinXML::Interaction::EIGENVALUES: {
+	SpinXML::Orientation o;
+	double xx,yy,zz;
+	thisInter->GetEigenvalues(&xx,&yy,&zz,&o);
+	eigenvalues eigv(xx,yy,zz);
+	inter.orientation(ConvertOrientationToXML(o));
+	inter.eigenvalues(eigv);
+	break;
+      }
+      case SpinXML::Interaction::AXRHOM: {
+	SpinXML::Orientation o;
+	double ax,rhom,iso;
+	thisInter->GetAxRhom(&ax,&rhom,&iso,&o);
+	axiality_rhombicity ar(iso,ax,rhom);
+	inter.orientation(ConvertOrientationToXML(o));
+	inter.axiality_rhombicity(ar);
+	break;
+      }
+      case SpinXML::Interaction::SPANSKEW: {
+	SpinXML::Orientation o;
+	double span,skew,iso;
+	thisInter->GetSpanSkew(&span,&skew,&iso,&o);
+	span_skew spsk(iso,span,skew);
+	inter.orientation(ConvertOrientationToXML(o));
+	inter.span_skew(spsk);
+	break;
+      }
+      default:
+	throw std::runtime_error("Interaction is of an unknown form");
+      };
+      inters.push_back(inter);
     }
-    case SpinXML::Interaction::EIGENVALUES: {
-      SpinXML::Orientation o;
-      double xx,yy,zz;
-      thisInter->GetEigenvalues(&xx,&yy,&zz,&o);
-      eigenvalues eigv(xx,yy,zz);
-      inter.orientation(ConvertOrientationToXML(o));
-      inter.eigenvalues(eigv);
-      break;
-    }
-    case SpinXML::Interaction::AXRHOM: {
-      SpinXML::Orientation o;
-      double ax,rhom,iso;
-      thisInter->GetAxRhom(&ax,&rhom,&iso,&o);
-      axiality_rhombicity ar(iso,ax,rhom);
-      inter.orientation(ConvertOrientationToXML(o));
-      inter.axiality_rhombicity(ar);
-      break;
-    }
-    case SpinXML::Interaction::SPANSKEW: {
-      SpinXML::Orientation o;
-      double span,skew,iso;
-      thisInter->GetSpanSkew(&span,&skew,&iso,&o);
-      span_skew spsk(iso,span,skew);
-      inter.orientation(ConvertOrientationToXML(o));
-      inter.span_skew(spsk);
-      break;
-    }
-    default:
-      throw std::runtime_error("Interaction is of an unknown form");
-    };
-    inters.push_back(inter);
   }
   ss.interaction(inters);
 

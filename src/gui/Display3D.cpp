@@ -374,8 +374,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 	 << mCamZ << wxT(">\n  look_at <0,0,0>\n}\n");
   povray << wxT("light_source {\n<1,0,0>\ncolor rgb <1,1,1>\n}\n");
   povray << wxT("light_source {\n<0,1,0>\ncolor rgb <1,1,1>\n}\n");
-  povray << wxT("light_source {\n<0,0,1>\ncolor rgb <1,1,1>\n}\n");
-  //povray << wxT("background{rgb<1,1,1>}\n\n");
+  povray << wxT("background{rgb<1,1,1>}\n\n");
 
   mRootNode->GetPovRayString(povray);
   wxFile f(wxT("povray.pov"),wxFile::write);

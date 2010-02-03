@@ -5,7 +5,7 @@
 #include <auto/SpinachGUI.h>
 #include <gui/Display3D.hpp>
 #include <gui/SpinGrid.hpp>
-#include <wx/aui/auibook.h>
+#include <wx/aui/aui.h>
 #include <wx/splitter.h>
 
 class RootFrame : public RootFrameBase {
@@ -40,15 +40,17 @@ public:
   void OnNmr(wxCommandEvent& e);
   void OnEpr(wxCommandEvent& e);
 
+  //Resize Event
+  void OnResize(wxSizeEvent& e);
 
   DECLARE_EVENT_TABLE();
 
 private:
   void UpdateTitle();
 
-  wxAuiNotebook* mNotebook; //Buggy under GTK+, don't use
-  wxSplitterWindow* mSplitter;
+  wxAuiManager* mAuiManager;
   SpinGridPanel* mSpinGridPanel;
+  wxPanel* mInterSizePanel;
   Display3D* mDisplay3D;
   ISpinSystemLoader* mSaver;
 

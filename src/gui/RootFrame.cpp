@@ -7,6 +7,7 @@
 
 //Input and output filters
 #include <shared/formats/xyz.hpp>
+#include <gui/InterDisplaySettings.hpp>
 
 using namespace std;
 
@@ -23,29 +24,41 @@ wxString GetExtension(const wxString& filename) {
 // RootFrame
 
 void RootFrame::InitFrame() {
-  //mNotebook=new wxAuiNotebook(mAuiPanel);
-  mSplitter = new wxSplitterWindow(this);
+  mAuiManager=new wxAuiManager(this);
+  mInterSizePanel=new wxPanel(this);
 
-  mSpinGridPanel=new SpinGridPanel(mSplitter);
+  mSpinGridPanel=new SpinGridPanel(this);
+  wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_HFC),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_G_TENSER),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_ZFS),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_EXCHANGE),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SHIELDING),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SCALAR),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_QUADRUPOLAR),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_DIPOLAR),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_LINEAR),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_BILINEAR),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC),wxEXPAND | wxALL);
+  mInterSizePanel->SetSizer(bs);
 
-  mDisplay3D=new Display3D(mSplitter);
+
+  mDisplay3D=new Display3D(this);
   mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));
 
   //mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
   mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));
 
   mDisplay3D->GetDC().depthOnly=false;
-
+  
 
   // add the panes to the manager
-  //mNotebook->AddPage(mDisplay3D, wxT("3D View"));
-  //mNotebook->AddPage(mSpinGridPanel, wxT("Grid View"));
-
-  mSplitter->Initialize(mSpinGridPanel);
-  mSplitter->Initialize(mDisplay3D);
-  mSplitter->SplitVertically(mSpinGridPanel,mDisplay3D);
-
-  mAuiPanel->GetSizer()->Add(mSplitter,1,wxEXPAND);
+  wxAuiPaneInfo display3dinfo;
+  display3dinfo.Center();
+  display3dinfo.CloseButton(false);
+  mAuiManager->AddPane(mDisplay3D,display3dinfo);
+  mAuiManager->AddPane(mSpinGridPanel,wxBOTTOM,wxT("Grid View"));
+  mAuiManager->AddPane(mInterSizePanel,wxLEFT,wxT("Tensor Visualisation"));
 
   //Grey the undo and redo menu ideams. They can be ungreyed when
   //there is an undo history
@@ -226,6 +239,10 @@ void RootFrame::OnEpr(wxCommandEvent& e) {
 }
 
 
+void RootFrame::OnResize(wxSizeEvent&e) {
+  mAuiManager->Update();
+}
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
 //File Menu
@@ -243,6 +260,9 @@ EVT_MENU(ID_REDO,RootFrame::OnRedo)
 EVT_MENU(ID_NMR_EPR,RootFrame::OnNmrEpr)
 EVT_MENU(ID_NMR,    RootFrame::OnNmr)
 EVT_MENU(ID_EPR,    RootFrame::OnEpr)
+
+//Resize
+EVT_SIZE(RootFrame::OnResize)
 
 END_EVENT_TABLE()
 

@@ -25,24 +25,23 @@ wxString GetExtension(const wxString& filename) {
 
 void RootFrame::InitFrame() {
   mAuiManager=new wxAuiManager(this);
-  mInterSizePanel=new wxPanel(this);
 
-  mSpinGridPanel=new SpinGridPanel(this);
+  mInterSizePanel=new wxPanel(this);
   wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_HFC),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_G_TENSER),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_ZFS),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_EXCHANGE),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SHIELDING),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SCALAR),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_QUADRUPOLAR),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_DIPOLAR),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_LINEAR),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_BILINEAR),wxEXPAND | wxALL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC),wxEXPAND | wxALL);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_HFC),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_G_TENSER),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_ZFS),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_EXCHANGE),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SHIELDING),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SCALAR),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_QUADRUPOLAR),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_DIPOLAR),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_LINEAR),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_BILINEAR),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC),0,0);
   mInterSizePanel->SetSizer(bs);
 
-
+  mSpinGridPanel=new SpinGridPanel(this);
   mDisplay3D=new Display3D(this);
   mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));
 
@@ -55,7 +54,9 @@ void RootFrame::InitFrame() {
   // add the panes to the manager
   wxAuiPaneInfo display3dinfo;
   display3dinfo.Center();
+  display3dinfo.CaptionVisible(false);
   display3dinfo.CloseButton(false);
+  display3dinfo.Movable(false);
   mAuiManager->AddPane(mDisplay3D,display3dinfo);
   mAuiManager->AddPane(mSpinGridPanel,wxBOTTOM,wxT("Grid View"));
   mAuiManager->AddPane(mInterSizePanel,wxLEFT,wxT("Tensor Visualisation"));

@@ -8233,11 +8233,11 @@
             <event name="OnUpdateUI"></event>
             <object class="wxFlexGridSizer" expanded="1">
                 <property name="cols">3</property>
-                <property name="flexible_direction">wxBOTH</property>
+                <property name="flexible_direction">wxHORIZONTAL</property>
                 <property name="growablecols">1</property>
                 <property name="growablerows"></property>
                 <property name="hgap">0</property>
-                <property name="minimum_size"></property>
+                <property name="minimum_size">0,0</property>
                 <property name="name">fgSizer24</property>
                 <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_ALL</property>
                 <property name="permission">none</property>
@@ -8297,7 +8297,7 @@
                 </object>
                 <object class="sizeritem" expanded="1">
                     <property name="border">0</property>
-                    <property name="flag">wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND</property>
+                    <property name="flag">wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
                     <property name="proportion">0</property>
                     <object class="CustomControl" expanded="1">
                         <property name="bg"></property>
@@ -8349,8 +8349,8 @@
                     </object>
                 </object>
                 <object class="sizeritem" expanded="1">
-                    <property name="border">5</property>
-                    <property name="flag">wxALL</property>
+                    <property name="border">0</property>
+                    <property name="flag"></property>
                     <property name="proportion">0</property>
                     <object class="wxColourPickerCtrl" expanded="1">
                         <property name="bg"></property>

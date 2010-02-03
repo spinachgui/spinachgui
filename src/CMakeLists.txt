@@ -62,6 +62,8 @@ set(guiSources ${guiSources} "gui/SpinGrid.cpp")
 set(guiSources ${guiSources} "gui/SpinSysManager.cpp")
 set(guiSources ${guiSources} "gui/RootFrame.cpp")
 set(guiSources ${guiSources} "gui/RightClickMenu.cpp")
+set(guiSources ${guiSources} "gui/InterDisplaySettings.cpp")
+set(guiSources ${guiSources} "gui/LogSlider.cpp")
 set(guiSources ${guiSources} "auto/SpinachGUI.cpp")
 
 set(sharedSources "shared/nuclear_data.cpp")

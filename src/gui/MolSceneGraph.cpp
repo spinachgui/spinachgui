@@ -113,7 +113,8 @@ void InterNode::LoadInteractionMatrix() {
 void InterNode::RawDraw(const SpinachDC& dc) {
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
   const static GLfloat blue[3]={0.0,0.0,0.5};
-
+  glColor4f(0.0,0.0,0.0,0.5);
+  glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   switch(mType) {
     //Draw as a ellipsoid around a nucleus
   case Interaction::ST_HFC:
@@ -136,11 +137,11 @@ void InterNode::RawDraw(const SpinachDC& dc) {
     glPushMatrix(); {
       if(mSpin->GetElement()==0) {
 	glMultMatrixf(mat);
-	gluSphere(dc.GetWireQuadric(),0.5,9,17);
+	gluSphere(dc.GetSolidQuadric(),0.5,29,37);
       } else {
 	glMultMatrixf(mat);
 	glScalef(0.04,0.04,0.04);
-	gluSphere(dc.GetWireQuadric(),1.0,9,17);
+	gluSphere(dc.GetSolidQuadric(),1.0,29,37);
       }
     } glPopMatrix();
     break;
@@ -178,6 +179,7 @@ void InterNode::RawDraw(const SpinachDC& dc) {
   electron_cenred_drawing:
     break;
   }
+  glDisable(GL_BLEND);
 }
 void InterNode::ToPovRay(wxString& str) {
   if(mSpin->GetElement()==0) {

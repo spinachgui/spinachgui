@@ -222,7 +222,6 @@ Display3D::~Display3D() {
 
 
 void Display3D::EnableGL() {
-  
   if(mGLContext == NULL) {
     mGLContext = new wxGLContext(this);
   }
@@ -272,6 +271,12 @@ void Display3D::EnableGL() {
 	
   //Create a dictionary of colours
   glMatrixMode(GL_MODELVIEW);
+
+  //Generate a texture for saving the depth buffer to
+  glGenTextures(1,&mTexDepth);
+  //Generate a texture for saving the depth buffer to
+  //glGenFramebuffers(1,&mFB);
+  cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
 }
 
 
@@ -366,7 +371,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     EnableGL();
   }
 
-  wxString povray;
+  /*wxString povray;
 
   povray << wxT("camera {\n  location <")
 	 << mCamX << wxT(",") 
@@ -379,7 +384,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
   mRootNode->GetPovRayString(povray);
   wxFile f(wxT("povray.pov"),wxFile::write);
   f.Write(povray);
-  f.Close();
+  f.Close();*/
 
   wxPaintDC dc(this);
 
@@ -417,16 +422,30 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
   mDC.mRotationMatrix=mRotationMatrix;
 
-  glEnable(GL_DEPTH_TEST);	
 
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
   glClear(GL_DEPTH_BUFFER_BIT);
+
+  if(mRootNode) {
+    mRootNode->Draw(mDC);
+  }
+
+  //glBindFramebuffer(GL_FRAMEBUFFER,&mFB);
+
+  glEnable(GL_TEXTURE_2D); {
+    glBindTexture(GL_TEXTURE_2D,mTexDepth);
+    glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
+  } glDisable(GL_TEXTURE_2D);
+	
+  glDepthFunc(GL_LEQUAL);
+
   glEnable(GL_LIGHTING);{
-    glClear(GL_COLOR_BUFFER_BIT);
+   glClear(GL_DEPTH_BUFFER_BIT);
+   glClear(GL_COLOR_BUFFER_BIT);
     if(mRootNode) {
       mRootNode->Draw(mDC);
     }
-
-	
     //Now draw the forground objects
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -437,6 +456,25 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     mForgroundNode->Draw(mDC);
   } glDisable(GL_LIGHTING);
 
+  glEnable(GL_TEXTURE_2D); {
+    glBindTexture(GL_TEXTURE_2D,mTexDepth);
+	
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0,width,height,0);
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity();
+	
+    long littleWidth=120;
+    long littleHeight=round(littleWidth*height/float(width));
+	
+    glBegin(GL_QUADS); {
+      glTexCoord2f(0,0);     glVertex2f(width-littleWidth,0);
+      glTexCoord2f(1.0,0);   glVertex2f(width,0);
+      glTexCoord2f(1.0,1.0); glVertex2f(width,littleHeight);
+      glTexCoord2f(0,1.0);   glVertex2f(width-littleWidth,littleHeight);
+    } glEnd();
+  }glDisable(GL_TEXTURE_2D);
 
   SwapBuffers();
 }

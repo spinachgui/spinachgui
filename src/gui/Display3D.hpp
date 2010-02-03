@@ -159,6 +159,9 @@ private:
   //Textures
   GLuint mTexDepth;
 
+  //Frame buffer objects
+  GLuint mFB;
+
   //GUI State Variables
   long mHover;
   double mHoverDist;

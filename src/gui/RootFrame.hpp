@@ -19,6 +19,7 @@ public:
 
   void InitFrame();
 
+  void LoadFromFile(const wxString& path, const wxString& dir, const wxString& filename);
   void SaveToFile(const wxString& filename,ISpinSystemLoader* saver=NULL);
 
   //Utility Functions

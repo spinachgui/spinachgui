@@ -114,36 +114,42 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
 				    wxString(filter) ,
 				    wxFD_OPEN);
   if(fd->ShowModal() == wxID_OK) {
-    mOpenPath=fd->GetPath();
-    mOpenFile=fd->GetFilename();
-    mOpenDir=fd->GetDirectory();
-    wxString ext=GetExtension(mOpenFile).Lower();
-
-    ISpinSystemLoader* loader=NULL;
-    for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
-	i!=wxGetApp().GetIOFilters().end();
-	++i) {
-      if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
-	 (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
-	if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
-	  loader=*i;
-	  break;
-	}
-      }
-    }
-    if(loader==NULL) {
-      wxLogError(wxString() << wxT("Unknown extension ") << ext);
-    } else {
-      try {
-	GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
-      } catch(const runtime_error& e) {
-	wxLogError(wxT("File is corrupt"));
-	wxString(e.what(),wxConvUTF8);
-      }
-    }
-    Chkpoint(wxT("Load File"));
-    UpdateTitle();
+    LoadFromFile(mOpenPath=fd->GetPath(),mOpenDir=fd->GetDirectory(),fd->GetFilename());
   }
+
+}
+
+void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxString& filename) {
+  mOpenPath=path;
+  mOpenFile=filename;
+  mOpenDir=dir;
+  wxString ext=GetExtension(mOpenFile).Lower();
+
+  ISpinSystemLoader* loader=NULL;
+  typedef vector<ISpinSystemLoader*>::const_iterator itor;
+  for(itor i=wxGetApp().GetIOFilters().begin();
+      i!=wxGetApp().GetIOFilters().end();
+      ++i) {
+    if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
+       (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+      if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
+	loader=*i;
+	break;
+      }
+    }
+  }
+  if(loader==NULL) {
+    wxLogError(wxString() << wxT("Unknown extension ") << ext);
+  } else {
+    try {
+      GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
+    } catch(const runtime_error& e) {
+      wxLogError(wxT("File is corrupt"));
+      wxString(e.what(),wxConvUTF8);
+    }
+  }
+  Chkpoint(wxT("Load File"));
+  UpdateTitle();
 }
 
 void RootFrame::OnSave(wxCommandEvent& e) {
@@ -242,6 +248,18 @@ void RootFrame::OnEpr(wxCommandEvent& e) {
 
 void RootFrame::OnResize(wxSizeEvent&e) {
   mAuiManager->Update();
+  static bool firstTime=true;
+  if(firstTime) {
+    firstTime=false;
+    //Execute this testing code once when the main window is
+    //created. Doing this in an onrezise should ensure that the window
+    //is on the screne at the time.
+    LoadFromFile(wxT("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log"),
+		 wxT("../../testing_kit/Gaussian/ESR spectroscopy/"),
+		 wxT("cpdyad_cation.log"));
+    //mSS->LoadFromFile("data/tryosine.log",loader);
+
+  }
 }
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)

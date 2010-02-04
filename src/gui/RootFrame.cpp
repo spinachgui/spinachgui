@@ -41,8 +41,10 @@ void RootFrame::InitFrame() {
   bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC),0,0);
   mInterSizePanel->SetSizer(bs);
 
-  mSpinGridPanel=new SpinGridPanel(this);
+  mSpinGrid=new SpinGrid(this);
+  mSpinInterEdit=new SpinInterEditPanel(this);
   mDisplay3D=new Display3D(this);
+
   mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));
 
   //mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
@@ -58,14 +60,18 @@ void RootFrame::InitFrame() {
   display3dinfo.CloseButton(false);
   display3dinfo.Movable(false);
   mAuiManager->AddPane(mDisplay3D,display3dinfo);
-  mAuiManager->AddPane(mSpinGridPanel,wxBOTTOM,wxT("Grid View"));
+  mAuiManager->AddPane(mSpinGrid,wxBOTTOM,wxT("Grid View"));
   mAuiManager->AddPane(mInterSizePanel,wxLEFT,wxT("Tensor Visualisation"));
+  mAuiManager->AddPane(mSpinInterEdit,wxBOTTOM,wxT("Interaction Editor"));
 
   //Grey the undo and redo menu ideams. They can be ungreyed when
   //there is an undo history
 
   mMenuItemUndo->Enable(false);
   mMenuItemRedo->Enable(false);
+
+  //Connect up the signals
+  mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
 }
 
 

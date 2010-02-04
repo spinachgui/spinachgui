@@ -39,7 +39,8 @@ public:
   }
 
   void OtherRowsDeleted(int pos,int number) {
-    if(pos<rowNumber) {
+    cout << "OtherRowsDeleted "<< pos <<  endl;
+    if(pos<rowNumber && pos > 0) {
       rowNumber-=number;
     }
   }
@@ -60,11 +61,6 @@ public:
     wxString str(getElementSymbol(element),wxConvUTF8);
     str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
     mParent->SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
-
-    //Set the interactions
-    mParent->SetCellValue(rowNumber,SpinGrid::COL_LINEAR     ,FormatInteractions(mSpin,LINEAR));
-    mParent->SetCellValue(rowNumber,SpinGrid::COL_BILINEAR   ,FormatInteractions(mSpin,BILINEAR));
-    mParent->SetCellValue(rowNumber,SpinGrid::COL_QUAD,       FormatInteractions(mSpin,QUAD));
   }
   
   void OnSpinChange() {
@@ -92,16 +88,13 @@ private:
 // SpinGrid
 
 const SpinGrid::SpinGridColum SpinGrid::columns[]={
-  {COL_SELECTED,   "Selected",73},
+  {COL_SELECTED,   "",20},
   {COL_LABEL,      "Label",105},    
   {COL_ELEMENT,    "Element",70},   
   {COL_ISOTOPES,   "Isotopes",70},  
   {COL_X,          "x",70},	    
   {COL_Y,          "y",70},	    
-  {COL_Z,          "z",70},	    
-  {COL_LINEAR,     "Linear",70},    
-  {COL_BILINEAR,   "Bilinear",70},
-  {COL_QUAD,"Quadrapolar",100}
+  {COL_Z,          "z",70}
 };		   
 
 
@@ -158,9 +151,6 @@ void SpinGrid::OnNewSpin(Spin* newSpin,long number) {
 }
 
 void SpinGrid::OnEndEdit(wxGridEvent& e) {
-  if(e.GetCol()==COL_LINEAR or e.GetCol()==COL_QUAD) {
-    cout << "OnEndEdit" << endl;
-  }
 }
 
 bool SpinGrid::DeleteRows(int pos,int numRows,bool updateLables) {
@@ -215,11 +205,6 @@ void SpinGrid::SetupRow(long rowNumber) {
   SetCellEditor(rowNumber,COL_X,new wxGridCellFloatEditor());
   SetCellEditor(rowNumber,COL_Y,new wxGridCellFloatEditor());
   SetCellEditor(rowNumber,COL_Z,new wxGridCellFloatEditor());
-
-  //The Linear, Bilienar and Quad colums should not be editable
-  SetReadOnly(rowNumber,COL_LINEAR);
-  SetReadOnly(rowNumber,COL_BILINEAR);
-  SetReadOnly(rowNumber,COL_QUAD);
 }
 
 void SpinGrid::OnCellChange(wxGridEvent& e) {
@@ -270,9 +255,10 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
     //The user clicked the last line, which means there is no spin to
     //edit
     e.Skip();
+    sigSelect((Spin*)NULL);
     return;
   }
-  sigSelect(columns[e.GetCol()].type,GetSS()->GetSpin(e.GetRow()));
+  sigSelect(GetSS()->GetSpin(e.GetRow()));
   e.Skip();
 }
 
@@ -303,38 +289,4 @@ EVT_GRID_CELL_RIGHT_CLICK(         SpinGrid::OnRightClick)
 END_EVENT_TABLE()
 
 
-//============================================================//
-// SpinGridPanel
-
-SpinGridPanel::SpinGridPanel(wxWindow* parent,wxWindowID id) 
-: wxPanel(parent,id){
-  wxBoxSizer* sizer=new wxBoxSizer(wxVERTICAL);
-
-  //NB: Construction must be in this order as wxGrid will emit a cell
-  //selection event as they are being constucted. This would cause
-  //this->OnInterUnSelect to be called which tries to do something
-  //with mInterEdit which is currently uninialised.
-  //
-  //The bright side is that we don't need to explicity call
-  //mInterEdit->SetSpin as the correct behavior obtained by default
-  //(so long as mInterEdit is constructed)
-  mInterEdit=new SpinInterEditPanel(this);
-  mInterEdit->SetDialogMode(false);
-  mGrid=new SpinGrid(this);
-
-  sizer->Add(mGrid,1,wxEXPAND | wxALL);
-  sizer->Add(mInterEdit,0,wxEXPAND | wxALL);
-
-  SetSizer(sizer);
-
-  mGrid->sigSelect.connect(mem_fun(*this,&SpinGridPanel::OnGridCellSelect));
-}
-
-void SpinGridPanel::OnGridCellSelect(SpinGrid::COL_TYPE col,Spin* spin) {
-  mInterEdit->Show(col==SpinGrid::COL_LINEAR   ||
-		   col==SpinGrid::COL_BILINEAR ||
-		   col==SpinGrid::COL_QUAD);
-  mInterEdit->SetSpin(spin);
-  Layout();
-}
 

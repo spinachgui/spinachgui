@@ -34,10 +34,7 @@ public:
     COL_ISOTOPES,
     COL_X,
     COL_Y,          
-    COL_Z,
-    COL_LINEAR,
-    COL_BILINEAR,
-    COL_QUAD
+    COL_Z
   };
 
   enum MENU_EVENT {
@@ -46,7 +43,7 @@ public:
     MENU_NEW_SPIN
   };
 
-  sigc::signal<void,COL_TYPE,SpinXML::Spin*> sigSelect;
+  sigc::signal<void,SpinXML::Spin*> sigSelect;
   sigc::signal<void> sigDying;
   sigc::signal<void> sigClearing;
   sigc::signal<void,int,int> sigRowDelete;
@@ -69,15 +66,5 @@ private:
 
 };
 
-class SpinGridPanel : public wxPanel, public sigc::trackable {
-public:
-  SpinGridPanel(wxWindow* parent,wxWindowID id=-1);
-
-  void OnGridCellSelect(SpinGrid::COL_TYPE col,SpinXML::Spin* spin);
-
-private:
-  SpinInterEditPanel* mInterEdit;
-  SpinGrid* mGrid;
-};
 
 #endif

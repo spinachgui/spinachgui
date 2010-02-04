@@ -50,8 +50,9 @@ private:
   void UpdateTitle();
 
   wxAuiManager* mAuiManager;
-  SpinGridPanel* mSpinGridPanel;
+  SpinGrid* mSpinGrid;
   wxPanel* mInterSizePanel;
+  SpinInterEditPanel* mSpinInterEdit;
   Display3D* mDisplay3D;
   ISpinSystemLoader* mSaver;
 

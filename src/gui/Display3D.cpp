@@ -104,6 +104,7 @@ SGNode::~SGNode() {
 void SGNode::AddNode(SGNode* node) {
   mChildren.push_back(node);
   node->sigDying.connect(mem_fun(this,&SGNode::RemoveNode));
+  node->sigDirty.connect(mem_fun(this,&SGNode::OnChildDirty));
 }
 
 void SGNode::RemoveNode(SGNode* node) {
@@ -113,6 +114,7 @@ void SGNode::RemoveNode(SGNode* node) {
       break;
     }
   }
+  sigDirty();
 }
 
 void SGNode::SetMaterial(const float material[3],bool use) {

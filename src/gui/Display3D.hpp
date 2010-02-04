@@ -52,7 +52,11 @@ public:
 
   ///Mark this node as dirty, that is, needing to drewdraw its display
   ///list.
-  void Dirty() {mDirty=true;}
+  void Dirty() {mDirty=true;sigDirty();}
+
+  ///Called when a parent becomes dirty. Pass the signal up to the top
+  ///node to trigger a redraw
+  void OnChildDirty() {sigDirty();}
 
   ///Draw, using RawDraw if needed or by calling the display list if
   ///one exists.
@@ -74,6 +78,7 @@ public:
   void GetPovRayString(wxString& str);
 
   sigc::signal<void,SGNode*> sigDying;
+  sigc::signal<void> sigDirty; //Signals that a redraw is needed
 private:
   ///Make whatever openGL calls are needed to draw the node.
   virtual void RawDraw(const SpinachDC& dc)=0;
@@ -113,7 +118,7 @@ private:
 };
 
 
-class Display3D :  public wxGLCanvas, sigc::trackable {
+class Display3D :  public wxGLCanvas, public sigc::trackable {
 public:
   Display3D(wxWindow* parent);
   virtual ~Display3D();
@@ -128,10 +133,13 @@ public:
 
   void SetRootSGNode(SGNode* node) {
     if(mRootNode) delete mRootNode; mRootNode=node;
+    mRootNode->sigDirty.connect(mem_fun(this,&Display3D::OnDirty));
   }
   void SetRootFGNode(SGNode* node) {
     if(mForgroundNode) delete mForgroundNode; mForgroundNode=node;
+    mForgroundNode->sigDirty.connect(mem_fun(this,&Display3D::OnDirty));
   }
+  void OnDirty() {Refresh();}
   SpinachDC& GetDC() {return mDC;}
 protected:
   DECLARE_EVENT_TABLE();

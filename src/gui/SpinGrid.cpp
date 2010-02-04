@@ -78,6 +78,7 @@ public:
   }
 
 private:
+  ~SpinGridRow(){}
   long rowNumber;
   Spin* mSpin;
   SpinGrid* mParent;

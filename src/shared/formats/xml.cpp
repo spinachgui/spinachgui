@@ -198,34 +198,57 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
     interaction xsdInter=inters[i];
 
     Interaction::SubType st=GetSpinXMLTypeFromXSDType(xsdInter.type());
+
     //TODO: Decide how to handle units
     long spinNumber=xsdInter.spin_1();
     long spinNumber2=-1;
     if(spinNumber <0 || spinNumber >= spinCount) {
       throw std::runtime_error("Spin index in interaction out of range");
     }
-    libss->GetSpin(spinNumber)->InsertInteraction(thisInter);
 
     if(xsdInter.spin_2().present()) {
-      long spinNumber2=xsdInter.spin_2().get();
+      spinNumber2=xsdInter.spin_2().get();
       if(spinNumber2 < 0 || spinNumber2 > spinCount) {
 	throw std::runtime_error("Spin index in interaction out of range");
       }
     }
-    if(st==SpinXML::Interaction::ST_CUSTOM_LINEAR)
-      if(spinNumber2 != -1) {
-	thisInter->SetSubType(SpinXML::Interaction::ST_CUSTOM_LINEAR,
-			      libss->GetSpin(spinNumber));
-      } else if(spinNumber2!=spinNumber) {
-	thisInter->SetSubType(SpinXML::Interaction::ST_CUSTOM_BILINEAR,
-			      libss->GetSpin(spinNumber),
-			      libss->GetSpin(spinNumber2));
-      } else {
-	thisInter->SetSubType(SpinXML::Interaction::ST_CUSTOM_QUADRATIC,
-			      libss->GetSpin(spinNumber),
-			      libss->GetSpin(spinNumber));{
+    //Now check the subtype is valid given the form
+    if(spinNumber2==-1) {
+      //Interaction must be linear
+      switch(st) {
+      case SpinXML::Interaction::ST_G_TENSER:
+      case SpinXML::Interaction::ST_SHIELDING:
+      case SpinXML::Interaction::ST_CUSTOM_LINEAR:
+	thisInter->SetSubType(st,libss->GetSpin(spinNumber));
+	break;
+      default:
+	throw std::runtime_error("Linear interaction was of a non linear subtype");
+      }
+    } else if(spinNumber2==spinNumber2) {
+      //Interaction must be quadratic
+      switch(st) {
+      case SpinXML::Interaction::ST_QUADRUPOLAR:
+      case SpinXML::Interaction::ST_ZFS:
+      case SpinXML::Interaction::ST_CUSTOM_QUADRATIC:
+	thisInter->SetSubType(st,libss->GetSpin(spinNumber),libss->GetSpin(spinNumber));
+	break;
+      default:
+	throw std::runtime_error("Quadrupolar interaction was of a non linear subtype");
+      }
+    } else {
+      switch(st) {
+      case SpinXML::Interaction::ST_EXCHANGE:
+      case SpinXML::Interaction::ST_DIPOLAR:
+      case SpinXML::Interaction::ST_SCALAR:
+      case SpinXML::Interaction::ST_CUSTOM_BILINEAR:
+	thisInter->SetSubType(st,libss->GetSpin(spinNumber),libss->GetSpin(spinNumber2));
+	break;
+      default:
+	throw std::runtime_error("Quadrupolar interaction was of a non linear subtype");
       }
     }
+
+
 
 
     if(xsdInter.scalar().present()) {

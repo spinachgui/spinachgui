@@ -72,6 +72,7 @@ void RootFrame::InitFrame() {
 
   //Connect up the signals
   mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
+  GetSS()->sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
 }
 
 

@@ -78,7 +78,7 @@ public:
   }
 
 private:
-  ~SpinGridRow(){}
+  SpinGridRow(const SpinGridRow&);
   long rowNumber;
   Spin* mSpin;
   SpinGrid* mParent;

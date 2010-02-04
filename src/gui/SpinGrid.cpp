@@ -10,41 +10,10 @@ using namespace std;
 
 using namespace SpinXML;
 
-const long ColumCount=10;  
+const long ColumCount=7;  
 
 //============================================================//
 // Utility functions.
-
-//Enum for use with wxString FormatLinearInteractions()
-enum AlgebrakeForm {
-  LINEAR,
-  BILINEAR,
-  QUAD,
-  ALL
-};
-
-//Write a string representing the interactions acting on a spin
-wxString FormatInteractions(Spin* spin,AlgebrakeForm form=ALL) {
-  wxString str;
-  vector<Interaction*> Interactions=spin->GetInteractions();
-  long count=Interactions.size();
-  bool first=true;
-  for(long i=0;i<count;i++) {
-
-    Interaction* inter=Interactions[i];
-    AlgebrakeForm f=(inter->GetIsLinear() ?
-		     LINEAR : (inter->GetIsBilinear() ? BILINEAR :
-			       (QUAD)));
-    if(f==form || form==ALL) {
-      if(!first) {
-	str << wxT(", ");
-      }
-      first=false;
-      str << wxString(Interaction::GetSubTypeName(inter->GetSubType()),wxConvUTF8);
-    }
-  }
-  return str;
-}
 
 
 class SpinGridRow : public sigc::trackable {

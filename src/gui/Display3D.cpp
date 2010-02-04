@@ -13,6 +13,7 @@ using namespace std;
 //============================================================//
 // Scene graphs
 
+
 void OpenGLText::RawDraw(const SpinachDC& dc) {
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_2D); {
@@ -90,14 +91,10 @@ SGNode::SGNode()
   : mDirty(true),
     mUseMaterial(false),
     mMaterial(defaultMaterial),
-    mList(glGenLists(1)),
-    mGeomOnlyList(glGenLists(1)),
     mIdentity(true) {
 }
 
 SGNode::~SGNode() {
-  glDeleteLists(mList,1);
-  glDeleteLists(mGeomOnlyList,1);
   sigDying(this);
 }
 
@@ -111,10 +108,13 @@ void SGNode::RemoveNode(SGNode* node) {
   for(itor i=mChildren.begin();i!=mChildren.end();++i) {
     if(*(i)==node) {
       mChildren.erase(i);
+      //If we have actually removed a node, we need to recompile this
+      //display list as well, because it still contains a reference to a
+      //dangleing display list
+      Dirty();
       break;
     }
   }
-  sigDirty();
 }
 
 void SGNode::SetMaterial(const float material[3],bool use) {
@@ -131,25 +131,20 @@ void SGNode::SetTranslation(const Vector3& v) {
 }
 
 void SGNode::Draw(const SpinachDC& dc) {
-  if(mDirty) {
-    glNewList(mList,GL_COMPILE);
-    if(!mIdentity) {
-      glPushMatrix();
-      glMultMatrixf(mat);
-    }
-    if(mUseMaterial) {
-      glMaterialfv(GL_FRONT,GL_SPECULAR,mMaterial);
-    }
-    RawDraw(dc);
-    for(itor i=mChildren.begin();i!=mChildren.end();++i) {
-      (*i)->Draw(dc);
-    }
-    if(!mIdentity) {
-      glPopMatrix();
-    }
-    glEndList();
-  } 
-  glCallList(mList);
+  if(!mIdentity) {
+    glPushMatrix();
+    glMultMatrixf(mat);
+  }
+  if(mUseMaterial) {
+    glMaterialfv(GL_FRONT,GL_SPECULAR,mMaterial);
+  }
+  RawDraw(dc);
+  for(itor i=mChildren.begin();i!=mChildren.end();++i) {
+    (*i)->Draw(dc);
+  }
+  if(!mIdentity) {
+    glPopMatrix();
+  }
 }
 
 void SGNode::GetPovRayString(wxString& str) {

@@ -56,7 +56,7 @@ public:
 
   ///Called when a parent becomes dirty. Pass the signal up to the top
   ///node to trigger a redraw
-  void OnChildDirty() {sigDirty();}
+  void OnChildDirty() {mDirty=true;sigDirty();}
 
   ///Draw, using RawDraw if needed or by calling the display list if
   ///one exists.
@@ -87,10 +87,6 @@ private:
 
   bool mDirty;
   ///Stores an openGL display list for rendering the node
-  int mList;
-  ///Stores an openGL display list for rendering the node
-  ///geomatary. Lighting and materials are not included
-  int mGeomOnlyList;
 
   bool mUseMaterial;
   const float* mMaterial;

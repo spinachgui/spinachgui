@@ -112,7 +112,7 @@ set(wxSpinachSources ${guiSources} ${sharedSources} ${formatSources})
 add_executable (wxSpinach ${wxSpinachSources})
 add_definitions(${wxWidgets_DEFINITIONS})
 target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
-target_link_libraries (wxSpinach GL GLEW) 
+target_link_libraries (wxSpinach GL) 
 target_link_libraries (wxSpinach xerces-c -lsigc-2.0)
 target_link_libraries (wxSpinach ${Boost_LIBRARIES})
 

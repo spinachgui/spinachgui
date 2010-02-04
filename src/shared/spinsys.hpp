@@ -306,7 +306,6 @@ namespace SpinXML {
     void OnSpinDeleted(Spin* spin){RemoveSpin(spin);}
 
     sigc::signal<void,Spin*,long> sigNewSpin;
-    sigc::signal<void> sigReloading;
     sigc::signal<void> sigReloaded;
     sigc::signal<void> sigDying;
   

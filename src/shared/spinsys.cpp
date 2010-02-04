@@ -34,7 +34,6 @@ SpinSystem::~SpinSystem() {
 void SpinSystem::Clear() {
   //Currently we need to delete the interactions Before the spins as
   //the spins have interactions as their children. 
-  sigReloading();
 
   for(long i=0;i<mSpins.size();i++) {
     mIgnoreSpinKill=mSpins[i];
@@ -130,7 +129,6 @@ void SpinSystem::RemoveSpin(Spin* _Spin) {
 
 
 void SpinSystem::LoadFromFile(const char* filename,ISpinSystemLoader* loader) {
-  sigReloading();
   try {
     loader->LoadFile(this,filename);
   } catch(const runtime_error& e) {

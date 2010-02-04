@@ -130,7 +130,7 @@ void SGNode::SetTranslation(const Vector3& v) {
 
 void SGNode::Draw(const SpinachDC& dc) {
   if(mDirty) {
-    //glNewList(mList,GL_COMPILE);
+    glNewList(mList,GL_COMPILE);
     if(!mIdentity) {
       glPushMatrix();
       glMultMatrixf(mat);
@@ -145,9 +145,9 @@ void SGNode::Draw(const SpinachDC& dc) {
     if(!mIdentity) {
       glPopMatrix();
     }
-    //glEndList();
+    glEndList();
   } 
-  //glCallList(mList);
+  glCallList(mList);
 }
 
 void SGNode::GetPovRayString(wxString& str) {

@@ -218,19 +218,20 @@ void CyclinderNode::RawDraw(const SpinachDC& dc) {
 
 
 
-
-
-
 MoleculeNode::MoleculeNode(SpinSystem* ss) 
   : mSS(ss) {
-  long count=ss->GetSpinCount();
+  OnReload();
+  mSS->sigReloaded.connect(mem_fun(this,&MoleculeNode::OnReload));
+}
+
+void MoleculeNode::OnReload() {
+  long count=mSS->GetSpinCount();
   for(long i=0;i<count;i++) {
-    Spin* spin=ss->GetSpin(i);
+    Spin* spin=mSS->GetSpin(i);
     if(spin->GetElement() != 0) {
       //If the spin is an electron, it should be drawn outside of the
       //molecule
       AddNode(new SpinNode(spin));
-      
     }
   }
 }
@@ -238,7 +239,11 @@ MoleculeNode::MoleculeNode(SpinSystem* ss)
 void MoleculeNode::OnNewSpin(Spin* newSpin,long number) {
   //Somehow, somewhere a new spin has been created, so create a new
   //spin renderer
-  AddNode(new SpinNode(newSpin));
+  if(newSpin->GetElement() != 0) {
+    Dirty();
+    AddNode(new SpinNode(newSpin));
+  }
+  cout << "MoleculeNode::OnNewSpin" << endl;
 }
 
 void MoleculeNode::ToPovRay(wxString& str) {

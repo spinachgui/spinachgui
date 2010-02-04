@@ -61,7 +61,7 @@ private:
 class MoleculeNode : public SGNode {
 public:
   MoleculeNode(SpinSystem* ss);
-
+  void OnReload();
   void OnNewSpin(SpinXML::Spin* newSpin,long number);
 
 private:

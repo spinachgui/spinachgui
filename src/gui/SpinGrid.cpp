@@ -125,6 +125,7 @@ SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
   SetRowLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
 
   mSS->sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
+  mSS->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
   RefreshFromSpinSystem();
 }
     
@@ -162,8 +163,7 @@ bool SpinGrid::DeleteRows(int pos,int numRows,bool updateLables) {
 
 void SpinGrid::RefreshFromSpinSystem() {
   mUpdating=true;
-
-  GetSS()->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
+  sigClearing();
 
   if(GetNumberRows()) {
     //Clear grid only clears the underlying data rather. The cells

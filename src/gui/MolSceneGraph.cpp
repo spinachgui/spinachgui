@@ -20,16 +20,30 @@ SpinNode::SpinNode(Spin* spin)
 
   static const Interaction::SubType NuclearCentredInterTypes[]=
     {Interaction::ST_HFC,
-     Interaction::ST_G_TENSER,
-     Interaction::ST_ZFS,
      Interaction::ST_SHIELDING,
      Interaction::ST_QUADRUPOLAR, 
      Interaction::ST_CUSTOM_LINEAR,
      Interaction::ST_CUSTOM_QUADRATIC};
 
-  for(long i=0;i<7;i++) {
-    if(mSpin->GetHasInteractionOfType(NuclearCentredInterTypes[i])) {
+  static const Interaction::SubType ElectronCentredInterTypes[]=
+    {Interaction::ST_G_TENSER,
+     Interaction::ST_ZFS,
+     Interaction::ST_CUSTOM_LINEAR,
+     Interaction::ST_CUSTOM_QUADRATIC};
+
+
+  //Here we are creating a node to visualise every type of
+  //interaction. I'm not sure if this is really the best idea in terms
+  //of efficency. We shall see.
+  if(spin->GetElement() != 0){
+    //Nulcear interactions
+    for(long i=0;i<5;i++) {
       AddNode(new InterNode(mSpin,NuclearCentredInterTypes[i]));
+    }
+  } else {
+    //Electron interactions
+    for(long i=0;i<4;i++) {
+      AddNode(new InterNode(mSpin,ElectronCentredInterTypes[i]));
     }
   }
 }

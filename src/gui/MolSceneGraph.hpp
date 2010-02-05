@@ -12,7 +12,6 @@ public:
   SpinNode(Spin* spin);
   void OnSpinDying(Spin*) {delete this;} //Arguments are usused
 private:
-  ~SpinNode(){}
 
   Spin* mSpin;
   virtual void RawDraw(const SpinachDC& dc);
@@ -24,9 +23,9 @@ public:
   InterNode(SpinXML::Spin* spin, SpinXML::Interaction::SubType st);
   void OnSpinDying(Spin*) {delete this;}
   void LoadInteractionMatrix();
+
   void OnNewInteraction(Interaction* inter);
 private:
-  ~InterNode(){}
   SpinXML::Spin* mSpin;
   SpinXML::Interaction::SubType mType;
 

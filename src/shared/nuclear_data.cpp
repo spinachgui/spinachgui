@@ -116,8 +116,8 @@ void LoadIsotopes() {
     istringstream stream;
     stream.str(beforeComment);
 
-    long p;  //Proton number
-    long m;  //Mass number
+    unsigned long p;  //Proton number
+    unsigned long m;  //Mass number
     long mult;
     double gamma; //Gamma
     stream >> p;

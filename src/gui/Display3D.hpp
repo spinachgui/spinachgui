@@ -131,6 +131,8 @@ public:
   void OnResize(wxSizeEvent& e);
   void OnDeleteSpinHover(wxCommandEvent& e);
 
+  void ResetView();
+
   void SetRootSGNode(SGNode* node) {
     if(mRootNode) delete mRootNode; mRootNode=node;
     mRootNode->sigDirty.connect(mem_fun(this,&Display3D::OnDirty));

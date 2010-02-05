@@ -289,6 +289,13 @@ void Display3D::EnableGL() {
   cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
 }
 
+void Display3D::ResetView() {
+  mRotationMatrix[0 ]=1;  mRotationMatrix[1 ]=0;  mRotationMatrix[2 ]=0;  mRotationMatrix[3 ]=0;
+  mRotationMatrix[4 ]=0;  mRotationMatrix[5 ]=1;  mRotationMatrix[6 ]=0;  mRotationMatrix[7 ]=0;
+  mRotationMatrix[8 ]=0;  mRotationMatrix[9 ]=0;  mRotationMatrix[10]=1;  mRotationMatrix[11]=0;
+  mRotationMatrix[12]=0;  mRotationMatrix[13]=0;  mRotationMatrix[14]=0;  mRotationMatrix[15]=1;
+  Refresh();
+}
 
 void Display3D::ChangeViewport() {
   GetClientSize(&mWidth,&mHeight);

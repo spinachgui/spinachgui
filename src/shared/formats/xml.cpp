@@ -263,17 +263,14 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
       thisInter->SetMatrix(mat);
     } else if(xsdInter.eigenvalues().present()) {
       SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
-      double xx,yy,zz;
       eigenvalues eigv=xsdInter.eigenvalues().get();
       thisInter->SetEigenvalues(eigv.XX(),eigv.YY(),eigv.ZZ(),o);
     } else if(xsdInter.axiality_rhombicity().present()) {
       SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
-      double ax,rhom,iso;
       axiality_rhombicity ar=xsdInter.axiality_rhombicity().get();
       thisInter->SetAxRhom(ar.ax(),ar.rh(),ar.iso(),o);
     } else if(xsdInter.span_skew().present()) {
       SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
-      double span,skew,iso;
       span_skew spanskew=xsdInter.span_skew().get();
       thisInter->SetSpanSkew(spanskew.span(),spanskew.skew(),spanskew.iso(),o);
     } else {

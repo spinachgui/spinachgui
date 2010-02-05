@@ -187,7 +187,8 @@ Display3D::Display3D(wxWindow* parent)
 	       0,wxT("Display3D"),
 	       gl_attribs),
     mRootNode(NULL),
-    mDC() {
+    mDC(),
+    mHover(-1) {
   mGLContext=NULL;
   mGLEnabled=false;
 

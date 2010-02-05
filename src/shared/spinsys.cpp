@@ -235,9 +235,6 @@ Matrix3 Spin::GetTotalInteraction(Interaction::SubType t) const {
   long interCount=mInter.size();
   for(long i=0;i < interCount;++i) {
     Interaction* inter=mInter[i];
-    if(!inter->IsSubType(t)) {
-      continue;
-    }
     if(inter->IsSubType(t)) {
       total+=inter->GetAsMatrix();
     }

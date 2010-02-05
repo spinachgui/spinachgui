@@ -95,6 +95,21 @@ SGNode::SGNode()
 }
 
 SGNode::~SGNode() {
+  while(mChildren.begin() != mChildren.end()) {
+    /*
+      Okay, so this loop looks like it will never end. What's actually
+      happening is that when the destructor of a SGNode is called, it
+      signals to its parent and the parent removes the pointer from
+      mChildren (see SGNode::AddNode)
+
+      While this means it's possible to delete a node without care or
+      worry, it does lead to this confuseing loop.
+
+      This is perhaps not my greatest achivement in the field of
+      writing readable code!
+     */
+    delete *(mChildren.begin());
+  }
   sigDying(this);
 }
 

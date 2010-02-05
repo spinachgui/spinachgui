@@ -101,6 +101,13 @@ InterNode::InterNode(SpinXML::Spin* spin, SpinXML::Interaction::SubType st)
   mat[14]=0;
   mat[15]=1;
   LoadInteractionMatrix();
+  spin->sigNewInteraction.connect(mem_fun(this,&InterNode::OnNewInteraction));
+}
+
+void InterNode::OnNewInteraction(Interaction* inter) {
+  if(inter->GetSubType()==mType) {
+    LoadInteractionMatrix();
+  }
 }
 
 void InterNode::LoadInteractionMatrix() {

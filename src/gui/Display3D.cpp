@@ -213,8 +213,6 @@ Display3D::~Display3D() {
   if(mRootNode) {
     delete mRootNode;
   }
-  gluDeleteQuadric(mQFilled);
-  gluDeleteQuadric(mQWireframe);
 }
 
 

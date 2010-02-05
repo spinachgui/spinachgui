@@ -38,6 +38,10 @@ public:
     gluQuadricDrawStyle(mWireQuadric,GLU_LINE);
     gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
   }
+  ~SpinachDC() {
+      gluDeleteQuadric(mSolidQuadric);
+      gluDeleteQuadric(mWireQuadric);
+  }
   int width,height;
   const float* mRotationMatrix;
 };
@@ -48,7 +52,7 @@ public:
   SGNode();
 
   ///Destruct the SGNode
-  ~SGNode();
+  virtual ~SGNode();
 
   ///Mark this node as dirty, that is, needing to drewdraw its display
   ///list.
@@ -172,10 +176,6 @@ private:
   long mMouseX,mMouseY;
   double mZoom;
   int mWidth,mHeight;
-
-  //Quadrics
-  GLUquadric* mQFilled;
-  GLUquadric* mQWireframe;
 
   //3D Variables
   double mCamX,mCamY,mCamZ;

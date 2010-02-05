@@ -641,7 +641,7 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
   //ture if mSpin2 is not mentioned and thus will not be kept.
   bool loseSpin2=mSpin2!=spin1 && mSpin2!=spin2;
 
-  if(loseSpin1 && loseSpin2 || (mSpin1==mSpin2)) {
+  if((loseSpin1 && loseSpin2) || (mSpin1==mSpin2)) {
     //Easyest case, we're replacing both spins
     sigRemoveSpin(this,mSpin1);
     mConnect1.disconnect();

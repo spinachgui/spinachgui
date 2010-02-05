@@ -280,121 +280,121 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
 }
 
 void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) const {
-  xml_schema::namespace_infomap map;
-  map[""].name = "";
-  map[""].schema = "../data/spinxml_schema.xsd";
+    xml_schema::namespace_infomap map;
+    map[""].name = "";
+    map[""].schema = "../data/spinxml_schema.xsd";
 
-  std::ofstream fout(filename);
-  if(!fout.is_open()) {
-    std::cerr << "Could not open " << filename << std::endl;
-    return;
-  }
-  spin_system ss;
-
-  spin_system::spin_sequence spins; 
-  for(long i=0;i<libss->GetSpinCount();i++) {
-    SpinXML::Spin* thisSpin=libss->GetSpin(i);
-
-    double x,y,z;
-    thisSpin->GetCoordinates(&x,&y,&z);
-    std::string label(thisSpin->GetLabel());
-
-    vector coords(x,y,z);
-    spin outSpin(coords,i,0);
-    outSpin.label(label);
-    outSpin.element(getElementSymbol(thisSpin->GetElement()));
-    spins.push_back(outSpin);
-  }
-  ss.spin(spins);
-
-  spin_system::interaction_sequence inters;
-  for(long i=0;i<libss->GetSpinCount();i++) {
-    SpinXML::Spin* spin=libss->GetSpin(i);
-    std::vector<Interaction*> thisInters=spin->GetInteractionsOnce();
-    for(long j=0;j<inters.size();j++) {
-      SpinXML::Interaction* thisInter=thisInters[j];
-
-      interaction1 inter(GetXSDTypeFromSpinXMLType(thisInter->GetSubType()),
-			 "MHz",
-			 libss->GetSpinNumber(thisInter->GetSpin1()),
-			 0);
-
-      if(thisInter->GetSpin2() != NULL) {
-	inter.spin_2(libss->GetSpinNumber(thisInter->GetSpin2()));
-      }
-
-      switch(thisInter->GetType()) {
-      case SpinXML::Interaction::SCALAR: {
-	double scalar;
-	thisInter->GetScalar(&scalar);
-	inter.scalar(scalar);
-	break;
-      }
-      case SpinXML::Interaction::MATRIX: {
-	SpinXML::Matrix3 mat;
-	thisInter->GetMatrix(&mat);
-	matrix::element_sequence eseq;
-	eseq.resize(9);  //Yes we need to do this. Codesynthsis doesn't
-	//do it for us
-	eseq[0]=mat(0,0);
-	eseq[1]=mat(1,0);
-	eseq[2]=mat(2,0);
-
-	eseq[3]=mat(0,1);
-	eseq[4]=mat(1,1);
-	eseq[5]=mat(2,1);
-
-	eseq[6]=mat(0,2);
-	eseq[7]=mat(1,2);
-	eseq[8]=mat(2,2);
-	matrix xsdmat;
-	xsdmat.element(eseq);
-	inter.matrix(xsdmat);
-	break;
-      }
-      case SpinXML::Interaction::EIGENVALUES: {
-	SpinXML::Orientation o;
-	double xx,yy,zz;
-	thisInter->GetEigenvalues(&xx,&yy,&zz,&o);
-	eigenvalues eigv(xx,yy,zz);
-	inter.orientation(ConvertOrientationToXML(o));
-	inter.eigenvalues(eigv);
-	break;
-      }
-      case SpinXML::Interaction::AXRHOM: {
-	SpinXML::Orientation o;
-	double ax,rhom,iso;
-	thisInter->GetAxRhom(&ax,&rhom,&iso,&o);
-	axiality_rhombicity ar(iso,ax,rhom);
-	inter.orientation(ConvertOrientationToXML(o));
-	inter.axiality_rhombicity(ar);
-	break;
-      }
-      case SpinXML::Interaction::SPANSKEW: {
-	SpinXML::Orientation o;
-	double span,skew,iso;
-	thisInter->GetSpanSkew(&span,&skew,&iso,&o);
-	span_skew spsk(iso,span,skew);
-	inter.orientation(ConvertOrientationToXML(o));
-	inter.span_skew(spsk);
-	break;
-      }
-      default:
-	throw std::runtime_error("Interaction is of an unknown form");
-      };
-      inters.push_back(inter);
+    std::ofstream fout(filename);
+    if(!fout.is_open()) {
+	std::cerr << "Could not open " << filename << std::endl;
+	return;
     }
-  }
-  ss.interaction(inters);
+    spin_system ss;
 
-  try {
-    spin_system_(fout, ss, map);
-  } catch (const xml_schema::exception& e) {
-    std::cerr << e << std::endl;
-    std::ostringstream errStream;
-    errStream << e << std::endl;
-    throw std::runtime_error(errStream.str());
-  }
+    spin_system::spin_sequence spins; 
+    for(long i=0;i<libss->GetSpinCount();i++) {
+	SpinXML::Spin* thisSpin=libss->GetSpin(i);
+
+	double x,y,z;
+	thisSpin->GetCoordinates(&x,&y,&z);
+	std::string label(thisSpin->GetLabel());
+
+	vector coords(x,y,z);
+	spin outSpin(coords,i,0);
+	outSpin.label(label);
+	outSpin.element(getElementSymbol(thisSpin->GetElement()));
+	spins.push_back(outSpin);
+    }
+    ss.spin(spins);
+
+    spin_system::interaction_sequence inters;
+    for(long i=0;i<libss->GetSpinCount();i++) {
+	SpinXML::Spin* spin=libss->GetSpin(i);
+	std::vector<SpinXML::Interaction*> thisInters=spin->GetInteractionsOnce();
+	for(unsigned long j=0;j<thisInters.size();j++) {
+	    SpinXML::Interaction* thisInter=thisInters[j];
+
+	    interaction1 inter(GetXSDTypeFromSpinXMLType(thisInter->GetSubType()),
+			       "MHz",
+			       libss->GetSpinNumber(thisInter->GetSpin1()),
+			       0);
+      
+	    if(thisInter->GetSpin2() != NULL) {
+		inter.spin_2(libss->GetSpinNumber(thisInter->GetSpin2()));
+	    }
+
+	    switch(thisInter->GetType()) {
+	    case SpinXML::Interaction::SCALAR: {
+		double scalar;
+		thisInter->GetScalar(&scalar);
+		inter.scalar(scalar);
+		break;
+	    }
+	    case SpinXML::Interaction::MATRIX: {
+		SpinXML::Matrix3 mat;
+		thisInter->GetMatrix(&mat);
+		matrix::element_sequence eseq;
+		eseq.resize(9);  //Yes we need to do this. Codesynthsis
+		//doesn't do it for us
+		eseq[0]=mat(0,0);
+		eseq[1]=mat(1,0);
+		eseq[2]=mat(2,0);
+
+		eseq[3]=mat(0,1);
+		eseq[4]=mat(1,1);
+		eseq[5]=mat(2,1);
+
+		eseq[6]=mat(0,2);
+		eseq[7]=mat(1,2);
+		eseq[8]=mat(2,2);
+		matrix xsdmat;
+		xsdmat.element(eseq);
+		inter.matrix(xsdmat);
+		break;
+	    }
+	    case SpinXML::Interaction::EIGENVALUES: {
+		SpinXML::Orientation o;
+		double xx,yy,zz;
+		thisInter->GetEigenvalues(&xx,&yy,&zz,&o);
+		eigenvalues eigv(xx,yy,zz);
+		inter.orientation(ConvertOrientationToXML(o));
+		inter.eigenvalues(eigv);
+		break;
+	    }
+	    case SpinXML::Interaction::AXRHOM: {
+		SpinXML::Orientation o;
+		double ax,rhom,iso;
+		thisInter->GetAxRhom(&ax,&rhom,&iso,&o);
+		axiality_rhombicity ar(iso,ax,rhom);
+		inter.orientation(ConvertOrientationToXML(o));
+		inter.axiality_rhombicity(ar);
+		break;
+	    }
+	    case SpinXML::Interaction::SPANSKEW: {
+		SpinXML::Orientation o;
+		double span,skew,iso;
+		thisInter->GetSpanSkew(&span,&skew,&iso,&o);
+		span_skew spsk(iso,span,skew);
+		inter.orientation(ConvertOrientationToXML(o));
+		inter.span_skew(spsk);
+		break;
+	    }
+	    default:
+		throw std::runtime_error("Interaction is of an unknown form");
+		};
+	    inters.push_back(inter);
+	}
+    }
+    ss.interaction(inters);
+
+    try {
+	spin_system_(fout, ss, map);
+    } catch (const xml_schema::exception& e) {
+	std::cerr << e << std::endl;
+	std::ostringstream errStream;
+	errStream << e << std::endl;
+	throw std::runtime_error(errStream.str());
+    }
 
 }
 

@@ -18,7 +18,7 @@
 IMPLEMENT_APP(SpinachApp);
 
 SpinachApp::~SpinachApp() {
-  for(long i=0;i<mIOFilters.size();i++) {
+  for(unsigned long i=0;i<mIOFilters.size();i++) {
     delete mIOFilters[i];
   }
 }

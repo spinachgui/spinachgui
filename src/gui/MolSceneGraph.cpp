@@ -178,6 +178,12 @@ void InterNode::RawDraw(const SpinachDC& dc) {
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
   electron_cenred_drawing:
     break;
+  case Interaction::ST_ANY:
+  case Interaction::ST_NMR:
+  case Interaction::ST_EPR:
+  default:
+    throw std::logic_error("Trying to draw an interaction with an invalid type");
+    break;
   }
   glDisable(GL_BLEND);
 }

@@ -76,9 +76,9 @@ public:
 private:
   SpinGridRow(const SpinGridRow&);
   ~SpinGridRow(){}
-  long rowNumber;
-  Spin* mSpin;
   SpinGrid* mParent;
+  Spin* mSpin;
+  long rowNumber;
 };
 
 
@@ -98,7 +98,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 
 SpinGrid::SpinGrid(wxWindow* parent)
-  :wxGrid(parent,wxID_ANY),mUpdating(false),mSS(GetSS()) {
+  :wxGrid(parent,wxID_ANY),mSS(GetSS()),mUpdating(false) {
 
   CreateGrid(0, ColumCount);
 

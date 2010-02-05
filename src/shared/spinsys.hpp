@@ -262,6 +262,7 @@ namespace SpinXML {
     std::vector<long> GetIsotopes() const;
     void SetIsotopes(std::vector<long> isotopes) const;
 
+    sigc::signal<void,Interaction*> sigNewInteraction;
     sigc::signal<void> sigChange;
     sigc::signal<void,Spin*> sigDying;
 

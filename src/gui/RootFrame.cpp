@@ -264,7 +264,9 @@ void RootFrame::OnResize(wxSizeEvent&e) {
     LoadFromFile(wxT("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log"),
 		 wxT("../../testing_kit/Gaussian/ESR spectroscopy/"),
 		 wxT("cpdyad_cation.log"));
-    //mSS->LoadFromFile("data/tryosine.log",loader);
+    LoadFromFile(wxT("data/tryosine.log"),
+		 wxT("data/"),
+		 wxT("tryosine.log"));
 
   }
 }

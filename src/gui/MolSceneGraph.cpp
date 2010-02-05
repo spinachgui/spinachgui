@@ -121,10 +121,12 @@ void InterNode::LoadInteractionMatrix() {
   mat[8 ]=abs(mat3.Get(2,0));
   mat[9 ]=abs(mat3.Get(2,1));
   mat[10]=abs(mat3.Get(2,2));
+  Dirty();
 }
 
 
 void InterNode::RawDraw(const SpinachDC& dc) {
+  LoadInteractionMatrix();
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
   const static GLfloat blue[3]={0.0,0.0,0.5};
   glColor4f(0.0,0.0,0.0,0.5);
@@ -276,7 +278,7 @@ void MoleculeNode::ToPovRay(wxString& str) {
     //If the spin is an electron, it should be drawn outside of the
     //molecule
     vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8,spin);
-    for(long j=0;j<nearby.size();j++) {
+    for(unsigned long j=0;j<nearby.size();j++) {
       if(nearby[j]->GetElement()==0) {
 	continue;
       }

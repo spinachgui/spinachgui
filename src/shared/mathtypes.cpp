@@ -163,6 +163,7 @@ Matrix3& Matrix3::operator+= (const Matrix3& m) {
 
 Matrix3& Matrix3::operator= (const Matrix3& m) {
   memcpy(raw,m.raw,9*sizeof(double));
+  return *this;
 }
 
 void Matrix3::Set(long column,long row,double val) {
@@ -221,7 +222,7 @@ const Orientation& Orientation::operator=(const Orientation& orient) {
     mData.mEuler.beta  =     orient.mData.mEuler.beta;
     mData.mEuler.gamma =     orient.mData.mEuler.gamma;
   }
-
+  return *this;
 }
 
 

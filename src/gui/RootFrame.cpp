@@ -28,17 +28,17 @@ void RootFrame::InitFrame() {
 
   mInterSizePanel=new wxPanel(this);
   wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_HFC),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_G_TENSER),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_ZFS),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_EXCHANGE),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SHIELDING),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SCALAR),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_QUADRUPOLAR),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_DIPOLAR),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_LINEAR),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_BILINEAR),0,0);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC),0,0);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_HFC),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_G_TENSER),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_ZFS),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_EXCHANGE),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SHIELDING),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SCALAR),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_QUADRUPOLAR),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_DIPOLAR),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_LINEAR),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_BILINEAR),1,wxEXPAND);
+  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC),1,wxEXPAND);
   mInterSizePanel->SetSizer(bs);
 
   mSpinGrid=new SpinGrid(this);

@@ -12,7 +12,6 @@
 class SpinGrid : public wxGrid, public sigc::trackable {
 public:
   SpinGrid(wxWindow* parent,wxWindowID id= -1);
-  ~SpinGrid() {sigDying();}
 
   //wx Event Handlers
   void OnEdit(wxGridEvent& e);
@@ -55,6 +54,7 @@ protected:
   void SetupRow(long rowNumber);
 
 private:
+  ~SpinGrid() {sigDying();}
   struct SpinGridColum {
     COL_TYPE type;
     const char* name;

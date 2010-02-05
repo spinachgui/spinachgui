@@ -271,6 +271,10 @@ void RootFrame::OnResize(wxSizeEvent&e) {
   }
 }
 
+void RootFrame::OnGLReset(wxCommandEvent& e) {
+  mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));  
+}
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
 //File Menu
@@ -291,6 +295,9 @@ EVT_MENU(ID_EPR,    RootFrame::OnEpr)
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)
+
+//Debug
+EVT_MENU(ID_GL_RESET,RootFrame::OnGLReset)
 
 END_EVENT_TABLE()
 

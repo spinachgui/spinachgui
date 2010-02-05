@@ -44,6 +44,9 @@ public:
   //Resize Event
   void OnResize(wxSizeEvent& e);
 
+  //Debug Menu
+  void OnGLReset(wxCommandEvent& e);
+
   DECLARE_EVENT_TABLE();
 
 private:

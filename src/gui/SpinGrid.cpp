@@ -39,7 +39,6 @@ public:
   }
 
   void OtherRowsDeleted(int pos,int number) {
-    cout << "OtherRowsDeleted "<< pos <<  endl;
     if(pos<rowNumber && pos > 0) {
       rowNumber-=number;
     }
@@ -67,10 +66,7 @@ public:
     UpdateRow();
   }
   void OnSpinDying(Spin* /*unused*/) {
-    cout << "A gird row knows a spin" <<  rowNumber << " just died" << endl;
-    if(mParent->DeleteRows(rowNumber,1)) {
-      cerr << "Error deleting grid row" << endl;
-    }
+    mParent->DeleteRows(rowNumber,1);
     delete this;
   }
   void OnGridDying() {

@@ -35,7 +35,7 @@ void SpinSystem::Clear() {
   //Currently we need to delete the interactions Before the spins as
   //the spins have interactions as their children. 
 
-  for(long i=0;i<mSpins.size();i++) {
+  for(unsigned long i=0;i<mSpins.size();i++) {
     mIgnoreSpinKill=mSpins[i];
     delete mSpins[i];
   }
@@ -59,7 +59,7 @@ Spin* SpinSystem::GetSpin(long n) const {
 }
 
 long SpinSystem::GetSpinNumber(Spin* spin) const {
-  for(long i=0;i<mSpins.size();i++) {
+  for(unsigned long i=0;i<mSpins.size();i++) {
     if(mSpins[i]==spin) {
       return i;
     }
@@ -119,7 +119,7 @@ void SpinSystem::RemoveSpin(Spin* _Spin) {
     mIgnoreSpinKill=NULL;
     return;
   }
-  for(long i=0;i<mSpins.size();i++) {
+  for(unsigned long i=0;i<mSpins.size();i++) {
     if(mSpins[i]==_Spin) {
       mSpins.erase(mSpins.begin()+i);
       return;
@@ -196,7 +196,7 @@ const char* Spin::GetLabel() const {
 
 vector<Interaction*> Spin::GetInteractionsOnce() const {
   vector<Interaction*> retVal;
-  for(long i=0;mInter.size();i++) {
+  for(unsigned long i=0;i<mInter.size();i++) {
     if(mInter[i]->GetIsBilinear()) {
       if(mInter[i]->GetOtherSpin(this) < this) {
 	retVal.push_back(mInter[i]);
@@ -221,7 +221,7 @@ void Spin::RemoveInteraction(Interaction* _Interaction) {
   if(_Interaction == NULL) {
     return;
   }
-  for(long i=0;i<mInter.size();i++) {
+  for(unsigned long i=0;i<mInter.size();i++) {
     if(mInter[i]==_Interaction) {
       mInter.erase(mInter.begin()+i);
     }
@@ -701,24 +701,30 @@ void Interaction::SetSubType(SubType st,Spin* spin1,Spin* spin2) {
 
 Interaction::Form Interaction::GetFormFromSubType(SubType st) {
   switch(st) {
-    case ST_CUSTOM_LINEAR:
-    case ST_SHIELDING:
-    case ST_G_TENSER:
-      return LINEAR;
+  case ST_CUSTOM_LINEAR:
+  case ST_SHIELDING:
+  case ST_G_TENSER:
+    return LINEAR;
 
-    case ST_CUSTOM_BILINEAR:
-    case ST_SCALAR:
-    case ST_DIPOLAR:
-    case ST_HFC:
-    case ST_EXCHANGE:
-      return BILINEAR;
+  case ST_CUSTOM_BILINEAR:
+  case ST_SCALAR:
+  case ST_DIPOLAR:
+  case ST_HFC:
+  case ST_EXCHANGE:
+    return BILINEAR;
 
-    case ST_ZFS: 
-    case ST_QUADRUPOLAR:
-    case ST_CUSTOM_QUADRATIC:
-      return QUADRATIC;
+  case ST_ZFS: 
+  case ST_QUADRUPOLAR:
+  case ST_CUSTOM_QUADRATIC:
+    return QUADRATIC;
+  case ST_ANY:
+  case ST_NMR:
+  case ST_EPR:
+    throw logic_error("Can't pass ST_ANY,ST_NMR,ST_EPR to GetFromFromSubType");
+  default:
+    throw logic_error("Unknown type in GetFromFromSubType");
   }
-  throw logic_error("Unknown type in GetFromFromSubType");
+
 }
 
 bool Interaction::IsSubType(SubType t) const {

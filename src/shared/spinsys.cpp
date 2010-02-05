@@ -205,6 +205,7 @@ vector<Interaction*> Spin::GetInteractionsOnce() const {
       retVal.push_back(mInter[i]);
     }
   }
+  return retVal;
 }
 
 void Spin::InsertInteraction(Interaction* _Interaction,long Position) {

@@ -11,7 +11,7 @@
 
 class SpinGrid : public wxGrid, public sigc::trackable {
 public:
-  SpinGrid(wxWindow* parent,wxWindowID id= -1);
+  SpinGrid(wxWindow* parent);
 
   //wx Event Handlers
   void OnEdit(wxGridEvent& e);

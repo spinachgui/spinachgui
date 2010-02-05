@@ -100,8 +100,8 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 
 
-SpinGrid::SpinGrid(wxWindow* parent,wxWindowID id)
-  :wxGrid(parent,id),mUpdating(false),mSS(GetSS()) {
+SpinGrid::SpinGrid(wxWindow* parent)
+  :wxGrid(parent,wxID_ANY),mUpdating(false),mSS(GetSS()) {
 
   CreateGrid(0, ColumCount);
 

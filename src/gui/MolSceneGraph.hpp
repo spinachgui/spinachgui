@@ -12,12 +12,16 @@ public:
     SpinNode(Spin* spin);
     void OnSpinDying(Spin*) {delete this;} //Arguments are usused
 
-
+    void OnSpinHover(Spin* spin);
+    void OnSpinSelect(std::vector<SpinXML::Spin*> spins);
 private:
 
     Spin* mSpin;
     virtual void RawDraw(SpinachDC& dc);
     virtual void ToPovRay(wxString& src);
+
+    bool mHover;
+    bool mSelected;
 };
 
 class InterNode : public SGNode {

@@ -14,16 +14,19 @@
 #include <wx/filename.h>
 
 
-
 IMPLEMENT_APP(SpinachApp);
 
 SpinachApp::~SpinachApp() {
     for(unsigned long i=0;i<mIOFilters.size();i++) {
         delete mIOFilters[i];
     }
+    delete mSelectionManager;
 }
 
 bool SpinachApp::OnInit() {
+    //Create the global selection manager
+    mSelectionManager = new SelectionManager;
+
     //Load the I/O Filters
 
     mIOFilters.push_back(new XYZLoader);
@@ -59,6 +62,39 @@ bool SpinachApp::OnInit() {
 
     return true;
 }
+
+
+//============================================================//
+// Selection Manager
+SelectionManager* SelectionManager::static_this=NULL;
+
+SelectionManager::SelectionManager() {
+    //There can be only one
+    assert(NULL==static_this);
+    static_this=this;
+}
+
+SelectionManager::~SelectionManager() {
+    assert(this==static_this);
+    static_this=NULL;
+}
+
+SelectionManager* SelectionManager::Instance() {
+    assert(static_this != NULL);
+    return static_this;
+}
+
+
+void SelectionManager::SetHover(SpinXML::Spin* spin) {
+    mHover=spin;
+    sigHover(spin);
+}
+
+void SelectionManager::SetSelection(const std::vector<SpinXML::Spin*>& selection) {
+    mSelection=selection;
+    sigSelect(mSelection);
+}
+
 
 
 

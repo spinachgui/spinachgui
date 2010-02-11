@@ -3,6 +3,7 @@
 #include <shared/nuclear_data.hpp>
 #include <cmath>
 #include <iostream>
+#include <gui/SpinachApp.hpp>
 
 using namespace std;
 
@@ -11,6 +12,10 @@ const double pi=3.141592654;
 ///Scenegraph node that draws a spin
 SpinNode::SpinNode(Spin* spin) 
     : mSpin(spin) {
+
+    mHover=false;
+    mSelected=false;
+
     mSpin->sigDying.connect(mem_fun(this,&SpinNode::OnSpinDying));
     if(spin->GetElement() != 0) {
         //Electrons are placed at (0,0,0)
@@ -46,6 +51,23 @@ SpinNode::SpinNode(Spin* spin)
             AddNode(new InterNode(mSpin,ElectronCentredInterTypes[i]));
         }
     }
+    SelectionManager::Instance()->sigHover.connect( mem_fun(this,&SpinNode::OnSpinHover));
+    SelectionManager::Instance()->sigSelect.connect(mem_fun(this,&SpinNode::OnSpinSelect));
+
+}
+void SpinNode::OnSpinHover(Spin* spin) {
+    if(spin==mSpin) {
+        mHover=true;
+        Dirty();
+    }
+}
+void SpinNode::OnSpinSelect(vector<Spin*> spins) {
+    for(vector<Spin*>::iterator i=spins.begin();i != spins.end(); ++i) {
+        if((*i)==mSpin) {
+            mSelected=true;
+            Dirty();
+        }
+    }
 }
 
 
@@ -53,9 +75,15 @@ void SpinNode::RawDraw(SpinachDC& dc) {
     const static GLfloat white[3]={0.5f,0.5f,0.5f};
     if(true) {
         GLfloat material[3];
-        material[0] = getElementR(mSpin->GetElement());
-        material[1] = getElementG(mSpin->GetElement());
-        material[2] = getElementB(mSpin->GetElement());
+        if(mSelected==false) {
+            material[0] = getElementR(mSpin->GetElement());
+            material[1] = getElementG(mSpin->GetElement());
+            material[2] = getElementB(mSpin->GetElement());
+        } else {
+            material[0] = 1.0;
+            material[1] = 1.0;
+            material[2] = 1.0;
+        }
 
         glMaterialfv(GL_FRONT, GL_SPECULAR, material);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, white);

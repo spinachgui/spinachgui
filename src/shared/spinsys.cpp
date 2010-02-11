@@ -162,7 +162,6 @@ Spin::Spin(const Spin& s) :
 }
 
 Spin::~Spin() {
-  cout << "About to kill a spin" << endl;
     sigDying(this);
 }
 

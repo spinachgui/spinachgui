@@ -49,7 +49,7 @@ SpinNode::SpinNode(Spin* spin)
 }
 
 
-void SpinNode::RawDraw(const SpinachDC& dc) {
+void SpinNode::RawDraw(SpinachDC& dc) {
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
   if(true) {
     GLfloat material[3];
@@ -132,7 +132,7 @@ void InterNode::LoadInteractionMatrix() {
 }
 
 
-void InterNode::RawDraw(const SpinachDC& dc) {
+void InterNode::RawDraw(SpinachDC& dc) {
   LoadInteractionMatrix();
   const static GLfloat white[3]={0.5f,0.5f,0.5f};
   const static GLfloat blue[3]={0.0,0.0,0.5};
@@ -230,7 +230,7 @@ void InterNode::ToPovRay(wxString& str) {
 
 
 
-void CyclinderNode::RawDraw(const SpinachDC& dc) {
+void CyclinderNode::RawDraw(SpinachDC& dc) {
   double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
   double x2=mR2.GetX(),y2=mR1.GetY(),z2=mR1.GetZ();
 
@@ -306,7 +306,7 @@ void MoleculeNode::ToPovRay(wxString& str) {
 
 }
 
-void MoleculeNode::RawDraw(const SpinachDC& dc) {
+void MoleculeNode::RawDraw(SpinachDC& dc) {
 
   static const GLfloat darkgreen[] = {0.0, 0.9,  0.0}; 
   static const GLfloat lightgreen[] = {0.0, 0.9,  0.0}; 

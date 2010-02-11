@@ -14,7 +14,7 @@ using namespace std;
 // Scene graphs
 
 
-void OpenGLText::RawDraw(const SpinachDC& dc) {
+void OpenGLText::RawDraw(SpinachDC& dc) {
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_TEXTURE_2D); {
     glDisable(GL_LIGHTING);
@@ -145,7 +145,7 @@ void SGNode::SetTranslation(const Vector3& v) {
   mat[3 ]=0;  mat[7 ]=0;  mat[11]=0;  mat[15]=1;
 }
 
-void SGNode::Draw(const SpinachDC& dc) {
+void SGNode::Draw(SpinachDC& dc) {
   if(!mIdentity) {
     glPushMatrix();
     glMultMatrixf(mat);

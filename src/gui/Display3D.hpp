@@ -64,7 +64,7 @@ public:
 
   ///Draw, using RawDraw if needed or by calling the display list if
   ///one exists.
-  void Draw(const SpinachDC& dc);
+  void Draw(SpinachDC& dc);
 
   ///Add a node to the scenegraph. To remove it, just make sure its
   ///destructor is called.
@@ -85,7 +85,7 @@ public:
   sigc::signal<void> sigDirty; //Signals that a redraw is needed
 private:
   ///Make whatever openGL calls are needed to draw the node.
-  virtual void RawDraw(const SpinachDC& dc)=0;
+  virtual void RawDraw(SpinachDC& dc)=0;
 
   virtual void ToPovRay(wxString& src)=0;
 
@@ -110,7 +110,7 @@ public:
   void SetStr(const wxString& str) {UpdateString(str);}
   
 private:
-  virtual void RawDraw(const SpinachDC& dc);
+  virtual void RawDraw(SpinachDC& dc);
   virtual void ToPovRay(wxString& src) {}
   void UpdateString(const wxString& str);
   GLuint texName;

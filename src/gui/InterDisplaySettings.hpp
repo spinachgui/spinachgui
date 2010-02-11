@@ -8,6 +8,7 @@
 class InterDisplaySettings : public InterDisplaySettingsBase {
 public:
   InterDisplaySettings(wxWindow* parent,SpinXML::Interaction::SubType st);
+  LogSlider* GetLogSlider() {return mLogSlider;}
 private:
 };
 

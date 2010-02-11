@@ -615,9 +615,9 @@ Matrix3 Interaction::GetAsMatrix() const {
 
     Matrix3 intMatrix=mOrient.GetAsMatrix();
 
-    Matrix3 result=intMatrix*Matrix3(xx, 0.0,0.0,
-				     0.0,yy, 0.0,
-				     0.0,0.0,zz)*intMatrix.Transpose();
+    Matrix3 result=intMatrix*Matrix3(xx,0.0,0.0,
+				     0.0,yy,0.0,
+				     0.0,0.0,zz);
     return result;
 
   } else {

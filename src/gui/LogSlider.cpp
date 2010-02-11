@@ -21,9 +21,10 @@ void LogSlider::SetValue(double value) {
     if(value<=0) {
 	throw std::runtime_error("In LogSlider value<=0");
     }
-    mLogValue=value;
+    mLogValue=log10(value);
     wxClientDC dc(this);
     RealPaint(dc);
+    sigChange(pow(10,mLogValue));
 }
 
 double LogSlider::GetValue() {
@@ -83,7 +84,7 @@ void LogSlider::OnLeftUp(wxMouseEvent&e) {
     mLogValue+=mLogValueDelta;
     mLogValueDelta=0;
     mStartDrag=0;
-    Refresh();
+    sigChange(pow(10,mLogValue));
 }
 
 void LogSlider::OnMouseMove(wxMouseEvent&e) {
@@ -94,6 +95,7 @@ void LogSlider::OnMouseMove(wxMouseEvent&e) {
 	mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
     }
     Refresh();
+    sigChange(pow(10,mLogValue+mLogValueDelta));
 }
 
 BEGIN_EVENT_TABLE(LogSlider, wxControl)

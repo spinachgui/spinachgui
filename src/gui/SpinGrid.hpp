@@ -20,7 +20,9 @@ public:
     void OnCellSelect(wxGridEvent& e);
     void OnRightClick(wxGridEvent& e);
     void OnDeleteSpinHover(wxCommandEvent& e);
+    void OnMouseMove(wxMouseEvent& e);
   
+    //sigc slots
     void OnNewSpin(SpinXML::Spin* newSpin,long number);
 
     //Overridden in order to emit a signal

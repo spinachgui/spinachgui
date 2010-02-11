@@ -27,6 +27,9 @@ public:
 
     spin->sigChange.connect(mem_fun(this,&SpinGridRow::UpdateRow));
     spin->sigDying.connect(mem_fun(this,&SpinGridRow::OnSpinDying));
+
+    
+
     UpdateRow();
   }
 
@@ -274,6 +277,18 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
+void SpinGrid::OnMouseMove(wxMouseEvent& e) {
+    cout << "Mouse event" << endl;
+    long y=e.GetY();
+
+    int row=YToRow(y);
+    if(row != wxNOT_FOUND) {
+        for(int i=0;i<GetNumberCols();i++){
+            SetCellBackgroundColour(row,i,wxColor(200,255,200));
+        }
+    }
+}
+
 
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)
 
@@ -283,6 +298,9 @@ EVT_GRID_EDITOR_HIDDEN   (         SpinGrid::OnEndEdit)
 EVT_GRID_EDITOR_SHOWN    (         SpinGrid::OnEdit)
 
 EVT_GRID_CELL_RIGHT_CLICK(         SpinGrid::OnRightClick)
+
+//This doesn't work, at th emoment
+EVT_MOTION               (         SpinGrid::OnMouseMove)
 
 END_EVENT_TABLE()
 

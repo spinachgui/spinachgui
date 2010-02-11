@@ -158,14 +158,10 @@ void InterNode::RawDraw(SpinachDC& dc) {
   nuclear_centred_drawing:
     //Apply the transformation matrix to warp the sphere
     glPushMatrix(); {
-      if(mSpin->GetElement()==0) {
-	glMultMatrixf(mat);
-	gluSphere(dc.GetSolidQuadric(),0.5,29,37);
-      } else {
-	glMultMatrixf(mat);
-	glScalef(0.04,0.04,0.04);
-	gluSphere(dc.GetSolidQuadric(),1.0,29,37);
-      }
+      double scalling=dc.mScallings[mType];
+      glMultMatrixf(mat);
+      glScalef(scalling,scalling,scalling);
+      gluSphere(dc.GetSolidQuadric(),1.0,29,37);
     } glPopMatrix();
     break;
     //Draw as a cyclinder

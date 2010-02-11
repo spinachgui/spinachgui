@@ -10,6 +10,7 @@
 #include <gui/InterDisplaySettings.hpp>
 
 using namespace std;
+using namespace sigc;
 
 //============================================================//
 // Utility Functions
@@ -27,25 +28,68 @@ void RootFrame::InitFrame() {
   mAuiManager=new wxAuiManager(this);
 
   mInterSizePanel=new wxPanel(this);
+
+  InterDisplaySettings* hfc_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ST_HFC             );
+  InterDisplaySettings* gt_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::ST_G_TENSER        );
+  InterDisplaySettings* zfs_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ST_ZFS             );
+  InterDisplaySettings* exc_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ST_EXCHANGE        );
+  InterDisplaySettings* shd_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ST_SHIELDING       );
+  InterDisplaySettings* sca_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ST_SCALAR          );
+  InterDisplaySettings* qp_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::ST_QUADRUPOLAR     );
+  InterDisplaySettings* dip_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ST_DIPOLAR         );
+  InterDisplaySettings* cl_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_LINEAR   );
+  InterDisplaySettings* cb_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_BILINEAR );
+  InterDisplaySettings* cq_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC);
+
+
   wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_HFC),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_G_TENSER),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_ZFS),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_EXCHANGE),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SHIELDING),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_SCALAR),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_QUADRUPOLAR),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_DIPOLAR),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_LINEAR),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_BILINEAR),1,wxEXPAND);
-  bs->Add(new InterDisplaySettings(mInterSizePanel,Interaction::ST_CUSTOM_QUADRATIC),1,wxEXPAND);
+  bs->Add(hfc_sp,1,wxEXPAND);
+  bs->Add(gt_sp ,1,wxEXPAND);
+  bs->Add(zfs_sp,1,wxEXPAND);
+  bs->Add(exc_sp,1,wxEXPAND);
+  bs->Add(shd_sp,1,wxEXPAND);
+  bs->Add(sca_sp,1,wxEXPAND);
+  bs->Add(qp_sp ,1,wxEXPAND);
+  bs->Add(dip_sp,1,wxEXPAND);
+  bs->Add(cl_sp ,1,wxEXPAND);
+  bs->Add(cb_sp ,1,wxEXPAND);
+  bs->Add(cq_sp ,1,wxEXPAND);
   mInterSizePanel->SetSizer(bs);
 
-  mSpinGrid=new SpinGrid(this);
-  mSpinInterEdit=new SpinInterEditPanel(this);
-  mDisplay3D=new Display3D(this);
+  mSpinGrid      = new SpinGrid(this);
+  mSpinInterEdit = new SpinInterEditPanel(this);
+  mDisplay3D     = new Display3D(this);
 
-  mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));
+  MoleculeNode* mn = new MoleculeNode(GetSS());
+
+  SpinachDC* spinDC=&mDisplay3D->GetDC();
+
+  hfc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_HFC             ));
+  gt_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_G_TENSER        )); 
+  zfs_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_ZFS             ));
+  exc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_EXCHANGE        ));
+  shd_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_SHIELDING       ));
+  sca_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_SCALAR          ));
+  qp_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_QUADRUPOLAR     ));
+  dip_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_DIPOLAR         ));
+  cl_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_CUSTOM_LINEAR   ));
+  cb_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_CUSTOM_BILINEAR )); 
+  cq_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_CUSTOM_QUADRATIC)); 
+
+  //Set sensible default scallings
+  hfc_sp->GetLogSlider()->SetValue(0.04);
+  gt_sp ->GetLogSlider()->SetValue(0.04);
+  zfs_sp->GetLogSlider()->SetValue(0.04);
+  exc_sp->GetLogSlider()->SetValue(0.04);
+  shd_sp->GetLogSlider()->SetValue(0.04);
+  sca_sp->GetLogSlider()->SetValue(0.04);
+  qp_sp ->GetLogSlider()->SetValue(0.04);
+  dip_sp->GetLogSlider()->SetValue(0.04);
+  cl_sp ->GetLogSlider()->SetValue(0.04);
+  cb_sp ->GetLogSlider()->SetValue(0.04);
+  cq_sp ->GetLogSlider()->SetValue(0.04);
+
+  mDisplay3D->SetRootSGNode(mn);
 
   //mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
   mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));

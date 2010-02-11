@@ -11,6 +11,36 @@
 using namespace std;
 
 //============================================================//
+// Device Context
+
+SpinachDC::SpinachDC()
+        : depthOnly(false),
+          mSolidQuadric(gluNewQuadric()),
+          mWireQuadric(gluNewQuadric()) {
+        gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
+        gluQuadricNormals  (mSolidQuadric,GLU_SMOOTH);
+	
+        gluQuadricDrawStyle(mWireQuadric,GLU_LINE);
+        gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
+        mScallings[Interaction::ST_HFC             ]=1.0;
+        mScallings[Interaction::ST_G_TENSER        ]=1.0;
+        mScallings[Interaction::ST_ZFS             ]=1.0;
+        mScallings[Interaction::ST_EXCHANGE        ]=1.0;
+        mScallings[Interaction::ST_SHIELDING       ]=1.0;
+        mScallings[Interaction::ST_SCALAR          ]=1.0;
+        mScallings[Interaction::ST_QUADRUPOLAR     ]=1.0;
+        mScallings[Interaction::ST_DIPOLAR         ]=1.0;
+        mScallings[Interaction::ST_CUSTOM_LINEAR   ]=1.0;
+        mScallings[Interaction::ST_CUSTOM_BILINEAR ]=1.0;
+        mScallings[Interaction::ST_CUSTOM_QUADRATIC]=1.0;
+}
+SpinachDC::~SpinachDC() {
+        gluDeleteQuadric(mSolidQuadric);
+        gluDeleteQuadric(mWireQuadric);
+}
+
+
+//============================================================//
 // Scene graphs
 
 

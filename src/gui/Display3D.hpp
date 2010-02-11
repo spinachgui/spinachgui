@@ -13,6 +13,7 @@
 #include <sigc++/sigc++.h>
 
 #include <list>
+#include <map>
 
 using namespace boost;
 using namespace SpinXML;
@@ -20,30 +21,26 @@ using namespace SpinXML;
 
 
 ///A class for storing all drawing options
-class SpinachDC {
+class SpinachDC : public sigc::trackable {
 public:
+  SpinachDC();
+  ~SpinachDC();
+
   GLUquadric* GetSolidQuadric() const {return mSolidQuadric;}
   GLUquadric* GetWireQuadric() const {return mWireQuadric;}
+
+  void SetScalling(double scalling,Interaction::SubType st) {mScallings[st]=scalling;}
+
   ///If true draw only to the depth buffer
   bool depthOnly;
   GLUquadric* mSolidQuadric;
   GLUquadric* mWireQuadric;
-  SpinachDC()
-    : depthOnly(false),
-      mSolidQuadric(gluNewQuadric()),
-      mWireQuadric(gluNewQuadric()) {
-    gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
-    gluQuadricNormals  (mSolidQuadric,GLU_SMOOTH);
-	
-    gluQuadricDrawStyle(mWireQuadric,GLU_LINE);
-    gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
-  }
-  ~SpinachDC() {
-      gluDeleteQuadric(mSolidQuadric);
-      gluDeleteQuadric(mWireQuadric);
-  }
   int width,height;
   const float* mRotationMatrix;
+  
+  ///The size of the displayed interaction in units of energy/length,
+  ///e.g. MHz/Nm
+  std::map<SpinXML::Interaction::SubType,double> mScallings;
 };
 
 class SGNode : public sigc::trackable {

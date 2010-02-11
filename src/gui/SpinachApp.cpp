@@ -18,46 +18,46 @@
 IMPLEMENT_APP(SpinachApp);
 
 SpinachApp::~SpinachApp() {
-  for(unsigned long i=0;i<mIOFilters.size();i++) {
-    delete mIOFilters[i];
-  }
+    for(unsigned long i=0;i<mIOFilters.size();i++) {
+        delete mIOFilters[i];
+    }
 }
 
 bool SpinachApp::OnInit() {
-  //Load the I/O Filters
+    //Load the I/O Filters
 
-  mIOFilters.push_back(new XYZLoader);
-  mIOFilters.push_back(new G03Loader);
+    mIOFilters.push_back(new XYZLoader);
+    mIOFilters.push_back(new G03Loader);
 
-  //Load the xml schema, it's more complicated, of course
-  wxFileName fn(argv[0]);
-  fn.Normalize();
-  fn=fn.GetPath();
-  fn.AppendDir(wxT("data"));
-  fn.SetFullName(wxT("spinxml_schema.xsd"));
-  wxString url(wxString(wxT("file://")) << fn.GetFullPath());
-  mIOFilters.push_back(new XMLLoader(url.char_str()));
+    //Load the xml schema, it's more complicated, of course
+    wxFileName fn(argv[0]);
+    fn.Normalize();
+    fn=fn.GetPath();
+    fn.AppendDir(wxT("data"));
+    fn.SetFullName(wxT("spinxml_schema.xsd"));
+    wxString url(wxString(wxT("file://")) << fn.GetFullPath());
+    mIOFilters.push_back(new XMLLoader(url.char_str()));
   
-  //Load the isotopes
+    //Load the isotopes
 
-  try {
-    LoadIsotopes();
-  } catch(runtime_error e) {
-    cout << "Isotopes not loaded" << endl;
-    wxLogError(wxString() <<
-	       wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") << 
-	       wxT("Message was:") << 
-	       wxString(e.what(),wxConvUTF8));
-    return false;
-  }
+    try {
+        LoadIsotopes();
+    } catch(runtime_error e) {
+        cout << "Isotopes not loaded" << endl;
+        wxLogError(wxString() <<
+                   wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") << 
+                   wxT("Message was:") << 
+                   wxString(e.what(),wxConvUTF8));
+        return false;
+    }
 
 
-  mSS = new SpinSystem;
+    mSS = new SpinSystem;
 
-  RootFrame* frame = new RootFrame(NULL);
-  frame->Show();
+    RootFrame* frame = new RootFrame(NULL);
+    frame->Show();
 
-  return true;
+    return true;
 }
 
 

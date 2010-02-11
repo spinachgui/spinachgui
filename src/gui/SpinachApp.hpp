@@ -9,13 +9,13 @@
 
 class SpinachApp : public wxApp {
 public:
-  ~SpinachApp();
-  virtual bool OnInit();
-  SpinXML::SpinSystem* GetSS() const {return mSS;}
-  const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
+    ~SpinachApp();
+    virtual bool OnInit();
+    SpinXML::SpinSystem* GetSS() const {return mSS;}
+    const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
 private:
-  SpinXML::SpinSystem* mSS;
-  std::vector<SpinXML::ISpinSystemLoader*> mIOFilters;
+    SpinXML::SpinSystem* mSS;
+    std::vector<SpinXML::ISpinSystemLoader*> mIOFilters;
 };
 
 

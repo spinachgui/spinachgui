@@ -10,6 +10,7 @@
 #include <shared/formats/xyz.hpp>
 #include <shared/formats/g03.hpp>
 #include <shared/formats/xml.hpp>
+#include <shared/formats/castep.hpp>
 
 #include <wx/filename.h>
 
@@ -31,6 +32,7 @@ bool SpinachApp::OnInit() {
 
     mIOFilters.push_back(new XYZLoader);
     mIOFilters.push_back(new G03Loader);
+    mIOFilters.push_back(new CASTEPLoader);
 
     //Load the xml schema, it's more complicated, of course
     wxFileName fn(argv[0]);

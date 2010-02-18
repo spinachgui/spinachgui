@@ -311,6 +311,9 @@ void RootFrame::OnResize(wxSizeEvent&e) {
     LoadFromFile(wxT("data/tryosine.log"),
 		 wxT("data/"),
 		 wxT("tryosine.log"));
+    LoadFromFile(wxT("data/OFNAPH01_NMR.magres"),
+		 wxT("data/"),
+		 wxT("OFNAPH01_NMR.magres"));
 
   }
 }

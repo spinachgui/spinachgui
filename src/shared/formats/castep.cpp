@@ -3,6 +3,7 @@
 #include <shared/nuclear_data.hpp>
 
 #include <boost/spirit/include/classic_core.hpp>
+#include <boost/spirit/include/classic_symbols.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -13,77 +14,70 @@ using namespace std;
 using namespace SpinXML;
 
 
+struct element_parser_type : symbols<unsigned> {
+    /* 
+       Just for fun, try renaming this class to element. No need to
+       change the element_p bit at the end. Go on, try it. When you
+       run the program with the renamed class it segfaults.
 
-/*struct elements : symbols<char,long> {
-    elements() {
+       I have no idea what is going on (maybe something is being
+       overwritten?).
+
+       And no, I am not making this up.
+    */
+    element_parser_type()
+    {
         add("H",1);
         add("C",6);
         add("F",9);
     }
 
-    } elements_;*/
+} element_p;
 
 
-template <typename Iterator>
-bool parse_castep(Iterator first, Iterator last) {
+struct castep : grammar<castep> {
+    template <typename ScannerT>
+    struct definition {
+        definition(castep const& self) {
+            header = str_p("============") >>
+                str_p("Atom:") >> element_p >> int_p >>
+                str_p("============");
 
-    /*struct atom : grammar<Iterator> {
-        atom() : atom::base_type(r) {
-            r=*lit("atom");
-        }
-        rule<Iterator> r;
-        };*/
-    /*   struct castep : grammar<Iterator> {
-        castep() : castep::base_type(atom) {
-            
+            coord_block = element_p >> int_p >> str_p("Coordinates") >> real_p >> real_p >> real_p >> str_p("A");
 
-            //file=*atom;
-                
-            // atom = header;// >> coord_block >> shielding_block >> eigenvalues_block >> anisotropy_block;
-            
-            //header = lit("============") >>
-            //     lit("Atom:") >> elements_ >> int_ >>
-            //     lit("============");
+            shielding_block=str_p("TOTAL") >> "Shielding" >> str_p("Tensor") >>
+                real_p >> real_p >> real_p >>
+                real_p >> real_p >> real_p >>
+                real_p >> real_p >> real_p;
 
-            /*coord_block = elements >> int_ >> lit("Coordinates") >> float_ >> float_ >> float_ >> lit("A");
-
-            shielding_block=lit("TOTAL") >> "Shielding" >> lit("Tensor") >>
-                float_ >> float_ >> float_ >>
-                float_ >> float_ >> float_ >>
-                float_ >> float_ >> float_;
-
-            eigen_block = elements >> int_ >> lit("Eigenvalue") >> elements >> float_ >> lit("(ppm)") >>
-                elements >> int_ >> lit("Eigenvector") >> elements >> float_ >> float_ >> float_;
+            eigen_block = element_p >> int_p >> str_p("Eigenvalue") >> element_p >> real_p >> str_p("(ppm)") >>
+                element_p >> int_p >> str_p("Eigenvector") >> element_p >> real_p >> real_p >> real_p;
 
             eigenvalues_block = eigen_block >> eigen_block >> eigen_block;
 
-            anisotropy_block = elements >> int_ >> lit("Isotropic:") >> float_ >> lit("(ppm)") >>
-                elements >> int_ >> lit("Anisotropy:") >> float_ >> lit("(ppm)") >>
-                elements >> int_ >> lit("Asymmetry:") >> float_;
+            anisotropy_block = element_p >> int_p >> str_p("Isotropic:") >> real_p >> str_p("(ppm)") >>
+                element_p >> int_p >> str_p("Anisotropy:") >> real_p >> str_p("(ppm)") >>
+                element_p >> int_p >> str_p("Asymmetry:") >> real_p;
 
+            atom = header >> coord_block;// >> shielding_block >> eigenvalues_block >> anisotropy_block;
+
+            file=*atom;
         }
-        rule<Iterator> header;
-        //rule<Iterator> coord_block;
-        //rule<Iterator> shielding_block;
-        //rule<Iterator> eigenvalues_block;
-        //rule<Iterator> anisotropy_block;
+        rule<ScannerT> const& start() {return file;}
+        rule<ScannerT> header;
+        rule<ScannerT> coord_block;
+        rule<ScannerT> shielding_block;
+        rule<ScannerT> eigenvalues_block;
+        rule<ScannerT> anisotropy_block;
 
-        //rule<Iterator> eigen_block;
+        rule<ScannerT> eigen_block;
 
-        rule<Iterator> atom;
+        rule<ScannerT> atom;
         
-        //rule<Iterator> file;
+        rule<ScannerT> file;
     };
+} castep_p;
 
-    */
-    //unused_type result;
-    //castep c;
-    //bool ret = parse(first,last,c.start);
-    if(first != last) {
-        return false;
-    }
-    return false;
-}
 
 void CASTEPLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 
@@ -102,8 +96,13 @@ void CASTEPLoader::LoadFile(SpinSystem* ss,const char* filename) const {
         str += *it;
         it++;
     }
+    str="============\n"
+        "Atom: C    1\n"
+        "============\n"
+        "C    1 Coordinates     -0.484    0.440    0.226   A\n";
 
-    if(parse_castep(str.begin(),str.end())) {
+
+    if(parse(str.begin(),str.end(),castep_p,space_p).full) {
         cout << "Parse Okay" << endl;
     } else {
         cout << "Parse error" << endl;

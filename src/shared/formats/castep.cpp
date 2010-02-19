@@ -34,12 +34,16 @@ struct element_parser_type : symbols<unsigned> {
 
 } element_p;
 
+void on_match(const __gnu_cxx::__normal_iterator<char*, string >,
+              const __gnu_cxx::__normal_iterator<char*, string >) {
+    cout << "Something was matched" << endl;
+}
 
 struct castep : grammar<castep> {
     template <typename ScannerT>
     struct definition {
         definition(castep const& self) {
-            header = str_p("============") >>
+            header = str_p("============")[&on_match] >>
                 str_p("Atom:") >> element_p >> int_p >>
                 str_p("============");
 

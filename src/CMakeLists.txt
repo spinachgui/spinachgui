@@ -45,7 +45,7 @@ if(WIN32)
 else()
   find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
   find_package(PythonLibs)
-  find_package(Boost REQUIRED program_options signals)
+  find_package(Boost REQUIRED program_options)
   #set(CMAKE_CXX_COMPILER "g++-4.2")
 endif()
 

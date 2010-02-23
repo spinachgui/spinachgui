@@ -66,43 +66,141 @@ struct v_parser_type : symbols<unsigned> {
 struct castep : grammar<castep> {
     ///These IDs label all the places on interest in the parse tree
     enum {
-        total_shielding_tensorID,
-        total_tensor
+        element_indexID=1                       ,
+                                      
+        headerID                                ,
+        coord_blockID                           ,
+        total_shielding_matrixID                ,
+        total_matrixID                          ,
+        eigensystem_block_total_shieldingID     ,
+        eigensystem_block_totalID               ,
+        anisotropy_blockID                      ,
+        cq_eta_blockID                          ,
+                                      
+                                      
+        eigen_block_total_shieldingID           ,
+        eigen_block_totalID                     ,
+                                      
+        total_shielding_tensorID                ,
+        total_tensorID                          ,
+        quadrupole_blockID                      ,
+                                      
+        fileID                                  
     };
-    void process_tree(tree_iter_t tree,string indent="") {
-        cout << indent << "process_tree(" 
+    
+    void identify_spins(tree_iter_t tree) {
+        //we are assuming we have been passed the root of the parse tree
+        for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
+            if(j->value.id()==total_shielding_tensorID) {
+                //Thanks to the grammar, we can rely on the child
+                //nodes being present and correct
+                
+                //Header
+                tree_iter_t header = j->children.begin();
+                tree_iter_t atom   = header->children.begin();
+                tree_iter_t index  = header->children.begin()+1;
+
+                //Coordinates
+                tree_iter_t coords = j->children.begin()+1;
+                tree_iter_t x_coord = coords->children.begin();
+                tree_iter_t y_coord = coords->children.begin()+1;
+                tree_iter_t z_coord = coords->children.begin()+2;
+
+                cout << "Creating a spin " <<
+                    string(atom->value.begin(),atom->value.end()) << " " << 
+                    string(index->value.begin(),index->value.end()) << " at (" << 
+                    string(x_coord->value.begin(),x_coord->value.end()) << " " <<
+                    string(y_coord->value.begin(),y_coord->value.end()) << " " <<
+                    string(z_coord->value.begin(),z_coord->value.end()) << " " <<
+                    ")" << endl;
+            }
+        }
+    }
+
+    void process_tree(tree_iter_t tree) {
+        //First pass, create spin objects and add them to the spin system
+        identify_spins(tree);
+        //Second pass, assign interactions to those spins.
+        /*if(tree->value.id()==fileID) {
+            for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
+                process_tree(j);
+            }
+        } else if( tree->value.id()==total_shielding_tensorID            ) {
+            
+        } else if( tree->value.id()==total_tensorID                      ) {
+        } else if( tree->value.id()==quadrupole_blockID                  ) {
+        } else if( tree->value.id()==headerID                            ) {}
+        else if( tree->value.id()==coord_blockID                       ) {}
+        else if( tree->value.id()==total_shielding_matrixID            ) {}
+        else if( tree->value.id()==total_matrixID                      ) {}
+        else if( tree->value.id()==eigensystem_block_total_shieldingID ) {}
+        else if( tree->value.id()==eigensystem_block_totalID           ) {}
+        else if( tree->value.id()==anisotropy_blockID                  ) {}
+        else if( tree->value.id()==cq_eta_blockID                      ) {}
+                                                                                                     
+        else if( tree->value.id()==eigen_block_total_shieldingID       ) {}
+        else if( tree->value.id()==eigen_block_totalID                 ) {}
+                                                                                                     
+        else {
+        }*/
+    }
+    void process_quadrupole() {
+
+    }
+    void print_tree(tree_iter_t tree,string indent="") {
+        string nodename;
+        if(      tree->value.id()==element_indexID                     ) {nodename="element_indexID";}
+        else if( tree->value.id()==headerID                            ) {nodename="headerID";}
+        else if( tree->value.id()==coord_blockID                       ) {nodename="coord_blockID";}
+        else if( tree->value.id()==total_shielding_matrixID            ) {nodename="total_shielding_matrixID";}
+        else if( tree->value.id()==total_matrixID                      ) {nodename="total_matrixID";}
+        else if( tree->value.id()==eigensystem_block_total_shieldingID ) {nodename="eigensystem_block_total_shieldingID";}
+        else if( tree->value.id()==eigensystem_block_totalID           ) {nodename="eigensystem_block_totalID";}
+        else if( tree->value.id()==anisotropy_blockID                  ) {nodename="anisotropy_blockID";}
+        else if( tree->value.id()==cq_eta_blockID                      ) {nodename="cq_eta_blockID";}
+                                                                                                                        
+        else if( tree->value.id()==eigen_block_total_shieldingID       ) {nodename="eigen_block_total_shieldingID";}
+        else if( tree->value.id()==eigen_block_totalID                 ) {nodename="eigen_block_totalID";}
+                                                                                                                        
+        else if( tree->value.id()==total_shielding_tensorID            ) {nodename="total_shielding_tensorID";}
+        else if( tree->value.id()==total_tensorID                      ) {nodename="total_tensorID";}
+        else if( tree->value.id()==quadrupole_blockID                  ) {nodename="quadrupole_blockID";}
+                                                                                                                        
+        else if( tree->value.id()==fileID                              ) {nodename="fileID";}          
+        else {
+            nodename="unknown";
+        }
+        cout << indent << nodename << "(" 
              << string(tree->value.begin(), tree->value.end()) << ")"<< endl;
         for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
-            process_tree(j,indent+"   ");
+            print_tree(j,indent+"   ");
         }
     }
 
     template <typename ScannerT>
     struct definition {
-        rule<ScannerT> const& start() {return file;}
-#define DECLARE_RULE(name,id) rule<ScannerT, parser_context<>,parser_tag<name##id> > name;
-        rule<ScannerT> element_index;
-
-        rule<ScannerT> header;
-        rule<ScannerT> coord_block;
-        rule<ScannerT> total_shielding_matrix;
-        rule<ScannerT> total_matrix;
-        rule<ScannerT> eigensystem_block_total_shielding;
-        rule<ScannerT> eigensystem_block_total;
-        rule<ScannerT> anisotropy_block;
-        rule<ScannerT> cq_eta_block;
-
-
-        rule<ScannerT> eigen_block_total_shielding;
-        rule<ScannerT> eigen_block_total;
-
-        rule<ScannerT> total_shielding_tensor;
-        rule<ScannerT> total_tensor;
-        rule<ScannerT> quadrupole_block;
-        
-        rule<ScannerT> file;
+#define RULE(name) rule<ScannerT, parser_context<>,parser_tag<name##ID> > name;
+        RULE(element_index                         );
+                                                   
+        RULE(header                                );
+        RULE(coord_block                           );
+        RULE(total_shielding_matrix                );
+        RULE(total_matrix                          );
+        RULE(eigensystem_block_total_shielding     );
+        RULE(eigensystem_block_total               );
+        RULE(anisotropy_block                      );
+        RULE(cq_eta_block                          );
+                                                   
+                                                   
+        RULE(eigen_block_total_shielding           );
+        RULE(eigen_block_total                     );
+                                                   
+        RULE(total_shielding_tensor                );
+        RULE(total_tensor                          );
+        RULE(quadrupole_block                      );
 #undef DECLARE_RULE
-
+        rule<ScannerT, parser_context<>,parser_tag<fileID> > file;
+        rule<ScannerT, parser_context<>,parser_tag<fileID> > const& start() {return file;}
 
         definition(castep const& self) {
 
@@ -110,43 +208,43 @@ struct castep : grammar<castep> {
                 element_p >> int_p;
 
             header = 
-                lexeme_d[+str_p("=")] >>
-                str_p("Atom:") >> element_index >>
-                lexeme_d[+str_p("=")];
+                no_node_d[lexeme_d[+str_p("=")]] >>
+                no_node_d[str_p("Atom:")] >> root_node_d[element_index] >>
+                no_node_d[lexeme_d[+str_p("=")]];
 
             coord_block =
-                element_index >> str_p("Coordinates") >> real_p >> real_p >> real_p >> str_p("A");
+                no_node_d[element_index >> str_p("Coordinates")] >> real_p >> real_p >> real_p >> no_node_d[str_p("A")];
 
-            total_shielding_matrix=str_p("TOTAL") >> "Shielding" >> str_p("Tensor") >>
+            total_shielding_matrix=no_node_d[str_p("TOTAL") >> "Shielding" >> str_p("Tensor")] >>
                 real_p >> real_p >> real_p >>
                 real_p >> real_p >> real_p >>
                 real_p >> real_p >> real_p;
 
-            total_matrix=str_p("TOTAL") >> str_p("tensor") >>
+            total_matrix=no_node_d[str_p("TOTAL") >> str_p("tensor")] >>
                 real_p >> real_p >> real_p >>
                 real_p >> real_p >> real_p >>
                 real_p >> real_p >> real_p;
 
             eigen_block_total_shielding =
-                element_index >> str_p("Eigenvalue")  >> sigma_p >> real_p >> str_p("(ppm)") >>
-                element_index >> str_p("Eigenvector") >> sigma_p >> real_p >> real_p >> real_p;
+                no_node_d[element_index >> str_p("Eigenvalue")]  >> sigma_p >> real_p >> no_node_d[str_p("(ppm)")] >>
+                no_node_d[element_index >> str_p("Eigenvector")] >> sigma_p >> real_p >> real_p >> real_p;
 
             eigen_block_total =
-                element_index >> str_p("Eigenvalue")  >> v_xyz_p >> real_p >>
-                element_index >> str_p("Eigenvector") >> v_xyz_p >> real_p >> real_p >> real_p;
+                no_node_d[element_index >> str_p("Eigenvalue")]  >> v_xyz_p >> real_p >>
+                no_node_d[element_index >> str_p("Eigenvector")] >> v_xyz_p >> real_p >> real_p >> real_p;
 
 
             eigensystem_block_total_shielding = eigen_block_total_shielding >> eigen_block_total_shielding >> eigen_block_total_shielding;
             eigensystem_block_total           = eigen_block_total           >> eigen_block_total           >> eigen_block_total;
 
             anisotropy_block =
-                element_index >> str_p("Isotropic:") >> real_p >> str_p("(ppm)") >>
-                element_index >> str_p("Anisotropy:") >> real_p >> str_p("(ppm)") >>
-                element_index >> str_p("Asymmetry:") >> real_p;
+                no_node_d[element_index] >> str_p("Isotropic:") >> real_p >> no_node_d[str_p("(ppm)")] >>
+                no_node_d[element_index] >> str_p("Anisotropy:") >> real_p >> no_node_d[str_p("(ppm)")] >>
+                no_node_d[element_index] >> str_p("Asymmetry:") >> real_p;
 
             cq_eta_block = 
-                element_index >> str_p("Cq:") >> real_p >> str_p("(MHz)") >>
-                element_index >> str_p("Eta:") >> real_p;
+                no_node_d[element_index >> str_p("Cq:")] >> real_p >> no_node_d[str_p("(MHz)")] >>
+                no_node_d[element_index >> str_p("Eta:")] >> real_p;
 
             total_shielding_tensor = 
                 header >>
@@ -163,13 +261,13 @@ struct castep : grammar<castep> {
                 cq_eta_block;
 
             quadrupole_block = 
-                lexeme_d[+str_p("=")] >>
-                str_p("Using") >> str_p("the") >> str_p("following") >> str_p("values") >>
-                str_p("of") >> str_p("the") >> str_p("electric") >> str_p("quadrupole") >>
-                str_p("moment") >>
-                element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=") >> real_p >> str_p("Barn") >>
-                element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=") >> real_p >> str_p("Barn") >>
-                lexeme_d[+str_p("=")];
+                no_node_d[lexeme_d[+str_p("=")]] >>
+                no_node_d[str_p("Using") >> str_p("the") >> str_p("following") >> str_p("values") >>
+                          str_p("of") >> str_p("the") >> str_p("electric") >> str_p("quadrupole") >>
+                          str_p("moment")] >>
+                no_node_d[element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=")] >> real_p >> no_node_d[str_p("Barn")] >>
+                no_node_d[element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=")] >> real_p >> no_node_d[str_p("Barn")] >>
+                no_node_d[lexeme_d[+str_p("=")]];
                 
 
             file=*(
@@ -193,6 +291,7 @@ void CASTEPLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 
     tree_parse_info<iter_t> result=ast_parse(fin,end,castep_p,space_p);
     if(result.full) {
+        castep_p.print_tree(result.trees.begin());
         castep_p.process_tree(result.trees.begin());
     } else {
         string badtext(result.stop,end);

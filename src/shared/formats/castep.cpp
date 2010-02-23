@@ -1,12 +1,14 @@
 
 #include <shared/formats/castep.hpp>
 #include <shared/nuclear_data.hpp>
+#include <shared/spinsys.hpp>
 
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_ast.hpp>
 #include <boost/spirit/include/classic_symbols.hpp>
 #include <boost/spirit/include/classic_file_iterator.hpp>
 
+#include <map>
 #include <fstream>
 #include <iostream>
 
@@ -14,6 +16,9 @@ using namespace BOOST_SPIRIT_CLASSIC_NS;
 
 using namespace std;
 using namespace SpinXML;
+
+typedef map<string,Spin*> spin_map_t;
+typedef spin_map_t::iterator spin_map_iter;
 
 typedef file_iterator<char>                                               iter_t;
 typedef tree_match<iter_t>                                                parse_tree_match_t;
@@ -64,7 +69,8 @@ struct v_parser_type : symbols<unsigned> {
 } v_xyz_p;
 
 struct castep : grammar<castep> {
-    ///These IDs label all the places on interest in the parse tree
+#define getString(x) string((x)->value.begin(),(x)->value.end())
+    ///These IDs label all the places on innterest in the parse tree
     enum {
         element_indexID=1                       ,
                                       
@@ -87,7 +93,8 @@ struct castep : grammar<castep> {
                                       
         fileID                                  
     };
-    
+    spin_map_t spin_map;
+
     void identify_spins(tree_iter_t tree) {
         //we are assuming we have been passed the root of the parse tree
         for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
@@ -106,13 +113,23 @@ struct castep : grammar<castep> {
                 tree_iter_t y_coord = coords->children.begin()+1;
                 tree_iter_t z_coord = coords->children.begin()+2;
 
+                //Create the spin
+                double x=strtod(getString(x_coord).c_str(),NULL);
+                double y=strtod(getString(y_coord).c_str(),NULL);
+                double z=strtod(getString(z_coord).c_str(),NULL);
+                string label=getString(atom)+getString(index);
+
+                Spin* spin = new Spin(Vector3(x,y,z),label,getElementBySymbol(getString(atom).c_str()));
+                spin_map[label]=spin;
+
                 cout << "Creating a spin " <<
-                    string(atom->value.begin(),atom->value.end()) << " " << 
-                    string(index->value.begin(),index->value.end()) << " at (" << 
-                    string(x_coord->value.begin(),x_coord->value.end()) << " " <<
-                    string(y_coord->value.begin(),y_coord->value.end()) << " " <<
-                    string(z_coord->value.begin(),z_coord->value.end()) << " " <<
+                    getString(atom) << " " << 
+                    getString(index) << " at (" << 
+                    getString(x_coord) << " " <<
+                    getString(y_coord) << " " <<
+                    getString(z_coord) << " " <<
                     ")" << endl;
+                //store
             }
         }
     }
@@ -176,6 +193,7 @@ struct castep : grammar<castep> {
             print_tree(j,indent+"   ");
         }
     }
+
 
     template <typename ScannerT>
     struct definition {

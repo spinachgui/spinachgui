@@ -15,11 +15,18 @@ using namespace BOOST_SPIRIT_CLASSIC_NS;
 using namespace std;
 using namespace SpinXML;
 
-typedef file_iterator<char> itor_t;
-typedef tree_match<itor_t>::tree_iterator  tree_itor_t;
+typedef file_iterator<char>                                               iter_t;
+typedef tree_match<iter_t>                                                parse_tree_match_t;
+typedef parse_tree_match_t::const_tree_iterator                           tree_iter_t;
+
+//typedef ast_match_policy<iter_t>                                          match_policy_t;
+//typedef scanner_policies<iteration_policy, match_policy_t, action_policy> scanner_policy_t;
+//typedef scanner<iter_t, scanner_policy_t>                                 scanner_t;
+typedef rule<>                                                            rule_t;
+
 
 struct element_parser_type : symbols<unsigned> {
-    /* 
+    /*
        Just for fun, try renaming this class to element. No need to
        change the element_p bit at the end. Go on, try it. When you
        run the program with the renamed class it segfaults.
@@ -29,7 +36,7 @@ struct element_parser_type : symbols<unsigned> {
 
        And no, I am not making this up.
     */
-    element_parser_type() {
+  element_parser_type() {
         add("H",1);
         add("C",6);
         add("F",9);
@@ -56,33 +63,56 @@ struct v_parser_type : symbols<unsigned> {
 
 } v_xyz_p;
 
-
-void on_shielding_match(file_iterator<char>,file_iterator<char>) {
-    cout << "Sheilding Tensor Block Matched" << endl;
-}
-void on_total_match(file_iterator<char>,file_iterator<char>) {
-    cout << "Total tensor block matched" << endl;
-}
-void on_quad_match(file_iterator<char>,file_iterator<char>) {
-    cout << "quadrupole block matched" << endl;
-}
-void on_match(file_iterator<char>,file_iterator<char>) {
-    cout << "something_was_matched" << endl;
-}
-
-
-
 struct castep : grammar<castep> {
+    ///These IDs label all the places on interest in the parse tree
+    enum {
+        total_shielding_tensorID,
+        total_tensor
+    };
+    void process_tree(tree_iter_t tree,string indent="") {
+        cout << indent << "process_tree(" 
+             << string(tree->value.begin(), tree->value.end()) << ")"<< endl;
+        for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
+            process_tree(j,indent+"   ");
+        }
+    }
+
     template <typename ScannerT>
     struct definition {
+        rule<ScannerT> const& start() {return file;}
+#define DECLARE_RULE(name,id) rule<ScannerT, parser_context<>,parser_tag<name##id> > name;
+        rule<ScannerT> element_index;
+
+        rule<ScannerT> header;
+        rule<ScannerT> coord_block;
+        rule<ScannerT> total_shielding_matrix;
+        rule<ScannerT> total_matrix;
+        rule<ScannerT> eigensystem_block_total_shielding;
+        rule<ScannerT> eigensystem_block_total;
+        rule<ScannerT> anisotropy_block;
+        rule<ScannerT> cq_eta_block;
+
+
+        rule<ScannerT> eigen_block_total_shielding;
+        rule<ScannerT> eigen_block_total;
+
+        rule<ScannerT> total_shielding_tensor;
+        rule<ScannerT> total_tensor;
+        rule<ScannerT> quadrupole_block;
+        
+        rule<ScannerT> file;
+#undef DECLARE_RULE
+
+
         definition(castep const& self) {
+
             element_index =
                 element_p >> int_p;
 
             header = 
-                token_node_d[+str_p("=")] >>
+                lexeme_d[+str_p("=")] >>
                 str_p("Atom:") >> element_index >>
-                token_node_d[+str_p("=")];
+                lexeme_d[+str_p("=")];
 
             coord_block =
                 element_index >> str_p("Coordinates") >> real_p >> real_p >> real_p >> str_p("A");
@@ -109,7 +139,8 @@ struct castep : grammar<castep> {
             eigensystem_block_total_shielding = eigen_block_total_shielding >> eigen_block_total_shielding >> eigen_block_total_shielding;
             eigensystem_block_total           = eigen_block_total           >> eigen_block_total           >> eigen_block_total;
 
-            anisotropy_block = element_p >> int_p >> str_p("Isotropic:") >> real_p >> str_p("(ppm)") >>
+            anisotropy_block =
+                element_index >> str_p("Isotropic:") >> real_p >> str_p("(ppm)") >>
                 element_index >> str_p("Anisotropy:") >> real_p >> str_p("(ppm)") >>
                 element_index >> str_p("Asymmetry:") >> real_p;
 
@@ -132,78 +163,45 @@ struct castep : grammar<castep> {
                 cq_eta_block;
 
             quadrupole_block = 
-                token_node_d[+str_p("=")] >>
+                lexeme_d[+str_p("=")] >>
                 str_p("Using") >> str_p("the") >> str_p("following") >> str_p("values") >>
                 str_p("of") >> str_p("the") >> str_p("electric") >> str_p("quadrupole") >>
                 str_p("moment") >>
                 element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=") >> real_p >> str_p("Barn") >>
                 element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=") >> real_p >> str_p("Barn") >>
-                token_node_d[+str_p("=")];
+                lexeme_d[+str_p("=")];
                 
 
             file=*(
+                   quadrupole_block |
                    total_shielding_tensor | 
-                   total_tensor | 
-                   quadrupole_block
+                   total_tensor 
                    ) >> end_p;
         }
-        rule<ScannerT> const& start() {return file;}
-        rule<ScannerT> element_index;
-
-        rule<ScannerT> header;
-        rule<ScannerT> coord_block;
-        rule<ScannerT> total_shielding_matrix;
-        rule<ScannerT> total_matrix;
-        rule<ScannerT> eigensystem_block_total_shielding;
-        rule<ScannerT> eigensystem_block_total;
-        rule<ScannerT> anisotropy_block;
-        rule<ScannerT> cq_eta_block;
-
-
-        rule<ScannerT> eigen_block_total_shielding;
-        rule<ScannerT> eigen_block_total;
-
-        rule<ScannerT> total_shielding_tensor;
-        rule<ScannerT> quadrupole_block;
-        rule<ScannerT> total_tensor;
-        
-        rule<ScannerT> file;
     };
-} castep_p;
-
-
-void process_tree(tree_itor_t tree,string indent="") {
-    cout << indent << "process_tree(" 
-         << string(tree->value.begin(), tree->value.end()) << ")"<< endl;
-    for(tree_itor_t j=tree->children.begin();j!=tree->children.end();++j) {
-        process_tree(j,indent+"   ");
-    }
-}
+}  castep_p;
 
 void CASTEPLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 
     ss->Clear();
-    //ifstream fin(filename);
 
-    itor_t fin(filename);
-    itor_t end=fin.make_end();
+    iter_t fin(filename);
+    iter_t end=fin.make_end();
     if(!fin) {
         throw runtime_error("Couldn't open file");
     }
 
-    tree_parse_info<itor_t> result=ast_parse(fin,end,castep_p,space_p);
+    tree_parse_info<iter_t> result=ast_parse(fin,end,castep_p,space_p);
     if(result.full) {
-        process_tree(result.trees.begin());
-    } else if(result.match) {
-        string badtext(result.stop,end);
-        if(badtext.length() > 40) {
-            badtext=badtext.substr(0,40);
-        }
-        string error="Syntax error near " + badtext;
-        throw runtime_error(error);
+        castep_p.process_tree(result.trees.begin());
     } else {
-        cout << "Parse Failed" << endl;
-        throw runtime_error("Parse Failed, file is corrupt");
+        string badtext(result.stop,end);
+        if(badtext.length() > 200) {
+            badtext=badtext.substr(0,200);
+        }
+        string error="Syntax error near: \"" + badtext + "\"";
+        cout << error << endl;
+        throw runtime_error(error);
     }
 
     ss->sigReloaded();

@@ -195,8 +195,9 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
     try {
       GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
     } catch(const runtime_error& e) {
-      wxLogError(wxT("File is corrupt"));
-      wxString(e.what(),wxConvUTF8);
+      wxString msg(e.what(),wxConvUTF8);
+      wxLogError(wxString() << wxT("File is corrupt:\n") << msg);
+
     }
   }
   Chkpoint(wxT("Load File"));

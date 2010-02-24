@@ -178,6 +178,145 @@ void Matrix3::Dump() const {
 }
 
 //==============================================================================//
+// Matrix4
+    
+const double IDENTITY4[]={1.0,0.0,0.0,0.0,
+                          0.0,1.0,0.0,0.0,
+			  0.0,0.0,1.0,0.0,
+                          0.0,0.0,0.0,1.0};
+
+
+Matrix4::Matrix4() {
+  memcpy(raw,IDENTITY4,16*sizeof(double));
+}
+
+Matrix4:: Matrix4(double a00,double a01,double a02,double a03,
+                  double a10,double a11,double a12,double a13,
+                  double a20,double a21,double a22,double a23,
+                  double a30,double a31,double a32,double a33) {
+    raw[0 ]=a00;  raw[1 ]=a01;   raw[2 ]=a02;  raw[3 ]=a03;
+    raw[4 ]=a10;  raw[5 ]=a11;   raw[6 ]=a12;  raw[7 ]=a13;
+    raw[8 ]=a20;  raw[9 ]=a21;   raw[10]=a22;  raw[11]=a23;
+    raw[12]=a30;  raw[13]=a31;   raw[14]=a32;  raw[15]=a33;
+}
+
+Matrix4::Matrix4(const Matrix4& m) {
+  memcpy(raw,m.raw,16*sizeof(double));
+}
+    
+const double* Matrix4::GetRaw() const {
+  return raw;
+}
+    
+double Matrix4::Get(long column, long row) const {
+  return raw[4*column+row];
+}
+
+double Matrix4::operator() (long column, long row) const {
+  return raw[4*column+row];
+}
+
+Matrix4 Matrix4::operator+ (const Matrix4& m) const {
+  Matrix4 result;
+  result.raw[0 ]=raw[0 ]+m.raw[0 ];
+  result.raw[1 ]=raw[1 ]+m.raw[1 ];
+  result.raw[2 ]=raw[2 ]+m.raw[2 ];
+  result.raw[3 ]=raw[3 ]+m.raw[3 ];
+
+  result.raw[4 ]=raw[4 ]+m.raw[4 ];
+  result.raw[5 ]=raw[5 ]+m.raw[5 ];
+  result.raw[6 ]=raw[6 ]+m.raw[6 ];
+  result.raw[7 ]=raw[7 ]+m.raw[7 ];
+
+  result.raw[8 ]=raw[8 ]+m.raw[8 ];
+  result.raw[9 ]=raw[9 ]+m.raw[9 ];
+  result.raw[10]=raw[10]+m.raw[10];
+  result.raw[11]=raw[11]+m.raw[11];
+
+  result.raw[12]=raw[12]+m.raw[12];
+  result.raw[13]=raw[13]+m.raw[13];
+  result.raw[14]=raw[14]+m.raw[14];
+  result.raw[15]=raw[15]+m.raw[15];
+  return result;
+}
+
+Matrix4 Matrix4::operator* (const Matrix4& m) const {
+  Matrix4 result;
+  result.raw[ 0]=raw[ 0]*m.raw[ 0] + raw[ 1]*m.raw[ 4] + raw[ 2]*m.raw[ 8] + raw[ 3]*m.raw[12];
+  result.raw[ 1]=raw[ 0]*m.raw[ 1] + raw[ 1]*m.raw[ 5] + raw[ 2]*m.raw[ 9] + raw[ 3]*m.raw[13];
+  result.raw[ 2]=raw[ 0]*m.raw[ 2] + raw[ 1]*m.raw[ 6] + raw[ 2]*m.raw[10] + raw[ 3]*m.raw[14];
+  result.raw[ 3]=raw[ 0]*m.raw[ 3] + raw[ 1]*m.raw[ 7] + raw[ 2]*m.raw[11] + raw[ 3]*m.raw[15];
+
+  result.raw[ 4]=raw[ 4]*m.raw[ 0] + raw[ 5]*m.raw[ 4] + raw[6 ]*m.raw[ 8] + raw[7 ]*m.raw[12];
+  result.raw[ 5]=raw[ 4]*m.raw[ 1] + raw[ 5]*m.raw[ 5] + raw[6 ]*m.raw[ 9] + raw[7 ]*m.raw[13];
+  result.raw[ 6]=raw[ 4]*m.raw[ 2] + raw[ 5]*m.raw[ 6] + raw[6 ]*m.raw[10] + raw[7 ]*m.raw[14];
+  result.raw[ 7]=raw[ 4]*m.raw[ 3] + raw[ 5]*m.raw[ 7] + raw[6 ]*m.raw[11] + raw[7 ]*m.raw[15];
+                                                                                        
+  result.raw[ 8]=raw[ 8]*m.raw[ 0] + raw[9 ]*m.raw[ 4] + raw[10]*m.raw[ 8] + raw[11]*m.raw[12];
+  result.raw[ 9]=raw[ 8]*m.raw[ 1] + raw[9 ]*m.raw[ 5] + raw[10]*m.raw[ 9] + raw[11]*m.raw[13];
+  result.raw[10]=raw[ 8]*m.raw[ 2] + raw[9 ]*m.raw[ 6] + raw[10]*m.raw[10] + raw[11]*m.raw[14];
+  result.raw[11]=raw[ 8]*m.raw[ 3] + raw[9 ]*m.raw[ 7] + raw[10]*m.raw[11] + raw[11]*m.raw[15];
+
+  result.raw[12]=raw[12]*m.raw[ 0] + raw[13]*m.raw[ 4] + raw[14]*m.raw[ 8] + raw[15]*m.raw[12];
+  result.raw[13]=raw[12]*m.raw[ 1] + raw[13]*m.raw[ 5] + raw[14]*m.raw[ 9] + raw[15]*m.raw[13];
+  result.raw[14]=raw[12]*m.raw[ 2] + raw[13]*m.raw[ 6] + raw[14]*m.raw[10] + raw[15]*m.raw[14];
+  result.raw[15]=raw[12]*m.raw[ 3] + raw[13]*m.raw[ 7] + raw[14]*m.raw[11] + raw[15]*m.raw[15];
+  return result;
+}
+
+Matrix4 Matrix4::Transpose() const {
+  Matrix4 result;
+  result.raw[0 ]=raw[0 ];
+  result.raw[5 ]=raw[5 ];
+  result.raw[10]=raw[10];
+  result.raw[15]=raw[15];
+
+  result.raw[1]=raw[4] ;    result.raw[4]=raw[1];
+  result.raw[2]=raw[8];     result.raw[8]=raw[2];
+  result.raw[3]=raw[12];    result.raw[12]=raw[3];
+
+  result.raw[6]=raw[9];     result.raw[9]=raw[6];
+  result.raw[7]=raw[13];    result.raw[13]=raw[7];
+
+  result.raw[11]=raw[14];   result.raw[14]=raw[11];
+
+  return result;
+}
+
+Matrix4& Matrix4::operator+= (const Matrix4& m) {
+  raw[0]=raw[0]+m.raw[0];
+  raw[1]=raw[1]+m.raw[1];
+  raw[2]=raw[2]+m.raw[2];
+       	     	       
+  raw[3]=raw[3]+m.raw[3];
+  raw[4]=raw[4]+m.raw[4];
+  raw[5]=raw[5]+m.raw[5];
+       	     	       
+  raw[6]=raw[6]+m.raw[6];
+  raw[7]=raw[7]+m.raw[7];
+  raw[8]=raw[8]+m.raw[8];
+  return *this;
+}
+
+Matrix4& Matrix4::operator= (const Matrix4& m) {
+  memcpy(raw,m.raw,16*sizeof(double));
+  return *this;
+}
+
+void Matrix4::Set(long column,long row,double val) {
+  raw[4*column+row]=val;
+}
+
+void Matrix4::Dump() const {
+  cout << "Matrix4:" << endl;
+  cout << " (" << raw[ 0] << " " <<  raw[ 1] << " " <<  raw[ 2] << " " <<  raw[ 3] << endl;
+  cout << "  " << raw[ 4] << " " <<  raw[ 5] << " " <<  raw[ 6] << " " <<  raw[ 7] << endl;
+  cout << "  " << raw[ 8] << " " <<  raw[ 9] << " " <<  raw[10] << " " <<  raw[11] << endl;
+  cout << "  " << raw[12] << " " <<  raw[13] << " " <<  raw[14] << " " <<  raw[15] << ")" << endl;
+}
+
+
+//==============================================================================//
 // Orientation
 
 Orientation::Orientation() : mType(UNDEFINED) {

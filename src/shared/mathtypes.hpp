@@ -88,6 +88,53 @@ namespace SpinXML {
         double raw[9];
     };
 
+    ///Class for storeing a 4x4 matrix. Mostly used for graphics, but
+    ///could be useful elsewhere...
+    class Matrix4 {
+    public:
+        ///Default constructor. Constructs the identity
+        Matrix4();
+        ///Constructs a specific 3x3 matrix
+        Matrix4(double a00,double a01,double a02,double a03,
+                double a10,double a11,double a12,double a13,
+                double a20,double a21,double a22,double a23,
+                double a30,double a31,double a32,double a33);
+        ///Copies the matrix
+        Matrix4(const Matrix4& m);
+
+        ///Print the matrix to the standard output in a human readable
+        ///format
+        void Dump() const;
+
+        ///Get the trace of the matrix
+        double Trace() const {return raw[0]+raw[5]+raw[10]+raw[15];}
+
+        ///Get the transpose of the matrix
+        Matrix4 Transpose() const;
+    
+        ///Get a pointer to the matrix in memory. The matrix is stored in
+        ///row major form (GetRaw()[0]=a00,GetRaw()[1]=a01, etc.)
+        const double* GetRaw() const;
+    
+        ///Get a specific value by row and column index.
+        double Get(long column, long row) const;
+        ///Get a specific value by row and column
+        double operator() (long column, long row) const;
+        ///Add together two matricese in the standard fasion.
+        Matrix4 operator+ (const Matrix4& m) const;
+        ///Multiply two matricese together
+        Matrix4 operator* (const Matrix4& m) const;
+        ///Add together two matricese in the standard fasion and set the
+        ///value of the first to the result
+        Matrix4& operator+= (const Matrix4& m);
+        ///Set the value of one matrix to the value of the second.
+        Matrix4& operator= (const Matrix4& m);
+        ///Set a specific element to the value of val
+        void Set(long column,long row,double val);
+    private:
+        double raw[16];
+    };
+
     ///Class for storing a 3 dimentional rotation
     class Orientation {
     public:

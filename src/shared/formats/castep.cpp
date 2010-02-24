@@ -24,11 +24,7 @@ typedef file_iterator<char>                                               iter_t
 typedef tree_match<iter_t>                                                parse_tree_match_t;
 typedef parse_tree_match_t::const_tree_iterator                           tree_iter_t;
 
-//typedef ast_match_policy<iter_t>                                          match_policy_t;
-//typedef scanner_policies<iteration_policy, match_policy_t, action_policy> scanner_policy_t;
-//typedef scanner<iter_t, scanner_policy_t>                                 scanner_t;
 typedef rule<>                                                            rule_t;
-
 
 struct element_parser_type : symbols<unsigned> {
     /*
@@ -42,9 +38,9 @@ struct element_parser_type : symbols<unsigned> {
        And no, I am not making this up.
     */
   element_parser_type() {
-        add("H",1);
-        add("C",6);
-        add("F",9);
+      for(long i=0;i<getElementCount();i++) {
+          add(getElementSymbol(i),i);
+      }
     }
 
 } element_p;
@@ -96,8 +92,10 @@ struct castep : grammar<castep> {
     };
     spin_map_t spin_map;
 
-    void identify_spins(tree_iter_t tree,SpinSystem* ss) {
-        //we are assuming we have been passed the root of the parse tree
+    void process_tree(tree_iter_t tree,SpinSystem* ss) {
+        //============================================================//
+        // First pass, create spin objects and add them to the spin system
+        //============================================================//
         for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
             if(j->value.id()==total_shielding_tensorID || j->value.id()==total_tensorID) {
                 //Thanks to the grammar, we can rely on the child
@@ -128,21 +126,12 @@ struct castep : grammar<castep> {
                     Spin* spin = new Spin(Vector3(x,y,z),label,element);
                     spin_map[label]=spin;
                     ss->InsertSpin(spin);
-
-                    cout << "Creating a spin " <<
-                        getString(atom) << " " << 
-                        getString(index) << " at (" << 
-                        getString(x_coord) << " " <<
-                        getString(y_coord) << " " <<
-                        getString(z_coord) << " " <<
-                        ")" << endl;
                 } 
             }
         }
-    }
-    
-    void identify_interactions(tree_iter_t tree) {
-        //we are assuming we have been passed the root of the parse tree
+        //============================================================//
+        //Second pass, assign interactions to those spins.
+        //============================================================//
         for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
             if(j->value.id()==total_tensorID || j->value.id()==total_shielding_tensorID) {
                 //Header
@@ -206,23 +195,14 @@ struct castep : grammar<castep> {
                 inter->SetEigenvalues(xx,yy,zz,o);
                 Interaction::SubType st=j->value.id()==total_tensorID  ? Interaction::ST_CUSTOM_LINEAR : Interaction::ST_SHIELDING;
                 inter->SetSubType(st,spin);
-                
-                cout << "Creating a new interaction, eigenvalues are " << xx << "," << yy << "," << zz << endl;
-            } else if(j->value.id()==total_shielding_tensorID) {
+
+            } else if (j->value.id()==quadrupole_blockID) {
+                //Quadrupole code here
             }
         }
-    }
-    void process_quadrupole() {
 
     }
-
-    void process_tree(tree_iter_t tree,SpinSystem* ss) {
-        //First pass, create spin objects and add them to the spin system
-        identify_spins(tree,ss);
-        //Second pass, assign interactions to those spins.
-        identify_interactions(tree);
-    }
-    void print_tree(tree_iter_t tree,string indent="") {
+    void print_tree(tree_iter_t tree,string indent="") const {
         string nodename;
         if(      tree->value.id()==element_indexID                     ) {nodename="element_indexID";}
         else if( tree->value.id()==headerID                            ) {nodename="headerID";}
@@ -274,11 +254,11 @@ struct castep : grammar<castep> {
         RULE(total_shielding_tensor                );
         RULE(total_tensor                          );
         RULE(quadrupole_block                      );
-#undef DECLARE_RULE
+#undef DECLARE
         rule<ScannerT, parser_context<>,parser_tag<fileID> > file;
         rule<ScannerT, parser_context<>,parser_tag<fileID> > const& start() {return file;}
 
-        definition(castep const& self) {
+        definition(castep const&) {
 
             element_index =
                 element_p >> int_p;

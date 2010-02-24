@@ -250,8 +250,7 @@ void RootFrame::SaveAs() {
     for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
 	i!=wxGetApp().GetIOFilters().end();
 	++i) {
-      if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
-	 (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+    if((*i)->GetFilterType()==ISpinSystemLoader::SAVE ||(*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
 	if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
 	  saver=*i;
 	  break;

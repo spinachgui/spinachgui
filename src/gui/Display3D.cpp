@@ -10,6 +10,9 @@
 
 using namespace std;
 
+GLuint pickingNameCounter=1;
+
+
 //============================================================//
 // Device Context
 
@@ -17,6 +20,7 @@ SpinachDC::SpinachDC()
     : depthOnly(false),
       mSolidQuadric(gluNewQuadric()),
       mWireQuadric(gluNewQuadric()) {
+    GLSelectMode=false;
     gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
     gluQuadricNormals  (mSolidQuadric,GLU_SMOOTH);
 	
@@ -121,7 +125,8 @@ SGNode::SGNode()
     : mDirty(true),
       mUseMaterial(false),
       mMaterial(defaultMaterial),
-      mIdentity(true) {
+      mIdentity(true),
+      mPickingName(pickingNameCounter++) {
 }
 
 SGNode::~SGNode() {
@@ -364,6 +369,9 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
     mMouseX=e.GetX();
     mMouseY=e.GetY();
   
+    Spin** pickedSpin;
+    DoPickingRender(pickedSpin);
+    SelectionManager::Instance()->SetHover(*pickedSpin);
 
     Refresh();
 }
@@ -436,6 +444,88 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
     wxPaintDC dc(this);
 
+}
+
+void Display3D::DoPickingRender(Spin** spin) {
+    spin=NULL;
+    glRenderMode(GL_SELECT);
+
+    if(mRootNode) {
+        mRootNode->Draw(mDC);
+    }
+    //Now draw the forground objects
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0,mWidth,0,mHeight,-50,50);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    mForgroundNode->Draw(mDC);
+
+    glRenderMode(GL_RENDER);
+}
+
+void Display3D::DoRender(SpinachDC& dc) {
+    int width,height;
+    GetClientSize(&width,&height);
+    mDC.width=width; mDC.height=height;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-width*mZoom, width*mZoom,
+            -height*mZoom, height*mZoom,
+            -40.0, 40.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    //Take the opertunity to calculate the rotation matrix for the scene
+    //TODO: This would be better handled on the CPU, it's only one
+    //matrix. Change when matrix classes have been written
+    float dotProduct=(mXRotate*mXRotate+mYRotate*mYRotate);
+    float norm=sqrt(dotProduct);
+    glLoadIdentity();
+
+    if(norm != 0){ //Prevent division by zero errors
+        glRotatef(dotProduct,mYRotate/norm,mXRotate/norm,0);
+    }
+    glTranslatef(mXTranslate*mZoom,mYTranslate*mZoom,0);
+    mXRotate=0;
+    mYRotate=0;
+    mXTranslate=0;
+    mYTranslate=0;
+    glMultMatrixf(mRotationMatrix);
+    glGetFloatv(GL_MODELVIEW_MATRIX,mRotationMatrix);
+    glLoadIdentity();
+    gluLookAt(mCamX,mCamY,mCamZ,0,0,-1,0,1,0);
+    glMultMatrixf(mRotationMatrix);
+
+    mDC.mRotationMatrix=mRotationMatrix;
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
+    if(mRootNode) {
+        mRootNode->Draw(mDC);
+    }
+    //Now draw the forground objects
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0,mWidth,0,mHeight,-50,50);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    mForgroundNode->Draw(mDC);
+}
+
+
+void Display3D::DoNormalRender() {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
+
+    SwapBuffers();
+
+}
+
+void Display3D::DoDebugRender() {
     int width,height;
     GetClientSize(&width,&height);
     mDC.width=width; mDC.height=height;
@@ -525,6 +615,18 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     }glDisable(GL_TEXTURE_2D);
 
     SwapBuffers();
+
+}
+
+wxString Display3D::DoPovrayRender() {
+
+}
+
+void Display3D::LowGraphicsRender() {
+
+}
+void Display3D::DepthOnlyMode() {
+
 }
 
 BEGIN_EVENT_TABLE(Display3D,wxGLCanvas)

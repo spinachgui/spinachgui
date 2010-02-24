@@ -19,7 +19,6 @@ using namespace boost;
 using namespace SpinXML;
 
 
-
 ///A class for storing all drawing options
 class SpinachDC : public sigc::trackable {
 public:
@@ -33,6 +32,10 @@ public:
 
     ///If true draw only to the depth buffer
     bool depthOnly;
+
+    ///If false then lighting will be off
+    bool lighting;
+
     GLUquadric* mSolidQuadric;
     GLUquadric* mWireQuadric;
     int width,height;
@@ -41,6 +44,8 @@ public:
     ///The size of the displayed interaction in units of energy/length,
     ///e.g. MHz/Nm
     std::map<SpinXML::Interaction::SubType,double> mScallings;
+
+    bool GLSelectMode;
 };
 
 class SGNode : public sigc::trackable {
@@ -98,6 +103,11 @@ private:
 
     std::list<SGNode*> mChildren;
     typedef std::list<SGNode*>::iterator itor;
+
+    ///The globally unique name of this node
+    GLuint mPickingName;
+
+    void DoRender(SpinachDC& dc);
 };
 
 
@@ -140,6 +150,31 @@ public:
     }
     void OnDirty() {Refresh();}
     SpinachDC& GetDC() {return mDC;}
+
+    ///Doesn't change any of the display settings, just executes the
+    ///common code required to find the rotation.
+    void DoRender(SpinachDC& dc);
+
+    ///Does an openGL picking render to select an object. If an object
+    ///is found this function sets its argument to not null.
+    void DoPickingRender(SpinXML::Spin** spin);
+
+    ///Renders the scene normally
+    void DoNormalRender();
+
+    ///A place to do various rendering add ons and experiments.
+    void DoDebugRender();
+
+    ///Instead of rendering to the screne, get a string suitable for
+    ///use as a povray file
+    wxString DoPovrayRender();
+
+    ///As normal, but do not use fancy graphics.
+    void LowGraphicsRender();
+
+    ///Turn off lighting and such, render to the depth buffer
+    void DepthOnlyMode();
+
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -156,6 +191,8 @@ private:
     //This nodes stay fixed on the screne
     SGNode* mForgroundNode;
 
+    ///This object contains the rendering options used during normal
+    ///rendering.
     SpinachDC mDC;
 
     bool mGLEnabled;
@@ -179,6 +216,7 @@ private:
     //3D Variables
     double mCamX,mCamY,mCamZ;
     float mRotationMatrix[16];
+    Matrix4 mTransformMatrix;
     float mXTranslate,mYTranslate;
     float mXRotate,mYRotate;
 };

@@ -145,6 +145,40 @@ void SpinSystem::SaveToFile(const char* filename,ISpinSystemLoader* saver) const
     return;
 }
 
+void SpinSystem::CalcNuclearDipoleDipole() {
+    for(unsigned long i=0;i<mSpins.size();i++) {
+        Spin* spin1=mSpins[i];
+        long element1=spin1->GetElement();
+        long isotope1=spin1->GetIsotopes()[0];
+        double g1=getGyromagneticRatio(element1,isotope1);
+
+        for(unsigned long j=i+1;j<mSpins.size();j++) {
+            Spin* spin2=mSpins[j]; 
+
+            //A unit vector pointing from spin1 tp spin2
+            double rx,ry,rz;
+            Vector3 r_1_2=(spin2->GetPosition()-spin1->GetPosition());
+            r_1_2.GetCoordinates(&rx,&ry,&rz);
+
+            long element2=spin2->GetElement();
+            long isotope2=spin2->GetIsotopes()[0];
+            double g2=getGyromagneticRatio(element2,isotope2);
+
+            double r=r_1_2.length();
+            double r2=r*r;
+            double r3=r2*r;
+            double r5=r2*r3;
+
+            Matrix3 dipole(r2-3*rx*rx  ,3*rx*ry     ,3*rx*rz,
+                           3*rx*ry     ,r2-3*ry*ry  ,3*ry*rz,
+                           3*rx*rz     ,3*ry*rz     ,r2-3*rz*rz);
+            static const double four_pi=12.5663706;
+            dipole=dipole * (mu0*hbar*g1*g2/(r5*four_pi));
+
+        }
+    }
+}
+
 
 
 //==============================================================================//

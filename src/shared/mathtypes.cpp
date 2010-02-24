@@ -8,6 +8,13 @@
 using namespace std;
 using namespace SpinXML;
 
+//============================================================//
+// Constants
+
+const double SpinXML::hbar=6.626068e-34;
+const double SpinXML::bohr_mag=9.27400915e-24;
+const double SpinXML::mu0=1.25663706e-6;
+
 //==============================================================================//
 // Vector3
 
@@ -21,6 +28,10 @@ Vector3::Vector3(double _x,double _y,double _z) : x(_x),y(_y),z(_z) {
 
 Vector3::Vector3(const Vector3& v) :  x(v.x),y(v.y),z(v.z) {
 
+}
+
+double Vector3::length() const  {
+    return sqrt(x*x+y*y+z*z);
 }
 
 double Vector3::GetX() const {
@@ -62,6 +73,16 @@ void Vector3::SetCoordinates(double _x,double _y, double _z) {
   z=_z;
   return;
 }
+
+void Vector3::normalise() {
+    double inv_length=1/sqrt(x*x+y*y+z*z);
+    x*=inv_length;
+    y*=inv_length;
+    z*=inv_length;                
+}
+
+//============================================================//
+// Matrix2
 
 
 //==============================================================================//
@@ -114,6 +135,22 @@ Matrix3 Matrix3::operator+ (const Matrix3& m) const {
   return result;
 }
 
+Matrix3 Matrix3::operator* (double s) const {
+    Matrix3 result;
+    result.raw[0]=raw[0]*s;
+    result.raw[1]=raw[1]*s;
+    result.raw[2]=raw[2]*s;
+              	    	 
+    result.raw[3]=raw[3]*s;
+    result.raw[4]=raw[4]*s;
+    result.raw[5]=raw[5]*s;
+              	        
+    result.raw[6]=raw[6]*s;
+    result.raw[7]=raw[7]*s;
+    result.raw[8]=raw[8]*s;
+    return result;
+}
+
 Matrix3 Matrix3::operator* (const Matrix3& m) const {
   Matrix3 result;
   result.raw[0]=raw[0]*m.raw[0] + raw[1]*m.raw[3] + raw[2]*m.raw[6];
@@ -144,6 +181,21 @@ Matrix3 Matrix3::Transpose() const {
   result.raw[6]=raw[2];
   result.raw[7]=raw[5];
   return result;
+}
+
+Matrix3 Matrix3::operator*= (double s) {
+  raw[0]=raw[0]*s;
+  raw[1]=raw[1]*s;
+  raw[2]=raw[2]*s;
+       	     	 
+  raw[3]=raw[3]*s;
+  raw[4]=raw[4]*s;
+  raw[5]=raw[5]*s;
+       	         
+  raw[6]=raw[6]*s;
+  raw[7]=raw[7]*s;
+  raw[8]=raw[8]*s;
+  return *this;
 }
 
 Matrix3& Matrix3::operator+= (const Matrix3& m) {

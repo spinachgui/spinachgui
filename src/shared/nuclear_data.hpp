@@ -13,6 +13,10 @@ double getElementR(long p);
 double getElementG(long p);
 double getElementB(long p);
 
+///Given a particular nucleous, get a sensible default isotope
+///(eg. p=6 should return 6, -> carbon is usually carbon 12)
+long getCommonIsotope(long p);
+
 long getElementBySymbol(const char* symb);
 
 
@@ -27,15 +31,14 @@ long getIsotopeCount(long protonN);
 ///Get the index'th isotope of a given element where 0 <= index <
 ///getIsotopeCount()
 
-//
+///Get the number of neutrons given an isotobe index
 long getNeutrons(long protonN,long index);
 
-///
-long getMultiplicity(long protonN,long index);
+///Get the nuclear spin in units of hbar/2
+long getNuclearSpin(long protonN,long index);
 
 ///
-double getGamma(long protonN,long index);
-
-
-
+double getGyromagneticRatio(long protonN,long index);
 #endif // __spinachcalcFrameBase__
+
+

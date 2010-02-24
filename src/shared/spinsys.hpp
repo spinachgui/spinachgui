@@ -310,6 +310,10 @@ namespace SpinXML {
         sigc::signal<void> sigReloaded;
         sigc::signal<void> sigDying;
 
+        ///Automacially calculate the nuclear dipole-dipole couplings
+        ///from the positions off the nuclear spins
+        void CalcNuclearDipoleDipole();
+
   
     private:
         friend class Spin;

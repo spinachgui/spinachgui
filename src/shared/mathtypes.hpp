@@ -6,6 +6,15 @@
 
 namespace SpinXML {
 
+    ///Plank's constant in SI units
+    extern const double hbar;
+
+    ///Bohr magneton in SI units
+    extern const double bohr_mag;
+    
+    ///Ther permeability of free space
+    extern const double mu0;
+
     ///Class for storing a 3 dimensional vector
     class Vector3 {
     public:
@@ -36,6 +45,18 @@ namespace SpinXML {
         ///Set the Z component 
         void SetZ(double _z);
 
+        ///Returns the magnitude of the vector
+        double length() const;
+
+        ///normalises the vector
+        void normalise();
+
+        Vector3 operator+(Vector3& v) const {
+            return Vector3(x+v.x,y+v.y,z+v.z);
+        }
+        Vector3 operator-(Vector3& v) const {
+            return Vector3(x-v.x,y-v.y,z-v.z);
+        }
 
     private:
         double x;
@@ -77,6 +98,10 @@ namespace SpinXML {
         Matrix3 operator+ (const Matrix3& m) const;
         ///Multiply two matricese together
         Matrix3 operator* (const Matrix3& m) const;
+        ///Multiply a matrix my a scalar
+        Matrix3 operator* (double s) const;
+        ///Multiply a matrix my a scalar
+        Matrix3 operator*= (double s);
         ///Add together two matricese in the standard fasion and set the
         ///value of the first to the result
         Matrix3& operator+= (const Matrix3& m);

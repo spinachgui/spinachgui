@@ -1,11 +1,16 @@
-#Layout: 
-#proton number, mass number,multiplicity,gyromagnetic ratio
+#Nuclear spin is recorded in units of hbar/2 so a spin 1/2 nucleus would be 1,
+#a spin 1 nucleus would be 2 and so on.
 #Everything after a '#' is a comment
-#Electron
-0	0	2	1.760859770e11
-#Hydrogen
-1	1	2	1.760859770e11
-#Carbon
-6	12	2	1.760859770e11
-#Nitrogen
-7	14	3	1.9337798e7
+#
+#proton number,	mass number,	nuclear spin,	gyromagnetic ratio
+#Electron:
+0		0		1		1.760859770e11
+#Hydrogen:
+1		1		1		1.760859770e11
+#Carbon:
+6		12		0		1.760859770e11
+6		13		1		1.760859770e11
+6		14		0		1.760859770e11
+#Nitrogen:
+7       	14		2		1.9337798e7
+7		15		1		1.9337798e7

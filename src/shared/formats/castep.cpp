@@ -70,6 +70,7 @@ struct v_parser_type : symbols<unsigned> {
 
 struct castep : grammar<castep> {
 #define getString(x) string((x)->value.begin(),(x)->value.end())
+#define getDouble(x) strtod(string((x)->value.begin(),(x)->value.end()).c_str(),NULL)
     ///These IDs label all the places on innterest in the parse tree
     enum {
         element_indexID=1                       ,
@@ -95,10 +96,10 @@ struct castep : grammar<castep> {
     };
     spin_map_t spin_map;
 
-    void identify_spins(tree_iter_t tree) {
+    void identify_spins(tree_iter_t tree,SpinSystem* ss) {
         //we are assuming we have been passed the root of the parse tree
         for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
-            if(j->value.id()==total_shielding_tensorID) {
+            if(j->value.id()==total_shielding_tensorID || j->value.id()==total_tensorID) {
                 //Thanks to the grammar, we can rely on the child
                 //nodes being present and correct
                 
@@ -113,56 +114,113 @@ struct castep : grammar<castep> {
                 tree_iter_t y_coord = coords->children.begin()+1;
                 tree_iter_t z_coord = coords->children.begin()+2;
 
-                //Create the spin
-                double x=strtod(getString(x_coord).c_str(),NULL);
-                double y=strtod(getString(y_coord).c_str(),NULL);
-                double z=strtod(getString(z_coord).c_str(),NULL);
                 string label=getString(atom)+getString(index);
+                spin_map_iter it = spin_map.find(label);
+                if(it == spin_map.end()) { //If the spin dosn't already exist
+                    //Create the spin
+                    double x=getDouble(x_coord);
+                    double y=getDouble(y_coord);
+                    double z=getDouble(z_coord);
+                    long element=getElementBySymbol(getString(atom).c_str());
+                    if(element == -1) {
+                        throw runtime_error("Unknown Element "+getString(atom));
+                    }
+                    Spin* spin = new Spin(Vector3(x,y,z),label,element);
+                    spin_map[label]=spin;
+                    ss->InsertSpin(spin);
 
-                Spin* spin = new Spin(Vector3(x,y,z),label,getElementBySymbol(getString(atom).c_str()));
-                spin_map[label]=spin;
-
-                cout << "Creating a spin " <<
-                    getString(atom) << " " << 
-                    getString(index) << " at (" << 
-                    getString(x_coord) << " " <<
-                    getString(y_coord) << " " <<
-                    getString(z_coord) << " " <<
-                    ")" << endl;
-                //store
+                    cout << "Creating a spin " <<
+                        getString(atom) << " " << 
+                        getString(index) << " at (" << 
+                        getString(x_coord) << " " <<
+                        getString(y_coord) << " " <<
+                        getString(z_coord) << " " <<
+                        ")" << endl;
+                } 
             }
         }
     }
+    
+    void identify_interactions(tree_iter_t tree) {
+        //we are assuming we have been passed the root of the parse tree
+        for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
+            if(j->value.id()==total_tensorID || j->value.id()==total_shielding_tensorID) {
+                //Header
+                tree_iter_t header = j->children.begin();
+                tree_iter_t atom   = header->children.begin();
+                tree_iter_t index  = header->children.begin()+1;
+                string label=getString(atom)+getString(index);
+                spin_map_iter it = spin_map.find(label);
+                if(it == spin_map.end()) {
+                    throw logic_error("Serious internal error while parsing.");
+                }
+                Spin* spin=it->second;
 
-    void process_tree(tree_iter_t tree) {
-        //First pass, create spin objects and add them to the spin system
-        identify_spins(tree);
-        //Second pass, assign interactions to those spins.
-        /*if(tree->value.id()==fileID) {
-            for(tree_iter_t j=tree->children.begin();j!=tree->children.end();++j) {
-                process_tree(j);
+                //Eigensystem interaction representation
+                tree_iter_t eigsys = j->children.begin()+3;
+                tree_iter_t eigsys_xx = eigsys->children.begin();
+                tree_iter_t eigsys_yy = eigsys->children.begin()+1;
+                tree_iter_t eigsys_zz = eigsys->children.begin()+2;
+                
+                //Check we have the components in the right place
+                //(Could do this with the grammer, but it would make it much more complicated)
+                const char* token_xx=j->value.id()==total_tensorID ? "V_xx": "sigma_xx";
+                const char* token_yy=j->value.id()==total_tensorID ? "V_yy": "sigma_yy";
+                const char* token_zz=j->value.id()==total_tensorID ? "V_zz": "sigma_zz";
+                if(getString(eigsys_xx->children.begin()  )!=token_xx) {
+                    throw runtime_error("Missing V_xx symbol");
+                }
+                if(getString(eigsys_xx->children.begin()+2)!=token_xx) {
+                    throw runtime_error("Missing V_xx symbol");
+                }
+                if(getString(eigsys_yy->children.begin()  )!=token_yy) {
+                    throw runtime_error("Missing V_yy symbol");
+                }
+                if(getString(eigsys_yy->children.begin()+2)!=token_yy) {
+                    throw runtime_error("Missing V_yy symbol");
+                }
+                if(getString(eigsys_zz->children.begin()  )!=token_zz) {
+                    throw runtime_error("Missing V_zz symbol");
+                }
+                if(getString(eigsys_zz->children.begin()+2)!=token_zz) {
+                    throw runtime_error("Missing V_zz symbol");
+                }
+                //Eigenvalues
+                double xx = getDouble(eigsys_xx->children.begin()+1);
+                double yy = getDouble(eigsys_yy->children.begin()+1);
+                double zz = getDouble(eigsys_zz->children.begin()+1);
+
+                //Eigenvectors
+                Vector3 vx(getDouble(eigsys_xx->children.begin()+3),
+                           getDouble(eigsys_xx->children.begin()+4),
+                           getDouble(eigsys_xx->children.begin()+5));
+                Vector3 vy(getDouble(eigsys_yy->children.begin()+3),
+                           getDouble(eigsys_yy->children.begin()+4),
+                           getDouble(eigsys_yy->children.begin()+5));
+                Vector3 vz(getDouble(eigsys_zz->children.begin()+3),
+                           getDouble(eigsys_zz->children.begin()+4),
+                           getDouble(eigsys_zz->children.begin()+5));
+                Orientation o;
+                o.SetEigenSystem(vx,vy,vz);
+                Interaction* inter = new Interaction;
+                inter->SetEigenvalues(xx,yy,zz,o);
+                Interaction::SubType st=j->value.id()==total_tensorID  ? Interaction::ST_CUSTOM_LINEAR : Interaction::ST_SHIELDING;
+                inter->SetSubType(st,spin);
+                
+                cout << "Creating a new interaction, eigenvalues are " << xx << "," << yy << "," << zz << endl;
+            } else if(j->value.id()==total_shielding_tensorID) {
             }
-        } else if( tree->value.id()==total_shielding_tensorID            ) {
-            
-        } else if( tree->value.id()==total_tensorID                      ) {
-        } else if( tree->value.id()==quadrupole_blockID                  ) {
-        } else if( tree->value.id()==headerID                            ) {}
-        else if( tree->value.id()==coord_blockID                       ) {}
-        else if( tree->value.id()==total_shielding_matrixID            ) {}
-        else if( tree->value.id()==total_matrixID                      ) {}
-        else if( tree->value.id()==eigensystem_block_total_shieldingID ) {}
-        else if( tree->value.id()==eigensystem_block_totalID           ) {}
-        else if( tree->value.id()==anisotropy_blockID                  ) {}
-        else if( tree->value.id()==cq_eta_blockID                      ) {}
-                                                                                                     
-        else if( tree->value.id()==eigen_block_total_shieldingID       ) {}
-        else if( tree->value.id()==eigen_block_totalID                 ) {}
-                                                                                                     
-        else {
-        }*/
+        }
     }
     void process_quadrupole() {
 
+    }
+
+    void process_tree(tree_iter_t tree,SpinSystem* ss) {
+        //First pass, create spin objects and add them to the spin system
+        identify_spins(tree,ss);
+        //Second pass, assign interactions to those spins.
+        identify_interactions(tree);
     }
     void print_tree(tree_iter_t tree,string indent="") {
         string nodename;
@@ -295,6 +353,8 @@ struct castep : grammar<castep> {
                    ) >> end_p;
         }
     };
+#undef getString
+#undef getDouble
 }  castep_p;
 
 void CASTEPLoader::LoadFile(SpinSystem* ss,const char* filename) const {
@@ -310,7 +370,7 @@ void CASTEPLoader::LoadFile(SpinSystem* ss,const char* filename) const {
     tree_parse_info<iter_t> result=ast_parse(fin,end,castep_p,space_p);
     if(result.full) {
         castep_p.print_tree(result.trees.begin());
-        castep_p.process_tree(result.trees.begin());
+        castep_p.process_tree(result.trees.begin(),ss);
     } else {
         string badtext(result.stop,end);
         if(badtext.length() > 200) {

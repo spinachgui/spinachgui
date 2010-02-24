@@ -34,7 +34,7 @@ vector<vector<Isotope> > gIsotopes;
 
 
 //List of elements indexed by proton number
-const long gKnownElements=9;
+const long gKnownElements=11;
 const Element gElements[]={
   {"E","Electron",   0.0,0.0,1.0},
   {"H","Hydrogen",   0.5,0.5,0.5},

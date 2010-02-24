@@ -75,6 +75,7 @@ set(formatSources "shared/formats/xyz.cpp")
 set(formatSources ${formatSources} "shared/formats/g03.cpp")
 set(formatSources ${formatSources} "shared/formats/xml.cpp")
 set(formatSources ${formatSources} "shared/formats/castep.cpp")
+set(formatSources ${formatSources} "shared/formats/simpson.cpp")
 
 set(pySources              "shared/spinsys.cpp")
 set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")

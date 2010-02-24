@@ -11,6 +11,7 @@
 #include <shared/formats/g03.hpp>
 #include <shared/formats/xml.hpp>
 #include <shared/formats/castep.hpp>
+#include <shared/formats/simpson.hpp>
 
 #include <wx/filename.h>
 
@@ -32,6 +33,7 @@ bool SpinachApp::OnInit() {
 
     mIOFilters.push_back(new XYZLoader);
     mIOFilters.push_back(new G03Loader);
+    mIOFilters.push_back(new SIMPSONLoader);
     mIOFilters.push_back(new CASTEPLoader);
 
     //Load the xml schema, it's more complicated, of course
@@ -62,7 +64,7 @@ bool SpinachApp::OnInit() {
     RootFrame* frame = new RootFrame(NULL);
     frame->Show();
 
-    return true;
+    return false;
 }
 
 

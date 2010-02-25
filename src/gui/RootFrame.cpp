@@ -195,8 +195,9 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
     try {
       GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
     } catch(const runtime_error& e) {
-      wxLogError(wxT("File is corrupt"));
-      wxString(e.what(),wxConvUTF8);
+      wxString msg(e.what(),wxConvUTF8);
+      wxLogError(wxString() << wxT("File is corrupt:\n") << msg);
+
     }
   }
   Chkpoint(wxT("Load File"));
@@ -237,23 +238,21 @@ void RootFrame::SaveAs() {
 				    wxString(wxT("Choose a file")),
 				    wxString(wxT("")), //Default file
 				    wxString(wxT("")), //Default dir
-				    filter ,
+				    filter,
 				    wxFD_SAVE);
   if(fd->ShowModal() == wxID_OK) {
     mOpenPath=fd->GetPath();
     mOpenFile=fd->GetFilename();
     mOpenDir=fd->GetDirectory();
     wxString ext=GetExtension(mOpenFile).Lower();
-
     ISpinSystemLoader* saver=NULL;
     for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
 	i!=wxGetApp().GetIOFilters().end();
 	++i) {
-      if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
-	 (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+    if((*i)->GetFilterType()==ISpinSystemLoader::SAVE ||(*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
 	if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
-	  saver=*i;
-	  break;
+            saver=*i;
+            break;
 	}
       }
     }
@@ -311,9 +310,19 @@ void RootFrame::OnResize(wxSizeEvent&e) {
     LoadFromFile(wxT("data/tryosine.log"),
 		 wxT("data/"),
 		 wxT("tryosine.log"));
-
+    LoadFromFile(wxT("data/OFNAPH01_NMR.magres"),
+		 wxT("data/"),
+		 wxT("OFNAPH01_NMR.magres"));
+    for(unsigned long i=0;i<wxGetApp().GetIOFilters().size();i++) {
+        ISpinSystemLoader* saver=wxGetApp().GetIOFilters()[i];
+        if(saver->GetFilterType()==ISpinSystemLoader::SAVE ||
+           saver->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+            GetSS()->SaveToFile((string("test.")+saver->GetFilter()).c_str(),saver);
+        }
+    }
   }
 }
+
 
 void RootFrame::OnGLReset(wxCommandEvent& e) {
   mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));  

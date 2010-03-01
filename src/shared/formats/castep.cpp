@@ -349,7 +349,7 @@ void CASTEPLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 
     tree_parse_info<iter_t> result=ast_parse(fin,end,castep_p,space_p);
     if(result.full) {
-        castep_p.print_tree(result.trees.begin());
+        //castep_p.print_tree(result.trees.begin());
         castep_p.process_tree(result.trees.begin(),ss);
     } else {
         string badtext(result.stop,end);

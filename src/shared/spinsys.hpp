@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <shared/mathtypes.hpp>
 #include <sigc++/sigc++.h>
+#include <shared/unit.hpp>
+
 
 
 namespace SpinXML {
@@ -125,7 +127,7 @@ namespace SpinXML {
         ///If the scalar sorage convention being used then this function will set
         ///the value of its argument to the appropreate value. Otherwise the
         ///result is undefined.
-        void GetScalar(double* Scalar) const;
+        void GetScalar(energy* Scalar) const;
         ///If the Matrix sorage convention being used then this function will set
         ///the value of its argument to the appropreate value. Otherwise the
         ///result is undefined.
@@ -133,26 +135,26 @@ namespace SpinXML {
         ///If the Eigenvalues sorage convention being used then this function will set
         ///the value of its arguments to the appropreate value. Otherwise the
         ///result is undefined.
-        void GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const;
+        void GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const;
         ///If the Axiality-Rhombicity sorage convention being used then this function will set
         ///the value of its arguments to the appropreate value. Otherwise the
         ///result is undefined.
-        void GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const;
+        void GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const;
         ///If the Span-Skew sorage convention being used then this function will set
         ///the value of its arguments to the appropreate value. Otherwise the
         ///result is undefined.
-        void GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const;
+        void GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const;
 
         ///Set the value of the interaction using the scalar covention.
-        void SetScalar(double Scalar);
+        void SetScalar(energy Scalar);
         ///Set the value of the interaction using the matrix covention.
         void SetMatrix(const Matrix3& InMatrix);
         ///Set the value of the interaction using the eigenvalue covention.
-        void SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient);
+        void SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient);
         ///Set the value of the interaction using the axiality-rhombicity covention.
-        void SetAxRhom(double iso,double ax, double rh, const Orientation& Orient);
+        void SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient);
         ///Set the value of the interaction using the span-skew covention.
-        void SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient);
+        void SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient);
 
         ///Cache the form of the interaction
         bool SetLinear();   
@@ -225,8 +227,8 @@ namespace SpinXML {
   
         Vector3& GetPosition();
         void SetPosition(Vector3 Position);
-        void GetCoordinates(double* _x,double* _y, double* _z) const;
-        void SetCoordinates(double _x,double _y, double _z);
+        void GetCoordinates(length* _x,length* _y, length* _z) const;
+        void SetCoordinates(length _x,length _y, length _z);
 
         void SetLabel(std::string Label);
         const char* GetLabel() const;
@@ -301,7 +303,7 @@ namespace SpinXML {
 
         ///Return all spins withing distance of point pos. Do not return
         ///skip all spins below Ignore
-        std::vector<Spin*> GetNearbySpins(Vector3 pos,double distance,Spin* Ignore=NULL);
+        std::vector<Spin*> GetNearbySpins(Vector3 pos,length distance,Spin* Ignore=NULL);
 
         //Event Handlers
         void OnSpinDeleted(Spin* spin){RemoveSpin(spin);}

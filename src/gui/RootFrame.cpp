@@ -313,6 +313,7 @@ void RootFrame::OnResize(wxSizeEvent&e) {
     LoadFromFile(wxT("data/OFNAPH01_NMR.magres"),
 		 wxT("data/"),
 		 wxT("OFNAPH01_NMR.magres"));
+    GetSS()->CalcNuclearDipoleDipole();
     for(unsigned long i=0;i<wxGetApp().GetIOFilters().size();i++) {
         ISpinSystemLoader* saver=wxGetApp().GetIOFilters()[i];
         if(saver->GetFilterType()==ISpinSystemLoader::SAVE ||

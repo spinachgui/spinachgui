@@ -174,7 +174,9 @@ void SpinSystem::CalcNuclearDipoleDipole() {
                            3*rx*rz     ,3*ry*rz     ,r2-3*rz*rz);
             static const double four_pi=12.5663706;
             dipole=dipole * (mu0*hbar*g1*g2/(r5*four_pi));
-
+            Interaction* inter=new Interaction;
+            inter->SetMatrix(dipole);
+            inter->SetSubType(Interaction::ST_DIPOLAR,spin1,spin2);
         }
     }
 }

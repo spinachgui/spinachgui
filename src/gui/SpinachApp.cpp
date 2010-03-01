@@ -15,6 +15,7 @@
 
 #include <wx/filename.h>
 
+#include <shared/unit.hpp>
 
 IMPLEMENT_APP(SpinachApp);
 
@@ -26,6 +27,21 @@ SpinachApp::~SpinachApp() {
 }
 
 bool SpinachApp::OnInit() {
+    //Test out the units system
+    energy p(1.0); // 1J
+    energy q(1.0); // 1J
+
+    energy s=p+q;
+
+    length a(1.0); //1M
+
+    ////This shouldn't compile
+    // length b=a+s;
+
+    double asMHz=s();
+    cout << "asDouble=" << s.get_double() << endl;
+    cout << "asMHz=" << asMHz << endl;
+
     //Create the global selection manager
     mSelectionManager = new SelectionManager;
 

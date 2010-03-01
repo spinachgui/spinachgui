@@ -70,6 +70,7 @@ set(sharedSources "shared/nuclear_data.cpp")
 set(sharedSources ${sharedSources} "shared/spinsys.cpp")
 set(sharedSources ${sharedSources} "shared/mathtypes.cpp")
 set(sharedSources ${sharedSources} "auto/spinxml_schema.cpp")
+set(sharedSources ${sharedSources} "shared/unit.cpp")
 
 set(formatSources "shared/formats/xyz.cpp")
 set(formatSources ${formatSources} "shared/formats/g03.cpp")

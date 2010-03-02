@@ -9,7 +9,7 @@
 
 #include <shared/formats/xyz.hpp>
 #include <shared/formats/g03.hpp>
-#include <shared/formats/xml.hpp>
+//#include <shared/formats/xml.hpp>
 #include <shared/formats/castep.hpp>
 #include <shared/formats/simpson.hpp>
 
@@ -28,38 +28,30 @@ SpinachApp::~SpinachApp() {
 
 bool SpinachApp::OnInit() {
     //Test out the units system
-    energy p(1.0); // 1J
-    energy q(1.0); // 1J
+    energy p=1.0*Joule; // 1J
+    energy q=1.0*Joule; // 1J
 
     energy s=p+q;
 
-    length a(1.0); //1M
-
-    ////This shouldn't compile
-    // length b=a+s;
-
-    double asMHz=s();
-    cout << "asDouble=" << s.get_double() << endl;
-    cout << "asMHz=" << asMHz << endl;
+    cout << "s=" << s[Hz] << "Hz" << endl;
 
     //Create the global selection manager
     mSelectionManager = new SelectionManager;
 
     //Load the I/O Filters
 
-    mIOFilters.push_back(new XYZLoader);
     mIOFilters.push_back(new G03Loader);
     mIOFilters.push_back(new SIMPSONLoader);
     mIOFilters.push_back(new CASTEPLoader);
 
     //Load the xml schema, it's more complicated, of course
-    wxFileName fn(argv[0]);
+    /*wxFileName fn(argv[0]);
     fn.Normalize();
     fn=fn.GetPath();
     fn.AppendDir(wxT("data"));
     fn.SetFullName(wxT("spinxml_schema.xsd"));
     wxString url(wxString(wxT("file://")) << fn.GetFullPath());
-    mIOFilters.push_back(new XMLLoader(url.char_str()));
+    mIOFilters.push_back(new XMLLoader(url.char_str()));*/
   
     //Load the isotopes
 
@@ -80,7 +72,7 @@ bool SpinachApp::OnInit() {
     RootFrame* frame = new RootFrame(NULL);
     frame->Show();
 
-    return false;
+    return true;
 }
 
 

@@ -116,14 +116,15 @@ struct castep : grammar<castep> {
                 spin_map_iter it = spin_map.find(label);
                 if(it == spin_map.end()) { //If the spin dosn't already exist
                     //Create the spin
-                    double x=getDouble(x_coord);
-                    double y=getDouble(y_coord);
-                    double z=getDouble(z_coord);
+                    length x,y,z;
+                    x[Angstroms]=getDouble(x_coord);
+                    y[Angstroms]=getDouble(y_coord);
+                    z[Angstroms]=getDouble(z_coord);
                     long element=getElementBySymbol(getString(atom).c_str());
                     if(element == -1) {
                         throw runtime_error("Unknown Element "+getString(atom));
                     }
-                    Spin* spin = new Spin(Vector3(x,y,z),label,element);
+                    Spin* spin = new Spin(Vector3l(x,y,z),label,element);
                     spin_map[label]=spin;
                     ss->InsertSpin(spin);
                 } 
@@ -175,9 +176,11 @@ struct castep : grammar<castep> {
                     throw runtime_error("Missing V_zz symbol");
                 }
                 //Eigenvalues
-                double xx = getDouble(eigsys_xx->children.begin()+1);
-                double yy = getDouble(eigsys_yy->children.begin()+1);
-                double zz = getDouble(eigsys_zz->children.begin()+1);
+                energy xx,yy,zz;
+                energy_unit u = j->value.id()==total_tensorID ? Joule : MHz;
+                xx[u] = getDouble(eigsys_xx->children.begin()+1);
+                yy[u] = getDouble(eigsys_yy->children.begin()+1);
+                zz[u] = getDouble(eigsys_zz->children.begin()+1);
 
                 //Eigenvectors
                 Vector3 vx(getDouble(eigsys_xx->children.begin()+3),

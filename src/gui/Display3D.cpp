@@ -167,11 +167,11 @@ void SGNode::SetMaterial(const float material[3],bool use) {
     mUseMaterial=use;
 }
 
-void SGNode::SetTranslation(const Vector3& v) {
+void SGNode::SetTranslation(const Vector3l& v) {
     mIdentity=false;
-    mat[0 ]=1;  mat[4 ]=0;  mat[8 ]=0;  mat[12]=v.GetX();
-    mat[1 ]=0;  mat[5 ]=1;  mat[9 ]=0;  mat[13]=v.GetY();
-    mat[2 ]=0;  mat[6 ]=0;  mat[10]=1;  mat[14]=v.GetZ();
+    mat[0 ]=1;  mat[4 ]=0;  mat[8 ]=0;  mat[12]=v.GetX()[Angstroms];
+    mat[1 ]=0;  mat[5 ]=1;  mat[9 ]=0;  mat[13]=v.GetY()[Angstroms];
+    mat[2 ]=0;  mat[6 ]=0;  mat[10]=1;  mat[14]=v.GetZ()[Angstroms];
     mat[3 ]=0;  mat[7 ]=0;  mat[11]=0;  mat[15]=1;
 }
 

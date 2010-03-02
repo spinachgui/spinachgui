@@ -13,7 +13,7 @@
 
 
 namespace SpinXML {
-
+    typedef Vector3_t<length> Vector3l;
 
     void SetSchemaLocation(const char* loc);
 
@@ -221,12 +221,12 @@ namespace SpinXML {
     class Spin : public sigc::trackable {
     private:
     public:  
-        Spin(Vector3 mPosition,std::string mLabel,long atomicNumber=1);
+        Spin(Vector3l mPosition,std::string mLabel,long atomicNumber=1);
         Spin(const Spin& s);
         ~Spin();
   
-        Vector3& GetPosition();
-        void SetPosition(Vector3 Position);
+        Vector3l& GetPosition();
+        void SetPosition(Vector3l Position);
         void GetCoordinates(length* _x,length* _y, length* _z) const;
         void SetCoordinates(length _x,length _y, length _z);
 
@@ -270,7 +270,7 @@ namespace SpinXML {
 
     private:
         std::vector<Interaction*> mInter;
-        Vector3 mPosition;
+        Vector3l mPosition;
         std::string mLabel;
         long mElement;
         std::vector<long> mIsotopes;
@@ -303,7 +303,7 @@ namespace SpinXML {
 
         ///Return all spins withing distance of point pos. Do not return
         ///skip all spins below Ignore
-        std::vector<Spin*> GetNearbySpins(Vector3 pos,length distance,Spin* Ignore=NULL);
+        std::vector<Spin*> GetNearbySpins(Vector3l pos,length distance,Spin* Ignore=NULL);
 
         //Event Handlers
         void OnSpinDeleted(Spin* spin){RemoveSpin(spin);}

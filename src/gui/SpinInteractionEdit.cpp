@@ -29,9 +29,9 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id) 
   : SpinInterEditPanelBase(parent,id),
+    mEditMode(EDIT_ALL),
     mSpin(NULL),
     mUpdatingListBox(false),
-    mEditMode(EDIT_ALL),
     mDialogMode(true) {
   mInterEdit=new InterEditPanel(this);
   mInterEdit->sigChange.connect(mem_fun(*this,&SpinInterEditPanel::DirtySelected));
@@ -55,7 +55,7 @@ void SpinInterEditPanel::Clear() {
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
   Interaction* inter=new Interaction();
-  inter->SetScalar(0.0);
+  inter->SetScalar(0.0*Hz);
   inter->SetSubType(Interaction::ST_SHIELDING,mSpin);
   mSpin->InsertInteraction(inter);
 
@@ -90,7 +90,7 @@ void SpinInterEditPanel::LoadFromSpin() {
 
   std::vector<Interaction*> oldInteractions=mSpin->GetInteractions(); 
   //Make sure all the interactions here are copies
-  for(long i=0;i<oldInteractions.size();i++) {
+  for(unsigned long i=0;i<oldInteractions.size();i++) {
     ListBoxInteraction lbi;
     lbi.inter=oldInteractions[i];
     lbi.modified=false;

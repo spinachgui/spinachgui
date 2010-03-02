@@ -16,7 +16,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
     c style I/O
   */
   ss->Clear();
-  Spin* s=new Spin(Vector3(0,0,0),string("Unpaired Electron"),0);
+  Spin* s=new Spin(Vector3l(0*Angstroms,0*Angstroms,0*Angstroms),string("Unpaired Electron"),0);
   ss->InsertSpin(s);
 
   ifstream fin(filename);
@@ -47,14 +47,14 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
       fin.getline(buff,500); line=buff; stream.str(line); //Read a line
       while(line.find("--------") == string::npos && !fin.eof()) {
 	int dummy1,atomicNumber,dummy3;
-	double x,y,z;
-	stream >> dummy1 >> atomicNumber >> dummy3 >> x >> y >> z;
+	length x,y,z;
+	stream >> dummy1 >> atomicNumber >> dummy3 >> x[Angstroms] >> y[Angstroms] >> z[Angstroms];
 	stream.clear();
 	fin.getline(buff,500); line=buff; stream.str(line); //Read a line
 	if(standardOrientFound) {
 	  //Update an existing spin
 	  if(ss->GetSpinCount() > nAtoms) {
-	    ss->GetSpin(nAtoms)->SetPosition(Vector3(x,y,z));
+	    ss->GetSpin(nAtoms)->SetPosition(Vector3l(x,y,z));
 	  } else {
 	    cerr << "Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables" << endl;
 	    throw runtime_error("Error reading standard orientation: the number of centres is not consistant amoung the standard orientation tables");
@@ -63,7 +63,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	  //Create a new spin
 	  string isotopeSymbol(getElementSymbol(atomicNumber));
 	  isotopeSymbol=isotopeSymbol; //We have no clue what the mass number is yet
-	  Spin* s=new Spin(Vector3(x,y,z),string("A Spin")+isotopeSymbol,atomicNumber);
+	  Spin* s=new Spin(Vector3l(x,y,z),string("A Spin")+isotopeSymbol,atomicNumber);
 	  ss->InsertSpin(s);
 	}
 	nAtoms++;
@@ -149,7 +149,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	  }
 	  for(long k=0;k<5 && k < j+1-i*5;k++) {
 	    string JCouplingStr;
-	    double JCoupling;
+	    energy JCoupling;
 	    fin >> JCouplingStr;
 	    //Fotran double precision output isn't compatable with C++ iostreams, so we have to tweek it
 	    //Replace the D with an E
@@ -165,7 +165,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	    //Pack it back into a istream and parse
 	    istringstream stream;
 	    stream.str(JCouplingStr);
-	    stream >> JCoupling;
+	    stream >> JCoupling[Hz];
 	    Interaction* inter=new Interaction();
             inter->SetScalar(JCoupling);
 	    inter->SetSubType(Interaction::ST_SCALAR,ss->GetSpin(j+2),ss->GetSpin(i*5+k+2));
@@ -179,11 +179,11 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
       istringstream stream;
       for (long i=0;i<nAtoms;i++) {
 	string dummy1,dummy2,dummy3;
-	double isoCoupling;
+	energy isoCoupling;
 	fin.getline(buff,500); line=buff; //Read a line
 	stream.clear(); stream.str(line);
 	//Read the coupling strength (in megaherz)
-	stream >> dummy1 >> dummy2 >> dummy3 >> isoCoupling;
+	stream >> dummy1 >> dummy2 >> dummy3 >> isoCoupling[MHz];
         
         Interaction* inter=new Interaction();
         inter->SetScalar(isoCoupling);
@@ -200,17 +200,17 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
       istringstream stream;
       for (long i=0;i<nAtoms;i++) {
 	string dummy1,dummy2,dummy3,dummy4,dummy5,isotope;
-	double eigenvalue1,eigenvalue2,eigenvalue3;
+	energy eigenvalue1,eigenvalue2,eigenvalue3;
 	double x1,y1,z1,x2,y2,z2,x3,y3,z3;
 	//Read the rotation matrix and eigenvalues (in megaherz)
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
-	stream                      >> dummy1 >> dummy2 >> eigenvalue1 >> dummy3 >> dummy4 >> x1 >> y1 >> z1;
+	stream                      >> dummy1 >> dummy2 >> eigenvalue1[MHz] >> dummy3 >> dummy4 >> x1 >> y1 >> z1;
 
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
-	stream >> dummy5 >> isotope >> dummy1 >> dummy2 >> eigenvalue2 >> dummy3 >> dummy4 >> x2 >> y2 >> z2;
+	stream >> dummy5 >> isotope >> dummy1 >> dummy2 >> eigenvalue2[MHz] >> dummy3 >> dummy4 >> x2 >> y2 >> z2;
 
 	fin.getline(buff,500); line=buff; stream.clear(); stream.str(line); //Read a line
-	stream                      >> dummy1 >> dummy2 >> eigenvalue3 >> dummy3 >> dummy4 >> x3 >> y3 >> z3;
+	stream                      >> dummy1 >> dummy2 >> eigenvalue3[MHz] >> dummy3 >> dummy4 >> x3 >> y3 >> z3;
 	//Skip a line
 	fin.getline(buff,500); line=buff; //Read a line
 

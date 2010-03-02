@@ -3,8 +3,10 @@
 #define _unit_h
 
 #include <iostream>
+#include <istream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 /*************************************************************
 Units API.
@@ -29,19 +31,19 @@ public:
         mToSI=toSIf;
         mFromSI=1/mToSI;
     }
-    const char* get_name_c() {
+    const char* get_name_c() const {
         return mName.c_str();
     }
-    const std::string& get_name() {
+    const std::string& get_name() const {
         return mName;
     }
     operator const char* () {
         return mName.c_str();
     }
-    double toSI(double nonSI) {
+    double toSI(double nonSI) const {
         return mToSI*nonSI;
     }
-    double fromSI(double SI) {
+    double fromSI(double SI) const {
         return mFromSI*SI;
     }
 private:
@@ -50,6 +52,43 @@ private:
     double mFromSI;
 };
 
+///This template is used to make cin >> x[metres]; y[MHz]=400; type
+/// syntax work, it shouldn't be used explicitly
+template<int energy,int length>
+struct ddouble_helper {
+    ddouble_helper(double* _si,const unit<energy,length>& _u) 
+        : u(_u),si(_si) {
+    }
+    const ddouble_helper& setup(double* _si,const unit<energy,length>& _u) {
+        si=_si;
+        u=_u;
+        return *this;
+    }
+    operator double() const {
+        return u.fromSI(*si);
+    }
+
+    double operator = (double val) const {
+        *si=u.toSI(val);
+        return val;
+    }
+    unit<energy,length> u;
+    double* si;
+};
+
+template<int energy,int length>
+std::istream& operator >> (std::istream& in,const ddouble_helper<energy,length>& val) {
+    double temp;
+    in >> temp;
+    (*val.si)=val.u.toSI(temp);
+    return in;
+}
+
+template<int energy,int length>
+std::ostream& operator << (std::ostream& out,const ddouble_helper<energy,length>& val) {
+    out << val.u.fromSI(*(val.si));
+    return out;
+}
 
 template<int energy,int length>
 struct ddouble {
@@ -65,10 +104,13 @@ struct ddouble {
     ddouble(double quantity,const unit<energy,length>& u) 
         : si(u.toSI(quantity)){
     }
-    ///Get the quantity in a particular unit example usage:
-    ///double gap=energy_gap[MHz];
-    double operator[](const unit<energy,length>& u) {
-        return u.fromSI(si);
+    //static ddouble_helper<energy,length> helper;
+    ///Get the quantity in a particular unit example usage: double
+    ///gap=energy_gap[MHz]; Not thread safe, I'm not sure how to
+    ///achive thread safeness right now, and it probably doesn't
+    ///matter.
+    const ddouble_helper<energy,length> operator[](const unit<energy,length>& u) {
+        return ddouble_helper<energy,length>(&si,u);
     }
     //The physical quatity in SI units
     double si;
@@ -111,6 +153,37 @@ ddouble<E1-E2,L1-L2> operator/(ddouble<E1,L1> lhs,ddouble<E2,L2> rhs) {
     return ddouble<E1-E2,L1-L2>(lhs.si/rhs.si);
 }
 
+///This template enables expressions like x=length1+length2
+template<int E,int L>
+ddouble<E,L> operator+(ddouble<E,L> lhs,ddouble<E,L> rhs) {
+    return ddouble<E,L>(lhs.si+rhs.si);
+}
+
+///This template enables expressions like x=length1+length2
+template<int E,int L>
+ddouble<E,L> operator-(const ddouble<E,L>& lhs,const ddouble<E,L>& rhs) {
+    return ddouble<E,L>(lhs.si-rhs.si);
+}
+
+///This template enables expressions like length1 > length2
+template<int E,int L>
+bool operator>(const ddouble<E,L>& lhs,const ddouble<E,L>& rhs) {
+    return lhs.si>rhs.si;
+}
+
+///This template enables expressions like length1 < length2
+template<int E,int L>
+bool operator<(ddouble<E,L> lhs,ddouble<E,L> rhs) {
+    return lhs.si<rhs.si;
+}
+
+///This template enables expressions like sqrt(legnth * length)
+template<int E,int L>
+ddouble<E/2,L/2> sqrt(ddouble<E,L> lhs) {
+    return ddouble<E/2,L/2>(std::sqrt(lhs.si));
+}
+
+
 
 
 typedef ddouble<1,0> energy;
@@ -121,12 +194,16 @@ typedef unit<1,0> energy_unit;
 typedef unit<0,1> length_unit;
 
 const energy_unit Joule("Joule",1.0);
+const energy_unit Hz("Hz",6.626068e-34);
+const energy_unit KHz("KHz",6.626068e-31);
+const energy_unit MHz("MHz",6.626068e-28);
+const energy_unit eV("eV",1.60217646e-19);
 
-const length_unit metre("metre",1.0);
+const length_unit metres("metres",1.0);
 const length_unit milimetre("milimetre",1e-3);
 const length_unit micrometre("micrometre",1e-6);
 const length_unit nanometre("nanometre",1e-9);
-const length_unit angstrom("Angstrom",1e-10);
+const length_unit Angstroms("Angstroms",1e-10);
 
 #endif
 

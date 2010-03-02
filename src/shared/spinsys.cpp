@@ -67,12 +67,12 @@ long SpinSystem::GetSpinNumber(Spin* spin) const {
     return -1;
 }
 
-vector<Spin*> SpinSystem::GetNearbySpins(Vector3 pos,double distance,Spin* Ignore) {
+vector<Spin*> SpinSystem::GetNearbySpins(Vector3l pos,length distance,Spin* Ignore) {
     std::vector<Spin*> result;
-    double dist2=distance*distance;
-    double x1=pos.GetX();
-    double y1=pos.GetY();
-    double z1=pos.GetZ();
+    length2 dist2=distance*distance;
+    length x1=pos.GetX();
+    length y1=pos.GetY();
+    length z1=pos.GetZ();
 
     long spinCount=mSpins.size();
 
@@ -81,11 +81,11 @@ vector<Spin*> SpinSystem::GetNearbySpins(Vector3 pos,double distance,Spin* Ignor
 
 
     for(long i=skipped+1;i<spinCount;i++) {
-        double x2,y2,z2;
+        length x2,y2,z2;
         mSpins[i]->GetCoordinates(&x2,&y2,&z2);
-        double deltaX=(x1-x2);
-        double deltaY=(y1-y2);
-        double deltaZ=(z1-z2);
+        length deltaX=(x1-x2);
+        length deltaY=(y1-y2);
+        length deltaZ=(z1-z2);
         if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ < dist2) {
             result.push_back(mSpins[i]);
         }
@@ -157,14 +157,14 @@ void SpinSystem::CalcNuclearDipoleDipole() {
 
             //A unit vector pointing from spin1 tp spin2
             double rx,ry,rz;
-            Vector3 r_1_2=(spin2->GetPosition()-spin1->GetPosition());
-            r_1_2.GetCoordinates(&rx,&ry,&rz);
+            Vector3l r_1_2=spin2->GetPosition()-spin1->GetPosition();
+            r_1_2.GetCoordinatesSI(&rx,&ry,&rz);
 
             long element2=spin2->GetElement();
             long isotope2=spin2->GetIsotopes()[0];
             double g2=getGyromagneticRatio(element2,isotope2);
 
-            double r=r_1_2.length();
+            double r=(r_1_2.length()).si;
             double r2=r*r;
             double r3=r2*r;
             double r5=r2*r3;
@@ -186,7 +186,7 @@ void SpinSystem::CalcNuclearDipoleDipole() {
 //==============================================================================//
 // Spin
 
-Spin::Spin(Vector3 Position,string Label,long atomicNumber) 
+Spin::Spin(Vector3l Position,string Label,long atomicNumber) 
     : mPosition(Position),mLabel(Label),mElement(atomicNumber) {
 }
 
@@ -201,21 +201,21 @@ Spin::~Spin() {
     sigDying(this);
 }
 
-Vector3& Spin::GetPosition() {
+Vector3l& Spin::GetPosition() {
     return mPosition;
 }
 
-void Spin::SetPosition(Vector3 Position) {
+void Spin::SetPosition(Vector3l Position) {
     sigChange();
     mPosition=Position;
 }
 
-void Spin::GetCoordinates(double* _x,double* _y, double* _z) const {
+void Spin::GetCoordinates(length* _x,length* _y, length* _z) const {
     mPosition.GetCoordinates(_x,_y,_z);
 }
 
 
-void Spin::SetCoordinates(double _x,double _y, double _z) {
+void Spin::SetCoordinates(length _x,length _y, length _z) {
     sigChange();
     mPosition.SetCoordinates(_x,_y,_z);
 }
@@ -510,8 +510,8 @@ Interaction::Type Interaction::GetType() const {
 
 
 
-void Interaction::GetScalar(double* Scalar) const {
-    *Scalar=mData.mScalar;
+void Interaction::GetScalar(energy* Scalar) const {
+    (*Scalar).si=mData.mScalar;
 }
 
 void Interaction::GetMatrix(Matrix3* OutMatrix) const {
@@ -519,34 +519,34 @@ void Interaction::GetMatrix(Matrix3* OutMatrix) const {
     return;
 }
 
-void Interaction::GetEigenvalues(double* XX,double* YY, double* ZZ, Orientation* OrientOut) const {
-    *XX=mData.mEigenvalues.XX;
-    *YY=mData.mEigenvalues.YY;
-    *ZZ=mData.mEigenvalues.ZZ;
+void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
+    (*XX).si=mData.mEigenvalues.XX;
+    (*YY).si=mData.mEigenvalues.YY;
+    (*ZZ).si=mData.mEigenvalues.ZZ;
     *OrientOut=mOrient;
     return;
 }
 
-void Interaction::GetAxRhom(double* iso,double* ax, double* rh, Orientation* OrientOut) const {
-    *iso=mData.mAxRhom.iso;
-    *ax=mData.mAxRhom.ax;
-    *rh=mData.mAxRhom.rh;
+void Interaction::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const {
+    (*iso).si=mData.mAxRhom.iso;
+    (*ax).si=mData.mAxRhom.ax;
+    (*rh).si=mData.mAxRhom.rh;
     *OrientOut=mOrient;
     return;
 }
 
-void Interaction::GetSpanSkew(double* iso,double* Span, double* Skew, Orientation* OrientOut) const {
-    *iso=mData.mSpanSkew.iso;
-    *Span=mData.mSpanSkew.span;
+void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const {
+    (*iso).si=mData.mSpanSkew.iso;
+    (*Span).si=mData.mSpanSkew.span;
     *Skew=mData.mSpanSkew.skew;
     *OrientOut=mOrient;
     return;
 }
 
-void Interaction::SetScalar(double Scalar) {
+void Interaction::SetScalar(energy Scalar) {
     sigChange();
     mType=SCALAR;
-    mData.mScalar=Scalar;
+    mData.mScalar=Scalar.si;
 }
 
 void Interaction::SetMatrix(const Matrix3& Matrix) {
@@ -555,31 +555,31 @@ void Interaction::SetMatrix(const Matrix3& Matrix) {
     mData.mMatrix=new Matrix3(Matrix);
 }
 
-void Interaction::SetEigenvalues(double XX,double YY, double ZZ, const Orientation& Orient) {
+void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
     sigChange();
     mType=EIGENVALUES;
-    mData.mEigenvalues.XX=XX;
-    mData.mEigenvalues.YY=YY;
-    mData.mEigenvalues.ZZ=ZZ;
+    mData.mEigenvalues.XX=XX.si;
+    mData.mEigenvalues.YY=YY.si;
+    mData.mEigenvalues.ZZ=ZZ.si;
     mOrient=Orient;
     return;
 }
 
-void Interaction::SetAxRhom(double iso,double ax, double rh, const Orientation& Orient) {
+void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
     sigChange();
     mType=AXRHOM;
-    mData.mAxRhom.iso=iso;
-    mData.mAxRhom.ax=ax;
-    mData.mAxRhom.rh=rh;
+    mData.mAxRhom.iso=iso.si;
+    mData.mAxRhom.ax=ax.si;
+    mData.mAxRhom.rh=rh.si;
     mOrient=Orient;
     return;
 }
 
-void Interaction::SetSpanSkew(double iso,double Span, double Skew, const Orientation& Orient) {
+void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
     sigChange();
     mType=SPANSKEW;
-    mData.mSpanSkew.iso=iso;
-    mData.mSpanSkew.span= Span;
+    mData.mSpanSkew.iso=iso.si;
+    mData.mSpanSkew.span= Span.si;
     mData.mSpanSkew.skew=Skew;
     mOrient=Orient;
     return;

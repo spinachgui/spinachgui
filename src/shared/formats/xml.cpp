@@ -173,7 +173,7 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
   for(long i=0;i<spinCount;i++) {
     spin xsdSpin=spins[i];
 
-    double x,y,z;
+    length x,y,z;
     vector coords=xsdSpin.coordinates();
     x=coords.x();
     y=coords.y();
@@ -181,9 +181,9 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
 
     SpinXML::Spin* newSpin;
     if(xsdSpin.label().present()) {
-      newSpin=new SpinXML::Spin(Vector3(x,y,z),xsdSpin.label().get());
+      newSpin=new SpinXML::Spin(Vector3l(x,y,z),xsdSpin.label().get());
     } else {
-      newSpin=new SpinXML::Spin(Vector3(x,y,z),"");
+      newSpin=new SpinXML::Spin(Vector3l(x,y,z),"");
     }
     newSpin->SetElement(getElementBySymbol(xsdSpin.element().c_str()));
 

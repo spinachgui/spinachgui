@@ -73,7 +73,7 @@ public:
     ///Removes a child node
     void RemoveNode(SGNode* node);
 
-    void SetTranslation(const Vector3& v);
+    void SetTranslation(const Vector3l& v);
     void SetIdentity() {mIdentity=true;}
 
     void GetPovRayString(wxString& str);

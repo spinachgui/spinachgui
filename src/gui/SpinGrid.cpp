@@ -50,16 +50,16 @@ public:
         }
     }
     void UpdateRow() {
-        double x,y,z;
+        length x,y,z;
         mSpin->GetCoordinates(&x,&y,&z);
 
         //Setup the label and the element columns
         mParent->SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(mSpin->GetLabel(),wxConvUTF8));
 
         //Setup the x,y,z coordinates
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y);
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z);
+        mParent->SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x[Angstroms]);
+        mParent->SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y[Angstroms]);
+        mParent->SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z[Angstroms]);
 
         //Set the element and isotope
         long element=mSpin->GetElement();
@@ -166,7 +166,7 @@ void SpinGrid::OnEdit(wxGridEvent& e) {
     if(e.GetRow()==sc) {
         //User is trying to edit the blank line at the bottom of the grid,
         //so create a new spin for them
-        GetSS()->InsertSpin(new Spin(Vector3(0,0,0),"New Spin",1));
+        GetSS()->InsertSpin(new Spin(Vector3l(0*metres,0*metres,0*metres),"New Spin",1));
     }
 }
 
@@ -247,17 +247,17 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         double x;
         GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
         Chkpoint(wxT("Spin Coordinates"));
-        mSS->GetSpin(e.GetRow())->GetPosition().SetX(x);
+        mSS->GetSpin(e.GetRow())->GetPosition().SetX(x*Angstroms);
     } else if(e.GetCol()==COL_Y) {
         double y;
         GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&y);
         Chkpoint(wxT("Spin Coordinates"));
-        mSS->GetSpin(e.GetRow())->GetPosition().SetY(y);
+        mSS->GetSpin(e.GetRow())->GetPosition().SetY(y*Angstroms);
     } else if(e.GetCol()==COL_Z) {
         double z;
         GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
         Chkpoint(wxT("Spin Coordinates"));
-        mSS->GetSpin(e.GetRow())->GetPosition().SetZ(z);
+        mSS->GetSpin(e.GetRow())->GetPosition().SetZ(z*Angstroms);
     } else if(e.GetCol()==COL_ELEMENT) {
         wxString content=GetCellValue(e.GetRow(),e.GetCol());
         long space=content.Find(wxT(" "));

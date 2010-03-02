@@ -76,7 +76,7 @@ void SpinDialog::SaveToSpin() {
     return;
   }
     
-  mSpin->SetCoordinates(x,y,z);
+  mSpin->SetCoordinates(x*Angstroms,y*Angstroms,z*Angstroms);
 
   wxString label=mSpinTitle->GetValue();
   mSpin->SetLabel(string(label.mb_str()));
@@ -87,16 +87,16 @@ void SpinDialog::SaveToSpin() {
 
 
 void SpinDialog::LoadFromSpin() {
-  double x,y,z;
+  length x,y,z;
   mSpin->GetCoordinates(&x,&y,&z);
   wxString label=wxString(mSpin->GetLabel(),wxConvUTF8);
 
   mSpinTitle->SetValue(label);
 
   wxString strX,strY,strZ;
-  strX << x;
-  strY << y;
-  strZ << z;
+  strX << x[Angstroms];
+  strY << y[Angstroms];
+  strZ << z[Angstroms];
 
   mXPosCtrl->SetValue(strX);
   mYPosCtrl->SetValue(strY);

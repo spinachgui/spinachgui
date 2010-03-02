@@ -105,12 +105,12 @@ void SpinNode::ToPovRay(wxString& src) {
         material[1] = getElementG(mSpin->GetElement());
         material[2] = getElementB(mSpin->GetElement());
 
-        Vector3 pos=mSpin->GetPosition();
+        Vector3l pos=mSpin->GetPosition();
 
         src << wxT("sphere{\n<") 
-            << pos.GetX() << wxT(",")
-            << pos.GetY() << wxT(",")
-            << pos.GetZ() << wxT(">, 0.1 \npigment {color rgb <") 
+            << pos.GetX()[Angstroms] << wxT(",")
+            << pos.GetY()[Angstroms] << wxT(",")
+            << pos.GetZ()[Angstroms] << wxT(">, 0.1 \npigment {color rgb <") 
             << getElementR(mSpin->GetElement()) << wxT(",")
             << getElementG(mSpin->GetElement()) << wxT(",")
             << getElementG(mSpin->GetElement()) << wxT(">}\n")
@@ -308,22 +308,28 @@ void MoleculeNode::ToPovRay(wxString& str) {
         }
         //If the spin is an electron, it should be drawn outside of the
         //molecule
-        vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8,spin);
+        vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8*Angstroms,spin);
         for(unsigned long j=0;j<nearby.size();j++) {
             if(nearby[j]->GetElement()==0) {
                 continue;
             }
-            Vector3 mR1=spin->GetPosition();
-            Vector3 mR2=nearby[j]->GetPosition();
+            Vector3l mR1=spin->GetPosition();
+            Vector3l mR2=nearby[j]->GetPosition();
 
-            double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
-            double x2=mR2.GetX(),y2=mR2.GetY(),z2=mR2.GetZ();
+            length x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
+            length x2=mR2.GetX(),y2=mR2.GetY(),z2=mR2.GetZ();
 
 			
             //Now we need to find the rotation between the z axis
             str << wxT("cylinder {")
-                << wxT("<") << x1 << wxT(",") << y1 << wxT(",") << z1 << wxT(",") wxT(">")
-                << wxT("<") << x2 << wxT(",") << y2 << wxT(",") << z2 << wxT(",") wxT(">") 
+                << wxT("<") << x1[Angstroms] 
+                << wxT(",") << y1[Angstroms] 
+                << wxT(",") << z1[Angstroms]
+                << wxT(">")
+                << wxT("<") << x2[Angstroms]
+                << wxT(",") << y2[Angstroms]
+                << wxT(",") << z2[Angstroms]
+                << wxT(">") 
                 << 0.04 << wxT(" \npigment{color rgb <0.0,0.0,0.7>}\n}\n");
         }
     }
@@ -368,16 +374,16 @@ void MoleculeNode::RawDraw(SpinachDC& dc) {
         }
         //If the spin is an electron, it should be drawn outside of the
         //molecule
-        vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8,spin);
-        for(long j=0;j<nearby.size();j++) {
+        vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8*Angstroms,spin);
+        for(unsigned long j=0;j<nearby.size();j++) {
             if(nearby[j]->GetElement()==0) {
                 continue;
             }
-            Vector3 mR1=spin->GetPosition();
-            Vector3 mR2=nearby[j]->GetPosition();
+            Vector3l mR1=spin->GetPosition();
+            Vector3l mR2=nearby[j]->GetPosition();
 
-            double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
-            double x2=mR2.GetX(),y2=mR2.GetY(),z2=mR2.GetZ();
+            double x1=mR1.GetX()[Angstroms],y1=mR1.GetY()[Angstroms],z1=mR1.GetZ()[Angstroms];
+            double x2=mR2.GetX()[Angstroms],y2=mR2.GetY()[Angstroms],z2=mR2.GetZ()[Angstroms];
 
             double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			

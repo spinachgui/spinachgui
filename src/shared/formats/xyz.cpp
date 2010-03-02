@@ -14,10 +14,12 @@ void XYZLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 
   long count=ss->GetSpinCount();
   for(long i=0;i<count;i++) {
-    double x,y,z;
+    length x,y,z;
     ss->GetSpins()[i]->GetCoordinates(&x,&y,&z);
     fout << getElementSymbol(ss->GetSpins()[i]->GetElement()) << " " 
-	 << x << " "<< y << " " << z << " " << endl;
+	 << x[Angstroms] << " " 
+         << y[Angstroms] << " " 
+         << z[Angstroms] << " " << endl;
   }
 }
 
@@ -37,13 +39,13 @@ void XYZLoader::LoadFile(SpinSystem* ss,const char* filename) const {
       throw runtime_error("Unexpected end of file");
     }
     string el;
-    double x,y,z;
-    fin >> el >> x >> y >> z;
+    length x,y,z;
+    fin >> el >> x[Angstroms] >> y[Angstroms] >> z[Angstroms];
     long atomicN=getElementBySymbol(el.c_str());
     if(atomicN==-1) {
       throw runtime_error("Unknown Element");
     }
-    ss->InsertSpin(new Spin(Vector3(x,y,z),el,atomicN));
+    ss->InsertSpin(new Spin(Vector3l(x,y,z),el,atomicN));
   }
   ss->sigReloaded();
 }

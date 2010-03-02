@@ -15,81 +15,12 @@ const double SpinXML::hbar=6.626068e-34;
 const double SpinXML::bohr_mag=9.27400915e-24;
 const double SpinXML::mu0=1.25663706e-6;
 
-//==============================================================================//
-// Vector3
-
-Vector3::Vector3() {
-    
-}
-
-Vector3::Vector3(double _x,double _y,double _z) : x(_x),y(_y),z(_z) {
-
-}
-
-Vector3::Vector3(const Vector3& v) :  x(v.x),y(v.y),z(v.z) {
-
-}
-
-double Vector3::length() const  {
-    return sqrt(x*x+y*y+z*z);
-}
-
-double Vector3::GetX() const {
-  return x;
-}
-double Vector3::GetY() const {
-  return y;
-}
-
-double Vector3::GetZ() const {
-  return z;
-}
-
-void Vector3::SetX(double _x) {
-  x=_x;
-  return;
-}
-
-void Vector3::SetY(double _y) {
-  y=_y;
-  return;
-}
-
-void Vector3::SetZ(double _z) {
-  z=_z;
-  return;
-}
-
-void Vector3::GetCoordinates(double* _x,double* _y, double* _z) const {
-  *_x=x;
-  *_y=y;
-  *_z=z;
-  return;
-}
-
-void Vector3::SetCoordinates(double _x,double _y, double _z) {
-  x=_x;
-  y=_y;
-  z=_z;
-  return;
-}
-
-void Vector3::normalise() {
-    double inv_length=1/sqrt(x*x+y*y+z*z);
-    x*=inv_length;
-    y*=inv_length;
-    z*=inv_length;                
-}
-
-//============================================================//
-// Matrix2
-
 
 //==============================================================================//
 // Matrix3
     
 const double IDENTITY3[]={1.0,0.0,0.0,
-	  		0.0,1.0,0.0,
+                          0.0,1.0,0.0,
 			  0.0,0.0,1.0};
 
 

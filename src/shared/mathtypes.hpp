@@ -3,6 +3,7 @@
 #define __MATHTYPES___H_
 
 #include <string>
+#include <cmath>
 
 namespace SpinXML {
 
@@ -16,53 +17,87 @@ namespace SpinXML {
     extern const double mu0;
 
     ///Class for storing a 3 dimensional vector
-    class Vector3 {
+    template<typename T>
+    class Vector3_t {
     public:
         ///Constructs an uninitalised vector
-        Vector3();
+        Vector3_t(){}
         ///Copy Constructor
-        Vector3(const Vector3& v);
+        Vector3_t(const Vector3_t& v) 
+            :  x(v.x),y(v.y),z(v.z) {
+        }
         ///Constructs a new vector
-        Vector3(double _x,double _y,double _z);
+        Vector3_t(T _x,T _y,T _z) 
+            : x(_x),y(_y),z(_z) {
+        }
 
         ///Sets it's arguments to the value of the vector's z,y and z
         ///components
-        void GetCoordinates(double* _x,double* _y, double* _z) const;
+        void GetCoordinates(T* _x,T* _y, T* _z) const {
+            *_x=x;
+            *_y=y;
+            *_z=z;
+        }
+        ///Sets it's arguments to the value of the vector's z,y and z
+        ///components in SI units
+        void GetCoordinatesSI(double* _x,double* _y, double* _z) const {
+            *_x=x.si;
+            *_y=y.si;
+            *_z=z.si;
+        }
         ///Sets the vector's x,y and z coordinates
-        void SetCoordinates(double _x,double _y, double _z);
+        void SetCoordinates(T _x,T _y, T _z) {
+            x=_x;
+            y=_y;
+            z=_z;
+        }
+        ///Sets the vector's x,y and z coordinates in SI units
+        void SetCoordinatesSI(double _x,double _y, double _z) {
+            x.si=_x;
+            y.si=_y;
+            z.si=_z;
+        }
 
         ///Get the X component 
-        double GetX() const;
+        T GetX() const {return x;}
         ///Get the Y component 
-        double GetY() const;
+        T GetY() const {return y;}
         ///Get the Z component 
-        double GetZ() const;    
+        T GetZ() const {return z;}
 
         ///Set the X component 
-        void SetX(double _x);
+        void SetX(T _x) {x=_x;}
         ///Set the Y component 
-        void SetY(double _y);
+        void SetY(T _y) {y=_y;}
         ///Set the Z component 
-        void SetZ(double _z);
+        void SetZ(T _z) {z=_z;}
 
         ///Returns the magnitude of the vector
-        double length() const;
+        T length() const {
+            return sqrt(x*x+y*y+z*z);
+        }
 
         ///normalises the vector
-        void normalise();
-
-        Vector3 operator+(Vector3& v) const {
-            return Vector3(x+v.x,y+v.y,z+v.z);
+        void normalise() {
+            double inv_length=1/sqrt(x.si*x.si+y.si*y.si+z.si*z.si);
+            x*=inv_length;
+            y*=inv_length;
+            z*=inv_length;                
         }
-        Vector3 operator-(Vector3& v) const {
-            return Vector3(x-v.x,y-v.y,z-v.z);
+
+        Vector3_t operator+(const Vector3_t& v) const {
+            return Vector3_t(x+v.x,y+v.y,z+v.z);
+        }
+        Vector3_t operator-(const Vector3_t& v) const {
+            return Vector3_t(x-v.x,y-v.y,z-v.z);
         }
 
     private:
-        double x;
-        double y;
-        double z;
+        T x;
+        T y;
+        T z;
     };
+    typedef Vector3_t<double> Vector3;
 
     ///Class for storeing a 3x3 matrix.
     class Matrix3 {

@@ -200,9 +200,9 @@ void InterEditPanel::LoadFromInter() {
   }
 
   if(mInter->GetType()==Interaction::SCALAR) {
-    double scalar;
+    energy scalar;
     mInter->GetScalar(&scalar);
-    mScalarCtrl->SetValue(wxString() << scalar);
+    mScalarCtrl->SetValue(wxString() << scalar[MHz]);
     mTypeChoiceBook->SetSelection(0);
   } else if(mInter->GetType()==Interaction::MATRIX) {
     Matrix3 mat;
@@ -222,36 +222,37 @@ void InterEditPanel::LoadFromInter() {
 
     mTypeChoiceBook->SetSelection(1);
   } else if(mInter->GetType()==Interaction::EIGENVALUES) {
-    double xx,yy,zz;
+    energy xx,yy,zz;
     Orientation o;
     mInter->GetEigenvalues(&xx,&yy,&zz,&o);
 
-    mEigenXXCtrl->SetValue(wxString() << xx);
-    mEigenYYCtrl->SetValue(wxString() << yy);
-    mEigenZZCtrl->SetValue(wxString() << zz);
+    mEigenXXCtrl->SetValue(wxString() << xx[MHz]);
+    mEigenYYCtrl->SetValue(wxString() << yy[MHz]);
+    mEigenZZCtrl->SetValue(wxString() << zz[MHz]);
     
     mOrientEigenvalueCtrl->SetOrient(o);
 
     mTypeChoiceBook->SetSelection(2);
 
   } else if(mInter->GetType()==Interaction::AXRHOM) {
-    double ax,rhom,iso;
+    energy ax,rhom,iso;
     Orientation o;
-    mInter->GetAxRhom(&ax,&rhom,&iso,&o);
-    mAxCtrl->       SetValue(wxString() <<ax);
-    mRhomCtrl->     SetValue(wxString() << rhom);
-    mAxRhomIsoCtrl->SetValue(wxString() << iso);
+    mInter->GetAxRhom(&iso,&ax,&rhom,&o);
+    mAxCtrl->       SetValue(wxString() << ax[MHz]);
+    mRhomCtrl->     SetValue(wxString() << rhom[MHz]);
+    mAxRhomIsoCtrl->SetValue(wxString() << iso[MHz]);
 
     mOrientAxRhomCtrl->SetOrient(o);
 
     mTypeChoiceBook->SetSelection(3);
   } else if(mInter->GetType()==Interaction::SPANSKEW) {
-    double span,skew,iso;
+    energy span,iso;
+    double skew;
     Orientation o;
-    mInter->GetSpanSkew(&span,&skew,&iso,&o);
-    mSpanCtrl->       SetValue(wxString() << span);
+    mInter->GetSpanSkew(&iso,&span,&skew,&o);
+    mSpanCtrl->       SetValue(wxString() << span[MHz]);
     mSkewCtrl->       SetValue(wxString() << skew);
-    mSpanSkewIsoCtrl->SetValue(wxString() << iso);
+    mSpanSkewIsoCtrl->SetValue(wxString() << iso[MHz]);
 
     mOrientSpanSkewCtrl->SetOrient(o);
 
@@ -267,7 +268,7 @@ void InterEditPanel::SaveToInter() {
   if(type==Interaction::SCALAR) {
     double scalar;
     mScalarCtrl->GetValue().ToDouble(&scalar);
-    mInter->SetScalar(scalar);
+    mInter->SetScalar(scalar*MHz);
   } else if(type==Interaction::MATRIX) {
     double xx,xy,xz;
     double yx,yy,yz;
@@ -295,7 +296,8 @@ void InterEditPanel::SaveToInter() {
     mEigenYYCtrl->GetValue().ToDouble(&yy);
     mEigenZZCtrl->GetValue().ToDouble(&zz);
  
-    mInter->SetEigenvalues(xx,yy,zz,mOrientEigenvalueCtrl->GetOrient());
+    mInter->SetEigenvalues(xx*MHz,yy*MHz,zz*MHz,
+                           mOrientEigenvalueCtrl->GetOrient());
 
   } else if(type==Interaction::AXRHOM) {
     double ax,rhom,iso;
@@ -304,7 +306,8 @@ void InterEditPanel::SaveToInter() {
     mRhomCtrl->     GetValue().ToDouble(&rhom);
     mAxRhomIsoCtrl->GetValue().ToDouble(&iso);
 
-    mInter->SetAxRhom(ax,rhom,iso,mOrientAxRhomCtrl->GetOrient());
+    mInter->SetAxRhom(iso*MHz,ax*MHz,rhom*MHz,
+                      mOrientAxRhomCtrl->GetOrient());
   } else if(type==Interaction::SPANSKEW) {
     double span,skew,iso;
 
@@ -312,7 +315,8 @@ void InterEditPanel::SaveToInter() {
     mSkewCtrl->       GetValue().ToDouble(&skew);
     mSpanSkewIsoCtrl->GetValue().ToDouble(&iso);
 
-    mInter->SetSpanSkew(span,skew,iso,mOrientSpanSkewCtrl->GetOrient());
+    mInter->SetSpanSkew(iso*MHz,span*MHz,skew,
+                        mOrientSpanSkewCtrl->GetOrient());
   }
   interChangeConnect.unblock();
 }

@@ -1,23 +1,12 @@
 import std.stream;
 import std.range;
 import std.algorithm;
+import std.math;
 
 string header="#Everything after a '#' is a comment. This file was based on data from the GAMMA NMR libraries
+#The gyromagnetic ratio is listed in radians per second per tesla
 #
 #proton number,	mass number,	multplicity,	gyromagnetic ratio";
-/*
-#Electron:
-0		0		1		1.760859770e11
-#Hydrogen:
-1		1		1		1.760859770e11
-#Carbon:
-6		12		0		1.760859770e11
-6		13		1		1.760859770e11
-6		14		0		1.760859770e11
-#Nitrogen:
-7       	14		2		1.9337798e7
-7		15		1		1.9337798e7
-*/
 
 void main() {
     int[] Spins = [ 2, 3, 2, 2, 1, 1, 3, 4, 5, 4, 7, 4, 1, 2, 3, 2, 1, 
@@ -61,10 +50,10 @@ void main() {
 
 /*  An array of known isotope relative frequencies (from 1H @ 400.130 MHz)  */
 
-    double[] RelFreqs = [ 400.130, 61.424, 426.791, 304.811, -1.1e6, -1.1e6, 
-                           58.883, 155.503, -1.1e6, 56.226, 42.990, 128.330, 
-                           -1.1e6, 100.613, 28.913, -40.561, -1.1e6, 54.242, 
-                           -1.1e6, 376.498, -1.1e6, 31.586, -1.1e6, 105.842, 
+    double[] RelFreqs = [ 400.130, 61.424, 426.791, 304.811, double.nan, double.nan, 
+                           58.883, 155.503, double.nan, 56.226, 42.990, 128.330, 
+                           double.nan, 100.613, 28.913, -40.561, double.nan, 54.242, 
+                           double.nan, 376.498, double.nan, 31.586, double.nan, 105.842, 
                            24.496, 104.262, 79.494, 161.977, 30.714, 39.205, 
                            32.635, 18.670, 10.247, 26.925, 97.200, 22.563, 
                            22.557, 39.893, 105.246, 22.615, 99.012, 12.956, 
@@ -81,8 +70,8 @@ void main() {
                            70.475, 19.414, 45.643, 31.722, 12.484, 7.478, 
                            47.976, 16.669, 90.129, 91.038, 9.131, 31.070, 
                            6.874, 7.486, 85.876, 6.918, 71.667, 26.457, 
-                           228.970, 231.219, 83.459, 64.297, -1.1e6, -1.1e6, 
-                           -1.1e6, -1.1e6, -1.1e6, 7.162, -263376.60322 ];
+                           228.970, 231.219, 83.459, 64.297, double.nan, double.nan, 
+                           double.nan, double.nan, double.nan, 7.162, -263376.60322 ];
    string[] Names = ["Electron",
                      "Hydrogen",                                                                                                                                                                                                      "Helium", 
                      "Lithium","Beryllium",                                                                                                                             "Boron",    "Carbon",   "Nitrogen",   "Oxygen",   "Fluorine", "Neon", 
@@ -95,6 +84,9 @@ void main() {
                      "Francium","Radium",
                          "Actinium","Thorium","Protactinium", "Uranium" ];
 
+   
+   double proton_magnetic_ratio = 42.58;//MHz/T
+   double field=RelFreqs[0]/proton_magnetic_ratio;
 
     auto fout = new File("../data/isotopes.dat",FileMode.OutNew);
     fout.writefln(header);
@@ -106,6 +98,7 @@ void main() {
         int massNumber = isotope.at!(1);
         int spin = isotope.at!(2);
         double relFreq = isotope.at!(3);
+        double gyro_ratio=2*PI*relFreq/field;
 
         if(protonNumber != currentProtonNumber) {
             currentProtonNumber=protonNumber;
@@ -114,8 +107,10 @@ void main() {
             } else {
                 fout.writefln("#","Unknown");
             }
-        }     
-        fout.writefln(protonNumber,"        ",massNumber,"        ",spin,"        ",relFreq); 
+        } 
+        if(!isNaN(gyro_ratio)) {
+            fout.writefln(protonNumber,"        ",massNumber,"        ",spin,"        ",gyro_ratio); 
+        }
     }
 
 }

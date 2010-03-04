@@ -151,6 +151,7 @@ void SpinSystem::CalcNuclearDipoleDipole() {
         long element1=spin1->GetElement();
         long isotope1=spin1->GetIsotopes()[0];
         double g1=getGyromagneticRatio(element1,isotope1);
+        if(abs(g1)<1e-10) continue;
 
         for(unsigned long j=i+1;j<mSpins.size();j++) {
             Spin* spin2=mSpins[j]; 
@@ -163,6 +164,7 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             long element2=spin2->GetElement();
             long isotope2=spin2->GetIsotopes()[0];
             double g2=getGyromagneticRatio(element2,isotope2);
+            if(abs(g2)<1e-10) continue;
             
             cout << "isotope1=" << isotope1 << "  isotope2="<< isotope2 << endl;
             cout << "g1="<< g1 << "  g2="<< g2 << endl;
@@ -194,9 +196,7 @@ void SpinSystem::CalcNuclearDipoleDipole() {
 Spin::Spin(Vector3l Position,string Label,long atomicNumber) 
     : mPosition(Position),mLabel(Label),mElement(atomicNumber) {
     long isotope=getCommonIsotope(atomicNumber);
-    vector<long> isotopes;
-    isotopes.push_back(isotope);
-    mIsotopes=isotopes;
+    mIsotopes.push_back(isotope);
 }
 
 Spin::Spin(const Spin& s) :

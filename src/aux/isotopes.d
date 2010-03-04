@@ -96,9 +96,11 @@ void main() {
     foreach(isotope;zip(Numbers,Masses,Spins,RelFreqs)) {
         int protonNumber = isotope.at!(0);
         int massNumber = isotope.at!(1);
-        int spin = isotope.at!(2);
+        int multiplcity = isotope.at!(2);
         double relFreq = isotope.at!(3);
         double gyro_ratio=2*PI*relFreq/field;
+
+        assert(massNumber >= protonNumber,"Mass number was less than the proton number");
 
         if(protonNumber != currentProtonNumber) {
             currentProtonNumber=protonNumber;
@@ -109,7 +111,9 @@ void main() {
             }
         } 
         if(!isNaN(gyro_ratio)) {
-            fout.writefln(protonNumber,"        ",massNumber,"        ",spin,"        ",gyro_ratio); 
+            fout.writefln(protonNumber,"        ",massNumber,"        ",multiplcity,"        ",gyro_ratio); 
+        } else if(multiplcity == 1) {
+            fout.writefln(protonNumber,"        ",massNumber,"        ",multiplcity,"        ",0); 
         }
     }
 

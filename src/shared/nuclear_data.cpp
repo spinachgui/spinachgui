@@ -7,14 +7,16 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <map>
 
 using namespace std;
 
 //A simple struct like datatype for storing data about nuclei
 struct Isotope {
-    long neutron;    //Number or protons+neutrons
-    long twiceSpin;
+    unsigned long neutron;    //Number or protons+neutrons
+    unsigned long twiceSpin;
     double gyro;
+    Isotope() {}
     Isotope(long n,long twospin,double g) : neutron(n),twiceSpin(twospin),gyro(g) {}
 };
 
@@ -30,7 +32,7 @@ struct Element {
 
 
 //An array of arrays of isotopes.
-vector<vector<Isotope> > gIsotopes;
+vector<map<long,Isotope> > gIsotopes;
 
 
 
@@ -118,6 +120,8 @@ void LoadIsotopes() {
     }
 
     string line;
+    gIsotopes.clear();
+    gIsotopes.resize(gKnownElements);
     while(getline(fin,line)) {
         string beforeComment=line.substr(0,line.find("#"));
         istringstream stream;
@@ -125,13 +129,13 @@ void LoadIsotopes() {
 
         unsigned long p;  //Proton number
         unsigned long m;  //Mass number
-        long twicespin;
+        long multiplicity;
         double gyro; 
         stream >> p;
         if(!stream.eof()) { //We have a blank or commented line
             stream >> m;
             if(stream.eof()) {throw runtime_error("Corupt file");}
-            stream >> twicespin;
+            stream >> multiplicity;
             if(stream.eof()) {throw runtime_error("Corupt file");}
             stream >> gyro;
             if(!stream.eof()) {throw runtime_error("Corupt file");}
@@ -139,27 +143,35 @@ void LoadIsotopes() {
             if(p >= gIsotopes.size()) {
                 gIsotopes.resize(p+1);
             }
-
-            gIsotopes[p].push_back(Isotope(m-p,twicespin,gyro));
+            gIsotopes[p][m-p]=Isotope(m-p,multiplicity-1,gyro);
         }
     }
+}
+
+vector<long> getKnownIsotopes(long protonN) {
+    vector<long> isotopes;
+    for(map<long,Isotope>::const_iterator i=gIsotopes[protonN].begin();
+        i!=gIsotopes[protonN].end();++i) {
+        isotopes.push_back((*i).second.neutron+protonN);
+    }
+    return isotopes;
 }
 
 long getIsotopeCount(long protonN){
     return gIsotopes[protonN].size();
 }
 
-long getNeutrons(long protonN,long index) {
-    return gIsotopes[protonN][index].neutron;
+long getNeutrons(long protonN,long neutronN) {
+    return gIsotopes[protonN][neutronN].neutron;
 }
 
 ///Get the nuclear spin in units of hbar/2
-long getNuclearSpin(long protonN,long index) {
-    return gIsotopes[protonN][index].twiceSpin;
+long getNuclearSpin(long protonN,long neutronN) {
+    return gIsotopes[protonN][neutronN].twiceSpin;
 }
 
-double getGyromagneticRatio(long protonN,long index) {
-    return gIsotopes[protonN][index].gyro;
+double getGyromagneticRatio(long protonN,long neutronN) {
+    return gIsotopes[protonN][neutronN].gyro;
 }
 
 

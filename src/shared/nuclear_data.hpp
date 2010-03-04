@@ -2,6 +2,7 @@
 #define NUCLEAR_DATA_H
 
 #include <string>
+#include <vector>
 #include <shared/unit.hpp>
 
 struct Isotope;
@@ -32,14 +33,17 @@ long getIsotopeCount(long protonN);
 ///Get the index'th isotope of a given element where 0 <= index <
 ///getIsotopeCount()
 
+///Return a vector of known mass numbers for a given proton number
+std::vector<long> getKnownIsotopes(long protonN);
+
 ///Get the number of neutrons given an isotobe index
-long getNeutrons(long protonN,long index);
+long getNeutrons(long protonN,long neutronN);
 
 ///Get the nuclear spin in units of hbar/2
-long getNuclearSpin(long protonN,long index);
+long getNuclearSpin(long protonN,long neutronN);
 
 ///
-double getGyromagneticRatio(long protonN,long index);
+double getGyromagneticRatio(long protonN,long neutronN);
 #endif // __spinachcalcFrameBase__
 
 

@@ -124,6 +124,15 @@ namespace SpinXML {
         ///ST_SCALAR then inter.IsSubType(ST_NMR) is true.
         bool IsSubType(SubType t) const;
     
+        ///For a bilinear interaction, get the spin that is not spinA
+        Spin* GetOtherSpin(Spin* spinA) {
+            if(spinA==mSpin1) {
+                return mSpin2;
+            } else {
+                return mSpin1;
+            }
+        }
+
         ///If the scalar sorage convention being used then this function will set
         ///the value of its argument to the appropreate value. Otherwise the
         ///result is undefined.

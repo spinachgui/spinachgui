@@ -136,10 +136,22 @@ ddouble<E,L> operator*(double no_unit,ddouble<E,L> with_unit) {
     return ddouble<E,L>(with_unit.si*no_unit);
 }
 
+///This template enables expressions like length x=2/len; 
+template<int E,int L>
+ddouble<E,L> operator/(double no_unit,ddouble<E,L> with_unit) {
+    return ddouble<E,L>(with_unit.si/no_unit);
+}
+
 ///This template enables expressions like length x=len*2; 
 template<int E,int L>
 ddouble<E,L> operator*(ddouble<E,L> with_unit,double no_unit) {
     return ddouble<E,L>(with_unit.si*no_unit);
+}
+
+///This template enables expressions like length x=len/2; 
+template<int E,int L>
+ddouble<E,L> operator/(ddouble<E,L> with_unit,double no_unit) {
+    return ddouble<E,L>(with_unit.si/no_unit);
 }
 
 
@@ -189,11 +201,14 @@ ddouble<E/2,L/2> sqrt(ddouble<E,L> lhs) {
 typedef ddouble<1,0> energy;
 typedef ddouble<0,1> length;
 typedef ddouble<0,2> length2;
+typedef ddouble<0,3> length3;
+typedef ddouble<0,4> length4;
+typedef ddouble<0,5> length5;
 
 typedef unit<1,0> energy_unit;
 typedef unit<0,1> length_unit;
 
-const energy_unit Joule("Joule",1.0);
+const energy_unit Joules("Joule",1.0);
 const energy_unit Hz("Hz",6.626068e-34);
 const energy_unit KHz("KHz",6.626068e-31);
 const energy_unit MHz("MHz",6.626068e-28);

@@ -207,6 +207,8 @@ void InterEditPanel::LoadFromInter() {
   } else if(mInter->GetType()==Interaction::MATRIX) {
     Matrix3 mat;
     mInter->GetMatrix(&mat);
+    
+    cout << "Trace=" << (mat.Trace()*Joules)[Hz] << "Hz" <<  endl;
 
     mMatXXCtrl->SetValue(wxString() << mat.Get(0,0));
     mMatXYCtrl->SetValue(wxString() << mat.Get(0,1));

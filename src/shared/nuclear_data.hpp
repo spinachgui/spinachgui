@@ -2,6 +2,7 @@
 #define NUCLEAR_DATA_H
 
 #include <string>
+#include <shared/unit.hpp>
 
 struct Isotope;
 

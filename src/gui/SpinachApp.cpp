@@ -27,14 +27,6 @@ SpinachApp::~SpinachApp() {
 }
 
 bool SpinachApp::OnInit() {
-    //Test out the units system
-    energy p=1.0*Joule; // 1J
-    energy q=1.0*Joule; // 1J
-
-    energy s=p+q;
-
-    cout << "s=" << s[Hz] << "Hz" << endl;
-
     //Create the global selection manager
     mSelectionManager = new SelectionManager;
 

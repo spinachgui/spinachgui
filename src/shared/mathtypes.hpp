@@ -2,8 +2,10 @@
 #ifndef __MATHTYPES___H_
 #define __MATHTYPES___H_
 
+#include <cstring>
 #include <string>
 #include <cmath>
+#include <shared/unit.hpp>
 
 namespace SpinXML {
 
@@ -99,54 +101,348 @@ namespace SpinXML {
     };
     typedef Vector3_t<double> Vector3;
 
-    ///Class for storeing a 3x3 matrix.
+
+    ///Class for storeing a 3x3 matrix defined over a field of
+    ///double. Behaves as a value type, whihc is probably fine for an
+    ///object with only 9 floating point numbers. Obviously you'd want
+    ///to be cleverer if you wanted to scale this up.
     class Matrix3 {
     public:
+        typedef double field;
         ///Default constructor. Constructs the identity
-        Matrix3();
+        Matrix3() {
+            static const double IDENTITY3[]={1.0,0.0,0.0,
+                                             0.0,1.0,0.0,
+                                             0.0,0.0,1.0};
+            memcpy(raw,IDENTITY3,9*sizeof(field));
+        }
         ///Constructs a specific 3x3 matrix
-        Matrix3(double a00,double a01,double a02,
-                double a10,double a11,double a12,
-                double a20,double a21,double a22);
-        ///Copies the matrix
-        Matrix3(const Matrix3& m);
+        Matrix3(field a00,field a01,field a02,
+                field a10,field a11,field a12,
+                field a20,field a21,field a22) {
+            raw[0]=a00;   raw[1]=a01;   raw[2]=a02;
+            raw[3]=a10;   raw[4]=a11;   raw[5]=a12;
+            raw[6]=a20;   raw[7]=a21;   raw[8]=a22;
+        }
 
-        ///Print the matrix to the standard output in a human readable
-        ///format
-        void Dump() const;
+        ///Copies the matrix
+        Matrix3(const Matrix3& m) {
+            memcpy(raw,m.raw,9*sizeof(field));
+        }
 
         ///Get the trace of the matrix
-        double Trace() const {return raw[0]+raw[4]+raw[8];}
+        field Trace() const {return raw[0]+raw[4]+raw[8];}
 
         ///Get the transpose of the matrix
-        Matrix3 Transpose() const;
+        Matrix3 Transpose() const {
+            Matrix3 result;
+            result.raw[0]=raw[0];
+            result.raw[4]=raw[4];
+            result.raw[8]=raw[8];
+
+            result.raw[1]=raw[3];
+            result.raw[2]=raw[6];
+            result.raw[5]=raw[7];
+
+            result.raw[3]=raw[1];
+            result.raw[6]=raw[2];
+            result.raw[7]=raw[5];
+            return result;
+        }
+        ///Transpose the matrix in place
+        void Transposed() {
+            field one =raw[1];
+            field two =raw[2];
+            field five=raw[5];
+            raw[1]=raw[3];
+            raw[2]=raw[6];
+            raw[5]=raw[7];
+
+            raw[3]=raw[1];
+            raw[6]=raw[2];
+            raw[7]=raw[5];
+        }
     
         ///Get a pointer to the matrix in memory. The matrix is stored in
         ///row major form (GetRaw()[0]=a00,GetRaw()[1]=a01, etc.)
-        const double* GetRaw() const;
+        const field* GetRaw() const {return raw;}
     
         ///Get a specific value by row and column index.
-        double Get(long column, long row) const;
+        field Get(long column, long row) const {
+            return raw[3*column+row];
+        }
         ///Get a specific value by row and column
-        double operator() (long column, long row) const;
+        field operator() (long column, long row) const {
+            return raw[3*column+row];
+        }
         ///Add together two matricese in the standard fasion.
-        Matrix3 operator+ (const Matrix3& m) const;
+        Matrix3 operator+ (const Matrix3& m) const {
+            Matrix3 result;
+            result.raw[0]=raw[0]+m.raw[0];
+            result.raw[1]=raw[1]+m.raw[1];
+            result.raw[2]=raw[2]+m.raw[2];
+	      	     	       
+            result.raw[3]=raw[3]+m.raw[3];
+            result.raw[4]=raw[4]+m.raw[4];
+            result.raw[5]=raw[5]+m.raw[5];
+	      	     	       
+            result.raw[6]=raw[6]+m.raw[6];
+            result.raw[7]=raw[7]+m.raw[7];
+            result.raw[8]=raw[8]+m.raw[8];
+            return result;
+        }
         ///Multiply two matricese together
-        Matrix3 operator* (const Matrix3& m) const;
+        Matrix3 operator* (const Matrix3& m) const {
+            Matrix3 result;
+            result.raw[0]=raw[0]*m.raw[0] + raw[1]*m.raw[3] + raw[2]*m.raw[6];
+            result.raw[1]=raw[0]*m.raw[1] + raw[1]*m.raw[4] + raw[2]*m.raw[7];
+            result.raw[2]=raw[0]*m.raw[2] + raw[1]*m.raw[5] + raw[2]*m.raw[8];
+
+            result.raw[3]=raw[3]*m.raw[0] + raw[4]*m.raw[3] + raw[5]*m.raw[6];
+            result.raw[4]=raw[3]*m.raw[1] + raw[4]*m.raw[4] + raw[5]*m.raw[7];
+            result.raw[5]=raw[3]*m.raw[2] + raw[4]*m.raw[5] + raw[5]*m.raw[8];
+
+            result.raw[6]=raw[6]*m.raw[0] + raw[7]*m.raw[3] + raw[8]*m.raw[6];
+            result.raw[7]=raw[6]*m.raw[1] + raw[7]*m.raw[4] + raw[8]*m.raw[7];
+            result.raw[8]=raw[6]*m.raw[2] + raw[7]*m.raw[5] + raw[8]*m.raw[8];
+            return result;
+        }
         ///Multiply a matrix my a scalar
-        Matrix3 operator* (double s) const;
+        Matrix3 operator* (double s) const {
+            Matrix3 result;
+            result.raw[0]=raw[0]*s;
+            result.raw[1]=raw[1]*s;
+            result.raw[2]=raw[2]*s;
+              	    	 
+            result.raw[3]=raw[3]*s;
+            result.raw[4]=raw[4]*s;
+            result.raw[5]=raw[5]*s;
+              	        
+            result.raw[6]=raw[6]*s;
+            result.raw[7]=raw[7]*s;
+            result.raw[8]=raw[8]*s;
+            return result;
+        }
+        ///divide a matrix my a scalar
+        Matrix3 operator/ (double s) const {
+            double inv_s=1.0/s; 
+            Matrix3 result;
+            result.raw[0]=raw[0]*inv_s;
+            result.raw[1]=raw[1]*inv_s;
+            result.raw[2]=raw[2]*inv_s;
+              	    	 
+            result.raw[3]=raw[3]*inv_s;
+            result.raw[4]=raw[4]*inv_s;
+            result.raw[5]=raw[5]*inv_s;
+              	        
+            result.raw[6]=raw[6]*inv_s;
+            result.raw[7]=raw[7]*inv_s;
+            result.raw[8]=raw[8]*inv_s;
+            return result;
+        }
+        void Dump() const;
+
         ///Multiply a matrix my a scalar
-        Matrix3 operator*= (double s);
+        Matrix3 operator*= (double s) {
+            raw[0]=raw[0]*s;
+            raw[1]=raw[1]*s;
+            raw[2]=raw[2]*s;
+       	     	 
+            raw[3]=raw[3]*s;
+            raw[4]=raw[4]*s;
+            raw[5]=raw[5]*s;
+       	         
+            raw[6]=raw[6]*s;
+            raw[7]=raw[7]*s;
+            raw[8]=raw[8]*s;
+        }
         ///Add together two matricese in the standard fasion and set the
         ///value of the first to the result
-        Matrix3& operator+= (const Matrix3& m);
+        Matrix3& operator+= (const Matrix3& m) {
+            raw[0]=raw[0]+m.raw[0];
+            raw[1]=raw[1]+m.raw[1];
+            raw[2]=raw[2]+m.raw[2];
+       	     	       
+            raw[3]=raw[3]+m.raw[3];
+            raw[4]=raw[4]+m.raw[4];
+            raw[5]=raw[5]+m.raw[5];
+       	     	       
+            raw[6]=raw[6]+m.raw[6];
+            raw[7]=raw[7]+m.raw[7];
+            raw[8]=raw[8]+m.raw[8];
+            return *this;
+        }
         ///Set the value of one matrix to the value of the second.
-        Matrix3& operator= (const Matrix3& m);
+        Matrix3& operator= (const Matrix3& m) {
+            memcpy(raw,m.raw,9*sizeof(double));
+            return *this;
+        }
         ///Set a specific element to the value of val
-        void Set(long column,long row,double val);
+        void Set(long column,long row,field val) {
+            raw[3*column+row]=val;
+        }
     private:
-        double raw[9];
+        field raw[9];
     };
+
+
+    ///Class for storeing a 3x3 matrix defined over a field with known
+    ///units. Behaves as a value type, whihc is probably fine for an
+    ///object with only 9 floating point numbers. Obviously you'd want
+    ///to be cleverer if you wanted to scale this up.
+    template<int energy,int length>
+    class Matrix3_t {
+    public:
+        typedef ddouble<energy,length> field;
+        ///Default constructor. Constructs the identity
+        Matrix3_t() {
+            static const double IDENTITY3[]={1.0,0.0,0.0,
+                                             0.0,1.0,0.0,
+                                             0.0,0.0,1.0};
+            memcpy(raw,IDENTITY3,9*sizeof(field));
+        }
+        ///Constructs a specific 3x3 matrix
+        Matrix3_t(field a00,field a01,field a02,
+                  field a10,field a11,field a12,
+                  field a20,field a21,field a22) {
+            raw[0]=a00;   raw[1]=a01;   raw[2]=a02;
+            raw[3]=a10;   raw[4]=a11;   raw[5]=a12;
+            raw[6]=a20;   raw[7]=a21;   raw[8]=a22;
+        }
+
+        ///Copies the matrix
+        Matrix3_t(const Matrix3_t& m) {
+            memcpy(raw,m.raw,9*sizeof(field));
+        }
+
+        ///Get the trace of the matrix
+        field Trace() const {return raw[0]+raw[4]+raw[8];}
+
+        ///Get the transpose of the matrix
+        Matrix3_t Transpose() const {
+            Matrix3_t result;
+            result.raw[0]=raw[0];
+            result.raw[4]=raw[4];
+            result.raw[8]=raw[8];
+
+            result.raw[1]=raw[3];
+            result.raw[2]=raw[6];
+            result.raw[5]=raw[7];
+
+            result.raw[3]=raw[1];
+            result.raw[6]=raw[2];
+            result.raw[7]=raw[5];
+            return result;
+        }
+        ///Transpose the matrix in place
+        void Transposed() {
+            field one =raw[1];
+            field two =raw[2];
+            field five=raw[5];
+            raw[1]=raw[3];
+            raw[2]=raw[6];
+            raw[5]=raw[7];
+
+            raw[3]=raw[1];
+            raw[6]=raw[2];
+            raw[7]=raw[5];
+        }
+    
+        ///Get a pointer to the matrix in memory. The matrix is stored in
+        ///row major form (GetRaw()[0]=a00,GetRaw()[1]=a01, etc.)
+        const field* GetRaw() const {return raw;}
+    
+        ///Get a specific value by row and column index.
+        field Get(long column, long row) const {
+            return raw[3*column+row];
+        }
+        ///Get a specific value by row and column index.
+        field GetSI(long column, long row) const {
+            return raw[3*column+row].si;
+        }
+        ///Get a specific value by row and column
+        field operator() (long column, long row) const {
+            return raw[3*column+row];
+        }
+        ///Add together two matricese in the standard fasion.
+        Matrix3_t operator+ (const Matrix3_t& m) const {
+            Matrix3_t result;
+            result.raw[0]=raw[0]+m.raw[0];
+            result.raw[1]=raw[1]+m.raw[1];
+            result.raw[2]=raw[2]+m.raw[2];
+	      	     	       
+            result.raw[3]=raw[3]+m.raw[3];
+            result.raw[4]=raw[4]+m.raw[4];
+            result.raw[5]=raw[5]+m.raw[5];
+	      	     	       
+            result.raw[6]=raw[6]+m.raw[6];
+            result.raw[7]=raw[7]+m.raw[7];
+            result.raw[8]=raw[8]+m.raw[8];
+            return result;
+        }
+        ///Multiply two matricese together
+        template<int E,int L>
+        Matrix3_t<energy+E,length+L> operator* (const Matrix3_t<E,L>& m) const;
+        ///Multiply a matrix my a scalar
+        template<int E,int L>
+        Matrix3_t<energy+E,length+L> operator* (ddouble<E,L> s) const {
+            Matrix3_t<energy+E,length+L> result;
+            result.raw[0]=raw[0]*s;
+            result.raw[1]=raw[1]*s;
+            result.raw[2]=raw[2]*s;
+              	    	 
+            result.raw[3]=raw[3]*s;
+            result.raw[4]=raw[4]*s;
+            result.raw[5]=raw[5]*s;
+              	        
+            result.raw[6]=raw[6]*s;
+            result.raw[7]=raw[7]*s;
+            result.raw[8]=raw[8]*s;
+            return result;
+        }
+        ///Multiply a matrix my a scalar
+        Matrix3_t operator*= (double s) {
+            raw[0]=raw[0]*s;
+            raw[1]=raw[1]*s;
+            raw[2]=raw[2]*s;
+       	     	 
+            raw[3]=raw[3]*s;
+            raw[4]=raw[4]*s;
+            raw[5]=raw[5]*s;
+       	         
+            raw[6]=raw[6]*s;
+            raw[7]=raw[7]*s;
+            raw[8]=raw[8]*s;
+        }
+        ///Add together two matricese in the standard fasion and set the
+        ///value of the first to the result
+        Matrix3_t& operator+= (const Matrix3_t& m) {
+            raw[0]=raw[0]+m.raw[0];
+            raw[1]=raw[1]+m.raw[1];
+            raw[2]=raw[2]+m.raw[2];
+       	     	       
+            raw[3]=raw[3]+m.raw[3];
+            raw[4]=raw[4]+m.raw[4];
+            raw[5]=raw[5]+m.raw[5];
+       	     	       
+            raw[6]=raw[6]+m.raw[6];
+            raw[7]=raw[7]+m.raw[7];
+            raw[8]=raw[8]+m.raw[8];
+            return *this;
+        }
+        ///Set the value of one matrix to the value of the second.
+        Matrix3_t& operator= (const Matrix3_t& m) {
+            memcpy(raw,m.raw,9*sizeof(double));
+            return *this;
+        }
+        ///Set a specific element to the value of val
+        void Set(long column,long row,field val) {
+            raw[3*column+row]=val;
+        }
+    private:
+        field raw[9];
+    };
+
 
     ///Class for storeing a 4x4 matrix. Mostly used for graphics, but
     ///could be useful elsewhere...

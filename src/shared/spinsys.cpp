@@ -156,24 +156,29 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             Spin* spin2=mSpins[j]; 
 
             //A unit vector pointing from spin1 tp spin2
-            double rx,ry,rz;
+            length rx,ry,rz;
             Vector3l r_1_2=spin2->GetPosition()-spin1->GetPosition();
-            r_1_2.GetCoordinatesSI(&rx,&ry,&rz);
+            r_1_2.GetCoordinates(&rx,&ry,&rz);
 
             long element2=spin2->GetElement();
             long isotope2=spin2->GetIsotopes()[0];
             double g2=getGyromagneticRatio(element2,isotope2);
+            
+            cout << "isotope1=" << isotope1 << "  isotope2="<< isotope2 << endl;
+            cout << "g1="<< g1 << "  g2="<< g2 << endl;
 
-            double r=(r_1_2.length()).si;
-            double r2=r*r;
-            double r3=r2*r;
-            double r5=r2*r3;
+            length r=(r_1_2.length());
+            length2 r2=r*r;
+            length3 r3=r2*r;
+            length5 r5=r2*r3;
 
-            Matrix3 dipole(r2-3*rx*rx  ,3*rx*ry     ,3*rx*rz,
-                           3*rx*ry     ,r2-3*ry*ry  ,3*ry*rz,
-                           3*rx*rz     ,3*ry*rz     ,r2-3*rz*rz);
+            Matrix3 dipole((r2-3*rx*rx).si  ,(3*rx*ry).si     ,(3*rx*rz).si,
+                           (3*rx*ry).si     ,(r2-3*ry*ry).si  ,(3*ry*rz).si,
+                           (3*rx*rz).si     ,(3*ry*rz).si     ,(r2-3*rz*rz).si);
             static const double four_pi=12.5663706;
-            dipole=dipole * (mu0*hbar*g1*g2/(r5*four_pi));
+            double coeff=(mu0*hbar*g1*g2/(r5.si*four_pi));
+            cout << "coeff=" << coeff << endl;
+            dipole=dipole * coeff;
             Interaction* inter=new Interaction;
             inter->SetMatrix(dipole);
             inter->SetSubType(Interaction::ST_DIPOLAR,spin1,spin2);
@@ -188,6 +193,10 @@ void SpinSystem::CalcNuclearDipoleDipole() {
 
 Spin::Spin(Vector3l Position,string Label,long atomicNumber) 
     : mPosition(Position),mLabel(Label),mElement(atomicNumber) {
+    long isotope=getCommonIsotope(atomicNumber);
+    vector<long> isotopes;
+    isotopes.push_back(isotope);
+    mIsotopes=isotopes;
 }
 
 Spin::Spin(const Spin& s) :
@@ -368,9 +377,7 @@ void Spin::SetIsotopes(std::vector<long> isotopes) const {
 }
 
 vector<long> Spin::GetIsotopes() const {
-    vector<long> retVal;
-    retVal.push_back(1);
-    return retVal;
+    return mIsotopes;
 }
 
 

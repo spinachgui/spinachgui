@@ -125,6 +125,7 @@ struct castep : grammar<castep> {
                         throw runtime_error("Unknown Element "+getString(atom));
                     }
                     Spin* spin = new Spin(Vector3l(x,y,z),label,element);
+
                     spin_map[label]=spin;
                     ss->InsertSpin(spin);
                 } 
@@ -177,7 +178,7 @@ struct castep : grammar<castep> {
                 }
                 //Eigenvalues
                 energy xx,yy,zz;
-                energy_unit u = j->value.id()==total_tensorID ? Joule : MHz;
+                energy_unit u = j->value.id()==total_tensorID ? Joules : MHz;
                 xx[u] = getDouble(eigsys_xx->children.begin()+1);
                 yy[u] = getDouble(eigsys_yy->children.begin()+1);
                 zz[u] = getDouble(eigsys_zz->children.begin()+1);

@@ -166,8 +166,8 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             double g2=getGyromagneticRatio(element2,isotope2);
             if(abs(g2)<1e-10) continue;
             
-            cout << "isotope1=" << isotope1 << "  isotope2="<< isotope2 << endl;
-            cout << "g1="<< g1 << "  g2="<< g2 << endl;
+            //cout << "isotope1=" << isotope1 << "  isotope2="<< isotope2 << endl;
+            //cout << "g1="<< g1 << "  g2="<< g2 << endl;
 
             length r=(r_1_2.length());
             length2 r2=r*r;
@@ -179,7 +179,7 @@ void SpinSystem::CalcNuclearDipoleDipole() {
                            (3*rx*rz).si     ,(3*ry*rz).si     ,(r2-3*rz*rz).si);
             static const double four_pi=12.5663706;
             double coeff=(mu0*hbar*g1*g2/(r5.si*four_pi));
-            cout << "coeff=" << coeff << endl;
+            //cout << "coeff=" << coeff << endl;
             dipole=dipole * coeff;
             Interaction* inter=new Interaction;
             inter->SetMatrix(dipole);

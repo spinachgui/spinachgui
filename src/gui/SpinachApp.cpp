@@ -17,6 +17,8 @@
 
 #include <shared/unit.hpp>
 
+#include <dstegr.hpp>
+
 IMPLEMENT_APP(SpinachApp);
 
 SpinachApp::~SpinachApp() {
@@ -27,6 +29,8 @@ SpinachApp::~SpinachApp() {
 }
 
 bool SpinachApp::OnInit() {
+    
+
     //Create the global selection manager
     mSelectionManager = new SelectionManager;
 

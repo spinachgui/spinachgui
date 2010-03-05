@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(popi)
+enable_language(Fortran)
+
 
 ############################################################
 #Tell me what commands are being executed.
@@ -37,10 +39,7 @@ set(wxWidgets_USE_UNICODE,ON)
 set(wxWidgets_USE_UNIVERSAL,OFF)
 set(wxWidgets_USE_STATIC,ON)
 
-set(xsd xsdcxx)
-
 if(WIN32)
-  set(xsd xsd)
   include("windows-config.cmake")
 else()
   find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
@@ -51,26 +50,11 @@ endif()
 
 ############################################################
 #List of source files for all the targets
-set(guiSources "gui/SpinachApp.cpp")
-set(guiSources ${guiSources} "gui/Display3D.cpp")
-set(guiSources ${guiSources} "gui/MolSceneGraph.cpp")
-set(guiSources ${guiSources} "gui/InteractionEdit.cpp")
-set(guiSources ${guiSources} "gui/SpinInteractionEdit.cpp")
-set(guiSources ${guiSources} "gui/OrientationEdit.cpp")
-set(guiSources ${guiSources} "gui/SpinDialog.cpp")
-set(guiSources ${guiSources} "gui/SpinGrid.cpp")
-set(guiSources ${guiSources} "gui/SpinSysManager.cpp")
-set(guiSources ${guiSources} "gui/RootFrame.cpp")
-set(guiSources ${guiSources} "gui/RightClickMenu.cpp")
-set(guiSources ${guiSources} "gui/InterDisplaySettings.cpp")
-set(guiSources ${guiSources} "gui/LogSlider.cpp")
-set(guiSources ${guiSources} "auto/SpinachGUI.cpp")
 
-set(sharedSources "shared/nuclear_data.cpp")
-set(sharedSources ${sharedSources} "shared/spinsys.cpp")
-set(sharedSources ${sharedSources} "shared/mathtypes.cpp")
-#set(sharedSources ${sharedSources} "auto/spinxml_schema.cpp")
-set(sharedSources ${sharedSources} "shared/unit.cpp")
+file(GLOB lapackSources lapack/double/*.f)
+file(GLOB guiSources gui/*.cpp "auto/SpinachGUI.cpp")
+file(GLOB sharedSources shared/*.cpp)
+
 
 set(formatSources "shared/formats/xyz.cpp")
 set(formatSources ${formatSources} "shared/formats/g03.cpp")
@@ -78,18 +62,13 @@ set(formatSources ${formatSources} "shared/formats/g03.cpp")
 set(formatSources ${formatSources} "shared/formats/castep.cpp")
 set(formatSources ${formatSources} "shared/formats/simpson.cpp")
 
-set(pySources              "shared/spinsys.cpp")
-set(pySources ${pySources} "shared/swig/spinsys_wrap.cpp")
-set(pySources ${pySources} "shared/spinxml_schema.cpp")
+file(GLOB cmdSources commandln/*.cpp)
 
-set(nuclearSources  "shared/nuclear_data.cpp")
-set(nuclearSources ${nuclearSources} "shared/swig/nuclear_data_wrap.cpp")
-
-set(cmdSources "commandln/main.cpp")
 
 ############################################################
- #If you include via absolute paths, you can move source files about
- #more easily.
+# Link and include directories
+# If you include via absolute paths, you can move source files about
+# more easily.
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(SYSTEM ${wxWidgets_INCLUDE_DIRS})
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR})
@@ -100,24 +79,36 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 include_directories(SYSTEM /usr/include/sigc++-2.0)
 include_directories(SYSTEM /usr/lib/sigc++-2.0/include/)
 
-
-
 link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
+link_directories(/home/gareth/src/CLAPACK-3.2.1)
+link_directories(/home/gareth/src/CLAPACK-3.2.1/F2CLIBS)
+
+############################################################
+# Libary Targets
+
+add_library(lapack_sample STATIC ${lapackSources})
+add_library(spinxml STATIC       ${sharedSources} ${formatSources})
+
+
+############################################################
+# Targets are speicified here
 
 #command line exe
-set(spinachSources ${cmdSources} ${sharedSources} ${formatSources})
+set(spinachSources ${cmdSources})
 add_executable (spinach ${spinachSources})
 target_link_libraries (spinach xerces-c -lsigc-2.0) 
+target_link_libraries (spinach f2c) 
+target_link_libraries (spinach spinxml) 
 target_link_libraries(spinach ${Boost_LIBRARIES})
-
+target_link_libraries(spinach  lapack_LINUX)
 #C++ GUI
-set(wxSpinachSources ${guiSources} ${sharedSources} ${formatSources})
+set(wxSpinachSources ${guiSources})
 add_executable (wxSpinach ${wxSpinachSources})
 add_definitions(${wxWidgets_DEFINITIONS})
-target_link_libraries (wxSpinach ${wxWidgets_LIBRARIES}) 
-target_link_libraries (wxSpinach GL) 
-target_link_libraries (wxSpinach xerces-c -lsigc-2.0)
-target_link_libraries (wxSpinach ${Boost_LIBRARIES})
+target_link_libraries (wxSpinach 
+${wxWidgets_LIBRARIES}  ${Boost_LIBRARIES}
+GL spinxml f2c xerces-c sigc-2.0 lapack_LINUX
+)
 
 
 

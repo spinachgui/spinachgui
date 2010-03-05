@@ -6,6 +6,7 @@
 #include <string>
 #include <cmath>
 #include <shared/unit.hpp>
+#include <shared/dstegr.hpp>
 
 namespace SpinXML {
 

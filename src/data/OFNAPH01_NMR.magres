@@ -1,0 +1,1519 @@
+============
+Atom: C    1
+============
+C    1 Coordinates     -0.484    0.440    0.226   A
+
+TOTAL Shielding Tensor
+
+              29.9281     44.3415    -10.3291
+              41.7066     82.1269    -65.3290
+              -8.6519    -70.8078    103.6671
+
+C    1 Eigenvalue  sigma_xx      -3.3483 (ppm)
+C    1 Eigenvector sigma_xx       0.7091     -0.6218     -0.3326
+C    1 Eigenvalue  sigma_yy      48.1790 (ppm)
+C    1 Eigenvector sigma_yy       0.6594      0.4176      0.6251
+C    1 Eigenvalue  sigma_zz     170.8913 (ppm)
+C    1 Eigenvector sigma_zz      -0.2498     -0.6626      0.7061
+
+C    1 Isotropic:       71.9074 (ppm)
+C    1 Anisotropy:     148.4760 (ppm)
+C    1 Asymmetry:        0.5206
+
+============
+Atom: C    2
+============
+C    2 Coordinates     -0.166    1.371    1.205   A
+
+TOTAL Shielding Tensor
+
+              21.6043     10.6946    -10.8403
+              34.8632     23.0124    -39.3661
+              13.3669    -52.8797     36.9228
+
+C    2 Eigenvalue  sigma_xx     -24.1433 (ppm)
+C    2 Eigenvector sigma_xx      -0.3810      0.7340      0.5622
+C    2 Eigenvalue  sigma_yy      25.5662 (ppm)
+C    2 Eigenvector sigma_yy       0.8917      0.1311      0.4331
+C    2 Eigenvalue  sigma_zz      80.1167 (ppm)
+C    2 Eigenvector sigma_zz      -0.2442     -0.6664      0.7045
+
+C    2 Isotropic:       27.1799 (ppm)
+C    2 Anisotropy:      79.4052 (ppm)
+C    2 Asymmetry:        0.9390
+
+============
+Atom: C    3
+============
+C    3 Coordinates      1.119    1.421    1.732   A
+
+TOTAL Shielding Tensor
+
+              10.3006     24.3437     -5.5095
+              17.0556     33.2883    -43.6410
+             -10.5848    -47.1685     41.9001
+
+C    3 Eigenvalue  sigma_xx     -13.0927 (ppm)
+C    3 Eigenvector sigma_xx       0.4545     -0.7184     -0.5266
+C    3 Eigenvalue  sigma_yy      10.2468 (ppm)
+C    3 Eigenvector sigma_yy      -0.8550     -0.1860     -0.4842
+C    3 Eigenvalue  sigma_zz      88.3349 (ppm)
+C    3 Eigenvector sigma_zz      -0.2499     -0.6703      0.6987
+
+C    3 Isotropic:       28.4963 (ppm)
+C    3 Anisotropy:      89.7579 (ppm)
+C    3 Asymmetry:        0.3900
+
+============
+Atom: C    4
+============
+C    4 Coordinates      2.094    0.540    1.267   A
+
+TOTAL Shielding Tensor
+
+              -4.0400     21.4206    -13.9568
+              26.8233     38.5677    -34.8318
+              -7.4524    -40.1658     48.1692
+
+C    4 Eigenvalue  sigma_xx     -15.6993 (ppm)
+C    4 Eigenvector sigma_xx       0.8669     -0.4795     -0.1362
+C    4 Eigenvalue  sigma_yy      10.8451 (ppm)
+C    4 Eigenvector sigma_yy       0.4271      0.5737      0.6989
+C    4 Eigenvalue  sigma_zz      87.5512 (ppm)
+C    4 Eigenvector sigma_zz      -0.2570     -0.6641      0.7021
+
+C    4 Isotropic:       27.5657 (ppm)
+C    4 Anisotropy:      89.9784 (ppm)
+C    4 Asymmetry:        0.4425
+
+============
+Atom: C    5
+============
+C    5 Coordinates     -1.776    0.395   -0.288   A
+
+TOTAL Shielding Tensor
+
+             -13.1460     40.1330      4.4464
+              16.6243     40.6564    -28.7253
+             -19.6640    -22.0422     52.7448
+
+C    5 Eigenvalue  sigma_xx     -25.4804 (ppm)
+C    5 Eigenvector sigma_xx       0.9119     -0.4081     -0.0437
+C    5 Eigenvalue  sigma_yy      26.5650 (ppm)
+C    5 Eigenvector sigma_yy       0.3172      0.6331      0.7061
+C    5 Eigenvalue  sigma_zz      79.1706 (ppm)
+C    5 Eigenvector sigma_zz      -0.2604     -0.6577      0.7068
+
+C    5 Isotropic:       26.7517 (ppm)
+C    5 Anisotropy:      78.6283 (ppm)
+C    5 Asymmetry:        0.9929
+
+============
+Atom: C    6
+============
+C    6 Coordinates      0.484    2.941    5.758   A
+
+TOTAL Shielding Tensor
+
+              29.9281    -44.3415    -10.3291
+             -41.7066     82.1269     65.3290
+              -8.6519     70.8078    103.6671
+
+C    6 Eigenvalue  sigma_xx      -3.3483 (ppm)
+C    6 Eigenvector sigma_xx      -0.7091     -0.6218      0.3326
+C    6 Eigenvalue  sigma_yy      48.1790 (ppm)
+C    6 Eigenvector sigma_yy       0.6594     -0.4176      0.6251
+C    6 Eigenvalue  sigma_zz     170.8913 (ppm)
+C    6 Eigenvector sigma_zz      -0.2498      0.6626      0.7061
+
+C    6 Isotropic:       71.9074 (ppm)
+C    6 Anisotropy:     148.4760 (ppm)
+C    6 Asymmetry:        0.5206
+
+============
+Atom: C    7
+============
+C    7 Coordinates      0.166    3.872    4.779   A
+
+TOTAL Shielding Tensor
+
+              21.6043    -10.6946    -10.8403
+             -34.8632     23.0124     39.3661
+              13.3669     52.8797     36.9228
+
+C    7 Eigenvalue  sigma_xx     -24.1433 (ppm)
+C    7 Eigenvector sigma_xx       0.3810      0.7340     -0.5622
+C    7 Eigenvalue  sigma_yy      25.5662 (ppm)
+C    7 Eigenvector sigma_yy       0.8917     -0.1311      0.4331
+C    7 Eigenvalue  sigma_zz      80.1167 (ppm)
+C    7 Eigenvector sigma_zz      -0.2442      0.6664      0.7045
+
+C    7 Isotropic:       27.1799 (ppm)
+C    7 Anisotropy:      79.4052 (ppm)
+C    7 Asymmetry:        0.9390
+
+============
+Atom: C    8
+============
+C    8 Coordinates     -1.119    3.922    4.252   A
+
+TOTAL Shielding Tensor
+
+              10.3006    -24.3437     -5.5095
+             -17.0556     33.2883     43.6410
+             -10.5848     47.1685     41.9001
+
+C    8 Eigenvalue  sigma_xx     -13.0927 (ppm)
+C    8 Eigenvector sigma_xx       0.4545      0.7184     -0.5266
+C    8 Eigenvalue  sigma_yy      10.2468 (ppm)
+C    8 Eigenvector sigma_yy       0.8550     -0.1860      0.4842
+C    8 Eigenvalue  sigma_zz      88.3349 (ppm)
+C    8 Eigenvector sigma_zz      -0.2499      0.6703      0.6987
+
+C    8 Isotropic:       28.4963 (ppm)
+C    8 Anisotropy:      89.7579 (ppm)
+C    8 Asymmetry:        0.3900
+
+============
+Atom: C    9
+============
+C    9 Coordinates     -2.094    3.041    4.717   A
+
+TOTAL Shielding Tensor
+
+              -4.0400    -21.4206    -13.9568
+             -26.8233     38.5677     34.8318
+              -7.4524     40.1658     48.1692
+
+C    9 Eigenvalue  sigma_xx     -15.6993 (ppm)
+C    9 Eigenvector sigma_xx       0.8669      0.4795     -0.1362
+C    9 Eigenvalue  sigma_yy      10.8451 (ppm)
+C    9 Eigenvector sigma_yy      -0.4271      0.5737     -0.6989
+C    9 Eigenvalue  sigma_zz      87.5512 (ppm)
+C    9 Eigenvector sigma_zz      -0.2570      0.6641      0.7021
+
+C    9 Isotropic:       27.5657 (ppm)
+C    9 Anisotropy:      89.9784 (ppm)
+C    9 Asymmetry:        0.4425
+
+============
+Atom: C   10
+============
+C   10 Coordinates      1.776    2.896    6.272   A
+
+TOTAL Shielding Tensor
+
+             -13.1460    -40.1330      4.4464
+             -16.6243     40.6564     28.7253
+             -19.6640     22.0422     52.7448
+
+C   10 Eigenvalue  sigma_xx     -25.4804 (ppm)
+C   10 Eigenvector sigma_xx       0.9119      0.4081     -0.0437
+C   10 Eigenvalue  sigma_yy      26.5650 (ppm)
+C   10 Eigenvector sigma_yy      -0.3172      0.6331     -0.7061
+C   10 Eigenvalue  sigma_zz      79.1706 (ppm)
+C   10 Eigenvector sigma_zz      -0.2604      0.6577      0.7068
+
+C   10 Isotropic:       26.7517 (ppm)
+C   10 Anisotropy:      78.6283 (ppm)
+C   10 Asymmetry:        0.9929
+
+============
+Atom: C   11
+============
+C   11 Coordinates      0.484   -0.440   -0.226   A
+
+TOTAL Shielding Tensor
+
+              29.9281     44.3415    -10.3291
+              41.7066     82.1269    -65.3290
+              -8.6519    -70.8078    103.6671
+
+C   11 Eigenvalue  sigma_xx      -3.3483 (ppm)
+C   11 Eigenvector sigma_xx       0.7091     -0.6218     -0.3326
+C   11 Eigenvalue  sigma_yy      48.1790 (ppm)
+C   11 Eigenvector sigma_yy       0.6594      0.4176      0.6251
+C   11 Eigenvalue  sigma_zz     170.8913 (ppm)
+C   11 Eigenvector sigma_zz      -0.2498     -0.6626      0.7061
+
+C   11 Isotropic:       71.9074 (ppm)
+C   11 Anisotropy:     148.4760 (ppm)
+C   11 Asymmetry:        0.5206
+
+============
+Atom: C   12
+============
+C   12 Coordinates      0.166   -1.371   -1.205   A
+
+TOTAL Shielding Tensor
+
+              21.6043     10.6946    -10.8403
+              34.8632     23.0124    -39.3661
+              13.3669    -52.8797     36.9228
+
+C   12 Eigenvalue  sigma_xx     -24.1433 (ppm)
+C   12 Eigenvector sigma_xx      -0.3810      0.7340      0.5622
+C   12 Eigenvalue  sigma_yy      25.5662 (ppm)
+C   12 Eigenvector sigma_yy       0.8917      0.1311      0.4331
+C   12 Eigenvalue  sigma_zz      80.1167 (ppm)
+C   12 Eigenvector sigma_zz      -0.2442     -0.6664      0.7045
+
+C   12 Isotropic:       27.1799 (ppm)
+C   12 Anisotropy:      79.4052 (ppm)
+C   12 Asymmetry:        0.9390
+
+============
+Atom: C   13
+============
+C   13 Coordinates     -1.119   -1.421   -1.732   A
+
+TOTAL Shielding Tensor
+
+              10.3006     24.3437     -5.5095
+              17.0556     33.2883    -43.6410
+             -10.5848    -47.1685     41.9001
+
+C   13 Eigenvalue  sigma_xx     -13.0927 (ppm)
+C   13 Eigenvector sigma_xx       0.4545     -0.7184     -0.5266
+C   13 Eigenvalue  sigma_yy      10.2468 (ppm)
+C   13 Eigenvector sigma_yy      -0.8550     -0.1860     -0.4842
+C   13 Eigenvalue  sigma_zz      88.3349 (ppm)
+C   13 Eigenvector sigma_zz      -0.2499     -0.6703      0.6987
+
+C   13 Isotropic:       28.4963 (ppm)
+C   13 Anisotropy:      89.7579 (ppm)
+C   13 Asymmetry:        0.3900
+
+============
+Atom: C   14
+============
+C   14 Coordinates     -2.094   -0.540   -1.267   A
+
+TOTAL Shielding Tensor
+
+              -4.0400     21.4206    -13.9568
+              26.8233     38.5677    -34.8318
+              -7.4524    -40.1658     48.1692
+
+C   14 Eigenvalue  sigma_xx     -15.6993 (ppm)
+C   14 Eigenvector sigma_xx       0.8669     -0.4795     -0.1362
+C   14 Eigenvalue  sigma_yy      10.8451 (ppm)
+C   14 Eigenvector sigma_yy       0.4271      0.5737      0.6989
+C   14 Eigenvalue  sigma_zz      87.5512 (ppm)
+C   14 Eigenvector sigma_zz      -0.2570     -0.6641      0.7021
+
+C   14 Isotropic:       27.5657 (ppm)
+C   14 Anisotropy:      89.9784 (ppm)
+C   14 Asymmetry:        0.4425
+
+============
+Atom: C   15
+============
+C   15 Coordinates      1.776   -0.395    0.288   A
+
+TOTAL Shielding Tensor
+
+             -13.1460     40.1330      4.4464
+              16.6243     40.6564    -28.7253
+             -19.6640    -22.0422     52.7448
+
+C   15 Eigenvalue  sigma_xx     -25.4804 (ppm)
+C   15 Eigenvector sigma_xx       0.9119     -0.4081     -0.0437
+C   15 Eigenvalue  sigma_yy      26.5650 (ppm)
+C   15 Eigenvector sigma_yy       0.3172      0.6331      0.7061
+C   15 Eigenvalue  sigma_zz      79.1706 (ppm)
+C   15 Eigenvector sigma_zz      -0.2604     -0.6577      0.7068
+
+C   15 Isotropic:       26.7517 (ppm)
+C   15 Anisotropy:      78.6283 (ppm)
+C   15 Asymmetry:        0.9929
+
+============
+Atom: C   16
+============
+C   16 Coordinates     -0.484    2.061    6.210   A
+
+TOTAL Shielding Tensor
+
+              29.9281    -44.3415    -10.3291
+             -41.7066     82.1269     65.3290
+              -8.6519     70.8078    103.6671
+
+C   16 Eigenvalue  sigma_xx      -3.3483 (ppm)
+C   16 Eigenvector sigma_xx      -0.7091     -0.6218      0.3326
+C   16 Eigenvalue  sigma_yy      48.1790 (ppm)
+C   16 Eigenvector sigma_yy       0.6594     -0.4176      0.6251
+C   16 Eigenvalue  sigma_zz     170.8913 (ppm)
+C   16 Eigenvector sigma_zz      -0.2498      0.6626      0.7061
+
+C   16 Isotropic:       71.9074 (ppm)
+C   16 Anisotropy:     148.4760 (ppm)
+C   16 Asymmetry:        0.5206
+
+============
+Atom: C   17
+============
+C   17 Coordinates     -0.166    1.130    7.189   A
+
+TOTAL Shielding Tensor
+
+              21.6043    -10.6946    -10.8403
+             -34.8632     23.0124     39.3661
+              13.3669     52.8797     36.9228
+
+C   17 Eigenvalue  sigma_xx     -24.1433 (ppm)
+C   17 Eigenvector sigma_xx       0.3810      0.7340     -0.5622
+C   17 Eigenvalue  sigma_yy      25.5662 (ppm)
+C   17 Eigenvector sigma_yy       0.8917     -0.1311      0.4331
+C   17 Eigenvalue  sigma_zz      80.1167 (ppm)
+C   17 Eigenvector sigma_zz      -0.2442      0.6664      0.7045
+
+C   17 Isotropic:       27.1799 (ppm)
+C   17 Anisotropy:      79.4052 (ppm)
+C   17 Asymmetry:        0.9390
+
+============
+Atom: C   18
+============
+C   18 Coordinates      1.119    1.080    7.716   A
+
+TOTAL Shielding Tensor
+
+              10.3006    -24.3437     -5.5095
+             -17.0556     33.2883     43.6410
+             -10.5848     47.1685     41.9001
+
+C   18 Eigenvalue  sigma_xx     -13.0927 (ppm)
+C   18 Eigenvector sigma_xx       0.4545      0.7184     -0.5266
+C   18 Eigenvalue  sigma_yy      10.2468 (ppm)
+C   18 Eigenvector sigma_yy       0.8550     -0.1860      0.4842
+C   18 Eigenvalue  sigma_zz      88.3349 (ppm)
+C   18 Eigenvector sigma_zz      -0.2499      0.6703      0.6987
+
+C   18 Isotropic:       28.4963 (ppm)
+C   18 Anisotropy:      89.7579 (ppm)
+C   18 Asymmetry:        0.3900
+
+============
+Atom: C   19
+============
+C   19 Coordinates      2.094    1.961    7.251   A
+
+TOTAL Shielding Tensor
+
+              -4.0400    -21.4206    -13.9568
+             -26.8233     38.5677     34.8318
+              -7.4524     40.1658     48.1692
+
+C   19 Eigenvalue  sigma_xx     -15.6993 (ppm)
+C   19 Eigenvector sigma_xx       0.8669      0.4795     -0.1362
+C   19 Eigenvalue  sigma_yy      10.8451 (ppm)
+C   19 Eigenvector sigma_yy      -0.4271      0.5737     -0.6989
+C   19 Eigenvalue  sigma_zz      87.5512 (ppm)
+C   19 Eigenvector sigma_zz      -0.2570      0.6641      0.7021
+
+C   19 Isotropic:       27.5657 (ppm)
+C   19 Anisotropy:      89.9784 (ppm)
+C   19 Asymmetry:        0.4425
+
+============
+Atom: C   20
+============
+C   20 Coordinates     -1.776    2.106    5.696   A
+
+TOTAL Shielding Tensor
+
+             -13.1460    -40.1330      4.4464
+             -16.6243     40.6564     28.7253
+             -19.6640     22.0422     52.7448
+
+C   20 Eigenvalue  sigma_xx     -25.4804 (ppm)
+C   20 Eigenvector sigma_xx       0.9119      0.4081     -0.0437
+C   20 Eigenvalue  sigma_yy      26.5650 (ppm)
+C   20 Eigenvector sigma_yy      -0.3172      0.6331     -0.7061
+C   20 Eigenvalue  sigma_zz      79.1706 (ppm)
+C   20 Eigenvector sigma_zz      -0.2604      0.6577      0.7068
+
+C   20 Isotropic:       26.7517 (ppm)
+C   20 Anisotropy:      78.6283 (ppm)
+C   20 Asymmetry:        0.9929
+
+============
+Atom: F    1
+============
+F    1 Coordinates     -1.073    2.196    1.650   A
+
+TOTAL Shielding Tensor
+
+             251.2410     61.8834    -23.8901
+              40.4538    323.8008   -113.1125
+             -35.9516   -112.7764    349.8032
+
+F    1 Eigenvalue  sigma_xx     210.8076 (ppm)
+F    1 Eigenvector sigma_xx       0.5536     -0.7007     -0.4502
+F    1 Eigenvalue  sigma_yy     248.6061 (ppm)
+F    1 Eigenvector sigma_yy       0.7925      0.2769      0.5434
+F    1 Eigenvalue  sigma_zz     465.4313 (ppm)
+F    1 Eigenvector sigma_zz      -0.2561     -0.6576      0.7086
+
+F    1 Isotropic:      308.2817 (ppm)
+F    1 Anisotropy:     235.7245 (ppm)
+F    1 Asymmetry:        0.2405
+
+============
+Atom: F    2
+============
+F    2 Coordinates      1.421    2.291    2.653   A
+
+TOTAL Shielding Tensor
+
+             273.5406     31.4924    -42.4095
+              28.9273    333.3411   -110.9622
+             -41.5847   -116.2701    348.3806
+
+F    2 Eigenvalue  sigma_xx     225.7790 (ppm)
+F    2 Eigenvector sigma_xx       0.1800      0.6900      0.7011
+F    2 Eigenvalue  sigma_yy     261.2265 (ppm)
+F    2 Eigenvector sigma_yy       0.9500     -0.3067      0.0579
+F    2 Eigenvalue  sigma_zz     468.2567 (ppm)
+F    2 Eigenvector sigma_zz      -0.2550     -0.6556      0.7107
+
+F    2 Isotropic:      318.4208 (ppm)
+F    2 Anisotropy:     224.7539 (ppm)
+F    2 Asymmetry:        0.2366
+
+============
+Atom: F    3
+============
+F    3 Coordinates      3.295    0.580    1.755   A
+
+TOTAL Shielding Tensor
+
+             234.0054     37.0569    -51.9944
+              39.4838    345.4558   -101.9298
+             -52.3509   -102.4254    358.8605
+
+F    3 Eigenvalue  sigma_xx     215.0525 (ppm)
+F    3 Eigenvector sigma_xx       0.9443     -0.0196      0.3286
+F    3 Eigenvalue  sigma_yy     251.3484 (ppm)
+F    3 Eigenvector sigma_yy      -0.2007      0.7569      0.6219
+F    3 Eigenvalue  sigma_zz     471.9208 (ppm)
+F    3 Eigenvector sigma_zz      -0.2609     -0.6532      0.7108
+
+F    3 Isotropic:      312.7739 (ppm)
+F    3 Anisotropy:     238.7203 (ppm)
+F    3 Asymmetry:        0.2281
+
+============
+Atom: F    4
+============
+F    4 Coordinates     -2.683    1.215    0.145   A
+
+TOTAL Shielding Tensor
+
+             233.2897     50.1801    -39.9732
+              67.4036    330.6868    -99.6113
+             -25.7312   -110.8675    357.0860
+
+F    4 Eigenvalue  sigma_xx     202.7317 (ppm)
+F    4 Eigenvector sigma_xx       0.8243     -0.5338     -0.1885
+F    4 Eigenvalue  sigma_yy     250.9741 (ppm)
+F    4 Eigenvector sigma_yy       0.5007      0.5321      0.6828
+F    4 Eigenvalue  sigma_zz     467.3567 (ppm)
+F    4 Eigenvector sigma_zz      -0.2642     -0.6572      0.7059
+
+F    4 Isotropic:      307.0208 (ppm)
+F    4 Anisotropy:     240.5038 (ppm)
+F    4 Asymmetry:        0.3009
+
+============
+Atom: F    5
+============
+F    5 Coordinates      1.073    4.697    4.334   A
+
+TOTAL Shielding Tensor
+
+             251.2410    -61.8834    -23.8901
+             -40.4538    323.8008    113.1125
+             -35.9516    112.7764    349.8032
+
+F    5 Eigenvalue  sigma_xx     210.8076 (ppm)
+F    5 Eigenvector sigma_xx      -0.5536     -0.7007      0.4502
+F    5 Eigenvalue  sigma_yy     248.6061 (ppm)
+F    5 Eigenvector sigma_yy       0.7925     -0.2769      0.5434
+F    5 Eigenvalue  sigma_zz     465.4313 (ppm)
+F    5 Eigenvector sigma_zz      -0.2561      0.6576      0.7086
+
+F    5 Isotropic:      308.2817 (ppm)
+F    5 Anisotropy:     235.7245 (ppm)
+F    5 Asymmetry:        0.2405
+
+============
+Atom: F    6
+============
+F    6 Coordinates     -1.421    4.792    3.331   A
+
+TOTAL Shielding Tensor
+
+             273.5406    -31.4924    -42.4095
+             -28.9273    333.3411    110.9622
+             -41.5847    116.2701    348.3806
+
+F    6 Eigenvalue  sigma_xx     225.7790 (ppm)
+F    6 Eigenvector sigma_xx      -0.1800      0.6900     -0.7011
+F    6 Eigenvalue  sigma_yy     261.2265 (ppm)
+F    6 Eigenvector sigma_yy       0.9500      0.3067      0.0579
+F    6 Eigenvalue  sigma_zz     468.2567 (ppm)
+F    6 Eigenvector sigma_zz      -0.2550      0.6556      0.7107
+
+F    6 Isotropic:      318.4208 (ppm)
+F    6 Anisotropy:     224.7539 (ppm)
+F    6 Asymmetry:        0.2366
+
+============
+Atom: F    7
+============
+F    7 Coordinates     -3.295    3.081    4.229   A
+
+TOTAL Shielding Tensor
+
+             234.0054    -37.0569    -51.9944
+             -39.4838    345.4558    101.9298
+             -52.3509    102.4254    358.8605
+
+F    7 Eigenvalue  sigma_xx     215.0525 (ppm)
+F    7 Eigenvector sigma_xx       0.9443      0.0196      0.3286
+F    7 Eigenvalue  sigma_yy     251.3484 (ppm)
+F    7 Eigenvector sigma_yy       0.2007      0.7569     -0.6219
+F    7 Eigenvalue  sigma_zz     471.9208 (ppm)
+F    7 Eigenvector sigma_zz      -0.2609      0.6532      0.7108
+
+F    7 Isotropic:      312.7739 (ppm)
+F    7 Anisotropy:     238.7203 (ppm)
+F    7 Asymmetry:        0.2281
+
+============
+Atom: F    8
+============
+F    8 Coordinates      2.683    3.716    5.839   A
+
+TOTAL Shielding Tensor
+
+             233.2897    -50.1801    -39.9732
+             -67.4036    330.6868     99.6113
+             -25.7312    110.8675    357.0860
+
+F    8 Eigenvalue  sigma_xx     202.7317 (ppm)
+F    8 Eigenvector sigma_xx       0.8243      0.5338     -0.1885
+F    8 Eigenvalue  sigma_yy     250.9741 (ppm)
+F    8 Eigenvector sigma_yy      -0.5007      0.5321     -0.6828
+F    8 Eigenvalue  sigma_zz     467.3567 (ppm)
+F    8 Eigenvector sigma_zz      -0.2642      0.6572      0.7059
+
+F    8 Isotropic:      307.0208 (ppm)
+F    8 Anisotropy:     240.5038 (ppm)
+F    8 Asymmetry:        0.3009
+
+============
+Atom: F    9
+============
+F    9 Coordinates      1.073   -2.196   -1.650   A
+
+TOTAL Shielding Tensor
+
+             251.2410     61.8834    -23.8901
+              40.4538    323.8008   -113.1125
+             -35.9516   -112.7764    349.8032
+
+F    9 Eigenvalue  sigma_xx     210.8076 (ppm)
+F    9 Eigenvector sigma_xx       0.5536     -0.7007     -0.4502
+F    9 Eigenvalue  sigma_yy     248.6061 (ppm)
+F    9 Eigenvector sigma_yy       0.7925      0.2769      0.5434
+F    9 Eigenvalue  sigma_zz     465.4313 (ppm)
+F    9 Eigenvector sigma_zz      -0.2561     -0.6576      0.7086
+
+F    9 Isotropic:      308.2817 (ppm)
+F    9 Anisotropy:     235.7245 (ppm)
+F    9 Asymmetry:        0.2405
+
+============
+Atom: F   10
+============
+F   10 Coordinates     -1.421   -2.291   -2.653   A
+
+TOTAL Shielding Tensor
+
+             273.5406     31.4924    -42.4095
+              28.9273    333.3411   -110.9622
+             -41.5847   -116.2701    348.3806
+
+F   10 Eigenvalue  sigma_xx     225.7790 (ppm)
+F   10 Eigenvector sigma_xx       0.1800      0.6900      0.7011
+F   10 Eigenvalue  sigma_yy     261.2265 (ppm)
+F   10 Eigenvector sigma_yy       0.9500     -0.3067      0.0579
+F   10 Eigenvalue  sigma_zz     468.2567 (ppm)
+F   10 Eigenvector sigma_zz      -0.2550     -0.6556      0.7107
+
+F   10 Isotropic:      318.4208 (ppm)
+F   10 Anisotropy:     224.7539 (ppm)
+F   10 Asymmetry:        0.2366
+
+============
+Atom: F   11
+============
+F   11 Coordinates     -3.295   -0.580   -1.755   A
+
+TOTAL Shielding Tensor
+
+             234.0054     37.0569    -51.9944
+              39.4838    345.4558   -101.9298
+             -52.3509   -102.4254    358.8605
+
+F   11 Eigenvalue  sigma_xx     215.0525 (ppm)
+F   11 Eigenvector sigma_xx       0.9443     -0.0196      0.3286
+F   11 Eigenvalue  sigma_yy     251.3484 (ppm)
+F   11 Eigenvector sigma_yy      -0.2007      0.7569      0.6219
+F   11 Eigenvalue  sigma_zz     471.9208 (ppm)
+F   11 Eigenvector sigma_zz      -0.2609     -0.6532      0.7108
+
+F   11 Isotropic:      312.7739 (ppm)
+F   11 Anisotropy:     238.7203 (ppm)
+F   11 Asymmetry:        0.2281
+
+============
+Atom: F   12
+============
+F   12 Coordinates      2.683   -1.215   -0.145   A
+
+TOTAL Shielding Tensor
+
+             233.2897     50.1801    -39.9732
+              67.4036    330.6868    -99.6113
+             -25.7312   -110.8675    357.0860
+
+F   12 Eigenvalue  sigma_xx     202.7317 (ppm)
+F   12 Eigenvector sigma_xx       0.8243     -0.5338     -0.1885
+F   12 Eigenvalue  sigma_yy     250.9741 (ppm)
+F   12 Eigenvector sigma_yy       0.5007      0.5321      0.6828
+F   12 Eigenvalue  sigma_zz     467.3567 (ppm)
+F   12 Eigenvector sigma_zz      -0.2642     -0.6572      0.7059
+
+F   12 Isotropic:      307.0208 (ppm)
+F   12 Anisotropy:     240.5038 (ppm)
+F   12 Asymmetry:        0.3009
+
+============
+Atom: F   13
+============
+F   13 Coordinates     -1.073    0.305    7.634   A
+
+TOTAL Shielding Tensor
+
+             251.2410    -61.8834    -23.8901
+             -40.4538    323.8008    113.1125
+             -35.9516    112.7764    349.8032
+
+F   13 Eigenvalue  sigma_xx     210.8076 (ppm)
+F   13 Eigenvector sigma_xx      -0.5536     -0.7007      0.4502
+F   13 Eigenvalue  sigma_yy     248.6061 (ppm)
+F   13 Eigenvector sigma_yy       0.7925     -0.2769      0.5434
+F   13 Eigenvalue  sigma_zz     465.4313 (ppm)
+F   13 Eigenvector sigma_zz      -0.2561      0.6576      0.7086
+
+F   13 Isotropic:      308.2817 (ppm)
+F   13 Anisotropy:     235.7245 (ppm)
+F   13 Asymmetry:        0.2405
+
+============
+Atom: F   14
+============
+F   14 Coordinates      1.421    0.210    8.637   A
+
+TOTAL Shielding Tensor
+
+             273.5406    -31.4924    -42.4095
+             -28.9273    333.3411    110.9622
+             -41.5847    116.2701    348.3806
+
+F   14 Eigenvalue  sigma_xx     225.7790 (ppm)
+F   14 Eigenvector sigma_xx      -0.1800      0.6900     -0.7011
+F   14 Eigenvalue  sigma_yy     261.2265 (ppm)
+F   14 Eigenvector sigma_yy       0.9500      0.3067      0.0579
+F   14 Eigenvalue  sigma_zz     468.2567 (ppm)
+F   14 Eigenvector sigma_zz      -0.2550      0.6556      0.7107
+
+F   14 Isotropic:      318.4208 (ppm)
+F   14 Anisotropy:     224.7539 (ppm)
+F   14 Asymmetry:        0.2366
+
+============
+Atom: F   15
+============
+F   15 Coordinates      3.295    1.921    7.739   A
+
+TOTAL Shielding Tensor
+
+             234.0054    -37.0569    -51.9944
+             -39.4838    345.4558    101.9298
+             -52.3509    102.4254    358.8605
+
+F   15 Eigenvalue  sigma_xx     215.0525 (ppm)
+F   15 Eigenvector sigma_xx       0.9443      0.0196      0.3286
+F   15 Eigenvalue  sigma_yy     251.3484 (ppm)
+F   15 Eigenvector sigma_yy       0.2007      0.7569     -0.6219
+F   15 Eigenvalue  sigma_zz     471.9208 (ppm)
+F   15 Eigenvector sigma_zz      -0.2609      0.6532      0.7108
+
+F   15 Isotropic:      312.7739 (ppm)
+F   15 Anisotropy:     238.7203 (ppm)
+F   15 Asymmetry:        0.2281
+
+============
+Atom: F   16
+============
+F   16 Coordinates     -2.683    1.286    6.129   A
+
+TOTAL Shielding Tensor
+
+             233.2897    -50.1801    -39.9732
+             -67.4036    330.6868     99.6113
+             -25.7312    110.8675    357.0860
+
+F   16 Eigenvalue  sigma_xx     202.7317 (ppm)
+F   16 Eigenvector sigma_xx       0.8243      0.5338     -0.1885
+F   16 Eigenvalue  sigma_yy     250.9741 (ppm)
+F   16 Eigenvector sigma_yy      -0.5007      0.5321     -0.6828
+F   16 Eigenvalue  sigma_zz     467.3567 (ppm)
+F   16 Eigenvector sigma_zz      -0.2642      0.6572      0.7059
+
+F   16 Isotropic:      307.0208 (ppm)
+F   16 Anisotropy:     240.5038 (ppm)
+F   16 Asymmetry:        0.3009
+
+==========================================================================
+  Using the following values of the electric quadrupole moment            
+  C  User defined.           Q =    1.0000 Barn
+  F  User defined.           Q =    1.0000 Barn
+==========================================================================
+
+============
+Atom: C    1
+============
+C    1 Coordinates     -0.484    0.440    0.226   A
+
+TOTAL tensor
+
+              -0.0759      0.0503     -0.0465
+               0.0503      0.0312     -0.1306
+              -0.0465     -0.1306      0.0447
+
+C    1 Eigenvalue  V_xx      -0.0889      
+C    1 Eigenvector V_xx       0.6530      0.4154      0.6333
+C    1 Eigenvalue  V_yy      -0.0976      
+C    1 Eigenvector V_yy      -0.7142      0.6161      0.3323
+C    1 Eigenvalue  V_zz       0.1866      
+C    1 Eigenvector V_zz      -0.2521     -0.6693      0.6989
+
+C    1 Cq:       43.8329 (MHz)
+C    1 Eta:       0.0469
+============
+Atom: C    2
+============
+C    2 Coordinates     -0.166    1.371    1.205   A
+
+TOTAL tensor
+
+               0.0533     -0.2821     -0.2339
+              -0.2821      0.0690      0.0020
+              -0.2339      0.0020     -0.1223
+
+C    2 Eigenvalue  V_xx      -0.0401      
+C    2 Eigenvector V_xx       0.2526      0.6658     -0.7021
+C    2 Eigenvalue  V_yy      -0.3599      
+C    2 Eigenvector V_yy       0.6475      0.4229      0.6339
+C    2 Eigenvalue  V_zz       0.4000      
+C    2 Eigenvector V_zz       0.7189     -0.6148     -0.3243
+
+C    2 Cq:       93.9885 (MHz)
+C    2 Eta:       0.7994
+============
+Atom: C    3
+============
+C    3 Coordinates      1.119    1.421    1.732   A
+
+TOTAL tensor
+
+              -0.3053      0.1626      0.0610
+               0.1626      0.1204      0.2177
+               0.0610      0.2177      0.1849
+
+C    3 Eigenvalue  V_xx      -0.0454      
+C    3 Eigenvector V_xx       0.2542      0.6684     -0.6990
+C    3 Eigenvalue  V_yy      -0.3606      
+C    3 Eigenvector V_yy      -0.9433      0.3309     -0.0266
+C    3 Eigenvalue  V_zz       0.4060      
+C    3 Eigenvector V_zz       0.2135      0.6661      0.7146
+
+C    3 Cq:       95.4008 (MHz)
+C    3 Eta:       0.7765
+============
+Atom: C    4
+============
+C    4 Coordinates      2.094    0.540    1.267   A
+
+TOTAL tensor
+
+               0.3063      0.0726      0.1921
+               0.0726     -0.2121     -0.1466
+               0.1921     -0.1466     -0.0942
+
+C    4 Eigenvalue  V_xx      -0.0276      
+C    4 Eigenvector V_xx       0.2607      0.6614     -0.7032
+C    4 Eigenvalue  V_yy      -0.3563      
+C    4 Eigenvector V_yy      -0.2588      0.7496      0.6091
+C    4 Eigenvalue  V_zz       0.3839      
+C    4 Eigenvector V_zz       0.9301      0.0232      0.3667
+
+C    4 Cq:       90.1931 (MHz)
+C    4 Eta:       0.8563
+============
+Atom: C    5
+============
+C    5 Coordinates     -1.776    0.395   -0.288   A
+
+TOTAL tensor
+
+               0.0143     -0.2671     -0.2341
+              -0.2671      0.0910      0.0135
+              -0.2341      0.0135     -0.1053
+
+C    5 Eigenvalue  V_xx      -0.0301      
+C    5 Eigenvector V_xx       0.2639      0.6603     -0.7031
+C    5 Eigenvalue  V_yy      -0.3529      
+C    5 Eigenvector V_yy       0.6797      0.3900      0.6213
+C    5 Eigenvalue  V_zz       0.3830      
+C    5 Eigenvector V_zz       0.6844     -0.6418     -0.3459
+
+C    5 Cq:       89.9992 (MHz)
+C    5 Eta:       0.8429
+============
+Atom: C    6
+============
+C    6 Coordinates      0.484    2.941    5.758   A
+
+TOTAL tensor
+
+              -0.0759     -0.0503     -0.0465
+              -0.0503      0.0312      0.1306
+              -0.0465      0.1306      0.0447
+
+C    6 Eigenvalue  V_xx      -0.0889      
+C    6 Eigenvector V_xx      -0.6530      0.4154     -0.6333
+C    6 Eigenvalue  V_yy      -0.0976      
+C    6 Eigenvector V_yy      -0.7142     -0.6161      0.3323
+C    6 Eigenvalue  V_zz       0.1866      
+C    6 Eigenvector V_zz      -0.2521      0.6693      0.6989
+
+C    6 Cq:       43.8329 (MHz)
+C    6 Eta:       0.0469
+============
+Atom: C    7
+============
+C    7 Coordinates      0.166    3.872    4.779   A
+
+TOTAL tensor
+
+               0.0533      0.2821     -0.2339
+               0.2821      0.0690     -0.0020
+              -0.2339     -0.0020     -0.1223
+
+C    7 Eigenvalue  V_xx      -0.0401      
+C    7 Eigenvector V_xx       0.2526     -0.6658     -0.7021
+C    7 Eigenvalue  V_yy      -0.3599      
+C    7 Eigenvector V_yy       0.6475     -0.4229      0.6339
+C    7 Eigenvalue  V_zz       0.4000      
+C    7 Eigenvector V_zz      -0.7189     -0.6148      0.3243
+
+C    7 Cq:       93.9885 (MHz)
+C    7 Eta:       0.7994
+============
+Atom: C    8
+============
+C    8 Coordinates     -1.119    3.922    4.252   A
+
+TOTAL tensor
+
+              -0.3053     -0.1626      0.0610
+              -0.1626      0.1204     -0.2177
+               0.0610     -0.2177      0.1849
+
+C    8 Eigenvalue  V_xx      -0.0454      
+C    8 Eigenvector V_xx      -0.2542      0.6684      0.6990
+C    8 Eigenvalue  V_yy      -0.3606      
+C    8 Eigenvector V_yy      -0.9433     -0.3309     -0.0266
+C    8 Eigenvalue  V_zz       0.4060      
+C    8 Eigenvector V_zz       0.2135     -0.6661      0.7146
+
+C    8 Cq:       95.4008 (MHz)
+C    8 Eta:       0.7765
+============
+Atom: C    9
+============
+C    9 Coordinates     -2.094    3.041    4.717   A
+
+TOTAL tensor
+
+               0.3063     -0.0726      0.1921
+              -0.0726     -0.2121      0.1466
+               0.1921      0.1466     -0.0942
+
+C    9 Eigenvalue  V_xx      -0.0276      
+C    9 Eigenvector V_xx       0.2607     -0.6614     -0.7032
+C    9 Eigenvalue  V_yy      -0.3563      
+C    9 Eigenvector V_yy      -0.2588     -0.7496      0.6091
+C    9 Eigenvalue  V_zz       0.3839      
+C    9 Eigenvector V_zz      -0.9301      0.0232     -0.3667
+
+C    9 Cq:       90.1931 (MHz)
+C    9 Eta:       0.8563
+============
+Atom: C   10
+============
+C   10 Coordinates      1.776    2.896    6.272   A
+
+TOTAL tensor
+
+               0.0143      0.2671     -0.2341
+               0.2671      0.0910     -0.0135
+              -0.2341     -0.0135     -0.1053
+
+C   10 Eigenvalue  V_xx      -0.0301      
+C   10 Eigenvector V_xx       0.2639     -0.6603     -0.7031
+C   10 Eigenvalue  V_yy      -0.3529      
+C   10 Eigenvector V_yy       0.6797     -0.3900      0.6213
+C   10 Eigenvalue  V_zz       0.3830      
+C   10 Eigenvector V_zz      -0.6844     -0.6418      0.3459
+
+C   10 Cq:       89.9992 (MHz)
+C   10 Eta:       0.8429
+============
+Atom: C   11
+============
+C   11 Coordinates      0.484   -0.440   -0.226   A
+
+TOTAL tensor
+
+              -0.0759      0.0503     -0.0465
+               0.0503      0.0312     -0.1306
+              -0.0465     -0.1306      0.0447
+
+C   11 Eigenvalue  V_xx      -0.0889      
+C   11 Eigenvector V_xx       0.6530      0.4154      0.6333
+C   11 Eigenvalue  V_yy      -0.0976      
+C   11 Eigenvector V_yy      -0.7142      0.6161      0.3323
+C   11 Eigenvalue  V_zz       0.1866      
+C   11 Eigenvector V_zz      -0.2521     -0.6693      0.6989
+
+C   11 Cq:       43.8329 (MHz)
+C   11 Eta:       0.0469
+============
+Atom: C   12
+============
+C   12 Coordinates      0.166   -1.371   -1.205   A
+
+TOTAL tensor
+
+               0.0533     -0.2821     -0.2339
+              -0.2821      0.0690      0.0020
+              -0.2339      0.0020     -0.1223
+
+C   12 Eigenvalue  V_xx      -0.0401      
+C   12 Eigenvector V_xx       0.2526      0.6658     -0.7021
+C   12 Eigenvalue  V_yy      -0.3599      
+C   12 Eigenvector V_yy       0.6475      0.4229      0.6339
+C   12 Eigenvalue  V_zz       0.4000      
+C   12 Eigenvector V_zz       0.7189     -0.6148     -0.3243
+
+C   12 Cq:       93.9885 (MHz)
+C   12 Eta:       0.7994
+============
+Atom: C   13
+============
+C   13 Coordinates     -1.119   -1.421   -1.732   A
+
+TOTAL tensor
+
+              -0.3053      0.1626      0.0610
+               0.1626      0.1204      0.2177
+               0.0610      0.2177      0.1849
+
+C   13 Eigenvalue  V_xx      -0.0454      
+C   13 Eigenvector V_xx       0.2542      0.6684     -0.6990
+C   13 Eigenvalue  V_yy      -0.3606      
+C   13 Eigenvector V_yy      -0.9433      0.3309     -0.0266
+C   13 Eigenvalue  V_zz       0.4060      
+C   13 Eigenvector V_zz       0.2135      0.6661      0.7146
+
+C   13 Cq:       95.4008 (MHz)
+C   13 Eta:       0.7765
+============
+Atom: C   14
+============
+C   14 Coordinates     -2.094   -0.540   -1.267   A
+
+TOTAL tensor
+
+               0.3063      0.0726      0.1921
+               0.0726     -0.2121     -0.1466
+               0.1921     -0.1466     -0.0942
+
+C   14 Eigenvalue  V_xx      -0.0276      
+C   14 Eigenvector V_xx       0.2607      0.6614     -0.7032
+C   14 Eigenvalue  V_yy      -0.3563      
+C   14 Eigenvector V_yy      -0.2588      0.7496      0.6091
+C   14 Eigenvalue  V_zz       0.3839      
+C   14 Eigenvector V_zz       0.9301      0.0232      0.3667
+
+C   14 Cq:       90.1931 (MHz)
+C   14 Eta:       0.8563
+============
+Atom: C   15
+============
+C   15 Coordinates      1.776   -0.395    0.288   A
+
+TOTAL tensor
+
+               0.0143     -0.2671     -0.2341
+              -0.2671      0.0910      0.0135
+              -0.2341      0.0135     -0.1053
+
+C   15 Eigenvalue  V_xx      -0.0301      
+C   15 Eigenvector V_xx       0.2639      0.6603     -0.7031
+C   15 Eigenvalue  V_yy      -0.3529      
+C   15 Eigenvector V_yy       0.6797      0.3900      0.6213
+C   15 Eigenvalue  V_zz       0.3830      
+C   15 Eigenvector V_zz       0.6844     -0.6418     -0.3459
+
+C   15 Cq:       89.9992 (MHz)
+C   15 Eta:       0.8429
+============
+Atom: C   16
+============
+C   16 Coordinates     -0.484    2.061    6.210   A
+
+TOTAL tensor
+
+              -0.0759     -0.0503     -0.0465
+              -0.0503      0.0312      0.1306
+              -0.0465      0.1306      0.0447
+
+C   16 Eigenvalue  V_xx      -0.0889      
+C   16 Eigenvector V_xx      -0.6530      0.4154     -0.6333
+C   16 Eigenvalue  V_yy      -0.0976      
+C   16 Eigenvector V_yy      -0.7142     -0.6161      0.3323
+C   16 Eigenvalue  V_zz       0.1866      
+C   16 Eigenvector V_zz      -0.2521      0.6693      0.6989
+
+C   16 Cq:       43.8329 (MHz)
+C   16 Eta:       0.0469
+============
+Atom: C   17
+============
+C   17 Coordinates     -0.166    1.130    7.189   A
+
+TOTAL tensor
+
+               0.0533      0.2821     -0.2339
+               0.2821      0.0690     -0.0020
+              -0.2339     -0.0020     -0.1223
+
+C   17 Eigenvalue  V_xx      -0.0401      
+C   17 Eigenvector V_xx       0.2526     -0.6658     -0.7021
+C   17 Eigenvalue  V_yy      -0.3599      
+C   17 Eigenvector V_yy       0.6475     -0.4229      0.6339
+C   17 Eigenvalue  V_zz       0.4000      
+C   17 Eigenvector V_zz      -0.7189     -0.6148      0.3243
+
+C   17 Cq:       93.9885 (MHz)
+C   17 Eta:       0.7994
+============
+Atom: C   18
+============
+C   18 Coordinates      1.119    1.080    7.716   A
+
+TOTAL tensor
+
+              -0.3053     -0.1626      0.0610
+              -0.1626      0.1204     -0.2177
+               0.0610     -0.2177      0.1849
+
+C   18 Eigenvalue  V_xx      -0.0454      
+C   18 Eigenvector V_xx      -0.2542      0.6684      0.6990
+C   18 Eigenvalue  V_yy      -0.3606      
+C   18 Eigenvector V_yy      -0.9433     -0.3309     -0.0266
+C   18 Eigenvalue  V_zz       0.4060      
+C   18 Eigenvector V_zz       0.2135     -0.6661      0.7146
+
+C   18 Cq:       95.4008 (MHz)
+C   18 Eta:       0.7765
+============
+Atom: C   19
+============
+C   19 Coordinates      2.094    1.961    7.251   A
+
+TOTAL tensor
+
+               0.3063     -0.0726      0.1921
+              -0.0726     -0.2121      0.1466
+               0.1921      0.1466     -0.0942
+
+C   19 Eigenvalue  V_xx      -0.0276      
+C   19 Eigenvector V_xx       0.2607     -0.6614     -0.7032
+C   19 Eigenvalue  V_yy      -0.3563      
+C   19 Eigenvector V_yy      -0.2588     -0.7496      0.6091
+C   19 Eigenvalue  V_zz       0.3839      
+C   19 Eigenvector V_zz      -0.9301      0.0232     -0.3667
+
+C   19 Cq:       90.1931 (MHz)
+C   19 Eta:       0.8563
+============
+Atom: C   20
+============
+C   20 Coordinates     -1.776    2.106    5.696   A
+
+TOTAL tensor
+
+               0.0143      0.2671     -0.2341
+               0.2671      0.0910     -0.0135
+              -0.2341     -0.0135     -0.1053
+
+C   20 Eigenvalue  V_xx      -0.0301      
+C   20 Eigenvector V_xx       0.2639     -0.6603     -0.7031
+C   20 Eigenvalue  V_yy      -0.3529      
+C   20 Eigenvector V_yy       0.6797     -0.3900      0.6213
+C   20 Eigenvalue  V_zz       0.3830      
+C   20 Eigenvector V_zz      -0.6844     -0.6418      0.3459
+
+C   20 Cq:       89.9992 (MHz)
+C   20 Eta:       0.8429
+============
+Atom: F    1
+============
+F    1 Coordinates     -1.073    2.196    1.650   A
+
+TOTAL tensor
+
+               0.5283     -1.9382     -1.2067
+              -1.9382      0.3758      0.7398
+              -1.2067      0.7398     -0.9041
+
+F    1 Eigenvalue  V_xx      -1.1611      
+F    1 Eigenvector V_xx       0.2555      0.6616     -0.7050
+F    1 Eigenvalue  V_yy      -1.7363      
+F    1 Eigenvector V_yy      -0.6739     -0.4010     -0.6206
+F    1 Eigenvalue  V_zz       2.8974      
+F    1 Eigenvector V_zz       0.6933     -0.6336     -0.3434
+
+F    1 Cq:      680.7762 (MHz)
+F    1 Eta:       0.1985
+============
+Atom: F    2
+============
+F    2 Coordinates      1.421    2.291    2.653   A
+
+TOTAL tensor
+
+              -1.4183      0.7773      0.6497
+               0.7773      0.5817      1.9377
+               0.6497      1.9377      0.8367
+
+F    2 Eigenvalue  V_xx      -1.2010      
+F    2 Eigenvector V_xx      -0.2484     -0.6612      0.7079
+F    2 Eigenvalue  V_yy      -1.6851      
+F    2 Eigenvector V_yy      -0.9415      0.3365     -0.0160
+F    2 Eigenvalue  V_zz       2.8861      
+F    2 Eigenvector V_zz      -0.2277     -0.6705     -0.7061
+
+F    2 Cq:      678.1398 (MHz)
+F    2 Eta:       0.1677
+============
+Atom: F    3
+============
+F    3 Coordinates      3.295    0.580    1.755   A
+
+TOTAL tensor
+
+               2.2830      0.1953      1.4957
+               0.1953     -1.4762     -0.1902
+               1.4957     -0.1902     -0.8068
+
+F    3 Eigenvalue  V_xx      -1.1938      
+F    3 Eigenvector V_xx       0.2660      0.6583     -0.7042
+F    3 Eigenvalue  V_yy      -1.6973      
+F    3 Eigenvector V_yy      -0.2638      0.7523      0.6037
+F    3 Eigenvalue  V_zz       2.8912      
+F    3 Eigenvector V_zz      -0.9272     -0.0252     -0.3737
+
+F    3 Cq:      679.3245 (MHz)
+F    3 Eta:       0.1741
+============
+Atom: F    4
+============
+F    4 Coordinates     -2.683    1.215    0.145   A
+
+TOTAL tensor
+
+               0.5617     -1.9398     -1.1971
+              -1.9398      0.3769      0.6943
+              -1.1971      0.6943     -0.9386
+
+F    4 Eigenvalue  V_xx      -1.1370      
+F    4 Eigenvector V_xx       0.2714      0.6663     -0.6946
+F    4 Eigenvalue  V_yy      -1.7505      
+F    4 Eigenvector V_yy      -0.6615     -0.3951     -0.6374
+F    4 Eigenvalue  V_zz       2.8875      
+F    4 Eigenvector V_zz       0.6991     -0.6324     -0.3335
+
+F    4 Cq:      678.4567 (MHz)
+F    4 Eta:       0.2125
+============
+Atom: F    5
+============
+F    5 Coordinates      1.073    4.697    4.334   A
+
+TOTAL tensor
+
+               0.5283      1.9382     -1.2067
+               1.9382      0.3758     -0.7398
+              -1.2067     -0.7398     -0.9041
+
+F    5 Eigenvalue  V_xx      -1.1611      
+F    5 Eigenvector V_xx       0.2555     -0.6616     -0.7050
+F    5 Eigenvalue  V_yy      -1.7363      
+F    5 Eigenvector V_yy       0.6739     -0.4010      0.6206
+F    5 Eigenvalue  V_zz       2.8974      
+F    5 Eigenvector V_zz       0.6933      0.6336     -0.3434
+
+F    5 Cq:      680.7762 (MHz)
+F    5 Eta:       0.1985
+============
+Atom: F    6
+============
+F    6 Coordinates     -1.421    4.792    3.331   A
+
+TOTAL tensor
+
+              -1.4183     -0.7773      0.6497
+              -0.7773      0.5817     -1.9377
+               0.6497     -1.9377      0.8367
+
+F    6 Eigenvalue  V_xx      -1.2010      
+F    6 Eigenvector V_xx      -0.2484      0.6612      0.7079
+F    6 Eigenvalue  V_yy      -1.6851      
+F    6 Eigenvector V_yy       0.9415      0.3365      0.0160
+F    6 Eigenvalue  V_zz       2.8861      
+F    6 Eigenvector V_zz      -0.2277      0.6705     -0.7061
+
+F    6 Cq:      678.1398 (MHz)
+F    6 Eta:       0.1677
+============
+Atom: F    7
+============
+F    7 Coordinates     -3.295    3.081    4.229   A
+
+TOTAL tensor
+
+               2.2830     -0.1953      1.4957
+              -0.1953     -1.4762      0.1902
+               1.4957      0.1902     -0.8068
+
+F    7 Eigenvalue  V_xx      -1.1938      
+F    7 Eigenvector V_xx       0.2660     -0.6583     -0.7042
+F    7 Eigenvalue  V_yy      -1.6973      
+F    7 Eigenvector V_yy       0.2638      0.7523     -0.6037
+F    7 Eigenvalue  V_zz       2.8912      
+F    7 Eigenvector V_zz      -0.9272      0.0252     -0.3737
+
+F    7 Cq:      679.3245 (MHz)
+F    7 Eta:       0.1741
+============
+Atom: F    8
+============
+F    8 Coordinates      2.683    3.716    5.839   A
+
+TOTAL tensor
+
+               0.5617      1.9398     -1.1971
+               1.9398      0.3769     -0.6943
+              -1.1971     -0.6943     -0.9386
+
+F    8 Eigenvalue  V_xx      -1.1370      
+F    8 Eigenvector V_xx       0.2714     -0.6663     -0.6946
+F    8 Eigenvalue  V_yy      -1.7505      
+F    8 Eigenvector V_yy       0.6615     -0.3951      0.6374
+F    8 Eigenvalue  V_zz       2.8875      
+F    8 Eigenvector V_zz       0.6991      0.6324     -0.3335
+
+F    8 Cq:      678.4567 (MHz)
+F    8 Eta:       0.2125
+============
+Atom: F    9
+============
+F    9 Coordinates      1.073   -2.196   -1.650   A
+
+TOTAL tensor
+
+               0.5283     -1.9382     -1.2067
+              -1.9382      0.3758      0.7398
+              -1.2067      0.7398     -0.9041
+
+F    9 Eigenvalue  V_xx      -1.1611      
+F    9 Eigenvector V_xx       0.2555      0.6616     -0.7050
+F    9 Eigenvalue  V_yy      -1.7363      
+F    9 Eigenvector V_yy      -0.6739     -0.4010     -0.6206
+F    9 Eigenvalue  V_zz       2.8974      
+F    9 Eigenvector V_zz       0.6933     -0.6336     -0.3434
+
+F    9 Cq:      680.7762 (MHz)
+F    9 Eta:       0.1985
+============
+Atom: F   10
+============
+F   10 Coordinates     -1.421   -2.291   -2.653   A
+
+TOTAL tensor
+
+              -1.4183      0.7773      0.6497
+               0.7773      0.5817      1.9377
+               0.6497      1.9377      0.8367
+
+F   10 Eigenvalue  V_xx      -1.2010      
+F   10 Eigenvector V_xx      -0.2484     -0.6612      0.7079
+F   10 Eigenvalue  V_yy      -1.6851      
+F   10 Eigenvector V_yy      -0.9415      0.3365     -0.0160
+F   10 Eigenvalue  V_zz       2.8861      
+F   10 Eigenvector V_zz      -0.2277     -0.6705     -0.7061
+
+F   10 Cq:      678.1398 (MHz)
+F   10 Eta:       0.1677
+============
+Atom: F   11
+============
+F   11 Coordinates     -3.295   -0.580   -1.755   A
+
+TOTAL tensor
+
+               2.2830      0.1953      1.4957
+               0.1953     -1.4762     -0.1902
+               1.4957     -0.1902     -0.8068
+
+F   11 Eigenvalue  V_xx      -1.1938      
+F   11 Eigenvector V_xx       0.2660      0.6583     -0.7042
+F   11 Eigenvalue  V_yy      -1.6973      
+F   11 Eigenvector V_yy      -0.2638      0.7523      0.6037
+F   11 Eigenvalue  V_zz       2.8912      
+F   11 Eigenvector V_zz      -0.9272     -0.0252     -0.3737
+
+F   11 Cq:      679.3245 (MHz)
+F   11 Eta:       0.1741
+============
+Atom: F   12
+============
+F   12 Coordinates      2.683   -1.215   -0.145   A
+
+TOTAL tensor
+
+               0.5617     -1.9398     -1.1971
+              -1.9398      0.3769      0.6943
+              -1.1971      0.6943     -0.9386
+
+F   12 Eigenvalue  V_xx      -1.1370      
+F   12 Eigenvector V_xx       0.2714      0.6663     -0.6946
+F   12 Eigenvalue  V_yy      -1.7505      
+F   12 Eigenvector V_yy      -0.6615     -0.3951     -0.6374
+F   12 Eigenvalue  V_zz       2.8875      
+F   12 Eigenvector V_zz       0.6991     -0.6324     -0.3335
+
+F   12 Cq:      678.4567 (MHz)
+F   12 Eta:       0.2125
+============
+Atom: F   13
+============
+F   13 Coordinates     -1.073    0.305    7.634   A
+
+TOTAL tensor
+
+               0.5283      1.9382     -1.2067
+               1.9382      0.3758     -0.7398
+              -1.2067     -0.7398     -0.9041
+
+F   13 Eigenvalue  V_xx      -1.1611      
+F   13 Eigenvector V_xx       0.2555     -0.6616     -0.7050
+F   13 Eigenvalue  V_yy      -1.7363      
+F   13 Eigenvector V_yy       0.6739     -0.4010      0.6206
+F   13 Eigenvalue  V_zz       2.8974      
+F   13 Eigenvector V_zz       0.6933      0.6336     -0.3434
+
+F   13 Cq:      680.7762 (MHz)
+F   13 Eta:       0.1985
+============
+Atom: F   14
+============
+F   14 Coordinates      1.421    0.210    8.637   A
+
+TOTAL tensor
+
+              -1.4183     -0.7773      0.6497
+              -0.7773      0.5817     -1.9377
+               0.6497     -1.9377      0.8367
+
+F   14 Eigenvalue  V_xx      -1.2010      
+F   14 Eigenvector V_xx      -0.2484      0.6612      0.7079
+F   14 Eigenvalue  V_yy      -1.6851      
+F   14 Eigenvector V_yy       0.9415      0.3365      0.0160
+F   14 Eigenvalue  V_zz       2.8861      
+F   14 Eigenvector V_zz      -0.2277      0.6705     -0.7061
+
+F   14 Cq:      678.1398 (MHz)
+F   14 Eta:       0.1677
+============
+Atom: F   15
+============
+F   15 Coordinates      3.295    1.921    7.739   A
+
+TOTAL tensor
+
+               2.2830     -0.1953      1.4957
+              -0.1953     -1.4762      0.1902
+               1.4957      0.1902     -0.8068
+
+F   15 Eigenvalue  V_xx      -1.1938      
+F   15 Eigenvector V_xx       0.2660     -0.6583     -0.7042
+F   15 Eigenvalue  V_yy      -1.6973      
+F   15 Eigenvector V_yy       0.2638      0.7523     -0.6037
+F   15 Eigenvalue  V_zz       2.8912      
+F   15 Eigenvector V_zz      -0.9272      0.0252     -0.3737
+
+F   15 Cq:      679.3245 (MHz)
+F   15 Eta:       0.1741
+
+============
+Atom: F   16
+============
+F   16 Coordinates     -2.683    1.286    6.129   A
+
+TOTAL tensor
+
+               0.5617      1.9398     -1.1971
+               1.9398      0.3769     -0.6943
+              -1.1971     -0.6943     -0.9386
+
+F   16 Eigenvalue  V_xx      -1.1370      
+F   16 Eigenvector V_xx       0.2714     -0.6663     -0.6946
+F   16 Eigenvalue  V_yy      -1.7505      
+F   16 Eigenvector V_yy       0.6615     -0.3951      0.6374
+F   16 Eigenvalue  V_zz       2.8875      
+F   16 Eigenvector V_zz       0.6991      0.6324     -0.3335
+
+F   16 Cq:      678.4567 (MHz)
+F   16 Eta:       0.2125   

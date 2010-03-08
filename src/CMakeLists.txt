@@ -55,12 +55,13 @@ file(GLOB lapackSources lapack/double/*.f)
 file(GLOB guiSources gui/*.cpp "auto/SpinachGUI.cpp")
 file(GLOB sharedSources shared/*.cpp)
 
-
-set(formatSources "shared/formats/xyz.cpp")
-set(formatSources ${formatSources} "shared/formats/g03.cpp")
-#set(formatSources ${formatSources} "shared/formats/xml.cpp")
-set(formatSources ${formatSources} "shared/formats/castep.cpp")
-set(formatSources ${formatSources} "shared/formats/simpson.cpp")
+set(formatSources 
+  "shared/formats/xyz.cpp"
+  "shared/formats/g03.cpp"
+  #  "shared/formats/xml.cpp"
+  "shared/formats/castep.cpp"
+  "shared/formats/simpson.cpp"
+)
 
 file(GLOB cmdSources commandln/*.cpp)
 

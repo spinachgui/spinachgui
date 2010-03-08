@@ -202,6 +202,24 @@ struct castep : grammar<castep> {
 
             } else if (j->value.id()==quadrupole_blockID) {
                 //Quadrupole code here
+                tree_iter_t it=j->children.begin();
+                while(it != j->children.end()) {
+                    string element=getString(it);
+                    double quadrupole_moment=getDouble(it+1);
+
+                    //Assiagn a quadrupole moment to every spin
+                    for(long i=0;i<ss->GetSpinCount();i++) {
+                        Spin* spin=ss->GetSpin(i);
+                        if(getElementBySymbol(element.c_str())==spin->GetElement()) {
+                            Interaction* quadinter=new Interaction;
+#warning "Wrong unit unsed in CASTEP"
+                            quadinter->SetScalar(quadrupole_moment * MHz);  //This is certainly the wrong unit
+                            quadinter->SetSubType(Interaction::ST_QUADRUPOLAR,spin);
+                        }
+                    }
+
+                    it+=2;
+                }
             }
         }
 
@@ -325,8 +343,7 @@ struct castep : grammar<castep> {
                 no_node_d[str_p("Using") >> str_p("the") >> str_p("following") >> str_p("values") >>
                           str_p("of") >> str_p("the") >> str_p("electric") >> str_p("quadrupole") >>
                           str_p("moment")] >>
-                no_node_d[element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=")] >> real_p >> no_node_d[str_p("Barn")] >>
-                no_node_d[element_p >> str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=")] >> real_p >> no_node_d[str_p("Barn")] >>
+                *(element_p >> no_node_d[str_p("User") >> str_p("defined.") >> str_p("Q") >> str_p("=")] >> real_p >> no_node_d[str_p("Barn")]) >>
                 no_node_d[lexeme_d[+str_p("=")]];
                 
 

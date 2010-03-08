@@ -17,7 +17,7 @@
 
 #include <shared/unit.hpp>
 
-#include <dstegr.hpp>
+#include <shared/dstegr.hpp>
 
 IMPLEMENT_APP(SpinachApp);
 

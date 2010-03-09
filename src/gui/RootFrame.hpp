@@ -40,6 +40,7 @@ public:
   void OnNmrEpr(wxCommandEvent& e);
   void OnNmr(wxCommandEvent& e);
   void OnEpr(wxCommandEvent& e);
+  void OnBondToggle(wxCommandEvent& e);
 
   //Resize Event
   void OnResize(wxSizeEvent& e);

@@ -382,6 +382,12 @@ void RootFrame::OnGLReset(wxCommandEvent& e) {
   mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));  
 }
 
+void RootFrame::OnBondToggle(wxCommandEvent& e) {
+  bool showBonds=e.IsChecked();
+  mMenuItemBondToggle->Check(showBonds);
+  mRootToolbar->ToggleTool(ID_BOND_TOGGLE,showBonds);
+}
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
 //File Menu
@@ -399,6 +405,8 @@ EVT_MENU(ID_REDO,RootFrame::OnRedo)
 EVT_MENU(ID_NMR_EPR,RootFrame::OnNmrEpr)
 EVT_MENU(ID_NMR,    RootFrame::OnNmr)
 EVT_MENU(ID_EPR,    RootFrame::OnEpr)
+
+EVT_MENU(ID_BOND_TOGGLE,  RootFrame::OnBondToggle)
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)

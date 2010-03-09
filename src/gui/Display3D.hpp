@@ -43,7 +43,9 @@ public:
     bool depthOnly;
     bool translucentPass;
 
+    void SetShowBonds(bool showBonds) {drawBonds=showBonds;}
     bool drawBonds;
+
 
     GLUquadric* mSolidQuadric;
     GLUquadric* mWireQuadric;

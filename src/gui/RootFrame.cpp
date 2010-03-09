@@ -62,7 +62,7 @@ void RootFrame::InitFrame() {
 
   MoleculeNode* mn = new MoleculeNode(GetSS());
 
-  SpinachDC* spinDC=&mDisplay3D->GetDC();
+  SpinachDC& spinDC=mDisplay3D->GetDC();
 
   //Connect the scalling sliders to the scalling
   hfc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_HFC             ));
@@ -143,6 +143,9 @@ void RootFrame::InitFrame() {
   cl_sp  -> SetColour(0   ,0.7 ,0   );
   cb_sp  -> SetColour(0   ,0.7 ,0   );
   cq_sp  -> SetColour(0   ,0.7 ,0   );
+
+  //Wire the DC up to the the bond toggle event
+  sigSetShowBonds.connect(mem_fun(spinDC,&SpinachDC::SetShowBonds));
 
 
   mDisplay3D->SetRootSGNode(mn);
@@ -386,6 +389,7 @@ void RootFrame::OnBondToggle(wxCommandEvent& e) {
   bool showBonds=e.IsChecked();
   mMenuItemBondToggle->Check(showBonds);
   mRootToolbar->ToggleTool(ID_BOND_TOGGLE,showBonds);
+  sigSetShowBonds(showBonds);
 }
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)

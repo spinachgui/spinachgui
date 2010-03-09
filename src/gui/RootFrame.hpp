@@ -48,6 +48,9 @@ public:
   //Debug Menu
   void OnGLReset(wxCommandEvent& e);
 
+  //Signals
+  sigc::signal<void,bool> sigSetShowBonds;
+
   DECLARE_EVENT_TABLE();
 
 private:

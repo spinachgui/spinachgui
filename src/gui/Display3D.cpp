@@ -17,6 +17,7 @@ SpinachDC::SpinachDC()
     : depthOnly(false),
       mSolidQuadric(gluNewQuadric()),
       mWireQuadric(gluNewQuadric()) {
+    drawBonds=true;
     gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
     gluQuadricNormals  (mSolidQuadric,GLU_SMOOTH);
 	

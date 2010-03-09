@@ -42,6 +42,9 @@ public:
     ///If true draw only to the depth buffer
     bool depthOnly;
     bool translucentPass;
+
+    bool drawBonds;
+
     GLUquadric* mSolidQuadric;
     GLUquadric* mWireQuadric;
     int width,height;

@@ -340,35 +340,36 @@ void MoleculeNode::RawDraw(SpinachDC& dc) {
     glMaterialfv(GL_FRONT, GL_SPECULAR, whiteMaterial);
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blueMaterial);
 
-#warning "This version contains really dumb bond drawing code! Replace as soon as feasable"
-    long count=mSS->GetSpinCount();
-    for(long i=0;i<count;i++) {
-        Spin* spin=mSS->GetSpin(i);
-        if(spin->GetElement() == 0) {
-            continue;
-        }
-        //If the spin is an electron, it should be drawn outside of the
-        //molecule
-        vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8*Angstroms,spin);
-        for(unsigned long j=0;j<nearby.size();j++) {
-            if(nearby[j]->GetElement()==0) {
+    if(dc.drawBonds) {
+        long count=mSS->GetSpinCount();
+        for(long i=0;i<count;i++) {
+            Spin* spin=mSS->GetSpin(i);
+            if(spin->GetElement() == 0) {
                 continue;
             }
-            Vector3l mR1=spin->GetPosition();
-            Vector3l mR2=nearby[j]->GetPosition();
+            //If the spin is an electron, it should be drawn outside of the
+            //molecule
+            vector<Spin*> nearby=mSS->GetNearbySpins(spin->GetPosition(),1.8*Angstroms,spin);
+            for(unsigned long j=0;j<nearby.size();j++) {
+                if(nearby[j]->GetElement()==0) {
+                    continue;
+                }
+                Vector3l mR1=spin->GetPosition();
+                Vector3l mR2=nearby[j]->GetPosition();
 
-            double x1=mR1.GetX()[Angstroms],y1=mR1.GetY()[Angstroms],z1=mR1.GetZ()[Angstroms];
-            double x2=mR2.GetX()[Angstroms],y2=mR2.GetY()[Angstroms],z2=mR2.GetZ()[Angstroms];
+                double x1=mR1.GetX()[Angstroms],y1=mR1.GetY()[Angstroms],z1=mR1.GetZ()[Angstroms];
+                double x2=mR2.GetX()[Angstroms],y2=mR2.GetY()[Angstroms],z2=mR2.GetZ()[Angstroms];
 
-            double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+                double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
-            //Now we need to find the rotation between the z axis
-            double angle=acos((z2-z1)/length);
-            glPushMatrix(); {
-                glTranslatef(x1,y1,z1);
-                glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-                gluCylinder(dc.GetSolidQuadric(),0.04,0.04,length,7,7);
-            } glPopMatrix();
+                //Now we need to find the rotation between the z axis
+                double angle=acos((z2-z1)/length);
+                glPushMatrix(); {
+                    glTranslatef(x1,y1,z1);
+                    glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
+                    gluCylinder(dc.GetSolidQuadric(),0.04,0.04,length,7,7);
+                } glPopMatrix();
+            }
         }
     }
 }

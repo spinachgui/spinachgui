@@ -29,10 +29,19 @@ public:
     GLUquadric* GetSolidQuadric() const {return mSolidQuadric;}
     GLUquadric* GetWireQuadric() const {return mWireQuadric;}
 
-    void SetScalling(double scalling,Interaction::SubType st) {mScallings[st]=scalling;}
+    void SetScalling(double scalling,Interaction::SubType st) {
+        mScallings[st]=scalling;
+    }
+    void SetColour(float r,float g,float b,Interaction::SubType st) {
+        mInterColours[st]=Vector3(r,g,b);
+    }
+    void SetVisible(bool v,Interaction::SubType st) {
+        mVisible[st]=v;
+    }
 
     ///If true draw only to the depth buffer
     bool depthOnly;
+    bool translucentPass;
     GLUquadric* mSolidQuadric;
     GLUquadric* mWireQuadric;
     int width,height;
@@ -41,6 +50,11 @@ public:
     ///The size of the displayed interaction in units of energy/length,
     ///e.g. MHz/Nm
     std::map<SpinXML::Interaction::SubType,double> mScallings;
+    ///The colour of the displayed interactions
+    std::map<SpinXML::Interaction::SubType,Vector3> mInterColours;
+    ///The visibility of the displayed interactions
+    std::map<SpinXML::Interaction::SubType,bool> mVisible;
+
 };
 
 class SGNode : public sigc::trackable {
@@ -67,6 +81,13 @@ public:
     ///destructor is called.
     void AddNode(SGNode* node);
 
+    ///Set the translucency of the node
+    void SetTranslucency(float level,bool use=true) {
+        mTranslucent=use;
+        mTranslucentLevel=level;
+        Dirty();
+    }
+
     ///
     void SetMaterial(const float material[3],bool use=true);
 
@@ -86,8 +107,10 @@ private:
 
     virtual void ToPovRay(wxString& src)=0;
 
+    bool mTranslucent;
+    float mTranslucentLevel;
+
     bool mDirty;
-    ///Stores an openGL display list for rendering the node
 
     bool mUseMaterial;
     const float* mMaterial;

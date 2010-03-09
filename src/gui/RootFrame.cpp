@@ -64,6 +64,7 @@ void RootFrame::InitFrame() {
 
   SpinachDC* spinDC=&mDisplay3D->GetDC();
 
+  //Connect the scalling sliders to the scalling
   hfc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_HFC             ));
   gt_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_G_TENSER        )); 
   zfs_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_ZFS             ));
@@ -75,6 +76,33 @@ void RootFrame::InitFrame() {
   cl_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_CUSTOM_LINEAR   ));
   cb_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_CUSTOM_BILINEAR )); 
   cq_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ST_CUSTOM_QUADRATIC)); 
+
+  //Connect the colour controls to the tensor colours
+  hfc_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_HFC             ));
+  gt_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_G_TENSER        )); 
+  zfs_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_ZFS             ));
+  exc_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_EXCHANGE        ));
+  shd_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_SHIELDING       ));
+  sca_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_SCALAR          ));
+  qp_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_QUADRUPOLAR     ));
+  dip_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_DIPOLAR         ));
+  cl_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_CUSTOM_LINEAR   ));
+  cb_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_CUSTOM_BILINEAR )); 
+  cq_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ST_CUSTOM_QUADRATIC)); 
+
+  //Connect the visibility toggles to the tensor colours
+  hfc_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_HFC             ));
+  gt_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_G_TENSER        )); 
+  zfs_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_ZFS             ));
+  exc_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_EXCHANGE        ));
+  shd_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_SHIELDING       ));
+  sca_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_SCALAR          ));
+  qp_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_QUADRUPOLAR     ));
+  dip_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_DIPOLAR         ));
+  cl_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_CUSTOM_LINEAR   ));
+  cb_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_CUSTOM_BILINEAR )); 
+  cq_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ST_CUSTOM_QUADRATIC)); 
+
 
   //Set sensible default scallings
   hfc_sp->GetLogSlider()->SetValue(0.04);
@@ -89,10 +117,38 @@ void RootFrame::InitFrame() {
   cb_sp ->GetLogSlider()->SetValue(0.04);
   cq_sp ->GetLogSlider()->SetValue(0.04);
 
+  //Set sensible default visibility
+  hfc_sp -> SetVisible(true);
+  gt_sp  -> SetVisible(true);
+  zfs_sp -> SetVisible(true);
+  exc_sp -> SetVisible(false);
+  shd_sp -> SetVisible(true);
+  sca_sp -> SetVisible(false);
+  qp_sp  -> SetVisible(true);
+  dip_sp -> SetVisible(false);
+  cl_sp  -> SetVisible(true);
+  cb_sp  -> SetVisible(true);
+  cq_sp  -> SetVisible(true);
+
+
+  //Setup the default colours
+  hfc_sp -> SetColour(0   ,0   ,1   );
+  gt_sp  -> SetColour(0   ,0.7 ,0   );
+  zfs_sp -> SetColour(0.7 ,0   ,0   );
+  exc_sp -> SetColour(0   ,0.0 ,0.3 );
+  shd_sp -> SetColour(0.4 ,0.4 ,0.4 );
+  sca_sp -> SetColour(0   ,0.7 ,0   );
+  qp_sp  -> SetColour(0   ,0.7 ,0   );
+  dip_sp -> SetColour(0   ,0.7 ,0   );
+  cl_sp  -> SetColour(0   ,0.7 ,0   );
+  cb_sp  -> SetColour(0   ,0.7 ,0   );
+  cq_sp  -> SetColour(0   ,0.7 ,0   );
+
+
   mDisplay3D->SetRootSGNode(mn);
 
-  //mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
-  mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));
+  mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
+  // mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));
 
   mDisplay3D->GetDC().depthOnly=false;
   
@@ -278,19 +334,16 @@ void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {
 }
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {
-  #warning "OnNmrEpr Doesn't work"
   mMenuItemNmrEpr->Check(true);
   mRootToolbar->ToggleTool(ID_NMR_EPR,true);
 }
 
 void RootFrame::OnNmr(wxCommandEvent& e) {
-  #warning "OnNmr Doesn't work"
   mMenuItemNmr->Check(true);
   mRootToolbar->ToggleTool(ID_NMR,true);
 }
 
 void RootFrame::OnEpr(wxCommandEvent& e) {
-  #warning "OnEpr Doesn't work"
   mMenuItemEpr->Check(true);
   mRootToolbar->ToggleTool(ID_EPR,true);
 }
@@ -310,9 +363,9 @@ void RootFrame::OnResize(wxSizeEvent&e) {
     LoadFromFile(wxT("data/tryosine.log"),
 		 wxT("data/"),
 		 wxT("tryosine.log"));
-    LoadFromFile(wxT("data/OFNAPH01_NMR.magres"),
+    /*LoadFromFile(wxT("data/OFNAPH01_NMR.magres"),
 		 wxT("data/"),
-		 wxT("OFNAPH01_NMR.magres"));
+		 wxT("OFNAPH01_NMR.magres"));*/
     GetSS()->CalcNuclearDipoleDipole();
     for(unsigned long i=0;i<wxGetApp().GetIOFilters().size();i++) {
         ISpinSystemLoader* saver=wxGetApp().GetIOFilters()[i];

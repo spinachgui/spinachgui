@@ -33,6 +33,31 @@ SpinachDC::SpinachDC()
     mScallings[Interaction::ST_CUSTOM_LINEAR   ]=1.0;
     mScallings[Interaction::ST_CUSTOM_BILINEAR ]=1.0;
     mScallings[Interaction::ST_CUSTOM_QUADRATIC]=1.0;
+
+    mInterColours[Interaction::ST_HFC             ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_G_TENSER        ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_ZFS             ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_EXCHANGE        ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_SHIELDING       ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_SCALAR          ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_QUADRUPOLAR     ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_DIPOLAR         ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_CUSTOM_LINEAR   ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_CUSTOM_BILINEAR ]=Vector3(1.0,1.0,1.0);
+    mInterColours[Interaction::ST_CUSTOM_QUADRATIC]=Vector3(1.0,1.0,1.0);
+
+    mVisible[Interaction::ST_HFC             ]=false;
+    mVisible[Interaction::ST_G_TENSER        ]=false;
+    mVisible[Interaction::ST_ZFS             ]=false;
+    mVisible[Interaction::ST_EXCHANGE        ]=false;
+    mVisible[Interaction::ST_SHIELDING       ]=false;
+    mVisible[Interaction::ST_SCALAR          ]=false;
+    mVisible[Interaction::ST_QUADRUPOLAR     ]=false;
+    mVisible[Interaction::ST_DIPOLAR         ]=false;
+    mVisible[Interaction::ST_CUSTOM_LINEAR   ]=false;
+    mVisible[Interaction::ST_CUSTOM_BILINEAR ]=false;
+    mVisible[Interaction::ST_CUSTOM_QUADRATIC]=false;
+
 }
 SpinachDC::~SpinachDC() {
         gluDeleteQuadric(mSolidQuadric);
@@ -121,7 +146,9 @@ SGNode::SGNode()
     : mDirty(true),
       mUseMaterial(false),
       mMaterial(defaultMaterial),
-      mIdentity(true) {
+      mIdentity(true),
+      mTranslucent(false),
+      mTranslucentLevel(1.0){
 }
 
 SGNode::~SGNode() {
@@ -181,9 +208,13 @@ void SGNode::Draw(SpinachDC& dc) {
         glMultMatrixf(mat);
     }
     if(mUseMaterial) {
-        glMaterialfv(GL_FRONT,GL_SPECULAR,mMaterial);
+        const static GLfloat white[4]={0.5f,0.5f,0.5f,0.5f};
+        glMaterialfv(GL_FRONT,GL_SPECULAR, white);
+        glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,mMaterial);
     }
-    RawDraw(dc);
+    if(dc.translucentPass == mTranslucent) {
+        RawDraw(dc);
+    }
     for(itor i=mChildren.begin();i!=mChildren.end();++i) {
         (*i)->Draw(dc);
     }
@@ -263,12 +294,14 @@ Display3D::~Display3D() {
 
 
 void Display3D::EnableGL() {
+    //cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
+
     if(mGLContext == NULL) {
         mGLContext = new wxGLContext(this);
     }
     this->SetCurrent(*mGLContext);
 	
-    glClearColor(0.0, 0.0, 0.2, 0.0);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
     glClearDepth(1.0);
 	
     glShadeModel(GL_SMOOTH);
@@ -288,9 +321,9 @@ void Display3D::EnableGL() {
 
     // GL_LIGHT0: the white light emitting light source
     // Create light components for GL_LIGHT0
-    GLfloat ambientLight0[] =  {0.0, 0.0, 0.0, 1.0};
-    GLfloat diffuseLight0[] =  {0.5, 0.5, 0.5, 1.0};
-    GLfloat specularLight0[] = {0.6, 0.6, 0.6, 1.0};
+    GLfloat ambientLight0[] =  {0.4, 0.4, 0.4, 1.0};
+    GLfloat diffuseLight0[] =  {0.6, 0.6, 0.6, 1.0};
+    GLfloat specularLight0[] = {0.8, 0.8, 0.8, 1.0};
     GLfloat position0[] =      {-1.5, 1.0,-4.0, 1.0};	
     // Assign created components to GL_LIGHT0
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
@@ -300,9 +333,9 @@ void Display3D::EnableGL() {
 	
     // GL_LIGHT1: the red light emitting light source
     // Create light components for GL_LIGHT1
-    GLfloat ambientLight1[] =  {0.1, 0.1, 0.1, 1.0};
-    GLfloat diffuseLight1[] =  {0.1, 0.1, 0.1, 1.0};
-    GLfloat specularLight1[] = {0.3, 0.3, 0.3, 1.0};
+    GLfloat ambientLight1[] =  {0.4, 0.4, 0.4, 1.0};
+    GLfloat diffuseLight1[] =  {0.6, 0.6, 0.6, 1.0};
+    GLfloat specularLight1[] = {0.8, 0.8, 0.8, 1.0};
     GLfloat position1[] =      {1.5, 1.0, 4.0, 1.0};	
     // Assign created components to GL_LIGHT1
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
@@ -310,6 +343,8 @@ void Display3D::EnableGL() {
     glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
     glLightfv(GL_LIGHT1, GL_POSITION, position1);
 	
+    glMaterialf(GL_FRONT, GL_SHININESS, 10.0f);
+
     //Create a dictionary of colours
     glMatrixMode(GL_MODELVIEW);
 
@@ -317,7 +352,6 @@ void Display3D::EnableGL() {
     glGenTextures(1,&mTexDepth);
     //Generate a texture for saving the depth buffer to
     //glGenFramebuffers(1,&mFB);
-    cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
 }
 
 void Display3D::ResetView() {
@@ -471,28 +505,38 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     mDC.mRotationMatrix=mRotationMatrix;
 
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glClear(GL_DEPTH_BUFFER_BIT);
 
-    if(mRootNode) {
+    glDepthFunc(GL_LESS);
+    //glClear(GL_DEPTH_BUFFER_BIT);
+
+    /*if(mRootNode) {
         mRootNode->Draw(mDC);
-    }
+        }*/
 
     //glBindFramebuffer(GL_FRAMEBUFFER,&mFB);
 
-    glEnable(GL_TEXTURE_2D); {
+    /*glEnable(GL_TEXTURE_2D); {
         glBindTexture(GL_TEXTURE_2D,mTexDepth);
         glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
-    } glDisable(GL_TEXTURE_2D);
+        } glDisable(GL_TEXTURE_2D);*/
 	
-    glDepthFunc(GL_LEQUAL);
-
+    //glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);  //Can move to initalisation
     glEnable(GL_LIGHTING);{
         glClear(GL_DEPTH_BUFFER_BIT);
         glClear(GL_COLOR_BUFFER_BIT);
         if(mRootNode) {
+            //Draw opaque objects first
+            glDepthMask(GL_TRUE);
+            mDC.translucentPass=false;
             mRootNode->Draw(mDC);
+            //Draw transparent/traslucent objects
+            glEnable (GL_BLEND);
+            glDepthMask(GL_TRUE); 
+            glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            mDC.translucentPass=true;
+            mRootNode->Draw(mDC);
+            glDisable (GL_BLEND); 
         }
         //Now draw the forground objects
         glMatrixMode(GL_PROJECTION);

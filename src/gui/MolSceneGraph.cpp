@@ -85,8 +85,8 @@ void SpinNode::RawDraw(SpinachDC& dc) {
             material[2] = 1.0;
         }
 
-        glMaterialfv(GL_FRONT, GL_SPECULAR, material);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
     }
     if(mSpin->GetElement()==0) {
         glTranslatef(40,dc.height-40,0);
@@ -130,6 +130,7 @@ InterNode::InterNode(SpinXML::Spin* spin, SpinXML::Interaction::SubType st)
     mat[15]=1;
     LoadInteractionMatrix();
     spin->sigNewInteraction.connect(mem_fun(this,&InterNode::OnNewInteraction));
+    SetTranslucency(0.5,true);
 }
 
 void InterNode::OnNewInteraction(Interaction* inter) {
@@ -161,69 +162,44 @@ void InterNode::LoadInteractionMatrix() {
 
 
 void InterNode::RawDraw(SpinachDC& dc) {
+    if(!dc.mVisible[mType]) 
+        return;
+    Vector3& colour=dc.mInterColours[mType];
+
     LoadInteractionMatrix();
-    const static GLfloat white[3]={0.5f,0.5f,0.5f};
-    const static GLfloat blue[3]={0.0,0.0,0.5};
-    glColor4f(0.0,0.0,0.0,0.5);
-    glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    GLfloat mem_colour[4];
+    mem_colour[0]=colour.GetX();
+    mem_colour[1]=colour.GetY();
+    mem_colour[2]=colour.GetZ();
+    mem_colour[3]=0.3f;
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mem_colour);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mem_colour);
+
+    glColor4f(colour.GetX(),colour.GetY(),colour.GetZ(),0.5);
     switch(mType) {
-        //Draw as a ellipsoid around a nucleus
     case Interaction::ST_HFC:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, blue);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto nuclear_centred_drawing;  //I know, I know, see http://xkcd.com/292/
     case Interaction::ST_CUSTOM_LINEAR:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto nuclear_centred_drawing;
     case Interaction::ST_CUSTOM_QUADRATIC:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto nuclear_centred_drawing;
     case Interaction::ST_QUADRUPOLAR:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-    nuclear_centred_drawing:
-        //Apply the transformation matrix to warp the sphere
         glPushMatrix(); {
             double scalling=dc.mScallings[mType];
-            glMultMatrixf(mat);
+            //glMultMatrixf(mat);
             glScalef(scalling,scalling,scalling);
             gluSphere(dc.GetSolidQuadric(),1.0,29,37);
         } glPopMatrix();
         break;
         //Draw as a cyclinder
     case Interaction::ST_EXCHANGE:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto cyclinder_drawing;
     case Interaction::ST_SHIELDING:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto cyclinder_drawing;
     case Interaction::ST_SCALAR:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto cyclinder_drawing;
     case Interaction::ST_DIPOLAR:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto cyclinder_drawing;
     case Interaction::ST_CUSTOM_BILINEAR:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-    cyclinder_drawing:
     
         break;
         //EPR electron type interactions
     case Interaction::ST_ZFS:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-        goto electron_cenred_drawing;
     case Interaction::ST_G_TENSER:
-        glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-    electron_cenred_drawing:
         break;
     case Interaction::ST_ANY:
     case Interaction::ST_NMR:
@@ -232,7 +208,6 @@ void InterNode::RawDraw(SpinachDC& dc) {
         throw std::logic_error("Trying to draw an interaction with an invalid type");
         break;
     }
-    glDisable(GL_BLEND);
 }
 void InterNode::ToPovRay(wxString& str) {
     if(mSpin->GetElement()==0) {
@@ -362,10 +337,10 @@ void MoleculeNode::RawDraw(SpinachDC& dc) {
 
     GLfloat whiteMaterial[] = {0.5, 0.5,  0.5}; 
     GLfloat blueMaterial[]  = {0.06,0.06, 0.4}; 
-    glMaterialfv(GL_FRONT, GL_SPECULAR, blueMaterial);
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, whiteMaterial);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, whiteMaterial);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blueMaterial);
 
-#warning "This version contains really dump bond drawing code! Replace as soon as feasable"
+#warning "This version contains really dumb bond drawing code! Replace as soon as feasable"
     long count=mSS->GetSpinCount();
     for(long i=0;i<count;i++) {
         Spin* spin=mSS->GetSpin(i);

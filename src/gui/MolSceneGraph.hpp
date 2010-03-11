@@ -42,20 +42,6 @@ private:
 };
 
 
-///Scene graph node that draws a cylinder between two points
-class CyclinderNode : public SGNode {
-    ///Create a node that draws a cyclinder of unit radius between
-    ///(0,0,0) and (0,0,1)
-    CyclinderNode()
-        : mRadius(1.0f),mR1(Vector3(0,0,0)),mR2(Vector3(0,0,0)) {}
-    ///Create a node that draws a cyclinder of a given radius between r1
-    ///and r2
-    CyclinderNode(Vector3& r1, Vector3& r2, float radius)
-        : mRadius(mRadius),mR1(r1),mR2(r2) {}
-    ///Set the paramiters of the cyclinder
-    void SetCyclinder(Vector3& r1, Vector3& r2, float radius) {
-        mRadius=radius; mR1=r1; mR2=r2; Dirty();
-    }
 private:
     virtual void RawDraw(SpinachDC& dc);
     virtual void ToPovRay(wxString& src) {/*TODO*/}

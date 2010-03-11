@@ -229,19 +229,7 @@ void InterNode::ToPovRay(wxString& str) {
 
 
 
-void CyclinderNode::RawDraw(SpinachDC& dc) {
-    double x1=mR1.GetX(),y1=mR1.GetY(),z1=mR1.GetZ();
-    double x2=mR2.GetX(),y2=mR1.GetY(),z2=mR1.GetZ();
 
-    double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
-			
-    //Now we need to find the rotation between the z axis
-    double angle=acos((z2-z1)/length);
-    glPushMatrix();
-    glTranslatef(x1,y1,z1);
-    glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-    gluCylinder(dc.GetSolidQuadric(),mRadius,mRadius,length,7,7);
-    glPopMatrix();
 }
 
 

@@ -207,6 +207,9 @@ typedef ddouble<0,5> length5;
 
 typedef unit<1,0> energy_unit;
 typedef unit<0,1> length_unit;
+typedef unit<0,0> no_unit;
+
+const no_unit     unitless("Unitless",1.0);
 
 const energy_unit Joules("Joule",1.0);
 const energy_unit Hz("Hz",6.626068e-34);

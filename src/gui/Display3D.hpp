@@ -121,9 +121,11 @@ private:
     const float* mMaterial;
   
     ///If true, skip the transform step
+protected:
     bool mIdentity;
     GLfloat mat[16];
 
+private:
     std::list<SGNode*> mChildren;
     typedef std::list<SGNode*>::iterator itor;
 };

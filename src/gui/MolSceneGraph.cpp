@@ -227,13 +227,6 @@ void InterNode::ToPovRay(wxString& str) {
 
 }
 
-
-
-
-}
-
-
-
 MoleculeNode::MoleculeNode(SpinSystem* ss) 
     : mSS(ss) {
     OnReload();
@@ -348,14 +341,14 @@ void MoleculeNode::RawDraw(SpinachDC& dc) {
                 double x1=mR1.GetX()[Angstroms],y1=mR1.GetY()[Angstroms],z1=mR1.GetZ()[Angstroms];
                 double x2=mR2.GetX()[Angstroms],y2=mR2.GetY()[Angstroms],z2=mR2.GetZ()[Angstroms];
 
-                double length=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+                double len=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
                 //Now we need to find the rotation between the z axis
-                double angle=acos((z2-z1)/length);
+                double angle=acos((z2-z1)/len);
                 glPushMatrix(); {
                     glTranslatef(x1,y1,z1);
                     glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-                    gluCylinder(dc.GetSolidQuadric(),0.04,0.04,length,7,7);
+                    gluCylinder(dc.GetSolidQuadric(),0.04,0.04,len,7,7);
                 } glPopMatrix();
             }
         }

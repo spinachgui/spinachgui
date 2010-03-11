@@ -19,7 +19,26 @@
 
 #include <shared/dstegr.hpp>
 
-IMPLEMENT_APP(SpinachApp);
+SpinachApp* gApp;
+
+SpinachApp& wxGetApp() {
+  return *gApp;
+}
+
+int main(int argc,char** argv) {
+  try {
+    gApp = new SpinachApp;
+    wxApp::SetInstance(gApp);
+    wxEntry(argc,argv);
+  } catch (logic_error& e) {
+    cerr << "Uncaught logic_error what()=" << e.what() << endl;
+  } catch (runtime_error& e) {
+    cerr << "Uncaught runtime_error what()=" << e.what() << endl;
+  } catch (...) {
+    cerr << "Uncaught unknown exception." << endl;
+    throw;
+  }
+}
 
 SpinachApp::~SpinachApp() {
     for(unsigned long i=0;i<mIOFilters.size();i++) {

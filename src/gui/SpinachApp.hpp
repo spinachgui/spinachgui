@@ -51,9 +51,8 @@ private:
     static SelectionManager* static_this;
 };
 
-
-
-DECLARE_APP(SpinachApp);
+///Fakes the get app macro
+SpinachApp& wxGetApp();
 
 //Define macros for accessing the most up to date spin system
 #define GetSS() (wxGetApp().GetSS())

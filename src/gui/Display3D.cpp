@@ -144,12 +144,12 @@ void OpenGLText::UpdateString(const wxString& str) {
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5}; 
 
 SGNode::SGNode()
-    : mDirty(true),
+    : mTranslucent(false),
+      mTranslucentLevel(1.0),
+      mDirty(true),
       mUseMaterial(false),
       mMaterial(defaultMaterial),
-      mIdentity(true),
-      mTranslucent(false),
-      mTranslucentLevel(1.0){
+      mIdentity(true){
 }
 
 SGNode::~SGNode() {

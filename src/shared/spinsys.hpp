@@ -267,6 +267,7 @@ namespace SpinXML {
 
         bool GetHasInteractionOfType(Interaction::SubType t) const;
         Matrix3 GetTotalInteraction(Interaction::SubType t) const;
+        double GetTotalInteractionTrace(Interaction::SubType t) const;
 
         long GetElement() const;
         void SetElement(long element);

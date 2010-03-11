@@ -287,6 +287,18 @@ Matrix3 Spin::GetTotalInteraction(Interaction::SubType t) const {
     return total;
 }
 
+double Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
+    double total=0;
+    long interCount=mInter.size();
+    for(long i=0;i < interCount;++i) {
+        Interaction* inter=mInter[i];
+        if(inter->IsSubType(t)) {
+            total+=inter->GetAsMatrix().Trace();
+        }
+    }
+    return total;
+}
+
 bool Spin::GetHasInteractionOfType(Interaction::SubType t) const {
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {

@@ -182,6 +182,9 @@ void InterNode::RawDraw(SpinachDC& dc) {
     case Interaction::ST_CUSTOM_LINEAR:
     case Interaction::ST_CUSTOM_QUADRATIC:
     case Interaction::ST_QUADRUPOLAR:
+    case Interaction::ST_ZFS:
+    case Interaction::ST_G_TENSER:
+    case Interaction::ST_SHIELDING:
         glPushMatrix(); {
             double scalling=dc.mScallings[mType];
             //glMultMatrixf(mat);
@@ -189,24 +192,17 @@ void InterNode::RawDraw(SpinachDC& dc) {
             gluSphere(dc.GetSolidQuadric(),1.0,29,37);
         } glPopMatrix();
         break;
-        //Draw as a cyclinder
     case Interaction::ST_EXCHANGE:
-    case Interaction::ST_SHIELDING:
     case Interaction::ST_SCALAR:
     case Interaction::ST_DIPOLAR:
     case Interaction::ST_CUSTOM_BILINEAR:
-    
-        break;
-        //EPR electron type interactions
-    case Interaction::ST_ZFS:
-    case Interaction::ST_G_TENSER:
-        break;
     case Interaction::ST_ANY:
     case Interaction::ST_NMR:
     case Interaction::ST_EPR:
     default:
-        throw std::logic_error("Trying to draw an interaction with an invalid type");
-        break;
+      cout << "Trying to draw an interaction with an invalid type: " << Interaction::GetSubTypeName(mType) << endl;
+      throw std::logic_error("Trying to draw an interaction with an invalid type");
+      break;
     }
 }
 void InterNode::ToPovRay(wxString& str) {

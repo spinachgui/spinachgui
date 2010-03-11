@@ -173,7 +173,7 @@ void InterNode::RawDraw(SpinachDC& dc) {
     mem_colour[2]=colour.GetZ();
     mem_colour[3]=0.3f;
 
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mem_colour);
+    //glMaterialfv(GL_FRONT, GL_SPECULAR, mem_colour);
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mem_colour);
 
     glColor4f(colour.GetX(),colour.GetY(),colour.GetZ(),0.5);

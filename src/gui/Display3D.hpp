@@ -94,7 +94,7 @@ public:
     }
 
     ///
-    void SetMaterial(const float material[3],bool use=true);
+    void SetMaterial(const float material[4],bool use=true);
 
     ///Removes a child node
     void RemoveNode(SGNode* node);

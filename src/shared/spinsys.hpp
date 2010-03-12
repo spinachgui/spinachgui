@@ -267,7 +267,9 @@ namespace SpinXML {
 
         bool GetHasInteractionOfType(Interaction::SubType t) const;
         Matrix3 GetTotalInteraction(Interaction::SubType t) const;
+        Matrix3 GetTotalInteraction(Interaction::SubType t,Spin* spin2) const;
         double GetTotalInteractionTrace(Interaction::SubType t) const;
+	double GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const;
 
         long GetElement() const;
         void SetElement(long element);
@@ -277,7 +279,6 @@ namespace SpinXML {
         sigc::signal<void,Interaction*> sigNewInteraction;
         sigc::signal<void> sigChange;
         sigc::signal<void,Spin*> sigDying;
-
     private:
         std::vector<Interaction*> mInter;
         Vector3l mPosition;

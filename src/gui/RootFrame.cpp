@@ -59,7 +59,7 @@ void RootFrame::InitFrame() {
     mSpinInterEdit = new SpinInterEditPanel(this);
     mDisplay3D     = new Display3D(this);
 
-    MoleculeNode* mn = new MoleculeNode(GetSS());
+    MoleculeNodeNew* mn = new MoleculeNodeNew(GetSS());
 
     SpinachDC& spinDC=mDisplay3D->GetDC();
 
@@ -104,17 +104,17 @@ void RootFrame::InitFrame() {
 
 
     //Set sensible default scallings
-    hfc_sp->GetLogSlider()->SetValue(0.04);
-    gt_sp ->GetLogSlider()->SetValue(0.04);
-    zfs_sp->GetLogSlider()->SetValue(0.04);
-    exc_sp->GetLogSlider()->SetValue(0.04);
-    shd_sp->GetLogSlider()->SetValue(0.04);
-    sca_sp->GetLogSlider()->SetValue(0.04);
-    qp_sp ->GetLogSlider()->SetValue(0.04);
-    dip_sp->GetLogSlider()->SetValue(0.04);
-    cl_sp ->GetLogSlider()->SetValue(0.04);
-    cb_sp ->GetLogSlider()->SetValue(0.04);
-    cq_sp ->GetLogSlider()->SetValue(0.04);
+    hfc_sp->GetLogSlider()->SetValue(1);
+    gt_sp ->GetLogSlider()->SetValue(1);
+    zfs_sp->GetLogSlider()->SetValue(1);
+    exc_sp->GetLogSlider()->SetValue(1);
+    shd_sp->GetLogSlider()->SetValue(1);
+    sca_sp->GetLogSlider()->SetValue(1);
+    qp_sp ->GetLogSlider()->SetValue(1);
+    dip_sp->GetLogSlider()->SetValue(1);
+    cl_sp ->GetLogSlider()->SetValue(1);
+    cb_sp ->GetLogSlider()->SetValue(1);
+    cq_sp ->GetLogSlider()->SetValue(1);
 
     //Set sensible default visibility
     hfc_sp -> SetVisible(true);
@@ -381,7 +381,7 @@ void RootFrame::OnResize(wxSizeEvent&e) {
 
 
 void RootFrame::OnGLReset(wxCommandEvent& e) {
-    mDisplay3D->SetRootSGNode(new MoleculeNode(GetSS()));  
+    mDisplay3D->SetRootSGNode(new MoleculeNodeNew(GetSS()));  
 }
 
 void RootFrame::OnBondToggle(wxCommandEvent& e) {

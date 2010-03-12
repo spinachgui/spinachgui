@@ -293,11 +293,24 @@ double Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
         if(inter->IsSubType(t)) {
-            total+=inter->GetAsMatrix().Trace();
+            total+=inter->GetAsScalar();
         }
     }
     return total;
 }
+
+double Spin::GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const {
+    double total=0;
+    long interCount=mInter.size();
+    for(long i=0;i < interCount;++i) {
+        Interaction* inter=mInter[i];
+        if(inter->IsSubType(t) && inter->GetOtherSpin(this)==spin2) {
+            total+=inter->GetAsScalar();
+        }
+    }
+    return total;
+}
+
 
 bool Spin::GetHasInteractionOfType(Interaction::SubType t) const {
     long interCount=mInter.size();

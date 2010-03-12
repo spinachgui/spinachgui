@@ -342,10 +342,6 @@ void MoleculeNode::OnReload() {
 	    }
 	    cout << i << " " << j << endl;
 	    //Add nodes to draw the bilinear interactions
-	    AddNode(new BilinInterNode(spin1,spin2,Interaction::ST_DIPOLAR));	      
-	    AddNode(new BilinInterNode(spin1,spin2,Interaction::ST_CUSTOM_BILINEAR)); 
-	    AddNode(new BilinInterNode(spin1,spin2,Interaction::ST_SCALAR));	      
-	    AddNode(new BilinInterNode(spin1,spin2,Interaction::ST_EXCHANGE));        
 	}
     }
 }
@@ -476,110 +472,6 @@ MoleculeFG::MoleculeFG(SpinSystem* ss)
     }
 }
 
-//============================================================//
-// BilinInterNode
-
-BilinInterNode::BilinInterNode(SpinXML::Spin* spin1,SpinXML::Spin* spin2, SpinXML::Interaction::SubType st) 
-    : mSpin1(spin1),mSpin2(spin2),mType(st) {
-    mSpin1->sigDying.connect(mem_fun(this,&BilinInterNode::OnSpinDying));
-    mSpin2->sigDying.connect(mem_fun(this,&BilinInterNode::OnSpinDying));
-
-    spin1->sigNewInteraction.connect(mem_fun(this,&BilinInterNode::OnNewInteraction));
-    spin2->sigNewInteraction.connect(mem_fun(this,&BilinInterNode::OnNewInteraction));
-
-    LoadInteractionTrace();
-    SetTranslucency(0.6,true);
-}
-
-void BilinInterNode::OnNewInteraction(Interaction* inter) {
-    if(inter->GetSubType()==mType) {
-        LoadInteractionTrace();
-    }
-}
-
-void BilinInterNode::LoadInteractionTrace() {
-    total_trace=mSpin1->GetTotalInteractionTrace(mType);
-    Dirty();
-}
-
-
-void BilinInterNode::RawDraw(SpinachDC& dc) {
-    if(!dc.mVisible[mType]) 
-        return;
-    Vector3& colour=dc.mInterColours[mType];
-
-    LoadInteractionTrace();
-    GLfloat mem_colour[4];
-    mem_colour[0]=colour.GetX();
-    mem_colour[1]=colour.GetY();
-    mem_colour[2]=colour.GetZ();
-    mem_colour[3]=0.6f;
-
-    //glMaterialfv(GL_FRONT, GL_SPECULAR, mem_colour);
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mem_colour);
-
-    glColor4f(colour.GetX(),colour.GetY(),colour.GetZ(),0.5);
-    switch(mType) {
-    case Interaction::ST_EXCHANGE:
-    case Interaction::ST_SHIELDING:
-    case Interaction::ST_SCALAR:
-    case Interaction::ST_DIPOLAR:
-    case Interaction::ST_CUSTOM_BILINEAR:
-        {
-	    cout << "Drawing a bilinear interaction" << endl;
-            length x1,y1,z1;
-            length x2,y2,z2;
-            mSpin1->GetCoordinates(&x1,&y1,&z1);
-            mSpin2->GetCoordinates(&x2,&y2,&z2);
-            
-            length len=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
-			
-            //Now we need to find the rotation between the z axis
-            double angle=acos(((z2-z1)/len)[unitless]);
-            glPushMatrix(); {
-                glTranslatef(x1[Angstroms],y1[Angstroms],z1[Angstroms]);
-                glRotatef(angle/2/pi*360,y1[Angstroms]-y2[Angstroms],x2[Angstroms]-x1[Angstroms],0);
-                gluCylinder(dc.GetSolidQuadric(),0.05,0.05,len[Angstroms],7,7);
-            } glPopMatrix();
-
-            double scalling=dc.mScallings[mType];
-            //glMultMatrixf(mat);
-            glScalef(scalling,scalling,scalling);
-            gluSphere(dc.GetSolidQuadric(),1.0,29,37);
-        }
-        break;
-        //EPR electron type interactions
-    case Interaction::ST_HFC:
-    case Interaction::ST_CUSTOM_LINEAR:
-    case Interaction::ST_CUSTOM_QUADRATIC:
-    case Interaction::ST_QUADRUPOLAR:
-    case Interaction::ST_ZFS:
-    case Interaction::ST_G_TENSER:
-    case Interaction::ST_ANY:
-    case Interaction::ST_NMR:
-    case Interaction::ST_EPR:
-    default:
-        throw std::logic_error("Trying to draw an bilinear interaction with an invalid type");
-        break;
-    }
-}
-void BilinInterNode::ToPovRay(wxString& str) {
-    if(true) {
-        /* Do nothing, for now */
-    } else {
-        str << wxT("sphere {<0,0,0> 0.04\n");
-        str << wxT("matrix<")
-            << mat[0 ] << wxT(",") << mat[1 ] << wxT(",") << mat[2 ]
-            << mat[4 ] << wxT(",") << mat[5 ] << wxT(",") << mat[6 ]
-            << mat[8 ] << wxT(",") << mat[9 ] << wxT(",") << mat[10]
-            << mat[12] << wxT(",") << mat[13] << wxT(",") << mat[14]
-            << wxT(">\n");
-        str << wxT("pigment {color rgbf <0.8,0.8,0.8,.8>}\n");
-        str << wxT("finish {reflection 0.1 refraction 0.9 phong 1.0}\n");
-        str << wxT("}\n");
-    }
-
-}
 
 //============================================================
 // The New 3D Code

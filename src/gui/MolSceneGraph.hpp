@@ -41,23 +41,6 @@ private:
     float mat[16];
 };
 
-class BilinInterNode : public SGNode {
-public:
-    BilinInterNode(SpinXML::Spin* spin1,SpinXML::Spin* spin2, SpinXML::Interaction::SubType st);
-    void OnSpinDying(Spin*) {delete this;}
-    void LoadInteractionTrace();
-
-    void OnNewInteraction(Interaction* inter);
-private:
-    SpinXML::Spin* mSpin1;
-    SpinXML::Spin* mSpin2;
-    SpinXML::Interaction::SubType mType;
-
-    void SetMatrix(const Matrix3& mat);
-    virtual void RawDraw(SpinachDC& dc);
-    virtual void ToPovRay(wxString& src);
-    double total_trace;
-};
 
 class MoleculeNode : public SGNode {
 public:

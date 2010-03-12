@@ -142,6 +142,13 @@ ddouble<E,L> operator/(double no_unit,ddouble<E,L> with_unit) {
     return ddouble<E,L>(with_unit.si/no_unit);
 }
 
+///This template enables expressions like length x=-x; 
+template<int E,int L>
+ddouble<E,L> operator-(ddouble<E,L> with_unit) {
+    return ddouble<E,L>(-with_unit);
+}
+
+
 ///This template enables expressions like length x=len*2; 
 template<int E,int L>
 ddouble<E,L> operator*(ddouble<E,L> with_unit,double no_unit) {
@@ -170,6 +177,19 @@ template<int E,int L>
 ddouble<E,L> operator+(ddouble<E,L> lhs,ddouble<E,L> rhs) {
     return ddouble<E,L>(lhs.si+rhs.si);
 }
+
+///This template enables expressions like x+=length1
+template<int E,int L>
+ddouble<E,L> operator+=(ddouble<E,L> lhs,ddouble<E,L> rhs) {
+    return ddouble<E,L>(lhs.si+=rhs.si);
+}
+
+///This template enables expressions like x-=length1
+template<int E,int L>
+ddouble<E,L> operator-=(ddouble<E,L> lhs,ddouble<E,L> rhs) {
+    return ddouble<E,L>(lhs.si-=rhs.si);
+}
+
 
 ///This template enables expressions like x=length1+length2
 template<int E,int L>

@@ -287,8 +287,8 @@ Matrix3 Spin::GetTotalInteraction(Interaction::SubType t) const {
     return total;
 }
 
-double Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
-    double total=0;
+energy Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
+    energy total=0*MHz;
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -299,8 +299,8 @@ double Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
     return total;
 }
 
-double Spin::GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const {
-    double total=0;
+energy Spin::GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const {
+    energy total=0*MHz;
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -322,8 +322,8 @@ bool Spin::GetHasInteractionOfType(Interaction::SubType t) const {
     return false;
 }
 
-double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
-    double total=0.0;
+energy Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
+    energy total=0.0*MHz;
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -338,8 +338,8 @@ double Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
 }
 
 
-double Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
-    double total=0.0;
+energy Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
+    energy total=0.0*MHz;
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -617,33 +617,33 @@ void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orienta
     return;
 }
 
-double Interaction::GetAsScalar() const {
+energy Interaction::GetAsScalar() const {
     if(mType==SCALAR) {
         //Return the identity multipled by the scalar
-        double s=mData.mScalar;
-        return s;
+        return mData.mScalar * Joules;
     } else if(mType==MATRIX) {
-        return mData.mMatrix->Trace();
+        return mData.mMatrix->Trace() * Joules;
     } else if(mType==EIGENVALUES) {
-        return mData.mEigenvalues.XX+mData.mEigenvalues.YY+mData.mEigenvalues.ZZ;
+        return (mData.mEigenvalues.XX+mData.mEigenvalues.YY+mData.mEigenvalues.ZZ) * Joules;
     } else if(mType==AXRHOM) {
-        double a=mData.mAxRhom.ax;
-        double r=mData.mAxRhom.rh;
-        double iso=mData.mAxRhom.iso;
-        double xx=a/3+iso/3;
-        double yy=-r/2-a/6+iso/3;
-        double zz= r/2-a/6+iso/3;
+        energy a=mData.mAxRhom.ax    *Joules;
+        energy r=mData.mAxRhom.rh    *Joules;
+        energy iso=mData.mAxRhom.iso *Joules;
+        energy xx=a/3+iso/3;
+        energy yy=-r/2-a/6+iso/3;
+        energy zz= r/2-a/6+iso/3;
         return xx+yy+zz;
     } else if(mType==SPANSKEW) {
-        double span=mData.mSpanSkew.span;
-        double skew=mData.mSpanSkew.skew;
-        double iso=mData.mSpanSkew.iso;
-        double xx=span*skew/6-span/2;
-        double yy=iso-span*skew/3;
-        double zz=span*skew/6+span/2;
+        energy span=mData.mSpanSkew.span *Joules;
+        double skew=mData.mSpanSkew.skew;  //Skew has no unit
+        energy iso=mData.mSpanSkew.iso   *Joules;
+        energy xx=span*skew/6-span/2;
+        energy yy=iso-span*skew/3;
+        energy zz=span*skew/6+span/2;
         return xx+yy+zz;
+    } else {
+	throw runtime_error("Called GetAsScalar on an interaction with no type!");
     }
-    return 0;
 }
 
 Matrix3 Interaction::GetAsMatrix() const {

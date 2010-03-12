@@ -175,7 +175,7 @@ namespace SpinXML {
         bool GetIsQuadratic();
 
         ///Get the isotropic value of the interaction
-        double GetAsScalar() const;
+        energy GetAsScalar() const;
         ///Get the interaction as a full matrix
         Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
         sigc::signal<void> sigChange;
@@ -259,8 +259,8 @@ namespace SpinXML {
         }
         void OnInteractionChange() {sigChange();}
 
-        double GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
-        double GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
+        energy GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
+        energy GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
 
         Matrix3 GetLinearInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
         Matrix3 GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
@@ -268,8 +268,8 @@ namespace SpinXML {
         bool GetHasInteractionOfType(Interaction::SubType t) const;
         Matrix3 GetTotalInteraction(Interaction::SubType t) const;
         Matrix3 GetTotalInteraction(Interaction::SubType t,Spin* spin2) const;
-        double GetTotalInteractionTrace(Interaction::SubType t) const;
-	double GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const;
+        energy GetTotalInteractionTrace(Interaction::SubType t) const;
+	energy GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const;
 
         long GetElement() const;
         void SetElement(long element);

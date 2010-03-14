@@ -3,9 +3,7 @@
 #define _unit_h
 
 #include <iostream>
-#include <istream>
 #include <string>
-#include <vector>
 #include <cmath>
 
 /*************************************************************
@@ -24,7 +22,16 @@ unit type being assigned to the ddouble)
 *************************************************************/
 
 
-template<int energy,int length>
+#define unit_template_dec1 int E1,int L1
+#define unit_template_dec2 int E2,int L2
+
+#define unit_template_inst1 E1,L1
+#define unit_template_inst2 E2,L2
+
+#define unit_template_combine(utc_op) E1 utc_op E2,L1 utc_op L2
+#define unit_template_inst_with_metafunc1(metafuc) E1 metafuc,L1 metafuc
+
+template<unit_template_dec1>
 class unit {
 public:
     unit(const std::string& name,double toSIf) : mName(name) {
@@ -54,12 +61,12 @@ private:
 
 ///This template is used to make cin >> x[metres]; y[MHz]=400; type
 /// syntax work, it shouldn't be used explicitly
-template<int energy,int length>
+template<unit_template_dec1>
 struct ddouble_helper {
-    ddouble_helper(double* _si,const unit<energy,length>& _u) 
+    ddouble_helper(double* _si,const unit<unit_template_inst1>& _u) 
         : u(_u),si(_si) {
     }
-    const ddouble_helper& setup(double* _si,const unit<energy,length>& _u) {
+    const ddouble_helper& setup(double* _si,const unit<unit_template_inst1>& _u) {
         si=_si;
         u=_u;
         return *this;
@@ -72,27 +79,27 @@ struct ddouble_helper {
         *si=u.toSI(val);
         return val;
     }
-    unit<energy,length> u;
+    unit<unit_template_inst1> u;
     double* si;
 };
 
-template<int energy,int length>
-std::istream& operator >> (std::istream& in,const ddouble_helper<energy,length>& val) {
+template<unit_template_dec1>
+std::istream& operator >> (std::istream& in,const ddouble_helper<unit_template_inst1>& val) {
     double temp;
     in >> temp;
     (*val.si)=val.u.toSI(temp);
     return in;
 }
 
-template<int energy,int length>
-std::ostream& operator << (std::ostream& out,const ddouble_helper<energy,length>& val) {
+template<unit_template_dec1>
+std::ostream& operator << (std::ostream& out,const ddouble_helper<unit_template_inst1>& val) {
     out << val.u.fromSI(*(val.si));
     return out;
 }
 
-template<int energy,int length>
+template<unit_template_dec1>
 struct ddouble {
-    typedef ddouble<energy,length> self_t;
+    typedef ddouble<unit_template_inst1> self_t;
     ///An uninitalised ddouble works just like an uninitalised double
     ddouble() {
     }
@@ -101,120 +108,133 @@ struct ddouble {
     explicit ddouble(double _si) : si(_si) {
     }
     ///Construct a 
-    ddouble(double quantity,const unit<energy,length>& u) 
+    ddouble(double quantity,const unit<unit_template_inst1>& u) 
         : si(u.toSI(quantity)){
     }
-    //static ddouble_helper<energy,length> helper;
+    //static ddouble_helper<unit_template_inst1> helper;
     ///Get the quantity in a particular unit example usage: double
     ///gap=energy_gap[MHz]; Not thread safe, I'm not sure how to
     ///achive thread safeness right now, and it probably doesn't
     ///matter.
-    const ddouble_helper<energy,length> operator[](const unit<energy,length>& u) {
-        return ddouble_helper<energy,length>(&si,u);
+    const ddouble_helper<unit_template_inst1> operator[](const unit<unit_template_inst1>& u) {
+        return ddouble_helper<unit_template_inst1>(&si,u);
     }
     //The physical quatity in SI units
     double si;
 };
 
-///This template enables expressions like api_call(400*MHz); where
-///otherwise api_call(energy(400,MHz)) would have been needed
-template<int E,int L>
-ddouble<E,L> operator*(double quantity,unit<E,L> u) {
-    return ddouble<E,L>(quantity,u);
-}
+///Special case of the unitless ddouble, which can be convered to and
+///from a regular double implicityly
+template<>
+struct ddouble<0,0> {
+    typedef ddouble<0,0> self_t;
+    ///An uninitalised ddouble works just like an uninitalised double
+    ddouble() {
+    }
+    //Allow implicit conversiont to double
+    operator double() {
+	return si;
+    }
+    ///Trying to construct a ddouble without specifying a unit doesn't
+    ///work unless you explicitly say you know what you're doing.
+    ddouble(double _si) : si(_si) {
+    }
+    ///Construct a 
+    ddouble(double quantity,const unit<0,0>& u) 
+        : si(u.toSI(quantity)){
+    }
+    //static ddouble_helper<0,0> helper;
+    ///Get the quantity in a particular unit example usage: double
+    ///gap=energy_gap[MHz]; Not thread safe, I'm not sure how to
+    ///achive thread safeness right now, and it probably doesn't
+    ///matter.
+    const ddouble_helper<0,0> operator[](const unit<0,0>& u) {
+        return ddouble_helper<0,0>(&si,u);
+    }
+    //The physical quatity in SI units
+    double si;
+};
 
-///This template enables expressions like api_call(MHz*400); where
-///otherwise api_call(energy(400,MHz)) would have been needed
-template<int E,int L>
-ddouble<E,L> operator*(unit<E,L> u,double quantity) {
-    return ddouble<E,L>(quantity,u);
-}
 
-///This template enables expressions like length x=2*len; 
-template<int E,int L>
-ddouble<E,L> operator*(double no_unit,ddouble<E,L> with_unit) {
-    return ddouble<E,L>(with_unit.si*no_unit);
+///These templates enable basic expressions that do not change the
+///unit (are closed in the unit)
+#define declare_op_closed(op)						\
+    template<unit_template_dec1>					\
+    ddouble<unit_template_inst1> operator op(ddouble<unit_template_inst1> lhs, \
+					     ddouble<unit_template_inst1> rhs) { \
+	return ddouble<unit_template_inst1>(lhs.si op rhs.si);		\
+    }
+declare_op_closed(+);
+declare_op_closed(+=);
+declare_op_closed(-);
+declare_op_closed(-=);
+
+
+
+//Declare an operator that does not change the dimension
+#define declare_op_open(op, meta_op)					\
+    template<unit_template_dec1,unit_template_dec2>			\
+    ddouble<unit_template_combine(meta_op)> operator op (ddouble<unit_template_inst1> lhs, \
+							 ddouble<unit_template_inst2> rhs) { \
+	return ddouble<unit_template_combine(meta_op)>(lhs.si op rhs.si); \
+    }
+declare_op_open(*,+);
+declare_op_open(*=,+);
+declare_op_open(/,-);
+declare_op_open(/=,-);
+
+//Delcare an operator the maps two ddoubles onto a bool
+#define declare_predicate(op)						\
+    template<unit_template_dec1>					\
+    bool operator op (ddouble<unit_template_inst1> lhs,			\
+		      ddouble<unit_template_inst1> rhs) {		\
+	return (lhs.si op rhs.si);					\
+    }
+
+declare_predicate(>);
+declare_predicate(<);
+
+///This template enables expressions like sqrt(legnth * length)
+template<unit_template_dec1>
+ddouble<unit_template_inst_with_metafunc1(/2)> sqrt(ddouble<unit_template_inst1> lhs) {
+    return ddouble<unit_template_inst_with_metafunc1(/2)>(std::sqrt(lhs.si));
 }
 
 ///This template enables expressions like length x=2/len; 
-template<int E,int L>
-ddouble<E,L> operator/(double no_unit,ddouble<E,L> with_unit) {
-    return ddouble<E,L>(with_unit.si/no_unit);
-}
+#define declate_half_unitless_op(op)				\
+    template<unit_template_dec1>					\
+    ddouble<unit_template_inst1> operator op (double no_unit,		\
+					      ddouble<unit_template_inst1> with_unit) { \
+	return ddouble<unit_template_inst1>(no_unit op with_unit.si);	\
+    }									\
+    template<unit_template_dec1>					\
+    ddouble<unit_template_inst1> operator op (ddouble<unit_template_inst1> with_unit, \
+					      double no_unit) {		\
+	return ddouble<unit_template_inst1>(with_unit.si op no_unit);	\
+    }
+declate_half_unitless_op(*);
+declate_half_unitless_op(/);
+
+///This template enables expressions like like api_call(400*MHz);
+/// where otherwise api_call(energy(400,MHz)) would have been needed
+#define declate_literal_helper(op)					\
+    template<unit_template_dec1>					\
+    ddouble<unit_template_inst1> operator op (double no_unit,		\
+					      unit<unit_template_inst1> u) { \
+	return ddouble<unit_template_inst1>(no_unit,u);			\
+    }									\
+    template<unit_template_dec1>					\
+    ddouble<unit_template_inst1> operator op (unit<unit_template_inst1> u, \
+					      double no_unit) {		\
+	return ddouble<unit_template_inst1>(no_unit,u);			\
+    }
+declate_literal_helper(*);
 
 ///This template enables expressions like length x=-x; 
-template<int E,int L>
-ddouble<E,L> operator-(ddouble<E,L> with_unit) {
-    return ddouble<E,L>(-with_unit);
+template<unit_template_dec1>
+ddouble<unit_template_inst1> operator-(ddouble<unit_template_inst1> with_unit) {
+    return ddouble<unit_template_inst1>(-with_unit);
 }
-
-
-///This template enables expressions like length x=len*2; 
-template<int E,int L>
-ddouble<E,L> operator*(ddouble<E,L> with_unit,double no_unit) {
-    return ddouble<E,L>(with_unit.si*no_unit);
-}
-
-///This template enables expressions like length x=len/2; 
-template<int E,int L>
-ddouble<E,L> operator/(ddouble<E,L> with_unit,double no_unit) {
-    return ddouble<E,L>(with_unit.si/no_unit);
-}
-
-
-template<int E1,int E2,int L1,int L2>
-ddouble<E1+E2,L1+L2> operator*(ddouble<E1,L1> lhs,ddouble<E2,L2> rhs) {
-    return ddouble<E1+E2,L1+L2>(lhs.si*rhs.si);
-}
-
-template<int E1,int E2,int L1,int L2>
-ddouble<E1-E2,L1-L2> operator/(ddouble<E1,L1> lhs,ddouble<E2,L2> rhs) {
-    return ddouble<E1-E2,L1-L2>(lhs.si/rhs.si);
-}
-
-///This template enables expressions like x=length1+length2
-template<int E,int L>
-ddouble<E,L> operator+(ddouble<E,L> lhs,ddouble<E,L> rhs) {
-    return ddouble<E,L>(lhs.si+rhs.si);
-}
-
-///This template enables expressions like x+=length1
-template<int E,int L>
-ddouble<E,L> operator+=(ddouble<E,L> lhs,ddouble<E,L> rhs) {
-    return ddouble<E,L>(lhs.si+=rhs.si);
-}
-
-///This template enables expressions like x-=length1
-template<int E,int L>
-ddouble<E,L> operator-=(ddouble<E,L> lhs,ddouble<E,L> rhs) {
-    return ddouble<E,L>(lhs.si-=rhs.si);
-}
-
-
-///This template enables expressions like x=length1+length2
-template<int E,int L>
-ddouble<E,L> operator-(const ddouble<E,L>& lhs,const ddouble<E,L>& rhs) {
-    return ddouble<E,L>(lhs.si-rhs.si);
-}
-
-///This template enables expressions like length1 > length2
-template<int E,int L>
-bool operator>(const ddouble<E,L>& lhs,const ddouble<E,L>& rhs) {
-    return lhs.si>rhs.si;
-}
-
-///This template enables expressions like length1 < length2
-template<int E,int L>
-bool operator<(ddouble<E,L> lhs,ddouble<E,L> rhs) {
-    return lhs.si<rhs.si;
-}
-
-///This template enables expressions like sqrt(legnth * length)
-template<int E,int L>
-ddouble<E/2,L/2> sqrt(ddouble<E,L> lhs) {
-    return ddouble<E/2,L/2>(std::sqrt(lhs.si));
-}
-
 
 
 

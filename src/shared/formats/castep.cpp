@@ -64,6 +64,8 @@ struct v_parser_type : symbols<unsigned> {
 
 } v_xyz_p;
 
+///Important note: the global castep_p parser is not thread safe (in
+///case it ever becomes relevent)
 struct castep : grammar<castep> {
 #define getString(x) string((x)->value.begin(),(x)->value.end())
 #define getDouble(x) strtod(string((x)->value.begin(),(x)->value.end()).c_str(),NULL)
@@ -93,6 +95,7 @@ struct castep : grammar<castep> {
     spin_map_t spin_map;
 
     void process_tree(tree_iter_t tree,SpinSystem* ss) {
+        spin_map.clear();
         //============================================================//
         // First pass, create spin objects and add them to the spin system
         //============================================================//

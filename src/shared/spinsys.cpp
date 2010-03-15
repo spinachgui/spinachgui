@@ -489,18 +489,12 @@ void Interaction::Dump() const {
 
 const char* Interaction::GetTypeName(Type t) {
     switch(t) {
-    case UNDEFINED:
-        return "Undefined";
-    case SCALAR:
-        return "Scalar";      
-    case MATRIX:
-        return "Matrix";     
-    case EIGENVALUES:
-        return "Eigenvalues";
-    case AXRHOM:
-        return "Axiality-Rhombicty";
-    case SPANSKEW:
-        return "Span-Skew";
+    case UNDEFINED:       return "Undefined";
+    case SCALAR:          return "Scalar";      
+    case MATRIX:          return "Matrix";     
+    case EIGENVALUES:     return "Eigenvalues";
+    case AXRHOM:          return "Axiality-Rhombicty";
+    case SPANSKEW:        return "Span-Skew";
     default:
         ostringstream stream;
         stream << "Unknow type submited to Interaction::GetTypeName() (t=";

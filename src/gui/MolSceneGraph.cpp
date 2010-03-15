@@ -540,9 +540,10 @@ void SpinDrawerNode::RawDraw(SpinachDC& dc) {
 	glMaterialfv(GL_FRONT, GL_SPECULAR, white);
 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
 	if(spin->GetElement()==0) {
-	    glTranslatef(40,dc.height-40,0);
-	    glMultMatrixf(dc.mRotationMatrix);
-	    gluSphere(dc.GetSolidQuadric(),9,14,14);
+            //Bug resulting in drawing no content after a g03 load tracked to this line:
+	    //glTranslatef(40.0f,dc.height-40.0f,0.0f);
+	    //glMultMatrixf(dc.mRotationMatrix);
+	    //gluSphere(dc.GetSolidQuadric(),9,14,14);
 
 	} else {
 	    gluSphere(dc.GetSolidQuadric(),0.1,14,14);

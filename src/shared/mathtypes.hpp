@@ -459,6 +459,9 @@ namespace SpinXML {
         ///Copies the matrix
         Matrix4(const Matrix4& m);
 
+        ///Constructs the matrix from a 3x3 matrix
+        Matrix4(const Matrix3&m);
+
         ///Print the matrix to the standard output in a human readable
         ///format
         void Dump() const;

@@ -49,6 +49,14 @@ Matrix4:: Matrix4(double a00,double a01,double a02,double a03,
     raw[12]=a30;  raw[13]=a31;   raw[14]=a32;  raw[15]=a33;
 }
 
+Matrix4::Matrix4(const Matrix3&m) {
+    const double* _raw=m.GetRaw();
+    raw[0 ]=_raw[0]; raw[1 ]=_raw[1]; raw[2 ]=_raw[2]; raw[3 ]=0;
+    raw[4 ]=_raw[3]; raw[5 ]=_raw[4]; raw[6 ]=_raw[5]; raw[7 ]=0;
+    raw[8 ]=_raw[6]; raw[9 ]=_raw[7]; raw[10]=_raw[8]; raw[11]=0;
+    raw[12]=0;       raw[13]=0;       raw[14]=0;       raw[15]=1;
+}
+
 Matrix4::Matrix4(const Matrix4& m) {
   memcpy(raw,m.raw,16*sizeof(double));
 }

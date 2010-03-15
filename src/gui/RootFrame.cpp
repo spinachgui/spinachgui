@@ -104,7 +104,7 @@ void RootFrame::InitFrame() {
 
 
     //Set sensible default scallings
-    hfc_sp->GetLogSlider()->SetValue(1);
+    hfc_sp->GetLogSlider()->SetValue(1e23);
     gt_sp ->GetLogSlider()->SetValue(1);
     zfs_sp->GetLogSlider()->SetValue(1);
     exc_sp->GetLogSlider()->SetValue(1);

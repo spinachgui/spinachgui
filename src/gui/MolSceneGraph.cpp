@@ -622,6 +622,28 @@ void InteractionDrawerNode::RawDrawInterType(SpinachDC& dc,Interaction::SubType 
     long count = mSS->GetSpinCount();
     for(long i=0;i<count;i++) {
 	Spin* spin=mSS->GetSpin(i);
+        Matrix3 mat3=spin->GetTotalInteraction(st);
+        GLfloat mat[16];
+        mat[3 ]=0;
+        mat[7 ]=0;
+        mat[11]=0;
+        mat[12]=0;
+        mat[13]=0;
+        mat[14]=0;
+        mat[15]=1;
+
+        mat[0 ]=abs(mat3.Get(0,0));
+	mat[1 ]=abs(mat3.Get(0,1));
+	mat[2 ]=abs(mat3.Get(0,2));
+			
+	mat[4 ]=abs(mat3.Get(1,0));
+	mat[5 ]=abs(mat3.Get(1,1));
+	mat[6 ]=abs(mat3.Get(1,2));
+			
+	mat[8 ]=abs(mat3.Get(2,0));
+	mat[9 ]=abs(mat3.Get(2,1));
+	mat[10]=abs(mat3.Get(2,2));
+
         glPushMatrix(); {
 	    if(spin->GetElement()!=0) {
 		if(st==Interaction::ST_G_TENSER) continue;
@@ -634,9 +656,8 @@ void InteractionDrawerNode::RawDrawInterType(SpinachDC& dc,Interaction::SubType 
 		if(st==Interaction::ST_SHIELDING  ) continue;
 		if(st==Interaction::ST_HFC        ) continue;
 	    }
-
             double scalling=dc.mScallings[st];
-            //glMultMatrixf(mat);
+            glMultMatrixf(mat);
             glScalef(scalling,scalling,scalling);
             gluSphere(dc.GetSolidQuadric(),1.0,29,37);
         } glPopMatrix();

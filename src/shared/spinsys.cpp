@@ -647,9 +647,6 @@ energy Interaction::GetAsScalar() const {
 }
 
 Matrix3 Interaction::GetAsMatrix() const {
-    return Matrix3(1,0,0,
-                   0,10,0,
-                   0,0,5);
     if(mType==SCALAR) {
         //Return the identity multipled by the scalar
         double s=mData.mScalar;

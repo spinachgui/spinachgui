@@ -530,7 +530,7 @@ void SpinDrawerNode::RawDraw(SpinachDC& dc) {
 			 spin->GetPosition().GetY()[Angstroms],
 			 spin->GetPosition().GetZ()[Angstroms]);
 	}
-	const static GLfloat white[3]={0.8f,0.8f,0.8f};
+	const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
 	GLfloat material[4]; material[3]=0.0f;
 
 	material[0] = getElementR(spin->GetElement());

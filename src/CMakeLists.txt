@@ -97,11 +97,15 @@ add_library(spinxml STATIC       ${sharedSources} ${formatSources})
 #command line exe
 set(spinachSources ${cmdSources})
 add_executable (spinach ${spinachSources})
-target_link_libraries (spinach xerces-c -lsigc-2.0) 
-target_link_libraries (spinach f2c) 
-target_link_libraries (spinach spinxml) 
-target_link_libraries(spinach ${Boost_LIBRARIES})
-target_link_libraries(spinach  lapack_LINUX)
+target_link_libraries (spinach 
+  xerces-c
+  sigc-2.0
+  spinxml
+  ${Boost_LIBRARIES}
+  lapack_LINUX 
+  blas_LINUX
+  f2c
+)
 #C++ GUI
 set(wxSpinachSources ${guiSources})
 add_executable (wxSpinach ${wxSpinachSources})

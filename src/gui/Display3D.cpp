@@ -293,6 +293,24 @@ Display3D::~Display3D() {
     }
 }
 
+void Display3D::PrintTransformMatricese() {
+    // get the current modelview matrix
+    GLfloat mv[16];
+    GLfloat p[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX , mv);
+    glGetFloatv(GL_PROJECTION_MATRIX , p);
+
+    cout << "(" << mv[0]  << "," << mv[1]  << "," << mv[2]  << "," << mv[3]  << endl
+         << " " << mv[4]  << "," << mv[5]  << "," << mv[6]  << "," << mv[7]  << "," << endl
+         << " " << mv[8]  << "," << mv[9]  << "," << mv[10] << "," << mv[11] << "," << endl
+         << " " << mv[12] << "," << mv[13] << "," << mv[14] << "," << mv[15] << "," << ")" << endl;
+
+    cout << "(" << p[0]  << "," << p[1]  << "," << p[2]  << "," << p[3]  << "," << endl
+         << " " << p[4]  << "," << p[5]  << "," << p[6]  << "," << p[7]  << "," << endl
+         << " " << p[8]  << "," << p[9]  << "," << p[10] << "," << p[11] << "," << endl
+         << " " << p[12] << "," << p[13] << "," << p[14] << "," << p[15] << ")" << endl;
+}
+
 
 void Display3D::EnableGL() {
     //cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;

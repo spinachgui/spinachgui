@@ -170,6 +170,8 @@ public:
     }
     void OnDirty() {Refresh();}
     SpinachDC& GetDC() {return mDC;}
+
+    void PrintTransformMatricese();
 protected:
     DECLARE_EVENT_TABLE();
 

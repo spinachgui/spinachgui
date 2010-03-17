@@ -27,6 +27,7 @@ unit type being assigned to the ddouble)
 #include <boost/mpl/plus.hpp>
 #include <boost/mpl/minus.hpp>
 #include <boost/mpl/equal.hpp>
+#include <boost/mpl/divides.hpp>
 
 #include <boost/mpl/vector_c.hpp>
 
@@ -40,6 +41,12 @@ struct plus_f {
 struct minus_f {
     template <class T1, class T2>
     struct apply : mpl::minus<T1,T2> {};
+};
+
+typedef mpl::vector_c<int,2,2,2,2,2,2,2>  _by_two;
+struct divide_by_f {
+    template <class T1,class divide_by_t>
+    struct apply : mpl::divides<T1,divide_by_t> {};
 };
 
 
@@ -60,37 +67,44 @@ typedef mpl::vector_c<int,1,1,-2,0,0,0,0>  _force;
 typedef mpl::vector_c<int,1,2,-2,0,0,0,0>  _energy;
 typedef mpl::vector_c<int,0,0,-1,0,0,0,0>  _frequency;
 
-typedef mpl::transform<_length, _length,plus_f>::type _length2;
-typedef mpl::transform<_length2,_length,plus_f>::type _length3;
-typedef mpl::transform<_length3,_length,plus_f>::type _length4;
-typedef mpl::transform<_length4,_length,plus_f>::type _length5;
+typedef mpl::vector_c<int,0,2,0,0,0,0,0> _length2;
+typedef mpl::vector_c<int,0,3,0,0,0,0,0> _length3;
+typedef mpl::vector_c<int,0,4,0,0,0,0,0> _length4;
+typedef mpl::vector_c<int,0,5,0,0,0,0,0> _length5;
 
+typedef mpl::vector_c<int,1,0,-2,0,0,0,0> _mass_per_time2;
 
 template <class D>
 struct unit {
-	unit(const std::string& name,double toSIf) : mName(name) {
-	    mToSI=toSIf;
-	    mFromSI=1/mToSI;
-	}
-	const char* get_name_c() const {
-	    return mName.c_str();
-	}
-	const std::string& get_name() const {
-	    return mName;
-	}
-	operator const char* () {
-	    return mName.c_str();
-	}
-	inline double toSI(double nonSI) const {
-	    return mToSI*nonSI;
-	}
-	inline double fromSI(double SI) const {
-	    return mFromSI*SI;
-	}
+    unit(const std::string& name,double toSIf) : mName(name) {
+	mToSI=toSIf;
+	mFromSI=1/mToSI;
+    }
+    const char* get_name_c() const {
+	return mName.c_str();
+    }
+    const std::string& get_name() const {
+	return mName;
+    }
+    operator const char* () {
+	return mName.c_str();
+    }
+    inline double toSI(double nonSI) const {
+	return mToSI*nonSI;
+    }
+    inline double fromSI(double SI) const {
+	return mFromSI*SI;
+    }
+    inline double get_to_si() const {
+	return mToSI;
+    }
+    inline double get_from_si() const {
+	return mFromSI;
+    }
     private:
-	std::string mName;
-	double mToSI;
-	double mFromSI;
+    std::string mName;
+    double mToSI;
+    double mFromSI;
 };
 
 //============================================================//
@@ -161,28 +175,33 @@ struct dreal {
 };
 
 //Allow explicit conversion for unitless numbers
-template <>
-struct dreal<double,_unitless> {
+template <class T>
+struct dreal<T,_unitless> {
     dreal() {}
     template <class OtherDimensions>
-    dreal(dreal<double,OtherDimensions> const& rhs)
+    dreal(dreal<T,OtherDimensions> const& rhs)
 	: si(rhs.si) {
 	BOOST_STATIC_ASSERT((mpl::equal<_unitless,OtherDimensions>::type::value));
     }
 
-    dreal(double val)
+    dreal(T val)
 	: si(val) {
     }
-    operator double() {
+    operator T() const {
 	return si;
     }
-    double si;
+    T si;
 };
 
 
 template <class T, class D>
 dreal<T,D>
 operator+(dreal<T,D> x, dreal<T,D> y) {
+  return dreal<T,D>(x.si + y.si);
+}
+template <class T, class D>
+dreal<T,D>
+operator+=(dreal<T,D> x, dreal<T,D> y) {
   return dreal<T,D>(x.si + y.si);
 }
 
@@ -192,11 +211,46 @@ operator-(dreal<T,D> x, dreal<T,D> y) {
   return dreal<T,D>(x.si - y.si);
 }
 
+template <class T, class D>
+dreal<T,D>
+operator-=(dreal<T,D> x, dreal<T,D> y) {
+  return dreal<T,D>(x.si - y.si);
+}
+template <class T, class D>
+dreal<T,D>
+operator-(dreal<T,D> x) {
+  return dreal<T,D>(-x.si);
+}
+
+
+template <class T, class D>
+bool
+operator<(dreal<T,D> x, dreal<T,D> y) {
+  return x.si < y.si;
+}
+
+template <class T, class D>
+bool
+operator>(dreal<T,D> x, dreal<T,D> y) {
+  return x.si > y.si;
+}
+
+
 template <class T, class D1, class D2>
 dreal<T,typename mpl::transform<D1,D2,plus_f>::type>
 operator*(dreal<T,D1> x, dreal<T,D2> y) {
     typedef typename mpl::transform<D1,D2,plus_f>::type dim;
     return dreal<T,dim>(x.si * y.si);
+}
+template <class D>
+dreal<double,D>
+operator*(double x, dreal<double,D> y) {
+    return dreal<double,D>(x * y.si);
+}
+template <class D>
+dreal<double,D>
+operator*(dreal<double,D> y,double x) {
+    return dreal<double,D>(y.si * x);
 }
 
 template <class T, class D1, class D2>
@@ -205,31 +259,57 @@ operator/(dreal<T,D1> x, dreal<T,D2> y) {
     typedef typename mpl::transform<D1,D2,minus_f>::type dim;
     return dreal<T,dim>(x.si / y.si);
 }
+template <class T, class D>
+dreal<T,D>
+operator/(T x, dreal<T,D> y) {
+    return dreal<T,D>(x / y.si);
+}
+template <class T, class D>
+dreal<T,D>
+operator/(dreal<T,D> y,T x) {
+    return dreal<T,D>(y.si / x);
+}
+
+
+
+template <class T, class D>
+dreal<T,typename mpl::transform<D,_by_two,divide_by_f>::type>
+sqrt(dreal<T,D> x) {
+    typedef typename mpl::transform<D,_by_two,divide_by_f>::type dim;
+    return dreal<T,dim>(sqrt(x.si));
+}
 
 
 
 //============================================================//
 // Opereations on units
 
-///Alow expresions like length x=5.0/metres
+///Alow expresions like length x=5.0*metres
 template <class T, class D>
 dreal<T,D>
-operator/(T real, unit<D> u) {
+operator*(T real, unit<D> u) {
     return dreal<T,D>(u.toSI(real));
 }
 
-///Alow expresions like area a=2/(metres * metres)
+///Alow expresions like area a=2*(metres * metres)
 template <class D1, class D2>
 unit<typename mpl::transform<D1,D2,plus_f> >
 operator * (unit<D1> u1, unit<D2> u2) {
-    return unit<typename mpl::transform<D1,D2,plus_f> >();
+    return unit<typename mpl::transform<D1,D2,plus_f> >(
+							u1.get_name() + "x" + u2.get_name(),
+							u1.get_to_si()*u2.get_to_si()
+							);
 }
 
 ///Alow expresions like speed = 3*(metres/second)
 template <class D1, class D2>
 unit<typename mpl::transform<D1,D2,minus_f> >
 operator / (unit<D1> u1, unit<D2> u2) {
-    return unit<typename mpl::transform<D1,D2,minus_f> >();
+    return
+	unit<typename mpl::transform<D1,D2,minus_f> >(
+						      u1.get_name() + "/" + u2.get_name(),
+						      u1.get_to_si()/u2.get_to_si()
+						      );
 }
 
 //============================================================//
@@ -249,6 +329,7 @@ name_dimension(length5);
 
 name_dimension(speed);
 
+name_dimension(mass_per_time2);
 
 name_dimension(mass);
 //Drat! Something the the standard library is already called time
@@ -260,6 +341,7 @@ name_dimension(mole);
 
 name_dimension(energy);
 
+const unitless_unit no_unit("unitless",1.0);
 
 const energy_unit Joules("Joule",1.0);
 const energy_unit Hz("Hz",6.626068e-34);
@@ -275,12 +357,20 @@ const length_unit micrometre("micrometre",1e-6);
 const length_unit nanometre("nanometre",1e-9);
 const length_unit Angstroms("Angstroms",1e-10);
 
+const length2_unit metres2("metres2",1.0);
 
 void test() {
-    length l1 = 1.0/metres;
-    length l2 = 1.0/metres;
+    dreal<double,_length> l1 = 1.0*metres;
+    dreal<double,_length> l2 = 1.0*metres;
 
-    length l3 = l1+l1;
+    length l3 = l2+(l1+l2);
+    length l4 = -l3;
+
+    length2 r2(2.0);
+
+
+    //Don't know why the length2 conversion has to be explicit here.
+    length2 result2=r2-length2(3*l1*l2);
 
     dreal<double,_time> t;// = 4/seconds;
     speed s = l1/t;

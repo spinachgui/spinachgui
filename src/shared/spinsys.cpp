@@ -3,10 +3,13 @@
 #include <sstream>
 #include <iostream>
 #include <shared/nuclear_data.hpp>
+#include <boost/variant/static_visitor.hpp>
+#include <boost/variant/apply_visitor.hpp>
 
 using namespace std;
 using namespace SpinXML;
 using namespace sigc;
+using namespace boost;
 
 //==============================================================================//
 // SpinSystem
@@ -86,7 +89,8 @@ vector<Spin*> SpinSystem::GetNearbySpins(Vector3l pos,length distance,Spin* Igno
         length deltaX=(x1-x2);
         length deltaY=(y1-y2);
         length deltaZ=(z1-z2);
-        if(deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ < dist2) {
+	length2 deltaR=deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ;
+        if(deltaR < dist2) {
             result.push_back(mSpins[i]);
         }
     }
@@ -169,20 +173,31 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             //cout << "isotope1=" << isotope1 << "  isotope2="<< isotope2 << endl;
             //cout << "g1="<< g1 << "  g2="<< g2 << endl;
 
-            length r=(r_1_2.length());
+            length r=(r_1_2.GetLength());
             length2 r2=r*r;
             length3 r3=r2*r;
             length5 r5=r2*r3;
 
-            Matrix3 dipole((r2-3*rx*rx).si  ,(3*rx*ry).si     ,(3*rx*rz).si,
-                           (3*rx*ry).si     ,(r2-3*ry*ry).si  ,(3*ry*rz).si,
-                           (3*rx*rz).si     ,(3*ry*rz).si     ,(r2-3*rz*rz).si);
+            Matrix3l2 dipole(length2(r2-length2(3.0*rx*rx)),
+			     length2(3.0*rx*ry),
+			     length2(3.0*rx*rz),
+
+		             length2(3.0*rx*ry),
+			     length2(r2-length2(3.0*ry*ry)),
+			     length2(3.0*ry*rz),
+			     
+			     length2(3.0*rx*rz),
+			     length2(3.0*ry*rz),
+			     length2(r2-length2(3.0*rz*rz)));
             static const double four_pi=12.5663706;
+#warning "Still need to check this calculation is producing sensible numbers"
             double coeff=(mu0*hbar*g1*g2/(r5.si*four_pi));
-            //cout << "coeff=" << coeff << endl;
-            dipole=dipole * coeff;
+
+	    dreal<double,_mass_per_time2>
+		dcoeff(coeff);
+            Matrix3e dipole_inter=dipole * dcoeff;
             Interaction* inter=new Interaction;
-            inter->SetMatrix(dipole);
+            inter->SetMatrix(dipole_inter);
             inter->SetSubType(Interaction::ST_DIPOLAR,spin1,spin2);
         }
     }
@@ -273,10 +288,10 @@ void Spin::RemoveInteraction(Interaction* _Interaction) {
     sigChange();
 }
 
-Matrix3 Spin::GetTotalInteraction(Interaction::SubType t) const {
-    Matrix3 total=Matrix3(0,0,0,
-                          0,0,0,
-                          0,0,0);
+Matrix3e Spin::GetTotalInteraction(Interaction::SubType t) const {
+    Matrix3e total=Matrix3e(0.0*Joules,0.0*Joules,0.0*Joules,
+			    0.0*Joules,0.0*Joules,0.0*Joules,
+			    0.0*Joules,0.0*Joules,0.0*Joules);
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -288,7 +303,7 @@ Matrix3 Spin::GetTotalInteraction(Interaction::SubType t) const {
 }
 
 energy Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
-    energy total=0*MHz;
+    energy total=0.0*MHz;
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -300,7 +315,7 @@ energy Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
 }
 
 energy Spin::GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const {
-    energy total=0*MHz;
+    energy total=0.0*MHz;
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -353,10 +368,10 @@ energy Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
     return total;
 }
 
-Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
-    Matrix3 total=Matrix3(0,0,0,
-                          0,0,0,
-                          0,0,0);
+Matrix3e Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
+    Matrix3e total=Matrix3e(0.0*Joules,0.0*Joules,0.0*Joules,
+			    0.0*Joules,0.0*Joules,0.0*Joules,
+			    0.0*Joules,0.0*Joules,0.0*Joules);
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -371,10 +386,10 @@ Matrix3 Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
 }
 
 
-Matrix3 Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
-    Matrix3 total=Matrix3(0,0,0,
-                          0,0,0,
-                          0,0,0);
+Matrix3e Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
+    Matrix3e total=Matrix3e(0.0*Joules,0.0*Joules,0.0*Joules,
+			    0.0*Joules,0.0*Joules,0.0*Joules,
+			    0.0*Joules,0.0*Joules,0.0*Joules);
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
@@ -416,75 +431,52 @@ Interaction::Interaction()
 }
 
 Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
+    mData(mData),
     mType(inter.mType),
     mSubType(inter.mSubType),
     mSpin1(inter.mSpin1),
-    mSpin2(inter.mSpin2) {
-
-    if(mType==SCALAR) {
-        mData.mScalar=inter.mData.mScalar;
-    } else if(mType==MATRIX) {
-        mData.mMatrix=new Matrix3(*inter.mData.mMatrix);
-    } else if(mType==EIGENVALUES) {
-        mData.mEigenvalues.XX=inter.mData.mEigenvalues.XX;
-        mData.mEigenvalues.YY=inter.mData.mEigenvalues.YY;
-        mData.mEigenvalues.ZZ=inter.mData.mEigenvalues.ZZ;
-        mOrient=mOrient;
-    } else if(mType==AXRHOM) {
-        mData.mAxRhom.ax=inter.mData.mAxRhom.ax;
-        mData.mAxRhom.rh=inter.mData.mAxRhom.rh;
-        mData.mAxRhom.iso=inter.mData.mAxRhom.iso;
-        mOrient=mOrient;
-    } else if(mType==SPANSKEW) {
-        mData.mSpanSkew.span=inter.mData.mSpanSkew.span;
-        mData.mSpanSkew.skew=inter.mData.mSpanSkew.skew;
-        mData.mSpanSkew.iso=inter.mData.mSpanSkew.iso;
-        mOrient=mOrient;
-    }
+    mSpin2(inter.mSpin2)  {
 }
 
 Interaction::~Interaction() {
     sigDying(this);
 }
 
+class thisVisitor : public static_visitor<> {
+public:
+    void operator()(energy& dat) const {
+	cout << "    Type=Scalar" <<  endl;
+	cout << "    Value=" << dat[MHz] << "MHz" << endl;
+    }
+    void operator()(Matrix3e& dat) const {
+	cout << "    Type=Matrix" <<  endl;
+	cout << "    Value=" << endl;
+    }
+    void operator()(eigenvalues_t& dat) const {
+	cout << "    Type=Eigenvalues" <<  endl;
+	cout << "    Value=(XX=" 
+	     << dat.XX[MHz] << "MHz ,YY="
+	     << dat.YY[MHz] << "MHz ,ZZ="
+	     << dat.ZZ[MHz] << "MHz)"
+	     << endl;
+	cout << "    Orient=";
+    }
+    void operator()(ax_rhom_t& dat) const {
+	cout << "    Type=Axiality Rhombicity" <<  endl;
+	cout << "    Value=" << endl; 
+	cout << "    Orient=";
+	cout << dat.mOrient.ToString() << endl;
+    }
+    void operator()(span_skew_t& dat) const {
+	cout << "    Type=Span-Skew" <<  endl;
+	cout << "    Value=" << endl;
+	cout << "    Orient=";
+	cout << dat.mOrient.ToString() << endl;
+    }
+};
 void Interaction::Dump() const {
     cout << "  Dumping an Interaction" << endl;
-    switch (GetType()) {
-    case UNDEFINED:
-        cout << "    Type=Undefined" <<  endl;
-        break;
-    case SCALAR:
-        cout << "    Type=Scalar" <<  endl;
-        cout << "    Value=" << mData.mScalar << endl;
-        break;
-    case MATRIX:
-        cout << "    Type=Matrix" <<  endl;
-        cout << "    Value=" << endl;
-        mData.mMatrix->Dump();
-        break;
-    case EIGENVALUES:
-        cout << "    Type=Eigenvalues" <<  endl;
-        cout << "    Value=(XX=" 
-             << mData.mEigenvalues.XX << ",YY="
-             << mData.mEigenvalues.YY << ",ZZ="
-             << mData.mEigenvalues.ZZ << ")"
-             << endl;
-        cout << "    Orient=";
-        cout << mOrient.ToString() << endl;
-        break;
-    case AXRHOM:
-        cout << "    Type=Axiality Rhombicity" <<  endl;
-        cout << "    Value=" << endl; 
-        cout << "    Orient=";
-        cout << mOrient.ToString() << endl;
-        break;
-    case SPANSKEW:
-        cout << "    Type=Span-Skew" <<  endl;
-        cout << "    Value=" << endl;
-        cout << "    Orient=";
-        cout << mOrient.ToString() << endl;
-        break;
-    }
+    // apply_visitor(thisVisitor(),mData);
 }
 
 const char* Interaction::GetTypeName(Type t) {
@@ -537,157 +529,168 @@ Interaction::Type Interaction::GetType() const {
 
 
 void Interaction::GetScalar(energy* Scalar) const {
-    (*Scalar).si=mData.mScalar;
+    *Scalar=get<energy>(mData);
 }
 
-void Interaction::GetMatrix(Matrix3* OutMatrix) const {
-    *OutMatrix=*mData.mMatrix;
+void Interaction::GetMatrix(Matrix3e* OutMatrix) const {
+    *OutMatrix=get<Matrix3e>(mData);
     return;
 }
 
 void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
-    (*XX).si=mData.mEigenvalues.XX;
-    (*YY).si=mData.mEigenvalues.YY;
-    (*ZZ).si=mData.mEigenvalues.ZZ;
-    *OrientOut=mOrient;
+    *XX=get<eigenvalues_t>(mData).XX;
+    *YY=get<eigenvalues_t>(mData).YY;
+    *ZZ=get<eigenvalues_t>(mData).ZZ;
+    *OrientOut=get<eigenvalues_t>(mData).mOrient;
     return;
 }
 
 void Interaction::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const {
-    (*iso).si=mData.mAxRhom.iso;
-    (*ax).si=mData.mAxRhom.ax;
-    (*rh).si=mData.mAxRhom.rh;
-    *OrientOut=mOrient;
+    *iso=get<ax_rhom_t>(mData).iso;
+    *ax= get<ax_rhom_t>(mData).ax;
+    *rh= get<ax_rhom_t>(mData).rh;
+    *OrientOut=get<ax_rhom_t>(mData).mOrient;
     return;
 }
 
 void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const {
-    (*iso).si=mData.mSpanSkew.iso;
-    (*Span).si=mData.mSpanSkew.span;
-    *Skew=mData.mSpanSkew.skew;
-    *OrientOut=mOrient;
+    *iso= get<span_skew_t> (mData).iso;
+    *Span=get<span_skew_t>(mData).span;
+    *Skew=get<span_skew_t>(mData).skew;
+    *OrientOut=get<span_skew_t>(mData).mOrient;
     return;
 }
 
 void Interaction::SetScalar(energy Scalar) {
     sigChange();
     mType=SCALAR;
-    mData.mScalar=Scalar.si;
+    get<energy>(mData)=Scalar;
 }
 
-void Interaction::SetMatrix(const Matrix3& Matrix) {
+void Interaction::SetMatrix(const Matrix3e& Matrix) {
     sigChange();
     mType=MATRIX;
-    mData.mMatrix=new Matrix3(Matrix);
+    get<Matrix3e>(mData)=Matrix3e(Matrix);
 }
 
 void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
     sigChange();
     mType=EIGENVALUES;
-    mData.mEigenvalues.XX=XX.si;
-    mData.mEigenvalues.YY=YY.si;
-    mData.mEigenvalues.ZZ=ZZ.si;
-    mOrient=Orient;
+    get<eigenvalues_t>(mData).XX=XX;
+    get<eigenvalues_t>(mData).YY=YY;
+    get<eigenvalues_t>(mData).ZZ=ZZ;
+    get<eigenvalues_t>(mData).mOrient=Orient;
     return;
 }
 
 void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
     sigChange();
     mType=AXRHOM;
-    mData.mAxRhom.iso=iso.si;
-    mData.mAxRhom.ax=ax.si;
-    mData.mAxRhom.rh=rh.si;
-    mOrient=Orient;
+    get<ax_rhom_t>(mData).iso=iso;
+    get<ax_rhom_t>(mData).ax=ax;
+    get<ax_rhom_t>(mData).rh=rh;
+    get<ax_rhom_t>(mData).mOrient=Orient;
     return;
 }
 
 void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
     sigChange();
     mType=SPANSKEW;
-    mData.mSpanSkew.iso=iso.si;
-    mData.mSpanSkew.span= Span.si;
-    mData.mSpanSkew.skew=Skew;
-    mOrient=Orient;
+    get<span_skew_t>(mData).iso=iso;
+    get<span_skew_t>(mData).span= Span;
+    get<span_skew_t>(mData).skew=Skew;
+    get<span_skew_t>(mData).mOrient=Orient;
     return;
 }
 
-energy Interaction::GetAsScalar() const {
-    if(mType==SCALAR) {
-        //Return the identity multipled by the scalar
-        return mData.mScalar * Joules;
-    } else if(mType==MATRIX) {
-        return mData.mMatrix->Trace() * Joules;
-    } else if(mType==EIGENVALUES) {
-        return (mData.mEigenvalues.XX+mData.mEigenvalues.YY+mData.mEigenvalues.ZZ) * Joules;
-    } else if(mType==AXRHOM) {
-        energy a=mData.mAxRhom.ax    *Joules;
-        energy r=mData.mAxRhom.rh    *Joules;
-        energy iso=mData.mAxRhom.iso *Joules;
-        energy xx=a/3+iso/3;
-        energy yy=-r/2-a/6+iso/3;
-        energy zz= r/2-a/6+iso/3;
-        return xx+yy+zz;
-    } else if(mType==SPANSKEW) {
-        energy span=mData.mSpanSkew.span *Joules;
-        double skew=mData.mSpanSkew.skew;  //Skew has no unit
-        energy iso=mData.mSpanSkew.iso   *Joules;
-        energy xx=span*skew/6-span/2;
-        energy yy=iso-span*skew/3;
-        energy zz=span*skew/6+span/2;
-        return xx+yy+zz;
-    } else {
-	throw runtime_error("Called GetAsScalar on an interaction with no type!");
+
+struct getAsScalarVisitor : public static_visitor<energy> {
+    energy operator()(energy& dat) const {
+	return dat;
     }
+    energy operator()(Matrix3e& dat) const {
+	return dat.Trace();
+    }
+    energy operator()(eigenvalues_t& dat) const {
+	return (dat.XX+dat.YY+dat.ZZ);
+    }
+    energy operator()(ax_rhom_t& dat) const {
+	energy a=dat.ax;
+	energy r=dat.rh;
+	energy iso=dat.iso;
+	energy xx=a/3.0+iso/3.0;
+	energy yy=-r/2.0-a/6.0+iso/3.0;
+	energy zz= r/2.0-a/6.0+iso/3.0;
+	return xx+yy+zz;
+    }
+    energy operator()(span_skew_t& dat) const {
+	energy span=dat.span;
+	double skew=dat.skew;  //Skew has no unit
+	energy iso=dat.iso;
+	energy xx=span*skew/6.0-span/2.0;
+	energy yy=iso-span*skew/3.0;
+	energy zz=span*skew/6.0+span/2.0;
+	return xx+yy+zz;
+    }
+};
+energy Interaction::GetAsScalar() const {
+    return 0.0*Joules;// apply_visitor(getAsScalarVisitor(),mData);
 }
 
-Matrix3 Interaction::GetAsMatrix() const {
-    if(mType==SCALAR) {
+struct getAsMatrixVisitor : public static_visitor<Matrix3e> {
+    Matrix3e operator()(energy& dat) const {
         //Return the identity multipled by the scalar
-        double s=mData.mScalar;
-        Matrix3 m(s,0,0,0,s,0,0,0,s);
+        Matrix3e m(dat,       0.0*Joules,0.0*Joules,
+		   0.0*Joules,dat,       0.0*Joules,
+		   0.0*Joules,0.0*Joules,dat        );
         return m;
-    } else if(mType==MATRIX) {
-        //Just return the matrix
-        Matrix3 m=*mData.mMatrix;
-        return m;
-    } else if(mType==EIGENVALUES || mType == AXRHOM || mType == SPANSKEW) {
-        //Convert to a matrix
-        double xx,yy,zz;
-
-        if(mType==EIGENVALUES) {
-            xx=mData.mEigenvalues.XX;
-            yy=mData.mEigenvalues.YY;
-            zz=mData.mEigenvalues.ZZ;
-        } else if(mType==AXRHOM) {
-            double a=mData.mAxRhom.ax;
-            double r=mData.mAxRhom.rh;
-            double iso=mData.mAxRhom.iso;
-            xx=a/3+iso/3;
-            yy=-r/2-a/6+iso/3;
-            zz= r/2-a/6+iso/3;
-        } else if(mType==SPANSKEW) {
-            double span=mData.mSpanSkew.span;
-            double skew=mData.mSpanSkew.skew;
-            double iso=mData.mSpanSkew.iso;
-            xx=span*skew/6-span/2;
-            yy=iso-span*skew/3;
-            zz=span*skew/6+span/2;
-        }
-
-        Matrix3 intMatrix=mOrient.GetAsMatrix();
-
-        Matrix3 result=intMatrix*Matrix3(xx,0.0,0.0,
-                                         0.0,yy,0.0,
-                                         0.0,0.0,zz);
-        return result;
-
-    } else {
-        cerr << "Interaction::mType is set to an invalid type! This is a serious programing error.\n" << endl;
-        throw logic_error("Interaction::mType is set to an invalid type! This is a serious programing error.\n");
     }
-    //Return the zero matrix identity
-    Matrix3 zero(0,0,0,0,0,0,0,0,0);
-    return zero;
+    Matrix3e operator()(Matrix3e& dat) const {
+        //Just return the matrix
+        return dat;
+    }
+    Matrix3e operator()(eigenvalues_t& dat) const {
+        //Convert to a matrix
+	energy xx=dat.XX;
+	energy yy=dat.YY;
+	energy zz=dat.ZZ;
+	return fromev(xx,yy,zz,dat.mOrient);
+    }
+    Matrix3e operator()(ax_rhom_t& dat) const {
+	energy a=  dat.ax;
+	energy r=  dat.rh;
+	energy iso=dat.iso;
+	energy xx=a/3.0+iso/3.0;
+	energy yy=-r/2.0-a/6.0+iso/3.0;
+	energy zz= r/2.0-a/6.0+iso/3.0;
+	return fromev(xx,yy,zz,dat.mOrient);
+    }
+    Matrix3e operator()(span_skew_t& dat) const {
+	energy span=dat.span;
+	double skew=dat.skew;  //Skew has no unit
+	energy iso= dat.iso;
+	energy xx=span*skew/6.0-span/2.0;
+	energy yy=iso-span*skew/3.0;
+	energy zz=span*skew/6.0+span/2.0;
+	return fromev(xx,yy,zz,dat.mOrient);
+    }
+private:
+    Matrix3e fromev(const energy xx,const energy yy,const energy zz,const Orientation& o) const {
+        Matrix3 intMatrix=o.GetAsMatrix();
+
+	energy zero=0.0*Joules;
+	Matrix3e in_eigen_frame(xx,  zero,zero, 
+				zero,yy  ,zero, 
+				zero,zero,zz   );
+
+	Matrix3e result=intMatrix*in_eigen_frame;
+        return result;
+    }
+};
+Matrix3e Interaction::GetAsMatrix() const {
+    return Matrix3e(0.0*Joules, 0.0*Joules, 0.0*Joules,
+		    0.0*Joules, 0.0*Joules, 0.0*Joules,
+		    0.0*Joules, 0.0*Joules, 0.0*Joules);// apply_visitor(getAsMatrixVisitor(),mData);
 }
 
 

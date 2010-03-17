@@ -9,11 +9,25 @@
 #include <shared/mathtypes.hpp>
 #include <sigc++/sigc++.h>
 #include <shared/unit.hpp>
-
-
+#include <boost/variant.hpp>
 
 namespace SpinXML {
-    typedef Vector3_t<length> Vector3l;
+    //============================================================//
+    // Typedefs
+
+    typedef Matrix3_t<double,_length> Matrix3l;
+    typedef Vector3_t<double,_length> Vector3l;
+
+    typedef Matrix3_t<double,_length2> Matrix3l2;
+    typedef Vector3_t<double,_length2> Vector3l2;
+
+    typedef Matrix3_t<double,_energy> Matrix3e;
+    typedef Vector3_t<double,_energy> Vector3e;
+
+    //============================================================//
+    // 3D vector type
+
+
 
     void SetSchemaLocation(const char* loc);
 
@@ -40,8 +54,26 @@ namespace SpinXML {
         virtual void SaveFile(const SpinSystem* ss,const char* filename) const=0;
     };
 
-
-
+    //============================================================//
+    struct eigenvalues_t {
+	energy XX;
+	energy YY;
+	energy ZZ;
+	Orientation mOrient;
+    };
+    struct ax_rhom_t {
+	energy iso;
+	energy ax;
+	energy rh;
+	Orientation mOrient;
+    };
+    struct span_skew_t {
+	energy iso;
+	energy span;
+	double skew;
+	Orientation mOrient;
+    };
+    //============================================================//
     ///Class representing one of the shielding paramiters such as the
     ///chemical shift or J coupling
     class Interaction : public sigc::trackable {
@@ -140,7 +172,7 @@ namespace SpinXML {
         ///If the Matrix sorage convention being used then this function will set
         ///the value of its argument to the appropreate value. Otherwise the
         ///result is undefined.
-        void GetMatrix(Matrix3* OutMatrix) const;
+        void GetMatrix(Matrix3e* OutMatrix) const;
         ///If the Eigenvalues sorage convention being used then this function will set
         ///the value of its arguments to the appropreate value. Otherwise the
         ///result is undefined.
@@ -157,7 +189,7 @@ namespace SpinXML {
         ///Set the value of the interaction using the scalar covention.
         void SetScalar(energy Scalar);
         ///Set the value of the interaction using the matrix covention.
-        void SetMatrix(const Matrix3& InMatrix);
+        void SetMatrix(const Matrix3e& InMatrix);
         ///Set the value of the interaction using the eigenvalue covention.
         void SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient);
         ///Set the value of the interaction using the axiality-rhombicity covention.
@@ -177,7 +209,7 @@ namespace SpinXML {
         ///Get the isotropic value of the interaction
         energy GetAsScalar() const;
         ///Get the interaction as a full matrix
-        Matrix3 GetAsMatrix() const /*throw(logic_error)*/;
+        Matrix3e GetAsMatrix() const /*throw(logic_error)*/;
         sigc::signal<void> sigChange;
         sigc::signal<void,Interaction*> sigDying;
         ///This signal is emited whenever one of the spins this interaction
@@ -186,31 +218,13 @@ namespace SpinXML {
         sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
 
     private:
-        union  {
-            double mScalar;
-            Matrix3* mMatrix;
-            struct {
-                double XX;
-                double YY;
-                double ZZ;
-            } mEigenvalues;
-            struct {
-                double iso;
-                double ax;
-                double rh;
-            } mAxRhom;
-            struct {
-                double iso;
-                double span;
-                double skew;
-            } mSpanSkew;
-        } mData;
 
-        Orientation mOrient;
+	typedef boost::variant<energy,Matrix3e,eigenvalues_t,ax_rhom_t,span_skew_t> var_t;
+	var_t mData;
+	
 
         Type mType;
         SubType mSubType;
-
     public:
         Spin* GetSpin1() const {return mSpin1;}
         Spin* GetSpin2() const {return mSpin2;}
@@ -225,6 +239,8 @@ namespace SpinXML {
         sigc::connection mDyingConnect2;
     private:
     };
+
+
 
     ///A class representing a spin in a spin system
     class Spin : public sigc::trackable {
@@ -262,12 +278,12 @@ namespace SpinXML {
         energy GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
         energy GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
 
-        Matrix3 GetLinearInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
-        Matrix3 GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
+        Matrix3e GetLinearInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
+        Matrix3e GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
 
         bool GetHasInteractionOfType(Interaction::SubType t) const;
-        Matrix3 GetTotalInteraction(Interaction::SubType t) const;
-        Matrix3 GetTotalInteraction(Interaction::SubType t,Spin* spin2) const;
+        Matrix3e GetTotalInteraction(Interaction::SubType t) const;
+        Matrix3e GetTotalInteraction(Interaction::SubType t,Spin* spin2) const;
         energy GetTotalInteractionTrace(Interaction::SubType t) const;
 	energy GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const;
 

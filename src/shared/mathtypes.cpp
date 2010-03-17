@@ -8,6 +8,7 @@
 using namespace std;
 using namespace SpinXML;
 
+
 //============================================================//
 // Constants
 
@@ -15,16 +16,6 @@ const double SpinXML::hbar=6.626068e-34;
 const double SpinXML::bohr_mag=9.27400915e-24;
 const double SpinXML::mu0=1.25663706e-6;
 
-
-//==============================================================================//
-// Matrix3
-
-void Matrix3::Dump() const {
-  cout << "Matrix3:" << endl;
-  cout << " (" << raw[0] << " " <<  raw[1] << " " <<  raw[2] << endl;
-  cout << "  " << raw[3] << " " <<  raw[4] << " " <<  raw[5] << endl;
-  cout << "  " << raw[6] << " " <<  raw[7] << " " <<  raw[8] << ")" << endl;
-}
 
 //==============================================================================//
 // Matrix4
@@ -50,10 +41,10 @@ Matrix4:: Matrix4(double a00,double a01,double a02,double a03,
 }
 
 Matrix4::Matrix4(const Matrix3&m) {
-    const double* _raw=m.GetRaw();
-    raw[0 ]=_raw[0]; raw[1 ]=_raw[1]; raw[2 ]=_raw[2]; raw[3 ]=0;
-    raw[4 ]=_raw[3]; raw[5 ]=_raw[4]; raw[6 ]=_raw[5]; raw[7 ]=0;
-    raw[8 ]=_raw[6]; raw[9 ]=_raw[7]; raw[10]=_raw[8]; raw[11]=0;
+    const dreal<double,_unitless>* _raw=m.GetRaw();
+    raw[0 ]=_raw[0].si; raw[1 ]=_raw[1].si; raw[2 ]=_raw[2].si; raw[3 ]=0;
+    raw[4 ]=_raw[3].si; raw[5 ]=_raw[4].si; raw[6 ]=_raw[5].si; raw[7 ]=0;
+    raw[8 ]=_raw[6].si; raw[9 ]=_raw[7].si; raw[10]=_raw[8].si; raw[11]=0;
     raw[12]=0;       raw[13]=0;       raw[14]=0;       raw[15]=1;
 }
 

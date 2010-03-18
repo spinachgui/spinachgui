@@ -40,8 +40,8 @@ int main(int argc,char** argv) {
     try {
         po::store(po::command_line_parser(argc, argv).options(cmd_opt).positional(pos_desc).run(), vm);
         po::notify(vm);
-    } catch(exception& e) {
-        cerr << e.what() << endl;
+    } catch(boost::exception& e) {
+        cerr << "Failed to parse command line" << endl;
         cerr << endl;
         cerr << visible_opt << endl;
         exit(1);

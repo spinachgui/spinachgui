@@ -359,25 +359,27 @@ const length_unit Angstroms("Angstroms",1e-10);
 
 const length2_unit metres2("metres2",1.0);
 
-void test() {
-    dreal<double,_length> l1 = 1.0*metres;
-    dreal<double,_length> l2 = 1.0*metres;
 
-    length l3 = l2+(l1+l2);
-    length l4 = -l3;
+struct test_code_compiles_properly {
+    test_code_compiles_properly() {
+        dreal<double,_length> l1 = 1.0*metres;
+        dreal<double,_length> l2 = 1.0*metres;
 
-    length2 r2(2.0);
+        length l3 = l2+(l1+l2);
+        length l4 = -l3;
+
+        length2 r2(2.0);
 
 
-    //Don't know why the length2 conversion has to be explicit here.
-    length2 result2=r2-length2(3*l1*l2);
+        //Don't know why the length2 conversion has to be explicit here.
+        length2 result2=r2-length2(3*l1*l2);
 
-    dreal<double,_time> t;// = 4/seconds;
-    speed s = l1/t;
+        dreal<double,_time> t;// = 4/seconds;
+        speed s = l1/t;
 
-    std::cout <<l1[milimetre] << std::endl;
-}
-
+        std::cout <<l1[milimetre] << std::endl;
+    }
+};
 
 #endif
 

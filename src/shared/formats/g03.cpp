@@ -124,7 +124,6 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
     } else if(line=="Total nuclear spin-spin coupling J (Hz):") {
       long rows = nAtoms/5; //The number of rows the matrix is split over with the full 5 colums.
                             //I'm relying on the fact that division is rounded down
-      long columsOnLastRow = nAtoms % 5;
       for(long i=0;i<rows;i++) {  //For each big row
 	//Skip the center number labels on the top row
 	for(long k=0;k<5;k++) {

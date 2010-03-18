@@ -200,9 +200,10 @@ struct castep : grammar<castep> {
                 o.SetEigenSystem(vx,vy,vz);
                 Interaction* inter = new Interaction;
                 inter->SetEigenvalues(xx,yy,zz,o);
-                Interaction::SubType st=j->value.id()==total_tensorID  ? Interaction::ST_CUSTOM_LINEAR : Interaction::ST_SHIELDING;
+                Interaction::SubType st=j->value.id()==total_tensorID  ?
+                    Interaction::ST_CUSTOM_LINEAR :
+                    Interaction::ST_SHIELDING;
                 inter->SetSubType(st,spin);
-
             } else if (j->value.id()==quadrupole_blockID) {
                 //Quadrupole code here
                 tree_iter_t it=j->children.begin();

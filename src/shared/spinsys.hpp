@@ -56,18 +56,27 @@ namespace SpinXML {
 
     //============================================================//
     struct eigenvalues_t {
+        eigenvalues_t(const energy _XX,const energy _YY,const energy _ZZ, const Orientation& o) 
+            : XX(_XX), YY(_YY), ZZ(_ZZ), mOrient(o) {
+        }
 	energy XX;
 	energy YY;
 	energy ZZ;
 	Orientation mOrient;
     };
     struct ax_rhom_t {
+        ax_rhom_t(const energy _iso,const energy _ax,const energy _rh, const Orientation& o) 
+            : iso(_iso), ax(_ax), rh(_rh), mOrient(o) {
+        }
 	energy iso;
 	energy ax;
 	energy rh;
 	Orientation mOrient;
     };
     struct span_skew_t {
+        span_skew_t(const energy _iso,const energy _span,const double _skew, const Orientation& o) 
+            : iso(_iso), span(_span), skew(_skew), mOrient(o) {
+        }
 	energy iso;
 	energy span;
 	double skew;

@@ -564,42 +564,33 @@ void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientatio
 void Interaction::SetScalar(energy Scalar) {
     sigChange();
     mType=SCALAR;
-    get<energy>(mData)=Scalar;
+    mData=Scalar;
 }
 
 void Interaction::SetMatrix(const Matrix3e& Matrix) {
     sigChange();
     mType=MATRIX;
-    get<Matrix3e>(mData)=Matrix3e(Matrix);
+    mData=Matrix3e(Matrix);
 }
 
 void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
     sigChange();
     mType=EIGENVALUES;
-    get<eigenvalues_t>(mData).XX=XX;
-    get<eigenvalues_t>(mData).YY=YY;
-    get<eigenvalues_t>(mData).ZZ=ZZ;
-    get<eigenvalues_t>(mData).mOrient=Orient;
+    mData=eigenvalues_t(XX,YY,ZZ,Orient);
     return;
 }
 
 void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
     sigChange();
     mType=AXRHOM;
-    get<ax_rhom_t>(mData).iso=iso;
-    get<ax_rhom_t>(mData).ax=ax;
-    get<ax_rhom_t>(mData).rh=rh;
-    get<ax_rhom_t>(mData).mOrient=Orient;
+    mData=ax_rhom_t(iso,ax,rh,Orient);
     return;
 }
 
 void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
     sigChange();
     mType=SPANSKEW;
-    get<span_skew_t>(mData).iso=iso;
-    get<span_skew_t>(mData).span= Span;
-    get<span_skew_t>(mData).skew=Skew;
-    get<span_skew_t>(mData).mOrient=Orient;
+    mData=span_skew_t(iso,Span,Skew,Orient);
     return;
 }
 

@@ -170,6 +170,9 @@ struct dreal {
     const dreal_helper<T,D> operator[](const unit<D>& u) {
 	return dreal_helper<T,D>(&si,u);
     }
+    T operator[](const unit<D>& u) const {
+	return u.fromSI(si);
+    }
 
     T si;
 };

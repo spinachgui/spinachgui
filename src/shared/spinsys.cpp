@@ -444,15 +444,15 @@ Interaction::~Interaction() {
 
 class thisVisitor : public static_visitor<> {
 public:
-    void operator()(energy& dat) const {
+    void operator()(const energy& dat) const {
 	cout << "    Type=Scalar" <<  endl;
 	cout << "    Value=" << dat[MHz] << "MHz" << endl;
     }
-    void operator()(Matrix3e& dat) const {
+    void operator()(const Matrix3e& dat) const {
 	cout << "    Type=Matrix" <<  endl;
 	cout << "    Value=" << endl;
     }
-    void operator()(eigenvalues_t& dat) const {
+    void operator()(const eigenvalues_t& dat) const {
 	cout << "    Type=Eigenvalues" <<  endl;
 	cout << "    Value=(XX=" 
 	     << dat.XX[MHz] << "MHz ,YY="
@@ -461,13 +461,13 @@ public:
 	     << endl;
 	cout << "    Orient=";
     }
-    void operator()(ax_rhom_t& dat) const {
+    void operator()(const ax_rhom_t& dat) const {
 	cout << "    Type=Axiality Rhombicity" <<  endl;
 	cout << "    Value=" << endl; 
 	cout << "    Orient=";
 	cout << dat.mOrient.ToString() << endl;
     }
-    void operator()(span_skew_t& dat) const {
+    void operator()(const span_skew_t& dat) const {
 	cout << "    Type=Span-Skew" <<  endl;
 	cout << "    Value=" << endl;
 	cout << "    Orient=";
@@ -476,7 +476,7 @@ public:
 };
 void Interaction::Dump() const {
     cout << "  Dumping an Interaction" << endl;
-    // apply_visitor(thisVisitor(),mData);
+    apply_visitor(thisVisitor(),mData);
 }
 
 const char* Interaction::GetTypeName(Type t) {
@@ -596,16 +596,16 @@ void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orienta
 
 
 struct getAsScalarVisitor : public static_visitor<energy> {
-    energy operator()(energy& dat) const {
+    energy operator()(const energy& dat) const {
 	return dat;
     }
-    energy operator()(Matrix3e& dat) const {
+    energy operator()(const Matrix3e& dat) const {
 	return dat.Trace();
     }
-    energy operator()(eigenvalues_t& dat) const {
+    energy operator()(const eigenvalues_t& dat) const {
 	return (dat.XX+dat.YY+dat.ZZ);
     }
-    energy operator()(ax_rhom_t& dat) const {
+    energy operator()(const ax_rhom_t& dat) const {
 	energy a=dat.ax;
 	energy r=dat.rh;
 	energy iso=dat.iso;
@@ -614,7 +614,7 @@ struct getAsScalarVisitor : public static_visitor<energy> {
 	energy zz= r/2.0-a/6.0+iso/3.0;
 	return xx+yy+zz;
     }
-    energy operator()(span_skew_t& dat) const {
+    energy operator()(const span_skew_t& dat) const {
 	energy span=dat.span;
 	double skew=dat.skew;  //Skew has no unit
 	energy iso=dat.iso;
@@ -625,29 +625,29 @@ struct getAsScalarVisitor : public static_visitor<energy> {
     }
 };
 energy Interaction::GetAsScalar() const {
-    return 0.0*Joules;// apply_visitor(getAsScalarVisitor(),mData);
+    return apply_visitor(getAsScalarVisitor(),mData);
 }
 
 struct getAsMatrixVisitor : public static_visitor<Matrix3e> {
-    Matrix3e operator()(energy& dat) const {
+    Matrix3e operator()(const energy& dat) const {
         //Return the identity multipled by the scalar
         Matrix3e m(dat,       0.0*Joules,0.0*Joules,
 		   0.0*Joules,dat,       0.0*Joules,
 		   0.0*Joules,0.0*Joules,dat        );
         return m;
     }
-    Matrix3e operator()(Matrix3e& dat) const {
+    Matrix3e operator()(const Matrix3e& dat) const {
         //Just return the matrix
         return dat;
     }
-    Matrix3e operator()(eigenvalues_t& dat) const {
+    Matrix3e operator()(const eigenvalues_t& dat) const {
         //Convert to a matrix
 	energy xx=dat.XX;
 	energy yy=dat.YY;
 	energy zz=dat.ZZ;
 	return fromev(xx,yy,zz,dat.mOrient);
     }
-    Matrix3e operator()(ax_rhom_t& dat) const {
+    Matrix3e operator()(const ax_rhom_t& dat) const {
 	energy a=  dat.ax;
 	energy r=  dat.rh;
 	energy iso=dat.iso;
@@ -656,7 +656,7 @@ struct getAsMatrixVisitor : public static_visitor<Matrix3e> {
 	energy zz= r/2.0-a/6.0+iso/3.0;
 	return fromev(xx,yy,zz,dat.mOrient);
     }
-    Matrix3e operator()(span_skew_t& dat) const {
+    Matrix3e operator()(const span_skew_t& dat) const {
 	energy span=dat.span;
 	double skew=dat.skew;  //Skew has no unit
 	energy iso= dat.iso;
@@ -679,9 +679,7 @@ private:
     }
 };
 Matrix3e Interaction::GetAsMatrix() const {
-    return Matrix3e(0.0*Joules, 0.0*Joules, 0.0*Joules,
-		    0.0*Joules, 0.0*Joules, 0.0*Joules,
-		    0.0*Joules, 0.0*Joules, 0.0*Joules);// apply_visitor(getAsMatrixVisitor(),mData);
+    return apply_visitor(getAsMatrixVisitor(),mData);
 }
 
 

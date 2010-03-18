@@ -166,7 +166,7 @@ void SpinGrid::OnEdit(wxGridEvent& e) {
     if(e.GetRow()==sc) {
         //User is trying to edit the blank line at the bottom of the grid,
         //so create a new spin for them
-        GetSS()->InsertSpin(new Spin(Vector3l(0*metres,0*metres,0*metres),"New Spin",1));
+        GetSS()->InsertSpin(new Spin(Vector3l(0.0*metres,0.0*metres,0.0*metres),"New Spin",1));
     }
 }
 

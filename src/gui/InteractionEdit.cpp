@@ -205,22 +205,22 @@ void InterEditPanel::LoadFromInter() {
     mScalarCtrl->SetValue(wxString() << scalar[MHz]);
     mTypeChoiceBook->SetSelection(0);
   } else if(mInter->GetType()==Interaction::MATRIX) {
-    Matrix3 mat;
+    Matrix3e mat;
     mInter->GetMatrix(&mat);
     
-    cout << "Trace=" << (mat.Trace()*Joules)[Hz] << "Hz" <<  endl;
+    cout << "Trace=" << mat.Trace()[Hz] << "Hz" <<  endl;
 
-    mMatXXCtrl->SetValue(wxString() << mat.Get(0,0));
-    mMatXYCtrl->SetValue(wxString() << mat.Get(0,1));
-    mMatXZCtrl->SetValue(wxString() << mat.Get(0,2));
+    mMatXXCtrl->SetValue(wxString() << mat.Get(0,0)[MHz]);
+    mMatXYCtrl->SetValue(wxString() << mat.Get(0,1)[MHz]);
+    mMatXZCtrl->SetValue(wxString() << mat.Get(0,2)[MHz]);
                             
-    mMatYXCtrl->SetValue(wxString() << mat.Get(1,0));
-    mMatYYCtrl->SetValue(wxString() << mat.Get(1,1));
-    mMatYZCtrl->SetValue(wxString() << mat.Get(1,2));
+    mMatYXCtrl->SetValue(wxString() << mat.Get(1,0)[MHz]);
+    mMatYYCtrl->SetValue(wxString() << mat.Get(1,1)[MHz]);
+    mMatYZCtrl->SetValue(wxString() << mat.Get(1,2)[MHz]);
                                 
-    mMatZXCtrl->SetValue(wxString() << mat.Get(2,0));
-    mMatZYCtrl->SetValue(wxString() << mat.Get(2,1));
-    mMatZZCtrl->SetValue(wxString() << mat.Get(2,2));
+    mMatZXCtrl->SetValue(wxString() << mat.Get(2,0)[MHz]);
+    mMatZYCtrl->SetValue(wxString() << mat.Get(2,1)[MHz]);
+    mMatZZCtrl->SetValue(wxString() << mat.Get(2,2)[MHz]);
 
     mTypeChoiceBook->SetSelection(1);
   } else if(mInter->GetType()==Interaction::EIGENVALUES) {
@@ -287,9 +287,9 @@ void InterEditPanel::SaveToInter() {
     mMatZYCtrl->GetValue().ToDouble(&zy);
     mMatZZCtrl->GetValue().ToDouble(&zz);
 
-    mInter->SetMatrix(Matrix3(xx,xy,xz,
-			      yx,yy,yz,
-			      zx,zy,zz));
+    mInter->SetMatrix(Matrix3e(xx*MHz,xy*MHz,xz*MHz,
+                               yx*MHz,yy*MHz,yz*MHz,
+                               zx*MHz,zy*MHz,zz*MHz));
 
   } else if(type==Interaction::EIGENVALUES) {
     double xx,yy,zz;

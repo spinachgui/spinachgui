@@ -16,7 +16,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
     c style I/O
   */
   ss->Clear();
-  Spin* s=new Spin(Vector3l(0*Angstroms,0*Angstroms,0*Angstroms),string("Unpaired Electron"),0);
+  Spin* s=new Spin(Vector3l(0.0*Angstroms,0.0*Angstroms,0.0*Angstroms),string("Unpaired Electron"),0);
   ss->InsertSpin(s);
 
   ifstream fin(filename);

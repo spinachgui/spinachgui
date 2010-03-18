@@ -235,18 +235,18 @@ void InterNode::LoadInteractionMatrix() {
     //again) 
 
     //TODO: This would be a great place to calculate the eigenvalues
-    Matrix3 mat3=mSpin->GetTotalInteraction(mType);
-    mat[0 ]=abs(mat3.Get(0,0));
-    mat[1 ]=abs(mat3.Get(0,1));
-    mat[2 ]=abs(mat3.Get(0,2));
+    Matrix3e mat3=mSpin->GetTotalInteraction(mType);
+    mat[0 ]=abs(mat3.Get(0,0)[MHz]);
+    mat[1 ]=abs(mat3.Get(0,1)[MHz]);
+    mat[2 ]=abs(mat3.Get(0,2)[MHz]);
 			
-    mat[4 ]=abs(mat3.Get(1,0));
-    mat[5 ]=abs(mat3.Get(1,1));
-    mat[6 ]=abs(mat3.Get(1,2));
+    mat[4 ]=abs(mat3.Get(1,0)[MHz]);
+    mat[5 ]=abs(mat3.Get(1,1)[MHz]);
+    mat[6 ]=abs(mat3.Get(1,2)[MHz]);
 			
-    mat[8 ]=abs(mat3.Get(2,0));
-    mat[9 ]=abs(mat3.Get(2,1));
-    mat[10]=abs(mat3.Get(2,2));
+    mat[8 ]=abs(mat3.Get(2,0)[MHz]);
+    mat[9 ]=abs(mat3.Get(2,1)[MHz]);
+    mat[10]=abs(mat3.Get(2,2)[MHz]);
     Dirty();
 }
 
@@ -623,7 +623,7 @@ void InteractionDrawerNode::RawDrawInterType(SpinachDC& dc,Interaction::SubType 
     long count = mSS->GetSpinCount();
     for(long i=0;i<count;i++) {
 	Spin* spin=mSS->GetSpin(i);
-        Matrix3 mat3=spin->GetTotalInteraction(st);
+        Matrix3e mat3=spin->GetTotalInteraction(st);
         GLfloat mat[16];
         mat[3 ]=0;
         mat[7 ]=0;
@@ -633,17 +633,17 @@ void InteractionDrawerNode::RawDrawInterType(SpinachDC& dc,Interaction::SubType 
         mat[14]=0;
         mat[15]=1;
 
-        mat[0 ]=abs(mat3.Get(0,0));
-	mat[1 ]=abs(mat3.Get(0,1));
-	mat[2 ]=abs(mat3.Get(0,2));
+        mat[0 ]=abs(mat3.Get(0,0)[MHz]);
+	mat[1 ]=abs(mat3.Get(0,1)[MHz]);
+	mat[2 ]=abs(mat3.Get(0,2)[MHz]);
 			
-	mat[4 ]=abs(mat3.Get(1,0));
-	mat[5 ]=abs(mat3.Get(1,1));
-	mat[6 ]=abs(mat3.Get(1,2));
+	mat[4 ]=abs(mat3.Get(1,0)[MHz]);
+	mat[5 ]=abs(mat3.Get(1,1)[MHz]);
+	mat[6 ]=abs(mat3.Get(1,2)[MHz]);
 			
-	mat[8 ]=abs(mat3.Get(2,0));
-	mat[9 ]=abs(mat3.Get(2,1));
-	mat[10]=abs(mat3.Get(2,2));
+	mat[8 ]=abs(mat3.Get(2,0)[MHz]);
+	mat[9 ]=abs(mat3.Get(2,1)[MHz]);
+	mat[10]=abs(mat3.Get(2,2)[MHz]);
 
         glPushMatrix(); {
 	    if(spin->GetElement()!=0) {

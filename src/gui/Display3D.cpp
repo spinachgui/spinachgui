@@ -605,7 +605,6 @@ void Display3D::OnPaint(wxPaintEvent& e) {
             GLuint* closestNames=NULL;
             GLuint closestNameCount=0;
             if(hits >0) {
-                cout << "Total Hits=" << hits;
                 for(long i=0;i<hits;i++) {
                     GLuint name_count = *(pbuff++);
                     float d1=float(*(pbuff++))/0x7fffffff;
@@ -618,12 +617,17 @@ void Display3D::OnPaint(wxPaintEvent& e) {
                     }
                     pbuff+=name_count;
                 }
-                cout << "  Closest hit name=";
-                for(long j=0;j<closestNameCount;j++) {
-                    cout << *(closestNames++) << " ";
+                switch(closestNames[0]){
+                case LAYER_SPINS:
+                    GetSelMgr()->SetHover(GetSS()->GetSpin(closestNames[1]));
+                    break;
+                case LAYER_INTERACTIONS:
+                    //NO_OP
+                    break;
+                case LAYER_BONDS:
+                    //NO_OP
+                    break;
                 }
-                cout << " distance=" << closestDistance;
-                cout << endl;
             }
         }
 

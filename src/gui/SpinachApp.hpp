@@ -15,6 +15,7 @@ public:
     ~SpinachApp();
     virtual bool OnInit();
     SpinXML::SpinSystem* GetSS() const {return mSS;}
+    SelectionManager* GetSelectionManager() const {return mSelectionManager;}
     const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
 
     sigc::signal<void> sigDying;
@@ -55,6 +56,7 @@ private:
 SpinachApp& wxGetApp();
 
 //Define macros for accessing the most up to date spin system
+#define GetSelMgr() (wxGetApp().GetSelectionManager())
 #define GetSS() (wxGetApp().GetSS())
 #define Chkpoint(x) 
 

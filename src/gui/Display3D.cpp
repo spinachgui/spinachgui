@@ -149,7 +149,8 @@ SGNode::SGNode()
       mDirty(true),
       mUseMaterial(false),
       mMaterial(defaultMaterial),
-      mIdentity(true){
+      mIdentity(true),
+      mPickingName(0) {
 }
 
 SGNode::~SGNode() {
@@ -213,8 +214,16 @@ void SGNode::Draw(SpinachDC& dc) {
         glMaterialfv(GL_FRONT,GL_SPECULAR, white);
         glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,mMaterial);
     }
-    if(dc.translucentPass == mTranslucent) {
+    if(dc.pass == SpinachDC::PICKING) {
+        glPushName(mPickingName);
+    }
+    if((dc.pass == SpinachDC::TRANSLUCENT && mTranslucent) ||
+       (dc.pass == SpinachDC::OPAQUE && !mTranslucent) ||
+       (dc.pass == SpinachDC::PICKING && !mTranslucent)) {
         RawDraw(dc);
+    }
+    if(dc.pass == SpinachDC::PICKING) {
+        glPopName();
     }
     for(itor i=mChildren.begin();i!=mChildren.end();++i) {
         (*i)->Draw(dc);
@@ -547,13 +556,13 @@ void Display3D::OnPaint(wxPaintEvent& e) {
         if(mRootNode) {
             //Draw opaque objects first
             glDepthMask(GL_TRUE);
-            mDC.translucentPass=false;
+            mDC.pass=SpinachDC::OPAQUE;
             mRootNode->Draw(mDC);
             //Draw transparent/traslucent objects
             glEnable (GL_BLEND);
             glDepthMask(GL_FALSE); 
             glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            mDC.translucentPass=true;
+            mDC.pass=SpinachDC::TRANSLUCENT;
             mRootNode->Draw(mDC);
             glDisable (GL_BLEND); 
 
@@ -581,31 +590,41 @@ void Display3D::OnPaint(wxPaintEvent& e) {
             glLoadIdentity();
             glMultMatrixd(mvmatrix);
 
-            mDC.translucentPass=false;
+            mDC.pass=SpinachDC::PICKING;
             GLuint buff[2000];
             GLint hits;
             glSelectBuffer(2000,buff);  //glSelectBuffer goes before glRenderMode
             glRenderMode(GL_SELECT);  
 
             glInitNames();
-            glPushName(0);
             mRootNode->Draw(mDC);
 
             hits=glRenderMode(GL_RENDER);
-            cout << "Got " << hits << " hits" << endl;
             GLuint* pbuff=buff;
-            for(long i=0;i<hits;i++) {
-                GLuint name_count = *(pbuff++);
-                cout << "  This is hit " << i <<" hit has=" << name_count << " names" << endl;
-                cout << "    record1=" << float(*(pbuff++))/0x7fffffff << endl;
-                cout << "    record2=" << float(*(pbuff++))/0x7fffffff << endl;
-                cout << "    name=";
-                for(long j=0;j<name_count;j++) {
-                    cout << *(pbuff++) << " ";
+            float closestDistance=HUGE_VAL;
+            GLuint* closestNames=NULL;
+            GLuint closestNameCount=0;
+            if(hits >0) {
+                cout << "Total Hits=" << hits;
+                for(long i=0;i<hits;i++) {
+                    GLuint name_count = *(pbuff++);
+                    float d1=float(*(pbuff++))/0x7fffffff;
+                    float d2=float(*(pbuff++))/0x7fffffff;
+                    float thisDistance=d1<d2 ? d1 : d2;
+                    if(closestDistance > thisDistance) {
+                        closestDistance=thisDistance;
+                        closestNames=pbuff;
+                        closestNameCount=name_count;
+                    }
+                    pbuff+=name_count;
                 }
+                cout << "  Closest hit name=";
+                for(long j=0;j<closestNameCount;j++) {
+                    cout << *(closestNames++) << " ";
+                }
+                cout << " distance=" << closestDistance;
                 cout << endl;
             }
-
         }
 
         //Now draw the forground objects

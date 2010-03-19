@@ -157,8 +157,9 @@ void MoleculeNodeNew::ToPovRay(wxString& src) {
 
 SpinDrawerNode::SpinDrawerNode(SpinSystem* ss) 
     : mSS(ss) {
-    
+    mPickingName=LAYER_SPINS;
 }
+
 void SpinDrawerNode::RawDraw(SpinachDC& dc) {
     long count=mSS->GetSpinCount();
     for(long i=0;i<count;i++) {
@@ -185,7 +186,9 @@ void SpinDrawerNode::RawDraw(SpinachDC& dc) {
 	    //gluSphere(dc.GetSolidQuadric(),9,14,14);
 
 	} else {
+            glPushName(i);
 	    gluSphere(dc.GetSolidQuadric(),0.1,14,14);
+            glPopName();
 	}
 	if(spin->GetElement() != 0){
 	    glPopMatrix();
@@ -204,6 +207,7 @@ BondDrawerNode::BondDrawerNode(SpinSystem* ss)
     : mSS(ss) {
     const static GLfloat blueMaterial[]  = {0.06,0.06,0.4,0.0f}; 
     SetMaterial(blueMaterial);	
+    mPickingName=LAYER_BONDS;
 }
 
 void BondDrawerNode::RawDraw(SpinachDC& dc) {
@@ -248,6 +252,7 @@ void BondDrawerNode::ToPovRay(wxString& src) {
 
 InteractionDrawerNode::InteractionDrawerNode(SpinSystem* ss) 
     : mSS(ss) {
+    mPickingName=LAYER_INTERACTIONS;
     //OptNucCentredDataStore;
 }
 

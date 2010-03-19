@@ -18,6 +18,11 @@
 using namespace boost;
 using namespace SpinXML;
 
+enum LAYER {
+    LAYER_SPINS,
+    LAYER_BONDS,
+    LAYER_INTERACTIONS,
+};
 
 
 ///A class for storing all drawing options
@@ -41,7 +46,13 @@ public:
 
     ///If true draw only to the depth buffer
     bool depthOnly;
-    bool translucentPass;
+
+    enum PASS {
+        OPAQUE,
+        TRANSLUCENT,
+        PICKING
+    };
+    PASS pass;
 
     void SetShowBonds(bool showBonds) {drawBonds=showBonds;}
     bool drawBonds;
@@ -124,6 +135,8 @@ private:
 protected:
     bool mIdentity;
     GLfloat mat[16];
+
+    GLint mPickingName;
 
 private:
     std::list<SGNode*> mChildren;

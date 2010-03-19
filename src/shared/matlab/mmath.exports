@@ -1,0 +1,5 @@
+mmathInitialize
+mmathInitializeWithHandlers
+mmathTerminate
+mmathPrintStackTrace
+mmathGetMcrID

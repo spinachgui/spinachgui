@@ -529,15 +529,15 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     //glClear(GL_DEPTH_BUFFER_BIT);
 
     /*if(mRootNode) {
-        mRootNode->Draw(mDC);
-        }*/
+      mRootNode->Draw(mDC);
+      }*/
 
     //glBindFramebuffer(GL_FRAMEBUFFER,&mFB);
 
     /*glEnable(GL_TEXTURE_2D); {
-        glBindTexture(GL_TEXTURE_2D,mTexDepth);
-        glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
-        } glDisable(GL_TEXTURE_2D);*/
+      glBindTexture(GL_TEXTURE_2D,mTexDepth);
+      glCopyTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT,0,0,width,height,0);
+      } glDisable(GL_TEXTURE_2D);*/
 	
     //glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);  //Can move to initalisation
@@ -551,12 +551,63 @@ void Display3D::OnPaint(wxPaintEvent& e) {
             mRootNode->Draw(mDC);
             //Draw transparent/traslucent objects
             glEnable (GL_BLEND);
-            glDepthMask(GL_TRUE); 
+            glDepthMask(GL_FALSE); 
             glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             mDC.translucentPass=true;
             mRootNode->Draw(mDC);
             glDisable (GL_BLEND); 
+
+            //Work out a line the world coordinates of the mouse
+            GLint viewport[4];
+            GLdouble mvmatrix[16],projmatrix[16];
+            glGetIntegerv(GL_VIEWPORT,viewport);
+            glGetDoublev(GL_MODELVIEW_MATRIX,mvmatrix);
+            glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
+            GLdouble worldFarX,  worldFarY ,worldFarZ;
+            GLdouble worldNearX, worldNearY,worldNearZ; 
+            gluUnProject(mMouseX,height-mMouseY-1,1.0,mvmatrix,projmatrix,viewport,&worldFarX, &worldFarY ,&worldFarZ);
+            gluUnProject(mMouseX,height-mMouseY-1,0.0,mvmatrix,projmatrix,viewport,&worldNearX,&worldNearY,&worldNearZ);
+
+
+            //Draw in opengl picking mode
+            glDepthMask(GL_TRUE); 
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glClear(GL_DEPTH_BUFFER_BIT);
+            gluPickMatrix(mMouseX,viewport[3]-mMouseY,3.0, 3.0, viewport);
+            glMultMatrixd(projmatrix);
+
+            glMatrixMode(GL_MODELVIEW);  
+            glLoadIdentity();
+            glMultMatrixd(mvmatrix);
+
+            mDC.translucentPass=false;
+            GLuint buff[2000];
+            GLint hits;
+            glSelectBuffer(2000,buff);  //glSelectBuffer goes before glRenderMode
+            glRenderMode(GL_SELECT);  
+
+            glInitNames();
+            glPushName(0);
+            mRootNode->Draw(mDC);
+
+            hits=glRenderMode(GL_RENDER);
+            cout << "Got " << hits << " hits" << endl;
+            GLuint* pbuff=buff;
+            for(long i=0;i<hits;i++) {
+                GLuint name_count = *(pbuff++);
+                cout << "  This is hit " << i <<" hit has=" << name_count << " names" << endl;
+                cout << "    record1=" << float(*(pbuff++))/0x7fffffff << endl;
+                cout << "    record2=" << float(*(pbuff++))/0x7fffffff << endl;
+                cout << "    name=";
+                for(long j=0;j<name_count;j++) {
+                    cout << *(pbuff++) << " ";
+                }
+                cout << endl;
+            }
+
         }
+
         //Now draw the forground objects
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -566,6 +617,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
         glLoadIdentity();
         mForgroundNode->Draw(mDC);
     } glDisable(GL_LIGHTING);
+
 
     glEnable(GL_TEXTURE_2D); {
         glBindTexture(GL_TEXTURE_2D,mTexDepth);

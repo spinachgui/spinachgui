@@ -108,7 +108,7 @@ void RootFrame::InitFrame() {
     gt_sp ->GetLogSlider()->SetValue(1);
     zfs_sp->GetLogSlider()->SetValue(1);
     exc_sp->GetLogSlider()->SetValue(1);
-    shd_sp->GetLogSlider()->SetValue(1);
+    shd_sp->GetLogSlider()->SetValue(0.001);
     sca_sp->GetLogSlider()->SetValue(1);
     qp_sp ->GetLogSlider()->SetValue(1);
     dip_sp->GetLogSlider()->SetValue(1);

@@ -51,7 +51,6 @@ endif()
 ############################################################
 #List of source files for all the targets
 
-file(GLOB lapackSources lapack/double/*.f)
 file(GLOB guiSources gui/*.cpp "auto/SpinachGUI.cpp")
 file(GLOB sharedSources shared/*.cpp)
 file(GLOB matlabSources shared/matlab/*.cpp shared/matlab/*.h)
@@ -89,7 +88,6 @@ link_directories(/home/gareth/src/CLAPACK-3.2.1/F2CLIBS)
 ############################################################
 # Libary Targets
 
-add_library(lapack_sample STATIC ${lapackSources})
 add_library(spinxml STATIC       ${sharedSources} ${formatSources} ${matlabSources})
 
 ############################################################

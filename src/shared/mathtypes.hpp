@@ -413,6 +413,12 @@ namespace SpinXML {
 	///Parses an orentation from a string representation. The form of
 	///the representation should be the same as returned by ToString
 	void FromString(std::string string);
+
+        Orientation GetAsEuler() const;
+        Orientation GetAsEigenSystem() const;
+        Orientation GetAsAngleAxis() const;
+        Orientation GetAsQuaternion() const;
+
     private:
 	void Clear();
 	union  {

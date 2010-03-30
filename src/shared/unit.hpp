@@ -282,6 +282,12 @@ sqrt(dreal<T,D> x) {
     return dreal<T,dim>(sqrt(x.si));
 }
 
+template <class T, class D>
+T
+atan2(dreal<T,D> y,dreal<T,D> x) {
+    return atan2(y.si,x.si);
+}
+
 
 
 //============================================================//

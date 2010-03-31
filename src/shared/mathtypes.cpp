@@ -4,11 +4,12 @@
 #include <cstring>
 #include <sstream>
 #include <cmath>
+#include <boost/variant/static_visitor.hpp>
+#include <boost/variant/apply_visitor.hpp>
 
 using namespace std;
 using namespace SpinXML;
 
-#define PI 3.141592653589793238462643
 
 //============================================================//
 // Constants
@@ -16,108 +17,6 @@ using namespace SpinXML;
 const double SpinXML::hbar=6.626068e-34;
 const double SpinXML::bohr_mag=9.27400915e-24;
 const double SpinXML::mu0=1.25663706e-6;
-
-//============================================================//
-// Simple Euler Angles Type
-
-
-struct EulerAngles {
-    double alpha,beta,gamma;
-    EulerAngles(double _alpha,double _beta, double _gamma) 
-        : alpha(_alpha),beta(_beta),gamma(_gamma) {
-
-    }
-};
-
-//============================================================//
-// Simple Quaternion Type
-
-
-struct Quaternion {
-    double w,x,y,z;
-    Quaternion(){}
-    Quaternion(double _w,double _x, double _y, double _z) 
-        : w(_w),x(_x),y(_y),z(_z){
-    }
-    Quaternion(double angle,const Vector3& axis) {
-        SetAngleAxis(angle,axis);
-    }
-    Quaternion operator*(const Quaternion& q2) {
-	Quaternion res;
-	double w1=w; double w2=q2.w;
-	double x1=x; double x2=q2.x;
-	double y1=y; double y2=q2.y;
-	double z1=z; double z2=q2.z;
-	res.w=w1*w2 - x1*x2 - y1*y2 - z1*z2;
-	res.x=w1*x2 + x1*w2 + y1*z2 - z1*y2;
-	res.y=w1*y2 - x1*z2 + y1*w2 + z1*x2;
-	res.z=w1*z2 + x1*y2 - y1*x2 + z1*w2;	
-
-	return res;
-    }
-    Vector3 Transform(Vector3 v) {
-        Quaternion v_as_q;
-        v_as_q.w=0;
-        v_as_q.x=v.GetX();
-        v_as_q.y=v.GetY();
-        v_as_q.z=v.GetZ();
-
-        v_as_q=(*this)*v_as_q*Quaternion(w,-x,-y,-z);
-
-        Vector3 ret;
-        ret.SetX(v_as_q.x);
-        ret.SetY(v_as_q.y);
-        ret.SetZ(v_as_q.z);
-        return ret;
-    }
-    void SetAngleAxis(double a,const Vector3& v) {
-        double _x=v.GetX();
-        double _y=v.GetY();
-        double _z=v.GetZ();
-
-	double norm = sqrt(_x*_x+_y*_y+_z*_z);
-	_x/=norm;
-	_y/=norm;
-	_z/=norm;
-
-	double sin_a=sin(a/2);
-	w=cos(a/2);
-	x=_x*sin_a;
-	y=_y*sin_a;
-	z=_z*sin_a;
-    }
-    double norm() {
-	return sqrt(w*w+x*x+y*y+z*z);
-    }
-    Quaternion Conjugulate() {
-        return Quaternion(w,-x,-y,-z);
-    }
-    EulerAngles ToEuler() {
-        Vector3 z_axis=Vector3(0,0,1);
-        Vector3 x_axis=Vector3(1,0,0);
-        z_axis=Transform(z_axis);
-        x_axis=Transform(x_axis);
-    
-        double gamma=atan2(z_axis.GetY(),z_axis.GetX());
-        double beta=atan2(sqrt(z_axis.GetX()*z_axis.GetX() + z_axis.GetY()*z_axis.GetY()).si,z_axis.GetZ().si);
-
-        //Use γ and β to rotate V2 back onto the point 0,0,1
-        Quaternion gammaTwist,betaTwist;
-        betaTwist.SetAngleAxis(-beta,Vector3(0,1,0));
-        gammaTwist.SetAngleAxis(-gamma,Vector3(0,0,1));
-
-        x_axis=(betaTwist*gammaTwist).Transform(x_axis);
-
-        double alpha = atan2(x_axis.GetY(),x_axis.GetX());
-        if(alpha < 0 || alpha >= 2*PI)  alpha = alpha-2*PI*floor(alpha/(2*PI));
-        if(alpha >= 2*PI) alpha = 0;
-        if(beta < 0 || beta >= PI)    beta = beta-  PI*floor(beta/PI);
-        if(gamma < 0 || gamma >= 2*PI)  gamma = gamma-2*PI*floor(gamma/(2*PI));
-        if(gamma >= 2*PI) gamma = 0;
-	return EulerAngles(alpha,beta,gamma);
-    }
-
-};
 
 
 
@@ -272,290 +171,204 @@ void Matrix4::Dump() const {
 //==============================================================================//
 // Orientation
 
-Orientation::Orientation() : mType(UNDEFINED) {
+Orientation::Orientation() : mData(EulerAngles(0,0,0)) {
 }
 
-Orientation::Orientation(const Orientation& orient) :
-  mType(orient.mType) {
-  if(mType==ANGLE_AXIS) {
-    mData.mAngleAxis.angle = mData.mAngleAxis.angle;
-    mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
-  } else if(mType==EIGENSYSTEM) {
-    mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);
-    mData.mEigenSystem.YAxis = new Vector3(*orient.mData.mEigenSystem.YAxis);
-    mData.mEigenSystem.ZAxis = new Vector3(*orient.mData.mEigenSystem.ZAxis);
-  } else if(mType==QUATERNION) {
-    mData.mQuaternion.real = orient.mData.mQuaternion.real;
-    mData.mQuaternion.i    = orient.mData.mQuaternion.i;
-    mData.mQuaternion.j    = orient.mData.mQuaternion.j;
-    mData.mQuaternion.k    = orient.mData.mQuaternion.k;
-  } else if(mType==EULER) {
-    mData.mEuler.alpha =     orient.mData.mEuler.alpha;
-    mData.mEuler.beta  =     orient.mData.mEuler.beta;
-    mData.mEuler.gamma =     orient.mData.mEuler.gamma;
-  }
-}
-
-const Orientation& Orientation::operator=(const Orientation& orient) {
-  mType=orient.mType;
-  if(mType==ANGLE_AXIS) {
-    mData.mAngleAxis.angle = orient.mData.mAngleAxis.angle;
-    mData.mAngleAxis.axis = new Vector3(*orient.mData.mAngleAxis.axis);
-  } else if(mType==EIGENSYSTEM) {
-    mData.mEigenSystem.XAxis = new Vector3(*orient.mData.mEigenSystem.XAxis);
-    mData.mEigenSystem.YAxis = new Vector3(*orient.mData.mEigenSystem.YAxis);
-    mData.mEigenSystem.ZAxis = new Vector3(*orient.mData.mEigenSystem.ZAxis);
-  } else if(mType==QUATERNION) {
-    mData.mQuaternion.real = orient.mData.mQuaternion.real;
-    mData.mQuaternion.i    = orient.mData.mQuaternion.i;
-    mData.mQuaternion.j    = orient.mData.mQuaternion.j;
-    mData.mQuaternion.k    = orient.mData.mQuaternion.k;
-  } else if(mType==EULER) {
-    mData.mEuler.alpha =     orient.mData.mEuler.alpha;
-    mData.mEuler.beta  =     orient.mData.mEuler.beta;
-    mData.mEuler.gamma =     orient.mData.mEuler.gamma;
-  }
-  return *this;
-}
-
-
-Orientation::~Orientation() {
-  Clear();
-}
-
-void Orientation::Clear() {
-  if(mType==ANGLE_AXIS && mData.mAngleAxis.axis != NULL) {
-    delete mData.mAngleAxis.axis;
-  } else if(mType==EIGENSYSTEM) {
-    delete mData.mEigenSystem.XAxis;
-    delete mData.mEigenSystem.YAxis;
-    delete mData.mEigenSystem.ZAxis;
-  }
-  mType=UNDEFINED;
-}
- 
 Orientation::Type Orientation::GetType() const {
-  return mType;
+    if(get<EulerAngles>(&mData)!=NULL) {
+        return EULER;
+    } else if(get<AngleAxis>(&mData)!=NULL) {
+        return ANGLE_AXIS;
+    } else if(get<Matrix3>(&mData)!=NULL) {
+        return EIGENSYSTEM;
+    } else  {
+        return QUATERNION;
+    }
 }
 
+
+class GetAsMatrixVisitor : public static_visitor<Matrix3> {
+public:
+    Matrix3 operator()(const EulerAngles& dat) const {
+        double cos_alpha = cos(dat.alpha);
+        double cos_beta  = cos(dat.beta); 
+        double cos_gamma = cos(dat.gamma);
+
+        double sin_alpha = sin(dat.alpha);
+        double sin_beta  = sin(dat.beta);
+        double sin_gamma = sin(dat.gamma);
+
+        double a11 = cos_alpha*cos_gamma - cos_beta * sin_gamma * sin_alpha;
+        double a22 =-sin_alpha*sin_gamma + cos_beta * cos_gamma * cos_alpha;
+        double a33 = cos_beta;
+
+        double a12 = cos_alpha*sin_gamma + cos_beta * cos_gamma * sin_alpha;
+        double a21 =-sin_alpha*cos_gamma + cos_beta * sin_gamma * sin_alpha;
+    
+        double a13 = sin_alpha*sin_beta;
+        double a31 = sin_beta *sin_gamma;
+    
+        double a23 = cos_alpha* sin_beta;
+        double a32 =-sin_beta * cos_gamma;
+        return Matrix3(a11,a12,a13,
+                       a21,a22,a23,
+                       a31,a32,a33);
+    }
+    Matrix3 operator()(const Matrix3& dat) const {
+        return dat;
+    }
+    Matrix3 operator()(const Quaternion& dat) const {
+        double W = dat.w;
+        double X = dat.x;
+        double Y = dat.y;
+        double Z = dat.z;
+
+        //Normalise the quaternion
+        double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
+        X=X*inv_mag;
+        Y=Y*inv_mag;
+        Z=Z*inv_mag;
+        W=W*inv_mag;
+    
+        double xx      = X * X;
+        double xy      = X * Y;
+        double xz      = X * Z;
+        double xw      = X * W;
+
+        double yy      = Y * Y;
+        double yz      = Y * Z;
+        double yw      = Y * W;
+
+        double zz      = Z * Z;
+        double zw      = Z * W;
+    
+        Matrix3 mat3(1 - 2 * ( yy + zz ), 2 * ( xy - zw )    , 2 * ( xz + yw ),
+                     2 * ( xy + zw )    , 1 - 2 * ( xx + zz ), 2 * ( yz - xw ),
+                     2 * ( xz - yw )    , 2 * ( yz + xw )    , 1 - 2 * ( xx + yy ));
+
+        return mat3;
+
+    }
+    Matrix3 operator()(const AngleAxis& dat) const {
+        double angle=dat.angle;
+        double x=dat.axis.GetX();
+        double y=dat.axis.GetY();
+        double z=dat.axis.GetZ();
+
+        double sin_a = sin(angle / 2);
+        double cos_a = cos(angle / 2);
+
+        double X = x * sin_a;
+        double Y = y * sin_a;
+        double Z = z * sin_a;
+        double W = cos_a;
+        //Normalise the quaternion
+        double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
+        X=X*inv_mag;
+        Y=Y*inv_mag;
+        Z=Z*inv_mag;
+        W=W*inv_mag;
+        double xx      = X * X;
+        double xy      = X * Y;
+        double xz      = X * Z;
+        double xw      = X * W;
+
+        double yy      = Y * Y;
+        double yz      = Y * Z;
+        double yw      = Y * W;
+
+        double zz      = Z * Z;
+        double zw      = Z * W;
+    
+        return Matrix3(1 - 2 * ( yy + zz ), 2 * ( xy - zw )     ,  2 * ( xz + yw ),
+                       2 * ( xy + zw )    ,  1 - 2 * ( xx + zz ),  2 * ( yz - xw ),
+                       2 * ( xz - yw )    ,  2 * ( yz + xw )    ,   1 - 2 * ( xx + yy ));
+
+    }
+};
 Matrix3 Orientation::GetAsMatrix() const {
-  if(mType==EIGENSYSTEM) {
-    const Vector3* xa=mData.mEigenSystem.XAxis;
-    const Vector3* ya=mData.mEigenSystem.YAxis;
-    const Vector3* za=mData.mEigenSystem.ZAxis;
-
-    return Matrix3(xa->GetX(),ya->GetX(),za->GetX(),
-		   xa->GetY(),ya->GetY(),za->GetY(),
-		   xa->GetZ(),ya->GetZ(),za->GetZ());
-  } else if(mType==QUATERNION) {
-    double W = mData.mQuaternion.real;
-    double X = mData.mQuaternion.i;
-    double Y = mData.mQuaternion.j;
-    double Z = mData.mQuaternion.k;
-
-    //Normalise the quaternion
-    double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
-    X=X*inv_mag;
-    Y=Y*inv_mag;
-    Z=Z*inv_mag;
-    W=W*inv_mag;
-    
-    double xx      = X * X;
-    double xy      = X * Y;
-    double xz      = X * Z;
-    double xw      = X * W;
-
-    double yy      = Y * Y;
-    double yz      = Y * Z;
-    double yw      = Y * W;
-
-    double zz      = Z * Z;
-    double zw      = Z * W;
-    
-    Matrix3 mat3(
-		 1 - 2 * ( yy + zz ),
-		 2 * ( xy - zw ),
-		 2 * ( xz + yw ),
-
-		 2 * ( xy + zw ),
-		 1 - 2 * ( xx + zz ),
-		 2 * ( yz - xw ),
-
-		 2 * ( xz - yw ),
-		 2 * ( yz + xw ),
-		 1 - 2 * ( xx + yy )
-		 );
-
-    return mat3;
-  } else if(mType==ANGLE_AXIS) {
-    double angle=mData.mAngleAxis.angle;
-    double x=mData.mAngleAxis.axis->GetX();
-    double y=mData.mAngleAxis.axis->GetY();
-    double z=mData.mAngleAxis.axis->GetZ();
-
-    double sin_a = sin(angle / 2);
-    double cos_a = cos(angle / 2);
-
-    double X = x * sin_a;
-    double Y = y * sin_a;
-    double Z = z * sin_a;
-    double W = cos_a;
-    //Normalise the quaternion
-    double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
-    X=X*inv_mag;
-    Y=Y*inv_mag;
-    Z=Z*inv_mag;
-    W=W*inv_mag;
-    double xx      = X * X;
-    double xy      = X * Y;
-    double xz      = X * Z;
-    double xw      = X * W;
-
-    double yy      = Y * Y;
-    double yz      = Y * Z;
-    double yw      = Y * W;
-
-    double zz      = Z * Z;
-    double zw      = Z * W;
-    
-    return Matrix3(
-		   1 - 2 * ( yy + zz ),
-		   2 * ( xy - zw ),
-		   2 * ( xz + yw ),
-
-		   2 * ( xy + zw ),
-		   1 - 2 * ( xx + zz ),
-		   2 * ( yz - xw ),
-
-		   2 * ( xz - yw ),
-		   2 * ( yz + xw ),
-		   1 - 2 * ( xx + yy )
-		   );
-
-  } else if(mType==EULER) {
-    double cos_alpha = cos(mData.mEuler.alpha);
-    double cos_beta  = cos(mData.mEuler.beta); 
-    double cos_gamma = cos(mData.mEuler.gamma);
-
-    double sin_alpha = sin(mData.mEuler.alpha);
-    double sin_beta  = sin(mData.mEuler.beta);
-    double sin_gamma = sin(mData.mEuler.gamma);
-
-    double a11 = cos_alpha*cos_gamma - cos_beta * sin_gamma * sin_alpha;
-    double a22 =-sin_alpha*sin_gamma + cos_beta * cos_gamma * cos_alpha;
-    double a33 = cos_beta;
-
-    double a12 = cos_alpha*sin_gamma + cos_beta * cos_gamma * sin_alpha;
-    double a21 =-sin_alpha*cos_gamma + cos_beta * sin_gamma * sin_alpha;
-    
-    double a13 = sin_alpha*sin_beta;
-    double a31 = sin_beta *sin_gamma;
-    
-    double a23 = cos_alpha* sin_beta;
-    double a32 =-sin_beta * cos_gamma;
-    return Matrix3(a11,a12,a13,
-		   a21,a22,a23,
-		   a31,a32,a33);
-  }
-  return Matrix3(1,0,0,0,1,0,0,0,1);
+    return apply_visitor(GetAsMatrixVisitor(),mData);
 }
 
 void Orientation::GetEuler(double* alpha,double* beta,double* gamma) const {
-  *alpha = mData.mEuler.alpha;
-  *beta = mData.mEuler.beta;
-  *gamma = mData.mEuler.gamma;
-  return;
+    *alpha = get<EulerAngles>(mData).alpha;
+    *beta =  get<EulerAngles>(mData).beta;
+    *gamma = get<EulerAngles>(mData).gamma;
 }
 
 void Orientation::GetAngleAxis(double* angle,Vector3* axis) const {
-  *angle = mData.mAngleAxis.angle;
-  *axis = *mData.mAngleAxis.axis;
-  return;
+    *angle = get<AngleAxis>(mData).angle;
+    *axis =  get<AngleAxis>(mData).axis;
 }
 
 void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) const {
-  *real = mData.mQuaternion.real;
-  *i = mData.mQuaternion.i;
-  *j = mData.mQuaternion.j;
-  *k = mData.mQuaternion.k;
-  return;
+    *real = get<Quaternion>(mData).w;
+    *i    = get<Quaternion>(mData).x;
+    *j    = get<Quaternion>(mData).y;
+    *k    = get<Quaternion>(mData).z;
 }
 
 void Orientation::GetEigenSystem(Vector3* XAxis,Vector3* YAxis, Vector3* ZAxis) const {
-  *XAxis = *mData.mEigenSystem.XAxis;
-  *YAxis = *mData.mEigenSystem.YAxis;
-  *ZAxis = *mData.mEigenSystem.ZAxis;
-  return;
+    Matrix3 mat = get<Matrix3>(mData);
+    *XAxis = Vector3(mat(0,0),mat(0,1),mat(0,2));
+    *YAxis = Vector3(mat(1,0),mat(1,1),mat(1,2));
+    *ZAxis = Vector3(mat(2,0),mat(2,1),mat(2,2));
 }
 
 void Orientation::SetEuler(double alpha,double beta,double gamma) {
-  Clear();
-  mType=EULER;
-  mData.mEuler.alpha=alpha;
-  mData.mEuler.beta =beta;
-  mData.mEuler.gamma=gamma;
-  return;
+  mData=EulerAngles(alpha,beta,gamma);
 }
 
 void Orientation::SetAngleAxis(double angle,const Vector3& axis) {
-  Clear();
-  mType=ANGLE_AXIS;
-  mData.mAngleAxis.angle=angle;
-  mData.mAngleAxis.axis=new Vector3(axis);
-  return;
-
+  mData=AngleAxis(angle,axis);
 }
 
 void Orientation::SetQuaternion(double real, double i, double j, double k) {
-  Clear();
-  mType=QUATERNION;
-  mData.mQuaternion.real=real;
-  mData.mQuaternion.i=i;
-  mData.mQuaternion.j=j;
-  mData.mQuaternion.k=k;
-  return;
+  mData=Quaternion(real,i,j,k);
 }
 
 void Orientation::SetEigenSystem(const Vector3& XAxis,const Vector3& YAxis, const Vector3& ZAxis) {
-  Clear();
-  mType=EIGENSYSTEM;
-  mData.mEigenSystem.XAxis=new Vector3(XAxis);
-  mData.mEigenSystem.YAxis=new Vector3(YAxis);
-  mData.mEigenSystem.ZAxis=new Vector3(ZAxis);
-  return;
+  mData=Matrix3(XAxis.GetX(),XAxis.GetY(),XAxis.GetZ(),
+                YAxis.GetX(),YAxis.GetY(),YAxis.GetZ(),
+                ZAxis.GetX(),ZAxis.GetY(),ZAxis.GetZ());
 }
 
+class ToStringVisitor : public static_visitor<string> {
+public:
+    string operator()(const EulerAngles& dat) const {
+        ostringstream oss;
+        oss << "eu:" << dat.alpha << "," << dat.beta << "," << dat.gamma;
+        return oss.str();
+    }
+    string operator()(const Matrix3& dat) const {
+        ostringstream oss;
+        oss << "es:"
+            << dat(0,0) << "," << dat(0,1) << "," << dat(0,2) 
+            << dat(1,0) << "," << dat(1,1) << "," << dat(1,2)
+            << dat(2,0) << "," << dat(2,1) << "," << dat(2,2);
+        return oss.str();
+    }
+    string operator()(const Quaternion& dat) const {
+        ostringstream oss;
+        oss << "q:"
+            << dat.w << ","
+            << dat.x    << ","
+            << dat.y    << ","
+            << dat.z;
+        return oss.str();
+    }
+    string operator()(const AngleAxis& dat) const {
+        ostringstream oss;
+        oss << "aa:"
+            << dat.angle << ","
+            << dat.axis.GetX() << ","
+            << dat.axis.GetY() << ","
+            << dat.axis.GetZ();
+        return oss.str();
+    }
+};
 string Orientation::ToString() const {
-  ostringstream oss;
-  switch(mType) {
-  case EULER:
-    oss << "eu:" << mData.mEuler.alpha << "," << mData.mEuler.beta << "," << mData.mEuler.gamma;
-    break;
-  case ANGLE_AXIS:
-    oss << "aa:"
-	<< mData.mAngleAxis.angle << ","
-	<< mData.mAngleAxis.axis->GetX() << ","
-	<< mData.mAngleAxis.axis->GetY() << ","
-	<< mData.mAngleAxis.axis->GetZ();
-    break;
-  case QUATERNION:
-    oss << "q:"
-	<< mData.mQuaternion.real << ","
-	<< mData.mQuaternion.i    << ","
-	<< mData.mQuaternion.j    << ","
-	<< mData.mQuaternion.k;
-    break;
-  case EIGENSYSTEM:
-    oss << "es:"
-	<< mData.mEigenSystem.XAxis->GetX() << "," << mData.mEigenSystem.XAxis->GetY() << "," <<  mData.mEigenSystem.XAxis->GetZ() 
-	<< mData.mEigenSystem.YAxis->GetX() << "," << mData.mEigenSystem.YAxis->GetY() << "," <<  mData.mEigenSystem.YAxis->GetZ() 
-	<< mData.mEigenSystem.ZAxis->GetX() << "," << mData.mEigenSystem.ZAxis->GetY() << "," <<  mData.mEigenSystem.ZAxis->GetZ();
-    break;
-  case UNDEFINED:
-    oss << "undefined";
-    break;
-  }
-  return oss.str();
+    return apply_visitor(ToStringVisitor(),mData);
 }
 
 void Orientation::FromString(std::string string) {
@@ -563,52 +376,40 @@ void Orientation::FromString(std::string string) {
 }
 
 
-
+class AsEulerVisitor : public static_visitor<Orientation> {
+public:
+    Orientation operator()(const EulerAngles& dat) const {
+        return Orientation(dat);
+    }
+    Orientation operator()(const Matrix3& dat) const {
+        Orientation q=Orientation(dat).GetAsQuaternion();
+        return q.GetAsEuler();
+    }
+    Orientation operator()(const Quaternion& dat) const {
+        Quaternion q(dat.w,dat.x,dat.y,dat.z);
+        return Orientation(q.ToEuler());
+    }
+    Orientation operator()(const AngleAxis& dat) const {
+        return Orientation(dat).GetAsQuaternion().GetAsEuler();
+    }
+};
 Orientation Orientation::GetAsEuler() const {
-    switch(mType) {
-    case EULER: {
-        return Orientation(*this);
-    }
-    case ANGLE_AXIS: {
-        Orientation q=GetAsQuaternion();
-        return q.GetAsEuler();
-    }
-    case QUATERNION: {
-        Quaternion q(mData.mQuaternion.real,
-                     mData.mQuaternion.i,
-                     mData.mQuaternion.j,
-                     mData.mQuaternion.k);
-        EulerAngles ea = q.ToEuler();
-        Orientation o;
-        o.SetEuler(ea.alpha,ea.beta,ea.gamma);
-        return o;
-    }
-    case EIGENSYSTEM: {
-        Orientation q=GetAsQuaternion();
-        return q.GetAsEuler();
-    }
-    case UNDEFINED:
-    default:
-        cerr << "Warning, cannot convert an undefined orientation" << endl;
-        return Orientation();
-    }
+    return apply_visitor(AsEulerVisitor(),mData);
 }
 
-Orientation Orientation::GetAsEigenSystem() const {
-    switch(mType) {
-    case EULER: {
-        Orientation o = GetAsQuaternion();
-        return o.GetAsEigenSystem();
+class AsDCMVisitor : public static_visitor<Orientation> {
+public:
+    Orientation operator()(const EulerAngles& dat) const {
+        return Orientation(dat).GetAsQuaternion().GetAsEigenSystem();
     }
-    case ANGLE_AXIS: {
-        Orientation o = GetAsQuaternion();
-        return o.GetAsEigenSystem();
+    Orientation operator()(const Matrix3& dat) const {
+        return Orientation(dat);
     }
-    case QUATERNION: {
-        double W = mData.mQuaternion.real;
-        double X = mData.mQuaternion.i;
-        double Y = mData.mQuaternion.j;
-        double Z = mData.mQuaternion.k;
+    Orientation operator()(const Quaternion& dat) const {
+        double W = dat.w;
+        double X = dat.x;
+        double Y = dat.y;
+        double Z = dat.z;
 
         //Normalise the quaternion
         double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
@@ -629,90 +430,64 @@ Orientation Orientation::GetAsEigenSystem() const {
         double zz = Z * Z;
         double zw = Z * W;
         
-        Orientation o;
-        o.SetEigenSystem(Vector3(1 - 2 * ( yy + zz ),2 * ( xy - zw ),2 * ( xz + yw )),
-                         Vector3(2 * ( xy + zw ),1 - 2 * ( xx + zz ),2 * ( yz - xw )),
-                         Vector3(2 * ( xz - yw ),2 * ( yz + xw ),1 - 2 * ( xx + yy )));
-        return o;
+        return Orientation(Matrix3(1 - 2 * ( yy + zz ),2 * ( xy - zw ),2 * ( xz + yw ),
+                                   2 * ( xy + zw ),1 - 2 * ( xx + zz ),2 * ( yz - xw ),
+                                   2 * ( xz - yw ),2 * ( yz + xw ),1 - 2 * ( xx + yy )));
     }
-    case EIGENSYSTEM:
-        return Orientation(*this);
-        break;
-    case UNDEFINED:
-    default:
-        cerr << "Warning, cannot convert an undefined orientation" << endl;
-            return Orientation();
+    Orientation operator()(const AngleAxis& dat) const {
+        return Orientation(dat).GetAsQuaternion().GetAsEigenSystem();
     }
+};
+Orientation Orientation::GetAsEigenSystem() const {
+    return apply_visitor(AsDCMVisitor(),mData);
 }
 
+class AsAngleAxisVisitor : public static_visitor<Orientation> {
+public:
+    Orientation operator()(const EulerAngles& dat) const {
+        return Orientation(dat).GetAsQuaternion().GetAsAngleAxis();
+    }
+    Orientation operator()(const Matrix3& dat) const {
+        return Orientation(dat).GetAsQuaternion().GetAsAngleAxis();
+    }
+    Orientation operator()(const Quaternion& dat) const {
+        double angle=2*acos(dat.w);
+        double inv_sin_a=1/(sqrt(1-dat.w*dat.w)*2);
+        double vx=dat.x*inv_sin_a;
+        double vy=dat.y*inv_sin_a;
+        double vz=dat.z*inv_sin_a;
+        return Orientation(AngleAxis(angle,Vector3(vx,vy,vz)));
+    }
+    Orientation operator()(const AngleAxis& dat) const {
+        return Orientation(dat);
+    }
+};
 Orientation Orientation::GetAsAngleAxis() const {
-    switch(mType) {
-    case EULER: {
-        Orientation o=GetAsQuaternion();
-        return o.GetAsAngleAxis();
-    }
-    case ANGLE_AXIS: {
-        return Orientation(*this);
-    }
-    case QUATERNION: {
-        double angle=2*acos(mData.mQuaternion.real);
-        double inv_sin_a=1/(sqrt(1-mData.mQuaternion.real*mData.mQuaternion.real)*2);
-        double vx=mData.mQuaternion.i*inv_sin_a;
-        double vy=mData.mQuaternion.j*inv_sin_a;
-        double vz=mData.mQuaternion.k*inv_sin_a;
-        Orientation o;
-        o.SetAngleAxis(angle,Vector3(vx,vy,vz));
-        return o;
-    }
-    case EIGENSYSTEM: {
-        Orientation o=GetAsQuaternion();
-        return o.GetAsAngleAxis();
-    }
-    case UNDEFINED:
-    default: {
-        cerr << "Warning, cannot convert an undefined orientation" << endl;
-        return Orientation();
-    }
-    }
+    return apply_visitor(AsAngleAxisVisitor(),mData);
 }
 
-Orientation Orientation::GetAsQuaternion() const {
-    switch(mType) {
-    case EULER: {
-	Quaternion q1(mData.mEuler.alpha,Vector3(0,0,1));
-	Quaternion q2(mData.mEuler.beta, Vector3(0,1,0));
-	Quaternion q3(mData.mEuler.gamma,Vector3(0,0,1));
+class AsQuaternionVisitor : public static_visitor<Orientation> {
+public:
+    Orientation operator()(const EulerAngles& dat) const {
+	Quaternion q1(dat.alpha,Vector3(0,0,1));
+	Quaternion q2(dat.beta, Vector3(0,1,0));
+	Quaternion q3(dat.gamma,Vector3(0,0,1));
         Quaternion q=q3*q2*q1;
-        Orientation o;
-        o.SetQuaternion(q.w,q.x,q.y,q.z);
-        return o;
+        return Orientation(q);
     }
-    case ANGLE_AXIS: {
-	double sin_a=sin(mData.mAngleAxis.angle/2);
-	double w=cos(mData.mAngleAxis.angle/2);
-	double x=mData.mAngleAxis.axis->GetX()*sin_a;
-	double y=mData.mAngleAxis.axis->GetY()*sin_a;
-	double z=mData.mAngleAxis.axis->GetZ()*sin_a;
-        Orientation o;
-        o.SetQuaternion(w,x,y,z);
-        return o;
-    }
-    case QUATERNION: {
-        return Orientation(*this);
-    }
-    case EIGENSYSTEM: {
+    Orientation operator()(const Matrix3& dat) const {
         double W,X,Y,Z;
-        double m00=mData.mEigenSystem.XAxis->GetX();
-        double m01=mData.mEigenSystem.XAxis->GetY();
-        double m02=mData.mEigenSystem.XAxis->GetZ();
+        double m00=dat(0,0);
+        double m01=dat(0,1);
+        double m02=dat(0,2);
 
-        double m10=mData.mEigenSystem.YAxis->GetX();
-        double m11=mData.mEigenSystem.YAxis->GetY();
-        double m12=mData.mEigenSystem.YAxis->GetZ();
+        double m10=dat(1,0);
+        double m11=dat(1,1);
+        double m12=dat(1,2);
 
-        double m20=mData.mEigenSystem.ZAxis->GetX();
-        double m21=mData.mEigenSystem.ZAxis->GetY();
-        double m22=mData.mEigenSystem.ZAxis->GetZ();
+        double m20=dat(2,0);
+        double m21=dat(2,1);
+        double m22=dat(2,2);
 
         double trace=m00+m11+m22 + 1;
         if(trace > 0) {
@@ -742,15 +517,21 @@ Orientation Orientation::GetAsQuaternion() const {
                 W = (m01 + m10)/S;
             }
         }
-        Orientation o;
-        o.SetQuaternion(W,X,Y,Z);
-        return o;
+        return Orientation(Quaternion(W,X,Y,Z));
     }
-    case UNDEFINED:
-    default: {
-        cerr << "Warning, cannot convert an undefined orientation" << endl;
-        return Orientation();
+    Orientation operator()(const Quaternion& dat) const {
+        return Orientation(dat);
     }
+    Orientation operator()(const AngleAxis& dat) const {
+	double sin_a=sin(dat.angle/2);
+	double w=cos(dat.angle/2);
+	double x=dat.axis.GetX()*sin_a;
+	double y=dat.axis.GetY()*sin_a;
+	double z=dat.axis.GetZ()*sin_a;
+        return Orientation(Quaternion(w,x,y,z));
     }
+};
+Orientation Orientation::GetAsQuaternion() const {
+    return apply_visitor(AsQuaternionVisitor(),mData);
 }
 

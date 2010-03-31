@@ -7,6 +7,10 @@
 #include <cmath>
 #include <shared/unit.hpp>
 #include <shared/dstegr.hpp>
+#include <boost/variant.hpp>
+
+#define PI 3.141592653589793238462643
+
 
 namespace SpinXML {
 
@@ -347,18 +351,130 @@ namespace SpinXML {
 	double raw[16];
     };
 
+
+    ///Euler angle type
+    struct EulerAngles {
+        double alpha,beta,gamma;
+        EulerAngles(double _alpha,double _beta, double _gamma) 
+            : alpha(_alpha),beta(_beta),gamma(_gamma) {
+
+        }
+    };
+
+    struct AngleAxis {
+        double angle;
+        Vector3 axis;
+        AngleAxis(double _angle,const Vector3& _axis) 
+            : angle(_angle),axis(_axis) {
+        }
+    };
+
+
+    /// Simple Quaternion Type
+    struct Quaternion {
+        double w,x,y,z;
+        Quaternion(){}
+        Quaternion(double _w,double _x, double _y, double _z) 
+            : w(_w),x(_x),y(_y),z(_z){
+        }
+        Quaternion(double angle,const Vector3& axis) {
+            SetAngleAxis(angle,axis);
+        }
+        Quaternion operator*(const Quaternion& q2) {
+            Quaternion res;
+            double w1=w; double w2=q2.w;
+            double x1=x; double x2=q2.x;
+            double y1=y; double y2=q2.y;
+            double z1=z; double z2=q2.z;
+            res.w=w1*w2 - x1*x2 - y1*y2 - z1*z2;
+            res.x=w1*x2 + x1*w2 + y1*z2 - z1*y2;
+            res.y=w1*y2 - x1*z2 + y1*w2 + z1*x2;
+            res.z=w1*z2 + x1*y2 - y1*x2 + z1*w2;	
+
+            return res;
+        }
+        Vector3 Transform(Vector3 v) {
+            Quaternion v_as_q;
+            v_as_q.w=0;
+            v_as_q.x=v.GetX();
+            v_as_q.y=v.GetY();
+            v_as_q.z=v.GetZ();
+
+            v_as_q=(*this)*v_as_q*Quaternion(w,-x,-y,-z);
+
+            Vector3 ret;
+            ret.SetX(v_as_q.x);
+            ret.SetY(v_as_q.y);
+            ret.SetZ(v_as_q.z);
+            return ret;
+        }
+        void SetAngleAxis(double a,const Vector3& v) {
+            double _x=v.GetX();
+            double _y=v.GetY();
+            double _z=v.GetZ();
+
+            double norm = sqrt(_x*_x+_y*_y+_z*_z);
+            _x/=norm;
+            _y/=norm;
+            _z/=norm;
+
+            double sin_a=sin(a/2);
+            w=cos(a/2);
+            x=_x*sin_a;
+            y=_y*sin_a;
+            z=_z*sin_a;
+        }
+        double norm() {
+            return sqrt(w*w+x*x+y*y+z*z);
+        }
+        Quaternion Conjugulate() {
+            return Quaternion(w,-x,-y,-z);
+        }
+        EulerAngles ToEuler() {
+            Vector3 z_axis=Vector3(0,0,1);
+            Vector3 x_axis=Vector3(1,0,0);
+            z_axis=Transform(z_axis);
+            x_axis=Transform(x_axis);
+    
+            double gamma=atan2(z_axis.GetY(),z_axis.GetX());
+            double beta=atan2(sqrt(z_axis.GetX()*z_axis.GetX() + z_axis.GetY()*z_axis.GetY()).si,z_axis.GetZ().si);
+
+            //Use γ and β to rotate V2 back onto the point 0,0,1
+            Quaternion gammaTwist,betaTwist;
+            betaTwist.SetAngleAxis(-beta,Vector3(0,1,0));
+            gammaTwist.SetAngleAxis(-gamma,Vector3(0,0,1));
+
+            x_axis=(betaTwist*gammaTwist).Transform(x_axis);
+
+            double alpha = atan2(x_axis.GetY(),x_axis.GetX());
+            if(alpha < 0 || alpha >= 2*PI)  alpha = alpha-2*PI*floor(alpha/(2*PI));
+            if(alpha >= 2*PI) alpha = 0;
+            if(beta < 0 || beta >= PI)    beta = beta-  PI*floor(beta/PI);
+            if(gamma < 0 || gamma >= 2*PI)  gamma = gamma-2*PI*floor(gamma/(2*PI));
+            if(gamma >= 2*PI) gamma = 0;
+            return EulerAngles(alpha,beta,gamma);
+        }
+
+    };
+
+
+
     ///Class for storing a 3 dimentional rotation
     class Orientation {
     public:
 	///Constructs and orientaion of type Orientation::UNDEFINED with all
 	///other data uninialised.
 	Orientation();
-	///Copies an orientation
-	Orientation(const Orientation& orient);
-	///Assignment Operation
-	const Orientation& operator=(const Orientation& orient);
+	///Constructs an orientation from euler angles
+	Orientation(const EulerAngles& ea) : mData(ea) {}
+	///Constructs an orientation from a matrix
+	Orientation(const Matrix3& m) : mData(m) {}
+	///Constructs an orientation from a quaternion
+	Orientation(const Quaternion& q) : mData(q) {}
+	///Constructs an orientation from an AngleAxis
+	Orientation(const AngleAxis& aa) : mData(aa) {}
 	///Destructor
-	~Orientation();
+	~Orientation() {};
     
 	///Enumeration of the four conventions on storing rotations
 	enum Type {
@@ -420,30 +536,8 @@ namespace SpinXML {
         Orientation GetAsQuaternion() const;
 
     private:
-	void Clear();
-	union  {
-	    struct {
-		double alpha;
-		double beta;
-		double gamma;
-	    } mEuler;
-	    struct {
-		double angle;
-		Vector3* axis;
-	    } mAngleAxis;
-	    struct {
-		double real;
-		double i;
-		double j;
-		double k;
-	    } mQuaternion;
-	    struct {
-		Vector3* XAxis;
-		Vector3* YAxis;
-		Vector3* ZAxis;
-	    } mEigenSystem;
-	} mData;
-	Type mType;
+        typedef boost::variant<EulerAngles,AngleAxis,Quaternion,Matrix3> var_t;
+        var_t mData;
     };
 };
 #endif

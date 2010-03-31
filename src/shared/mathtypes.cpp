@@ -523,15 +523,58 @@ public:
         return Orientation(dat);
     }
     Orientation operator()(const AngleAxis& dat) const {
+        double vx=dat.axis.GetX();
+        double vy=dat.axis.GetY();
+        double vz=dat.axis.GetZ();
+
 	double sin_a=sin(dat.angle/2);
 	double w=cos(dat.angle/2);
-	double x=dat.axis.GetX()*sin_a;
-	double y=dat.axis.GetY()*sin_a;
-	double z=dat.axis.GetZ()*sin_a;
+	double x=vx*sin_a;
+	double y=vy*sin_a;
+	double z=vz*sin_a;
         return Orientation(Quaternion(w,x,y,z));
     }
 };
 Orientation Orientation::GetAsQuaternion() const {
     return apply_visitor(AsQuaternionVisitor(),mData);
 }
+
+class NormaliseVisitor : public static_visitor<> {
+public:
+    void operator()(EulerAngles& dat) const {
+        dat.Normalize();
+    }
+    void operator()(Matrix3& dat) const {
+        dat.Othogonalise();
+    }
+    void operator()(Quaternion& dat) const {
+        dat.Normalise();
+    }
+    void operator()(AngleAxis& dat) const {
+        dat.Normalise();
+    }
+};
+void Orientation::Normalise() {
+    apply_visitor(NormaliseVisitor(),mData);
+}
+
+class NormalisedVisitor : public static_visitor<Orientation> {
+public:
+    Orientation operator()(const EulerAngles& dat) const {
+        return Orientation(dat.Normalized());
+    }
+    Orientation operator()(const Matrix3& dat) const {
+        return Orientation(dat.Othogonalised());
+    }
+    Orientation operator()(const Quaternion& dat) const {
+        return Orientation(dat.Normalised());
+    }
+    Orientation operator()(const AngleAxis& dat) const {
+        return Orientation(dat.Normalised());
+    }
+};
+Orientation Orientation::Normalised() const {
+    return apply_visitor(NormalisedVisitor(),mData);
+}
+
 

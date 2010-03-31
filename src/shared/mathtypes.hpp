@@ -62,12 +62,21 @@ namespace SpinXML {
 	    y.si=_y;
 	    z.si=_z;
 	}
-	///normalises the vector
+	///normalises the vector in place
         void normalise() {
             double inv_length=1/sqrt(x.si*x.si+y.si*y.si+z.si*z.si);
             x.si*=inv_length;
             y.si*=inv_length;
             z.si*=inv_length;                
+        }
+	///normalises the vector
+        Vector3_t normalised() const {
+            double inv_length=1/sqrt(x.si*x.si+y.si*y.si+z.si*z.si);
+            Vector3_t retVal;
+            retVal.x.si=x.si*inv_length;
+            retVal.y.si=y.si*inv_length;
+            retVal.z.si=z.si*inv_length;
+            return retVal;
         }
 
         Vector3_t operator+(const Vector3_t& v) const {
@@ -176,6 +185,18 @@ namespace SpinXML {
 	    raw[6]=raw[2];
 	    raw[7]=raw[5];
 	}
+
+        ///Project the matrix into SO(3) in place
+        void Othogonalise() {
+            //TODO
+        }
+
+        ///Project the matrix into SO(3)
+        Matrix3_t Othogonalised() const {
+            //TODO
+            return Matrix3_t();
+        }
+
     
 	///Get a pointer to the matrix in memory. The matrix is stored in
 	///row major form (GetRaw()[0]=a00,GetRaw()[1]=a01, etc.)
@@ -359,6 +380,13 @@ namespace SpinXML {
             : alpha(_alpha),beta(_beta),gamma(_gamma) {
 
         }
+        void Normalize() {
+            
+        }
+        EulerAngles Normalized() const {
+            
+        }
+
     };
 
     struct AngleAxis {
@@ -367,6 +395,13 @@ namespace SpinXML {
         AngleAxis(double _angle,const Vector3& _axis) 
             : angle(_angle),axis(_axis) {
         }
+        void Normalise() {
+            axis.normalise();
+        }
+        AngleAxis Normalised() const {
+            return AngleAxis(angle,axis.normalised());
+        }
+
     };
 
 
@@ -427,6 +462,22 @@ namespace SpinXML {
         double norm() {
             return sqrt(w*w+x*x+y*y+z*z);
         }
+        void Normalise() {
+            double norm=sqrt(w*w+x*x+y*y+z*z);
+            w/=norm;
+            x/=norm;
+            y/=norm;
+            z/=norm;
+        }
+        Quaternion Normalised() const {
+            double norm=sqrt(w*w+x*x+y*y+z*z);
+            w*norm;
+            x*norm;
+            y*norm;
+            z*norm;
+            return Quaternion(w,x,y,z);
+        }
+
         Quaternion Conjugulate() {
             return Quaternion(w,-x,-y,-z);
         }
@@ -485,6 +536,11 @@ namespace SpinXML {
 	    EIGENSYSTEM
 	};
     
+        ///Normalise the contained rotation in place.
+        void Normalise();
+        ///Normalise the contained rotation.
+        Orientation Normalised() const;
+
 	///Returns the convention that is being used to store the rotation
 	Type GetType() const;
 

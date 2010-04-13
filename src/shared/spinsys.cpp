@@ -11,6 +11,62 @@ using namespace SpinXML;
 using namespace sigc;
 using namespace boost;
 
+//============================================================//
+// Eigenvalue/AxRhom/SpanSkew conversions
+
+/// eigenvalues -> ax rhom
+ax_rhom_t     eigenvalues_t::AsAxRhom() const {
+        //Sort so that xx <= yy <= zz
+        energy tmp;
+        //if(zz < yy) tmp=zz; zz=yy; yy=tmp;
+        //if(zz < xx) tmp=zz; zz=xx; xx=tmp; //Now zz is definatly bigest
+        //if(yy < xx) tmp=xx; xx=yy; yy=tmp;
+
+        energy iso = (xx+yy+zz)/3.0;
+        energy ax=2*zz -  xx - yy;
+        energy rh=xx - yy;
+        cout << "done conversion" << endl;
+        return ax_rhom_t(iso,ax,rh,mOrient);
+}
+/// eigenvalues -> span skew
+span_skew_t   eigenvalues_t::AsSpanSkew() const {
+
+        //Sort so that xx <= yy <= zz
+        energy tmp;
+        //if(zz < yy) tmp=zz; zz=yy; yy=tmp;
+        //if(zz < xx) tmp=zz; zz=xx; xx=tmp; //Now zz is definatly bigest
+        //if(yy < xx) tmp=xx; xx=yy; yy=tmp;
+
+        energy iso = (xx+yy+zz)/3.0;
+        energy span=zz - xx;
+        double skew=((3.0/2.0)*((iso-yy)/span)).si;
+        return span_skew_t(iso,span,skew,mOrient);
+}
+
+/// ax rhom -> eigenvalues
+eigenvalues_t ax_rhom_t::AsEigenvalues() const {
+    energy xx=iso - ax/6.0 + rh/2.0;
+    energy yy=iso - ax/6.0 - rh/2.0;
+    energy zz=iso + ax/3.0;
+    return eigenvalues_t(xx,yy,zz,mOrient);
+}
+/// ax rhom -> span skew
+span_skew_t   ax_rhom_t::AsSpanSkew() const {
+    return AsEigenvalues().AsSpanSkew();
+}
+
+/// span skew -> eigenvalues
+eigenvalues_t span_skew_t::AsEigenvalues() const {
+    energy xx=span*skew/6.0-span/2.0;
+    energy yy=iso-span*skew/3.0;
+    energy zz=span*skew/6.0+span/2.0;
+    return eigenvalues_t(xx,yy,zz,mOrient);
+}
+/// span skew -> ax rhom
+ax_rhom_t     span_skew_t::AsAxRhom() const {
+    return AsEigenvalues().AsAxRhom();
+}
+
 //==============================================================================//
 // SpinSystem
 
@@ -296,7 +352,9 @@ Matrix3e Spin::GetTotalInteraction(Interaction::SubType t) const {
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
         if(inter->IsSubType(t)) {
-            total+=inter->GetAsMatrix();
+            Matrix3e mat;
+            inter->AsMatrix().GetMatrix(&mat);
+            total+=mat;
         }
     }
     return total;
@@ -308,7 +366,9 @@ energy Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
         if(inter->IsSubType(t)) {
-            total+=inter->GetAsScalar();
+            energy e;
+            inter->AsScalar().GetScalar(&e);
+            total+=e;
         }
     }
     return total;
@@ -320,7 +380,9 @@ energy Spin::GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const 
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
         if(inter->IsSubType(t) && inter->GetOtherSpin(this)==spin2) {
-            total+=inter->GetAsScalar();
+            energy e;
+            inter->AsScalar().GetScalar(&e);
+            total+=e;
         }
     }
     return total;
@@ -337,71 +399,6 @@ bool Spin::GetHasInteractionOfType(Interaction::SubType t) const {
     return false;
 }
 
-energy Spin::GetLinearInteractionAsScalar(Interaction::SubType t) const {
-    energy total=0.0*MHz;
-    long interCount=mInter.size();
-    for(long i=0;i < interCount;++i) {
-        Interaction* inter=mInter[i];
-        if(!inter->GetIsLinear()) {
-            continue;
-        }
-        if(inter->IsSubType(t)) {
-            total+=inter->GetAsScalar();
-        }
-    }
-    return total;
-}
-
-
-energy Spin::GetQuadrapolarInteractionAsScalar(Interaction::SubType t) const {
-    energy total=0.0*MHz;
-    long interCount=mInter.size();
-    for(long i=0;i < interCount;++i) {
-        Interaction* inter=mInter[i];
-        if(!inter->GetIsQuadratic()) {
-            continue;
-        }
-        if(inter->IsSubType(t)) {
-            total+=inter->GetAsScalar();
-        }
-    }
-    return total;
-}
-
-Matrix3e Spin::GetLinearInteractionAsMatrix(Interaction::SubType t) const {
-    Matrix3e total=Matrix3e(0.0*Joules,0.0*Joules,0.0*Joules,
-			    0.0*Joules,0.0*Joules,0.0*Joules,
-			    0.0*Joules,0.0*Joules,0.0*Joules);
-    long interCount=mInter.size();
-    for(long i=0;i < interCount;++i) {
-        Interaction* inter=mInter[i];
-        if(!inter->GetIsLinear()) {
-            continue;
-        }
-        if(inter->IsSubType(t)) {
-            total+=inter->GetAsMatrix();
-        }
-    }
-    return total;
-}
-
-
-Matrix3e Spin::GetQuadrapolarInteractionAsMatrix(Interaction::SubType t) const {
-    Matrix3e total=Matrix3e(0.0*Joules,0.0*Joules,0.0*Joules,
-			    0.0*Joules,0.0*Joules,0.0*Joules,
-			    0.0*Joules,0.0*Joules,0.0*Joules);
-    long interCount=mInter.size();
-    for(long i=0;i < interCount;++i) {
-        Interaction* inter=mInter[i];
-        if(!inter->GetIsQuadratic()) {
-            continue;
-        }
-        if(inter->IsSubType(t)) {
-            total+=inter->GetAsMatrix();
-        }
-    }
-    return total;
-}
 
 long Spin::GetElement() const {
     return mElement;
@@ -427,12 +424,11 @@ vector<long> Spin::GetIsotopes() const {
 // Interaction
 
 Interaction::Interaction() 
-    : mType(UNDEFINED),mSubType(ST_ANY),mSpin1(NULL),mSpin2(NULL) {
+    : mSubType(ST_ANY),mSpin1(NULL),mSpin2(NULL) {
 }
 
 Interaction::Interaction(const Interaction& inter,SpinSystem* system) :
     mData(mData),
-    mType(inter.mType),
     mSubType(inter.mSubType),
     mSpin1(inter.mSpin1),
     mSpin2(inter.mSpin2)  {
@@ -455,9 +451,9 @@ public:
     void operator()(const eigenvalues_t& dat) const {
 	cout << "    Type=Eigenvalues" <<  endl;
 	cout << "    Value=(XX=" 
-	     << dat.XX[MHz] << "MHz ,YY="
-	     << dat.YY[MHz] << "MHz ,ZZ="
-	     << dat.ZZ[MHz] << "MHz)"
+	     << dat.xx[MHz] << "MHz ,YY="
+	     << dat.yy[MHz] << "MHz ,ZZ="
+	     << dat.zz[MHz] << "MHz)"
 	     << endl;
 	cout << "    Orient=";
     }
@@ -523,7 +519,17 @@ const char* Interaction::GetSubTypeName(SubType st) {
 }
 
 Interaction::Type Interaction::GetType() const {
-    return mType;
+    if(get<energy>(&mData)!=NULL) {
+        return SCALAR;
+    } else if(get<Matrix3e>(&mData)!=NULL) {
+        return MATRIX;
+    } else if(get<eigenvalues_t>(&mData)!=NULL) {
+        return EIGENVALUES;
+    } else if(get<ax_rhom_t>(&mData)!=NULL) {
+        return AXRHOM;
+    } else  {
+        return SPANSKEW;
+    }
 }
 
 
@@ -538,9 +544,9 @@ void Interaction::GetMatrix(Matrix3e* OutMatrix) const {
 }
 
 void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
-    *XX=get<eigenvalues_t>(mData).XX;
-    *YY=get<eigenvalues_t>(mData).YY;
-    *ZZ=get<eigenvalues_t>(mData).ZZ;
+    *XX=get<eigenvalues_t>(mData).xx;
+    *YY=get<eigenvalues_t>(mData).yy;
+    *ZZ=get<eigenvalues_t>(mData).zz;
     *OrientOut=get<eigenvalues_t>(mData).mOrient;
     return;
 }
@@ -563,123 +569,30 @@ void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientatio
 
 void Interaction::SetScalar(energy Scalar) {
     sigChange();
-    mType=SCALAR;
     mData=Scalar;
 }
 
 void Interaction::SetMatrix(const Matrix3e& Matrix) {
     sigChange();
-    mType=MATRIX;
     mData=Matrix3e(Matrix);
 }
 
 void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
     sigChange();
-    mType=EIGENVALUES;
     mData=eigenvalues_t(XX,YY,ZZ,Orient);
     return;
 }
 
 void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
     sigChange();
-    mType=AXRHOM;
     mData=ax_rhom_t(iso,ax,rh,Orient);
     return;
 }
 
 void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
     sigChange();
-    mType=SPANSKEW;
     mData=span_skew_t(iso,Span,Skew,Orient);
     return;
-}
-
-
-struct getAsScalarVisitor : public static_visitor<energy> {
-    energy operator()(const energy& dat) const {
-	return dat;
-    }
-    energy operator()(const Matrix3e& dat) const {
-	return dat.Trace();
-    }
-    energy operator()(const eigenvalues_t& dat) const {
-	return (dat.XX+dat.YY+dat.ZZ);
-    }
-    energy operator()(const ax_rhom_t& dat) const {
-	energy a=dat.ax;
-	energy r=dat.rh;
-	energy iso=dat.iso;
-	energy xx=a/3.0+iso/3.0;
-	energy yy=-r/2.0-a/6.0+iso/3.0;
-	energy zz= r/2.0-a/6.0+iso/3.0;
-	return xx+yy+zz;
-    }
-    energy operator()(const span_skew_t& dat) const {
-	energy span=dat.span;
-	double skew=dat.skew;  //Skew has no unit
-	energy iso=dat.iso;
-	energy xx=span*skew/6.0-span/2.0;
-	energy yy=iso-span*skew/3.0;
-	energy zz=span*skew/6.0+span/2.0;
-	return xx+yy+zz;
-    }
-};
-energy Interaction::GetAsScalar() const {
-    return apply_visitor(getAsScalarVisitor(),mData);
-}
-
-struct getAsMatrixVisitor : public static_visitor<Matrix3e> {
-    Matrix3e operator()(const energy& dat) const {
-        //Return the identity multipled by the scalar
-        Matrix3e m(dat,       0.0*Joules,0.0*Joules,
-		   0.0*Joules,dat,       0.0*Joules,
-		   0.0*Joules,0.0*Joules,dat        );
-        return m;
-    }
-    Matrix3e operator()(const Matrix3e& dat) const {
-        //Just return the matrix
-        return dat;
-    }
-    Matrix3e operator()(const eigenvalues_t& dat) const {
-        //Convert to a matrix
-	energy xx=dat.XX;
-	energy yy=dat.YY;
-	energy zz=dat.ZZ;
-	return fromev(xx,yy,zz,dat.mOrient);
-    }
-    Matrix3e operator()(const ax_rhom_t& dat) const {
-	energy a=  dat.ax;
-	energy r=  dat.rh;
-	energy iso=dat.iso;
-	energy xx=a/3.0+iso/3.0;
-	energy yy=-r/2.0-a/6.0+iso/3.0;
-	energy zz= r/2.0-a/6.0+iso/3.0;
-	return fromev(xx,yy,zz,dat.mOrient);
-    }
-    Matrix3e operator()(const span_skew_t& dat) const {
-	energy span=dat.span;
-	double skew=dat.skew;  //Skew has no unit
-	energy iso= dat.iso;
-	energy xx=span*skew/6.0-span/2.0;
-	energy yy=iso-span*skew/3.0;
-	energy zz=span*skew/6.0+span/2.0;
-	return fromev(xx,yy,zz,dat.mOrient);
-    }
-private:
-    Matrix3e fromev(const energy xx,const energy yy,const energy zz,const Orientation& o) const {
-        Matrix3 intMatrix=o.GetAsMatrix();
-
-	energy zero=0.0*Joules;
-	Matrix3e in_eigen_frame(xx,  zero,zero, 
-				zero,yy  ,zero, 
-				zero,zero,zz   );
-
-	Matrix3e result=intMatrix*in_eigen_frame;
-        return result;
-    }
-};
-Matrix3e Interaction::GetAsMatrix() const {
-    return apply_visitor(getAsMatrixVisitor(),mData);
 }
 
 
@@ -846,5 +759,152 @@ bool Interaction::GetIsQuadratic() {
 
 }
 
+struct getAsScalarVisitor : public static_visitor<energy> {
+    energy operator()(const energy& dat) const {
+        return dat;
+    }
+    energy operator()(const Matrix3e& dat) const {
+	return dat.Trace()/3.0;
+    }
+    energy operator()(const eigenvalues_t& dat) const {
+	return dat.xx+dat.yy+dat.zz;
+    }
+    energy operator()(const ax_rhom_t& dat) const {
+	return dat.iso*3.0;
+    }
+    energy operator()(const span_skew_t& dat) const {
+	return dat.iso*3.0;
+    }
+};
+void Interaction::ToScalar() {
+    mData=apply_visitor(getAsScalarVisitor(),mData);
+}
+Interaction Interaction::AsScalar() const {
+    return apply_visitor(getAsScalarVisitor(),mData);
+}
 
+struct getAsMatrixVisitor : public static_visitor<Matrix3e> {
+    Matrix3e operator()(const energy& dat) const {
+        //Return the identity multipled by the scalar
+        return Matrix3e(dat,       0.0*Joules,0.0*Joules,
+                        0.0*Joules,dat,       0.0*Joules,
+                        0.0*Joules,0.0*Joules,dat        );
+    }
+    Matrix3e operator()(const Matrix3e& dat) const {
+        //Just return the matrix
+        return dat;
+    }
+    Matrix3e operator()(const eigenvalues_t& dat) const {
+        //Convert to a matrix
+	return fromev(dat.xx,dat.yy,dat.zz,dat.mOrient);
+    }
+    Matrix3e operator()(const ax_rhom_t& dat) const {
+        eigenvalues_t edat = dat.AsEigenvalues();
+	return fromev(edat.xx,edat.yy,edat.zz,dat.mOrient);
+    }
+    Matrix3e operator()(const span_skew_t& dat) const {
+        eigenvalues_t edat = dat.AsEigenvalues();
+	return fromev(edat.xx,edat.yy,edat.zz,dat.mOrient);
+    }
+private:
+    Matrix3e fromev(const energy xx,const energy yy,const energy zz,const Orientation& o) const {
+        Matrix3 intMatrix=o.GetAsMatrix();
+
+	energy zero=0.0*Joules;
+	Matrix3e in_eigen_frame(xx,  zero,zero, 
+				zero,yy  ,zero, 
+				zero,zero,zz   );
+
+	Matrix3e result=intMatrix*in_eigen_frame;
+        return result;
+    }
+};
+void Interaction::ToMatrix() {
+    mData=apply_visitor(getAsMatrixVisitor(),mData);
+}
+Interaction Interaction::AsMatrix() const {
+    return Interaction(apply_visitor(getAsMatrixVisitor(),mData));
+}
+
+struct getAsEigenvaluesVisitor : public static_visitor<eigenvalues_t> {
+    eigenvalues_t operator()(const energy& dat) const {
+        //Return the identity multipled by the scalar
+        return eigenvalues_t(dat,dat,dat,Orientation(Quaternion(1,0,0,0)));
+    }
+    eigenvalues_t operator()(const Matrix3e& dat) const {
+        cerr << "Skipping a hard conversion" << endl;
+        energy zero=0.0*Joules;
+        return eigenvalues_t(zero,zero,zero,Orientation(Quaternion(1,0,0,0)));
+    }
+    eigenvalues_t operator()(const eigenvalues_t& dat) const {
+	return dat;
+    }
+    eigenvalues_t operator()(const ax_rhom_t& dat) const {
+	return dat.AsEigenvalues();
+    }
+    eigenvalues_t operator()(const span_skew_t& dat) const {
+	return dat.AsEigenvalues();
+    }
+};
+void Interaction::ToEigenvalues() {
+    mData=apply_visitor(getAsEigenvaluesVisitor(),mData);
+}
+Interaction Interaction::AsEigenvalues() const {
+    return Interaction(apply_visitor(getAsEigenvaluesVisitor(),mData));
+}
+
+struct getAsAxRhomVisitor : public static_visitor<ax_rhom_t> {
+    ax_rhom_t operator()(const energy& dat) const {
+        return ax_rhom_t(0.0*Joules,0.0*Joules,dat,Quaternion(1,0,0,0));
+    }
+    ax_rhom_t operator()(const Matrix3e& dat) const {
+        cerr << "Skipping a hard conversion" << endl;
+        energy zero=0.0*Joules;
+        return ax_rhom_t(zero,zero,zero,Orientation(Quaternion(1,0,0,0)));
+    }
+    ax_rhom_t operator()(const eigenvalues_t& dat) const {
+        cout << "Enterning eigenvalues->ax_rhom visitor" << endl;
+	return dat.AsAxRhom();
+    }
+    ax_rhom_t operator()(const ax_rhom_t& dat) const {
+	return dat;
+    }
+    ax_rhom_t operator()(const span_skew_t& dat) const {
+	return dat.AsAxRhom();
+    }
+};
+void Interaction::ToAxRhom() {
+    cout << "ToAxRhom" << endl;
+    mData=apply_visitor(getAsAxRhomVisitor(),mData);
+}
+Interaction Interaction::AsAxRhom() const {
+    cout << "AsAxRhom" << endl;
+    return Interaction(apply_visitor(getAsAxRhomVisitor(),mData));
+}
+
+struct getAsSpanSkewVisitor : public static_visitor<span_skew_t> {
+    span_skew_t operator()(const energy& dat) const {
+        return span_skew_t(dat,0.0*Joules,0.0,Quaternion(1,0,0,0));
+    }
+    span_skew_t operator()(const Matrix3e& dat) const {
+        cerr << "Skipping a hard conversion" << endl;
+        energy zero=0.0*Joules;
+        return span_skew_t(zero,zero,0,Orientation(Quaternion(1,0,0,0)));
+    }
+    span_skew_t operator()(const eigenvalues_t& dat) const {
+ 	return dat.AsSpanSkew();
+    }
+    span_skew_t operator()(const ax_rhom_t& dat) const {
+	return dat.AsSpanSkew();
+    }
+    span_skew_t operator()(const span_skew_t& dat) const {
+	return dat;
+    }
+};
+void Interaction::ToSpanSkew() {
+    mData=apply_visitor(getAsSpanSkewVisitor(),mData);
+}
+Interaction Interaction::AsSpanSkew() const {
+    return Interaction(apply_visitor(getAsSpanSkewVisitor(),mData));
+}
 

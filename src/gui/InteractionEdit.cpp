@@ -107,46 +107,18 @@ void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
   }
   Interaction::Type type=TypeOrders[e.GetSelection()];
   if(type==Interaction::SCALAR) {
-    mScalarCtrl->SetValue(wxT("0.0"));
+      mInter->ToScalar();
   } else if(type==Interaction::MATRIX) {
-    mMatXXCtrl->SetValue(wxT("0.0"));
-    mMatXYCtrl->SetValue(wxT("0.0"));
-    mMatXZCtrl->SetValue(wxT("0.0"));
-                           
-    mMatYXCtrl->SetValue(wxT("0.0"));
-    mMatYYCtrl->SetValue(wxT("0.0"));
-    mMatYZCtrl->SetValue(wxT("0.0"));
-                           
-    mMatZXCtrl->SetValue(wxT("0.0"));
-    mMatZYCtrl->SetValue(wxT("0.0"));
-    mMatZZCtrl->SetValue(wxT("0.0"));
+      mInter->ToMatrix();
   } else if(type==Interaction::EIGENVALUES) {
-    mEigenXXCtrl->SetValue(wxT("0.0"));
-    mEigenYYCtrl->SetValue(wxT("0.0"));
-    mEigenZZCtrl->SetValue(wxT("0.0"));
-
-    Orientation o;
-    o.SetQuaternion(1.0,0.0,0.0,0.0);
-    mOrientEigenvalueCtrl->SetOrient(o);
+      mInter->ToEigenvalues();
   } else if(type==Interaction::AXRHOM) {
-    mAxCtrl->       SetValue(wxT("0.0"));
-    mRhomCtrl->     SetValue(wxT("0.0"));
-    mAxRhomIsoCtrl->SetValue(wxT("0.0"));
-
-    Orientation o;
-    o.SetQuaternion(1.0,0.0,0.0,0.0);
-    mOrientAxRhomCtrl->SetOrient(o);
+      mInter->ToAxRhom();
+      cout << "Conversion done" << endl;
   } else if(type==Interaction::SPANSKEW) {
-    mSpanCtrl->       SetValue(wxT("0.0"));
-    mSkewCtrl->       SetValue(wxT("0.0"));
-    mSpanSkewIsoCtrl->SetValue(wxT("0.0"));
-
-    Orientation o;
-    o.SetQuaternion(1.0,0.0,0.0,0.0);
-    mOrientSpanSkewCtrl->SetOrient(o);
+      mInter->ToSpanSkew();
   }
-  SaveToInter();        
-  e.Skip();
+  LoadFromInter();
 }
 
 void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
@@ -169,9 +141,11 @@ void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
   SetSubTypeSelection(st);
   STClientData* data=dynamic_cast<STClientData*>(mSubTypeCombo->GetClientObject(0));
   cout << Interaction::GetSubTypeName(data->GetData()) << endl;
+  cout << "Done update sub type combo" << endl;
 }
 
 void InterEditPanel::LoadFromInter() {
+    cout << "Load from Inter()" << endl;
   mLoading=true;
 
   if(mInter->GetIsLinear()) {
@@ -198,6 +172,7 @@ void InterEditPanel::LoadFromInter() {
     long Spin2Number=GetSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
     mSpin2Combo->SetSelection(Spin2Number);
   }
+  cout << "About the start testing types" << endl;
 
   if(mInter->GetType()==Interaction::SCALAR) {
     energy scalar;
@@ -237,13 +212,14 @@ void InterEditPanel::LoadFromInter() {
     mTypeChoiceBook->SetSelection(2);
 
   } else if(mInter->GetType()==Interaction::AXRHOM) {
+      cout << "type==axrhom" << endl;
     energy ax,rhom,iso;
     Orientation o;
     mInter->GetAxRhom(&iso,&ax,&rhom,&o);
     mAxCtrl->       SetValue(wxString() << ax[MHz]);
     mRhomCtrl->     SetValue(wxString() << rhom[MHz]);
     mAxRhomIsoCtrl->SetValue(wxString() << iso[MHz]);
-
+    cout << "Set everything but the orientation" << endl;
     mOrientAxRhomCtrl->SetOrient(o);
 
     mTypeChoiceBook->SetSelection(3);
@@ -259,6 +235,8 @@ void InterEditPanel::LoadFromInter() {
     mOrientSpanSkewCtrl->SetOrient(o);
 
     mTypeChoiceBook->SetSelection(4);
+  } else {
+      cerr << "Interaction.type was undefined" << endl;
   }
 
   mLoading=false;

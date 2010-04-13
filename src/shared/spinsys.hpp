@@ -54,29 +54,44 @@ namespace SpinXML {
         virtual void SaveFile(const SpinSystem* ss,const char* filename) const=0;
     };
 
-    //============================================================//
+    struct eigenvalues_t;
+    struct ax_rhom_t;
+    struct span_skew_t;
+
+    ///============================================================//
+    /// Private class
     struct eigenvalues_t {
         eigenvalues_t(const energy _XX,const energy _YY,const energy _ZZ, const Orientation& o) 
-            : XX(_XX), YY(_YY), ZZ(_ZZ), mOrient(o) {
+            : xx(_XX), yy(_YY), zz(_ZZ), mOrient(o) {
         }
-	energy XX;
-	energy YY;
-	energy ZZ;
+        ax_rhom_t AsAxRhom() const;
+        span_skew_t AsSpanSkew() const;
+	energy xx;
+	energy yy;
+	energy zz;
 	Orientation mOrient;
     };
+    ///============================================================//
+    /// Private class
     struct ax_rhom_t {
         ax_rhom_t(const energy _iso,const energy _ax,const energy _rh, const Orientation& o) 
             : iso(_iso), ax(_ax), rh(_rh), mOrient(o) {
         }
+        eigenvalues_t AsEigenvalues() const;
+        span_skew_t AsSpanSkew() const;
 	energy iso;
 	energy ax;
 	energy rh;
 	Orientation mOrient;
     };
+    ///============================================================//
+    /// Private class
     struct span_skew_t {
         span_skew_t(const energy _iso,const energy _span,const double _skew, const Orientation& o) 
             : iso(_iso), span(_span), skew(_skew), mOrient(o) {
         }
+        eigenvalues_t AsEigenvalues() const;
+        ax_rhom_t AsAxRhom() const;
 	energy iso;
 	energy span;
 	double skew;
@@ -88,9 +103,34 @@ namespace SpinXML {
     class Interaction : public sigc::trackable {
         friend class SpinSystem;
     public:
+        ///Enumeration of the storage conventions used by this interaction
+        enum Type {
+            UNDEFINED,
+            SCALAR,
+            MATRIX,
+            EIGENVALUES,
+            AXRHOM,
+            SPANSKEW
+        };
+
         ///Constructs an undefined interaction. The type are returned by
         ///GetType() is null UNDEFINED.
         Interaction();
+        ///Construct from a scalar
+        Interaction(energy inter)          
+            : mData(inter){}
+        ///Construct from a matrix
+        Interaction(const Matrix3e& inter)
+            : mData(inter){}
+        ///Construct from a matrix
+        Interaction(const eigenvalues_t& inter)
+            : mData(inter){}
+        ///Construct from a matrix
+        Interaction(const ax_rhom_t& inter)
+            : mData(inter){}
+        ///Construct from a matrix
+        Interaction(const span_skew_t& inter)
+            : mData(inter){}
         ///Copy constructor
         Interaction(const Interaction& inter, SpinSystem* newSystem=NULL);
         ///Destructor
@@ -109,16 +149,6 @@ namespace SpinXML {
             BILINEAR,
             QUADRATIC,
             ANY_FORM
-        };
-
-        ///Enumeration of the storage conventions used by this interaction
-        enum Type {
-            UNDEFINED,
-            SCALAR,
-            MATRIX,
-            EIGENVALUES,
-            AXRHOM,
-            SPANSKEW
         };
 
         ///Enumeration what the physical source of this interaction is. Can
@@ -215,10 +245,6 @@ namespace SpinXML {
         bool GetIsBilinear(); 
         bool GetIsQuadratic();
 
-        ///Get the isotropic value of the interaction
-        energy GetAsScalar() const;
-        ///Get the interaction as a full matrix
-        Matrix3e GetAsMatrix() const /*throw(logic_error)*/;
         sigc::signal<void> sigChange;
         sigc::signal<void,Interaction*> sigDying;
         ///This signal is emited whenever one of the spins this interaction
@@ -226,13 +252,22 @@ namespace SpinXML {
         ///spin
         sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
 
+        void ToScalar();
+        void ToMatrix();
+        void ToEigenvalues();
+        void ToAxRhom();
+        void ToSpanSkew();
+
+        Interaction AsScalar() const;
+        Interaction AsMatrix() const;
+        Interaction AsEigenvalues() const;
+        Interaction AsAxRhom() const;
+        Interaction AsSpanSkew() const;
+
     private:
 
 	typedef boost::variant<energy,Matrix3e,eigenvalues_t,ax_rhom_t,span_skew_t> var_t;
 	var_t mData;
-	
-
-        Type mType;
         SubType mSubType;
     public:
         Spin* GetSpin1() const {return mSpin1;}

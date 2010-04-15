@@ -17,8 +17,6 @@
 
 #include <shared/unit.hpp>
 
-#include <shared/dstegr.hpp>
-
 SpinachApp* gApp;
 
 SpinachApp& wxGetApp() {

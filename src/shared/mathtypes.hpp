@@ -6,7 +6,6 @@
 #include <string>
 #include <cmath>
 #include <shared/unit.hpp>
-#include <shared/dstegr.hpp>
 #include <boost/variant.hpp>
 
 #define PI 3.141592653589793238462643

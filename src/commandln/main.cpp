@@ -7,7 +7,6 @@
 #include <shared/spinsys.hpp>
 #include <boost/program_options.hpp>
 
-#include <shared/dstegr.hpp>
 
 using namespace SpinXML;
 using namespace std;
@@ -15,8 +14,6 @@ namespace po = boost::program_options;
 
 
 int main(int argc,char** argv) {
-
-    tridiagonal_eigenvalues(3);
 
     po::options_description visible_opt("Options");
     visible_opt.add_options()

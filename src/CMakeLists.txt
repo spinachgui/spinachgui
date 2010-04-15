@@ -51,7 +51,6 @@ endif()
 ############################################################
 #List of source files for all the targets
 
-file(GLOB lapackSources lapack/double/*.f)
 file(GLOB guiSources gui/*.cpp "auto/SpinachGUI.cpp")
 file(GLOB sharedSources shared/*.cpp)
 
@@ -81,13 +80,10 @@ include_directories(SYSTEM /usr/include/sigc++-2.0)
 include_directories(SYSTEM /usr/lib/sigc++-2.0/include/)
 
 link_directories(${CodeSynthesisXSD_LIBRARY_PATH})
-link_directories(/home/gareth/src/CLAPACK-3.2.1)
-link_directories(/home/gareth/src/CLAPACK-3.2.1/F2CLIBS)
 
 ############################################################
 # Libary Targets
 
-add_library(lapack_sample STATIC ${lapackSources})
 add_library(spinxml STATIC       ${sharedSources} ${formatSources})
 
 
@@ -102,9 +98,6 @@ target_link_libraries (spinach
   sigc-2.0
   spinxml
   ${Boost_LIBRARIES}
-  lapack_LINUX 
-  blas_LINUX
-  f2c
 )
 #C++ GUI
 set(wxSpinachSources ${guiSources})
@@ -112,7 +105,7 @@ add_executable (wxSpinach ${wxSpinachSources})
 add_definitions(${wxWidgets_DEFINITIONS})
 target_link_libraries (wxSpinach 
 ${wxWidgets_LIBRARIES}  ${Boost_LIBRARIES}
-GL spinxml f2c xerces-c sigc-2.0 lapack_LINUX
+GL spinxml xerces-c sigc-2.0 
 )
 
 

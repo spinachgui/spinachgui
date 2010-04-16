@@ -184,6 +184,34 @@ namespace SpinXML {
 	    raw[6]=raw[2];
 	    raw[7]=raw[5];
 	}
+        typedef dreal<T,typename mpl::transform<D,_by_three,times_by_f>::type > det_t;
+        det_t det() const {
+            return
+                raw[0]*(raw[8]*raw[4]-raw[7]*raw[5])
+                -raw[3]*(raw[8]*raw[1]-raw[7]*raw[2])
+                +raw[6]*(raw[5]*raw[1]-raw[4]*raw[2]);
+        }
+
+        ///Return a copy of the matrix inverted.
+        typedef Matrix3_t<T,typename mpl::transform<D,negate_f>::type> inverse_t;
+        inverse_t Inverted() {
+            det_t Det = det();
+
+            inverse_t mat;
+            mat.Set(0,0,  (raw[8]*raw[4]-raw[7]*raw[5]) / Det);
+            mat.Set(0,1, -(raw[8]*raw[3]-raw[6]*raw[5]) / Det);
+            mat.Set(0,2,  (raw[7]*raw[3]-raw[6]*raw[4]) / Det);
+                                                        
+            mat.Set(1,0, -(raw[8]*raw[1]-raw[7]*raw[2]) / Det);
+            mat.Set(1,1,  (raw[8]*raw[0]-raw[6]*raw[2]) / Det);
+            mat.Set(1,2, -(raw[7]*raw[0]-raw[6]*raw[1]) / Det);
+                                                      
+            mat.Set(2,0,  (raw[5]*raw[1]-raw[4]*raw[2]) / Det);
+            mat.Set(2,1, -(raw[5]*raw[0]-raw[3]*raw[2]) / Det);
+            mat.Set(2,2,  (raw[4]*raw[0]-raw[3]*raw[1]) / Det);
+
+            return mat;
+        }
 
         ///Project the matrix into SO(3) in place
         void Othogonalise() {

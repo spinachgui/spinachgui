@@ -26,8 +26,11 @@ unit type being assigned to the ddouble)
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/plus.hpp>
 #include <boost/mpl/minus.hpp>
-#include <boost/mpl/equal.hpp>
+#include <boost/mpl/times.hpp>
 #include <boost/mpl/divides.hpp>
+#include <boost/mpl/negate.hpp>
+#include <boost/mpl/equal.hpp>
+
 
 #include <boost/mpl/vector_c.hpp>
 
@@ -42,11 +45,20 @@ struct minus_f {
     template <class T1, class T2>
     struct apply : mpl::minus<T1,T2> {};
 };
+struct negate_f {
+    template <class T1>
+    struct apply : mpl::negate<T1> {};
+};
 
 typedef mpl::vector_c<int,2,2,2,2,2,2,2>  _by_two;
+typedef mpl::vector_c<int,3,3,3,3,3,3,3>  _by_three;
 struct divide_by_f {
     template <class T1,class divide_by_t>
     struct apply : mpl::divides<T1,divide_by_t> {};
+};
+struct times_by_f {
+    template <class T1,class times_by_t>
+    struct apply : mpl::times<T1,times_by_t> {};
 };
 
 

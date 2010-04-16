@@ -92,7 +92,6 @@ add_library(spinxml STATIC       ${sharedSources} ${formatSources})
 #math test exe
 add_executable (math tests/math.cpp)
 target_link_libraries (math 
-  xerces-c
   sigc-2.0
   spinxml
   ${Boost_LIBRARIES}

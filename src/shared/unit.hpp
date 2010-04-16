@@ -249,6 +249,16 @@ bool
 operator>(dreal<T,D> x, dreal<T,D> y) {
   return x.si > y.si;
 }
+template <class T, class D>
+bool
+operator==(dreal<T,D> x, dreal<T,D> y) {
+  return x.si == y.si;
+}
+template <class T, class D>
+bool
+operator!=(dreal<T,D> x, dreal<T,D> y) {
+  return x.si != y.si;
+}
 
 
 template <class T, class D1, class D2>

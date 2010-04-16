@@ -57,9 +57,9 @@ span_skew_t   ax_rhom_t::AsSpanSkew() const {
 
 /// span skew -> eigenvalues
 eigenvalues_t span_skew_t::AsEigenvalues() const {
-    energy xx=span*skew/6.0-span/2.0;
+    energy xx=iso+span*skew/6.0-span/2.0;
     energy yy=iso-span*skew/3.0;
-    energy zz=span*skew/6.0+span/2.0;
+    energy zz=iso+span*skew/6.0+span/2.0;
     return eigenvalues_t(xx,yy,zz,mOrient);
 }
 /// span skew -> ax rhom

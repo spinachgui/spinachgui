@@ -39,7 +39,7 @@ span_skew_t   eigenvalues_t::AsSpanSkew() const {
 
         energy iso = (xx+yy+zz)/3.0;
         energy span=zz - xx;
-        double skew=((3.0/2.0)*((iso-yy)/span)).si;
+        double skew=span == energy(0.0) && span == energy(-0.0) ? 0.5 : ((3.0/2.0)*((iso-yy)/span)).si;
         return span_skew_t(iso,span,skew,mOrient);
 }
 

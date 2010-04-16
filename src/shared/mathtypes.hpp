@@ -5,11 +5,13 @@
 #include <cstring>
 #include <string>
 #include <cmath>
+#include <complex>
 #include <shared/unit.hpp>
+#include <shared/polynomial.hpp>
 #include <boost/variant.hpp>
 
 #define PI 3.141592653589793238462643
-
+using std::complex;
 
 namespace SpinXML {
 
@@ -21,6 +23,17 @@ namespace SpinXML {
     
     ///Ther permeability of free space
     extern const double mu0;
+
+
+    void standalone_eig(C a, C b, C c,
+                        C d, C e, C f,
+                        C g, C h, C i,
+                        C* e1,C* e2, C* e3,
+                        C* vx1,C* vy1, C* vz1,
+                        C* vx2,C* vy2, C* vz2,
+                        C* vx3,C* vy3, C* vz3);
+
+
 
     template<typename T,typename D>
     class Vector3_t {
@@ -121,6 +134,8 @@ namespace SpinXML {
     class Matrix3_t {
     public:
 	typedef dreal<T,D> field;
+        typedef complex<field> cplex;
+        typedef Vector3_t<T,D> Vector3T;
 	///Default constructor. Constructs the identity
 	Matrix3_t() {
 	    static const double IDENTITY3[]={1.0,0.0,0.0,
@@ -156,7 +171,7 @@ namespace SpinXML {
 	field Trace() const {return raw[0]+raw[4]+raw[8];}
 
 	///Get the transpose of the matrix
-	Matrix3_t Transpose() const {
+	Matrix3_t Transposed() const {
 	    Matrix3_t result;
 	    result.raw[0]=raw[0];
 	    result.raw[4]=raw[4];
@@ -172,7 +187,7 @@ namespace SpinXML {
 	    return result;
 	}
 	///Transpose the matrix in place
-	void Transposed() {
+	void Transpose() {
 	    field one =raw[1];
 	    field two =raw[2];
 	    field five=raw[5];
@@ -211,6 +226,66 @@ namespace SpinXML {
             mat.Set(2,2,  (raw[4]*raw[0]-raw[3]*raw[1]) / Det);
 
             return mat;
+        }
+
+        ///Obtain the complex eigenvalues and
+        ///eigenvectors. Correctness and simplicity is favored over
+        ///speed here so it is recomended that the result is cached
+        void eig(field& e1,
+                 field& e2,
+                 field& e3,
+                 Vector3T& v1,
+                 Vector3T& v2,
+                 Vector3T& v3
+                 ) const {
+            
+            //==============================//
+            // Bookeeping
+
+            C a   = C(raw[0].si,0.0), b = C(raw[1].si,0.0), c = C(raw[2].si,0.0),
+                d = C(raw[3].si,0.0), e = C(raw[4].si,0.0), f = C(raw[5].si,0.0),
+                g = C(raw[6].si,0.0), h = C(raw[7].si,0.0), i = C(raw[8].si,0.0);
+ 
+            C xx,yy,zz,
+                vx1, vy1,  vz1,
+                vx2, vy2,  vz2,
+                vx3, vy3,  vz3;
+            standalone_eig(a,b,c,
+                           d,e,f,
+                           g,h,i,
+                           &xx,  &yy,  &zz,
+                           &vx1, &vy1, &vz1,
+                           &vx2, &vy2, &vz2,
+                           &vx3, &vy3, &vz3);
+
+            //==============================//
+            // Output
+
+            //We will assume real eigenvectors for now
+            v1=Vector3T(field(real(vx1)),
+                        field(real(vy1)),
+                        field(real(vz1))).normalised();
+            v2=Vector3T(field(real(vx2)),
+                        field(real(vy2)),
+                        field(real(vz2))).normalised();
+            v3=Vector3T(field(real(vx3)),
+                        field(real(vy3)),
+                        field(real(vz3))).normalised();
+
+            /*v1=Vector3T(field(1),
+                        field(0),
+                        field(0));
+            v2=Vector3T(field(0),
+                        field(1),
+                        field(0));
+            v3=Vector3T(field(0),
+                        field(0),
+                        field(1));*/
+
+
+            e1 = field(real(xx));
+            e2 = field(real(yy));
+            e3 = field(real(zz));
         }
 
         ///Project the matrix into SO(3) in place
@@ -348,7 +423,7 @@ namespace SpinXML {
 	field raw[9];
     };
     typedef Matrix3_t<double,_unitless> Matrix3;
-
+    typedef Matrix3_t<complex<long double>, _unitless> Matrix3cl;
     ///Class for storeing a 4x4 matrix. Mostly used for graphics, but
     ///could be useful elsewhere...
     class Matrix4 {

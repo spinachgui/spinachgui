@@ -815,7 +815,7 @@ private:
 				zero,yy  ,zero, 
 				zero,zero,zz   );
 
-	Matrix3e result=intMatrix*in_eigen_frame;
+	Matrix3e result=intMatrix*in_eigen_frame*intMatrix.Transposed();
         return result;
     }
 };
@@ -832,9 +832,13 @@ struct getAsEigenvaluesVisitor : public static_visitor<eigenvalues_t> {
         return eigenvalues_t(dat,dat,dat,Orientation(Quaternion(1,0,0,0)));
     }
     eigenvalues_t operator()(const Matrix3e& dat) const {
-        cerr << "Skipping a hard conversion" << endl;
-        energy zero=0.0*Joules;
-        return eigenvalues_t(zero,zero,zero,Orientation(Quaternion(1,0,0,0)));
+        energy e1,e2,e3;//Eigenvalues
+        Vector3e v1,v2,v3;//Eigenvectors
+        dat.eig(e1,e2,e3,
+                v1,v2,v3);
+        return eigenvalues_t(e1,e2,e3,Orientation(Matrix3(v1.GetX().si,v2.GetX().si,v3.GetX().si,
+                                                          v1.GetY().si,v2.GetY().si,v3.GetY().si,
+                                                          v1.GetZ().si,v2.GetZ().si,v3.GetZ().si)));
     }
     eigenvalues_t operator()(const eigenvalues_t& dat) const {
 	return dat;

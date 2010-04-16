@@ -578,3 +578,170 @@ Orientation Orientation::Normalised() const {
 }
 
 
+void SpinXML::standalone_eig(C a, C b, C c,
+                    C d, C e, C f,
+                    C g, C h, C i,
+                    C* e1,C* e2, C* e3,
+                    C* vx1,C* vy1, C* vz1,
+                    C* vx2,C* vy2, C* vz2,
+                    C* vx3,C* vy3, C* vz3) {
+
+    std::cout << "Finding the eigenvalues of this matrix:" << std::endl;
+    std::cout << "  (" << a << " " << b << " " << c <<  std::endl
+              << "   " << d << " " << e << " " << f <<  std::endl
+              << "   " << g << " " << h << " " << i << ")" <<  std::endl;
+    //==============================//
+    // Special cases
+    if(isZero(b) && isZero(c) && isZero(f) &&
+       isZero(d) && isZero(h) && isZero(g)) {
+        //Diagonal matrix. Life is easy
+        *e1=a;
+        *e2=e;
+        *e3=i;
+        *vx1 = a;
+        *vy2 = e;
+        *vz3 = i;
+        *vx2 = *vy3 = *vz1 = C(0.0);
+        *vx3 = *vy1 = *vz2 = C(0.0);
+        return;
+    }
+    
+    //==============================//
+    // Eigenvalues
+
+    C poly_a = C(-1,0);
+    C poly_b = a+e+i;
+    C poly_c = d*b+g*c+f*h-a*e-a*i-e*i;
+    C poly_d = a*e*i - a*f*h - d*b*i + d*c*h + g*b*f - g*c*e;
+    
+    cubic characteristic_polynomial(poly_a,poly_b,poly_c,poly_d);
+    C lambda1,lambda2,lambda3;
+    std::cout << "==========Finding the eigenvalues==========" << std::endl;
+    characteristic_polynomial.solve2(&lambda1,&lambda2,&lambda3);
+    
+    //==============================//
+    // Eigenvectors
+    std::cout << "==========Finding the eigenvectors==========" << std::endl;
+    //Assume the first element of the eigenvector is 1;
+
+    C x1 = C(1.0,0), y1, z1;
+    C x2 = C(1.0,0), y2, z2;
+    C x3 = C(1.0,0), y3, z3;
+    overdetermined
+        (b        ,c,
+         e-lambda1,f,
+         h        ,i-lambda1,
+         lambda1-a,-d,-g,
+         &y1,&z1);
+    overdetermined
+        (b        ,c,
+         e-lambda2,f,
+         h        ,i-lambda2,
+         lambda2-a,-d,-g,
+         &y2,&z2);
+    overdetermined
+        (b        ,c,
+         e-lambda3,f,
+         h        ,i-lambda3,
+         lambda3-a,-d,-g,
+         &y3,&z3);
+    /*
+    //First eigenvector
+    C x1 = C(1.0,0.0);
+    C y1 = (f*lambda1-a*f+d*c)/(c*lambda1 - e*c + b*f);
+    C z1 = (h*lambda1-a*h+g*b)/(b*lambda1 - i*b + c*h);
+
+    //Second eigenvector
+    C x2 = C(1.0,0.0);
+    C y2 = (f*lambda2-a*f+d*c)/(c*lambda2 - e*c + b*f);
+    C z2 = (h*lambda2-a*h+g*b)/(b*lambda2 - i*b + c*h);
+
+    //Third eigenvector
+    C x3 = C(1.0,0.0);
+    C y3 = (f*lambda3-a*f+d*c)/(c*lambda3 - e*c + b*f);
+    C z3 = (h*lambda3-a*h+g*b)/(b*lambda3 - i*b + c*h);
+    */
+
+    std::cout << "First Eigenvector (Before norming)    : ("
+              << x1 << "," << y1 << "," << z1 << ")" << std::endl;
+    std::cout << "Second Eigenvector (Before norming)   : ("
+              << x2 << "," << y2 << "," << z2 << ")" << std::endl;
+    std::cout << "Third Eigenvector (Before norming)    : ("
+              << x3 << "," << y3 << "," << z3 << ")" << std::endl;
+
+            
+
+    //==============================//
+    // Normalisation
+
+    C norm1=sqrt(x1*std::conj(x1) + y1*std::conj(y1) + z1*std::conj(z1));
+    C norm2=sqrt(x2*std::conj(x2) + y2*std::conj(y2) + z2*std::conj(z2));
+    C norm3=sqrt(x3*std::conj(x3) + y3*std::conj(y3) + z3*std::conj(z3));
+
+    std::cout << "norm1=" << norm1 << std::endl;
+    std::cout << "norm2=" << norm2 << std::endl;
+    std::cout << "norm3=" << norm3 << std::endl;
+
+    x1/=norm1;
+    y1/=norm1;
+    z1/=norm1;
+
+    x2/=norm2;
+    y2/=norm2;
+    z2/=norm2;
+
+    x3/=norm3;
+    y3/=norm3;
+    z3/=norm3;
+
+    //==============================//
+    // Output
+
+    //We will assume real eigenvectors for now
+    *vx1=x1;
+    *vy1=y1;
+    *vz1=z1;
+
+    *vx2=x2;
+    *vy2=y2;
+    *vz2=z2;
+
+    *vx3=x3;
+    *vy3=y3;
+    *vz3=z3;
+
+    *e1 = real(lambda1);
+    *e2 = real(lambda2);
+    *e3 = real(lambda3);
+
+    //==============================//
+    // Sanity checks (can be removed safely)
+
+    C 
+        t11 = a*x1+b*y1+c*z1,
+        t12 = d*x1+e*y1+f*z1,
+        t13 = g*x1+h*y1+i*z1; 
+    C 
+        t21 = a*x2+b*y2+c*z2,
+        t22 = d*x2+e*y2+f*z2,
+        t23 = g*x2+h*y2+i*z2; 
+    C 
+        t31 = a*x3+b*y3+c*z3,
+        t32 = d*x3+e*y3+f*z3,
+        t33 = g*x3+h*y3+i*z3; 
+
+    std::cout << "First Eigenvector           : ("
+              << x1 << "," << y1 << "," << z1 << ")" << std::endl;
+    std::cout << "First Eigenvector tranformed: ("
+              << t11/lambda1 << "," << t12/lambda1 << "," << t13/lambda1 << ")" << std::endl;
+
+    std::cout << "Second Eigenvector           : ("
+              << x2 << "," << y2 << "," << z2 << ")" << std::endl;
+    std::cout << "Second Eigenvector tranformed: ("
+              << t21/lambda2 << "," << t22/lambda2 << "," << t23/lambda2 << ")" << std::endl;
+    std::cout << "Third Eigenvector           : ("
+              << x3 << "," << y3 << "," << z3 << ")" << std::endl;
+    std::cout << "Third Eigenvector tranformed: ("
+              << t31/lambda3 << "," << t32/lambda3 << "," << t33/lambda3 << ")" << std::endl;
+}
+

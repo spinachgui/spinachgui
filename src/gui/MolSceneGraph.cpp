@@ -146,7 +146,24 @@ MoleculeNodeNew::MoleculeNodeNew(SpinSystem* ss)
 }
 
 void MoleculeNodeNew::RawDraw(SpinachDC& dc) {
-	//In this case, do nothing
+    static const GLfloat white[] = {0.5, 0.5, 0.5};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+
+    //Draw some coordiante axese
+    glBegin(GL_LINES); {
+        glVertex3f(0,0,0);
+        glVertex3f(5,0,0);
+    }glEnd();
+
+    glBegin(GL_LINES); {
+        glVertex3f(0,0,0);
+        glVertex3f(0,5,0);
+    } glEnd();
+
+    glBegin(GL_LINES); {
+        glVertex3f(0,0,0);
+        glVertex3f(0,0,5);
+    } glEnd();
 }
 
 void MoleculeNodeNew::ToPovRay(wxString& src) {

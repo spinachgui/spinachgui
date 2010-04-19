@@ -31,8 +31,7 @@ set(buildDir ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
 
 #GDB can debug an optermised executable. It's one of a very small
 #number of debuggers that can.
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb")
-
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-strings ")
 
 set(wxWidgets_USE_DEBUG,ON)
 set(wxWidgets_USE_UNICODE,ON)

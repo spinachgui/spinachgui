@@ -296,7 +296,7 @@ namespace SpinXML {
         ///Project the matrix into SO(3)
         Matrix3_t Othogonalised() const {
             //TODO
-            return Matrix3_t();
+            return Matrix3_t(*this);
         }
 
     

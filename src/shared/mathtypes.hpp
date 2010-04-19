@@ -299,6 +299,20 @@ namespace SpinXML {
             return Matrix3_t(*this);
         }
 
+        field FrobeniusNorm() const {
+            return sqrt(
+                        raw[0]*raw[0]+
+                        raw[1]*raw[1]+
+                        raw[2]*raw[2]+
+
+                        raw[3]*raw[3]+
+                        raw[4]*raw[4]+
+                        raw[5]*raw[5]+
+
+                        raw[6]*raw[6]+
+                        raw[7]*raw[7]+
+                        raw[8]*raw[8]);
+        }
     
 	///Get a pointer to the matrix in memory. The matrix is stored in
 	///row major form (GetRaw()[0]=a00,GetRaw()[1]=a01, etc.)

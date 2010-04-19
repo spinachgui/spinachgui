@@ -347,10 +347,10 @@ void InteractionDrawerNode::RawDrawBilinInterType(SpinachDC& dc, Interaction::Su
 	    }
 	    double scalling=dc.mScallings[st];
 	    double deltaScalling=2*scalling - scalling;
-	    double trace=i*count+j;//spin1->GetTotalInteractionTrace(st,spin2);
+	    energy norm=spin1->GetTotalInteractionNorm(st,spin2);
 
-	    if(scalling < trace) {
-		double width=(trace > scalling*2) ? 0.04 : (((trace-scalling)/deltaScalling)*0.04);
+	    if(scalling < norm[MHz]) {
+		double width=(norm[MHz] > scalling*2) ? 0.04 : (((norm[MHz]-scalling)/deltaScalling)*0.04);
 		DrawCylinder(spin1->GetPosition(),
 			     spin2->GetPosition(),
 			     width*Angstroms,

@@ -326,10 +326,9 @@ namespace SpinXML {
         Matrix3e GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
 
         bool GetHasInteractionOfType(Interaction::SubType t) const;
-        Matrix3e GetTotalInteraction(Interaction::SubType t) const;
-        Matrix3e GetTotalInteraction(Interaction::SubType t,Spin* spin2) const;
-        energy GetTotalInteractionTrace(Interaction::SubType t) const;
-	energy GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const;
+        Matrix3e GetTotalInteraction(Interaction::SubType t,Spin* spin2 = NULL) const;
+	energy GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2 = NULL) const;
+        energy GetTotalInteractionNorm(Interaction::SubType t,Spin* spin2 = NULL) const;
 
         long GetElement() const;
         void SetElement(long element);

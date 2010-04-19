@@ -344,7 +344,7 @@ void Spin::RemoveInteraction(Interaction* _Interaction) {
     sigChange();
 }
 
-Matrix3e Spin::GetTotalInteraction(Interaction::SubType t) const {
+Matrix3e Spin::GetTotalInteraction(Interaction::SubType t,Spin* spin2) const {
     Matrix3e total=Matrix3e(0.0*Joules,0.0*Joules,0.0*Joules,
 			    0.0*Joules,0.0*Joules,0.0*Joules,
 			    0.0*Joules,0.0*Joules,0.0*Joules);
@@ -352,23 +352,15 @@ Matrix3e Spin::GetTotalInteraction(Interaction::SubType t) const {
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
         if(inter->IsSubType(t)) {
-            Matrix3e mat;
-            inter->AsMatrix().GetMatrix(&mat);
-            total+=mat;
-        }
-    }
-    return total;
-}
-
-energy Spin::GetTotalInteractionTrace(Interaction::SubType t) const {
-    energy total=0.0*MHz;
-    long interCount=mInter.size();
-    for(long i=0;i < interCount;++i) {
-        Interaction* inter=mInter[i];
-        if(inter->IsSubType(t)) {
-            energy e;
-            inter->AsScalar().GetScalar(&e);
-            total+=e;
+            if(spin2 && inter->GetOtherSpin(this)!=spin2) {
+                continue;
+            }
+            energy xx; energy yy; energy zz;
+            Orientation o;
+            inter->AsEigenvalues().GetEigenvalues(&xx,&yy,&zz,&o);
+            total+=o.GetAsMatrix()*Matrix3e(xx        ,energy(0.0),energy(0.0),
+                                            energy(0.0),yy        ,energy(0.0),
+                                            energy(0.0),energy(0.0),zz        );
         }
     }
     return total;
@@ -379,13 +371,21 @@ energy Spin::GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const 
     long interCount=mInter.size();
     for(long i=0;i < interCount;++i) {
         Interaction* inter=mInter[i];
-        if(inter->IsSubType(t) && inter->GetOtherSpin(this)==spin2) {
+        if(inter->IsSubType(t)) {
+            if(spin2 && inter->GetOtherSpin(this)!=spin2) {
+                continue;
+            }
             energy e;
             inter->AsScalar().GetScalar(&e);
             total+=e;
         }
     }
     return total;
+}
+
+
+energy Spin::GetTotalInteractionNorm(Interaction::SubType t,Spin* spin2) const {
+    return GetTotalInteraction(t,spin2).FrobeniusNorm();
 }
 
 

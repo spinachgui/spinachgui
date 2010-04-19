@@ -280,7 +280,7 @@ struct castep : grammar<castep> {
         RULE(total_shielding_tensor                );
         RULE(total_tensor                          );
         RULE(quadrupole_block                      );
-#undef DECLARE
+#undef RULE
         rule<ScannerT, parser_context<>,parser_tag<fileID> > file;
         rule<ScannerT, parser_context<>,parser_tag<fileID> > const& start() {return file;}
 

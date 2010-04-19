@@ -452,6 +452,10 @@ public:
     }
     Orientation operator()(const Quaternion& dat) const {
         double angle=2*acos(dat.w);
+        if(angle == 0.0 || angle == -0.0) {
+            //Singularty at the identity
+            return Orientation(AngleAxis(angle,Vector3(0,0,0)));
+        }
         double inv_sin_a=1/(sqrt(1-dat.w*dat.w)*2);
         double vx=dat.x*inv_sin_a;
         double vy=dat.y*inv_sin_a;

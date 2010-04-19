@@ -590,10 +590,6 @@ void SpinXML::standalone_eig(C a, C b, C c,
                     C* vx2,C* vy2, C* vz2,
                     C* vx3,C* vy3, C* vz3) {
 
-    std::cout << "Finding the eigenvalues of this matrix:" << std::endl;
-    std::cout << "  (" << a << " " << b << " " << c <<  std::endl
-              << "   " << d << " " << e << " " << f <<  std::endl
-              << "   " << g << " " << h << " " << i << ")" <<  std::endl;
     //==============================//
     // Special cases
     if(isZero(b) && isZero(c) && isZero(f) &&
@@ -620,12 +616,10 @@ void SpinXML::standalone_eig(C a, C b, C c,
     
     cubic characteristic_polynomial(poly_a,poly_b,poly_c,poly_d);
     C lambda1,lambda2,lambda3;
-    std::cout << "==========Finding the eigenvalues==========" << std::endl;
     characteristic_polynomial.solve2(&lambda1,&lambda2,&lambda3);
     
     //==============================//
     // Eigenvectors
-    std::cout << "==========Finding the eigenvectors==========" << std::endl;
     //Assume the first element of the eigenvector is 1;
 
     C x1 = C(1.0,0), y1, z1;
@@ -666,14 +660,6 @@ void SpinXML::standalone_eig(C a, C b, C c,
     C z3 = (h*lambda3-a*h+g*b)/(b*lambda3 - i*b + c*h);
     */
 
-    std::cout << "First Eigenvector (Before norming)    : ("
-              << x1 << "," << y1 << "," << z1 << ")" << std::endl;
-    std::cout << "Second Eigenvector (Before norming)   : ("
-              << x2 << "," << y2 << "," << z2 << ")" << std::endl;
-    std::cout << "Third Eigenvector (Before norming)    : ("
-              << x3 << "," << y3 << "," << z3 << ")" << std::endl;
-
-            
 
     //==============================//
     // Normalisation
@@ -682,9 +668,6 @@ void SpinXML::standalone_eig(C a, C b, C c,
     C norm2=sqrt(x2*std::conj(x2) + y2*std::conj(y2) + z2*std::conj(z2));
     C norm3=sqrt(x3*std::conj(x3) + y3*std::conj(y3) + z3*std::conj(z3));
 
-    std::cout << "norm1=" << norm1 << std::endl;
-    std::cout << "norm2=" << norm2 << std::endl;
-    std::cout << "norm3=" << norm3 << std::endl;
 
     x1/=norm1;
     y1/=norm1;
@@ -718,34 +701,5 @@ void SpinXML::standalone_eig(C a, C b, C c,
     *e2 = real(lambda2);
     *e3 = real(lambda3);
 
-    //==============================//
-    // Sanity checks (can be removed safely)
-
-    C 
-        t11 = a*x1+b*y1+c*z1,
-        t12 = d*x1+e*y1+f*z1,
-        t13 = g*x1+h*y1+i*z1; 
-    C 
-        t21 = a*x2+b*y2+c*z2,
-        t22 = d*x2+e*y2+f*z2,
-        t23 = g*x2+h*y2+i*z2; 
-    C 
-        t31 = a*x3+b*y3+c*z3,
-        t32 = d*x3+e*y3+f*z3,
-        t33 = g*x3+h*y3+i*z3; 
-
-    std::cout << "First Eigenvector           : ("
-              << x1 << "," << y1 << "," << z1 << ")" << std::endl;
-    std::cout << "First Eigenvector tranformed: ("
-              << t11/lambda1 << "," << t12/lambda1 << "," << t13/lambda1 << ")" << std::endl;
-
-    std::cout << "Second Eigenvector           : ("
-              << x2 << "," << y2 << "," << z2 << ")" << std::endl;
-    std::cout << "Second Eigenvector tranformed: ("
-              << t21/lambda2 << "," << t22/lambda2 << "," << t23/lambda2 << ")" << std::endl;
-    std::cout << "Third Eigenvector           : ("
-              << x3 << "," << y3 << "," << z3 << ")" << std::endl;
-    std::cout << "Third Eigenvector tranformed: ("
-              << t31/lambda3 << "," << t32/lambda3 << "," << t33/lambda3 << ")" << std::endl;
 }
 

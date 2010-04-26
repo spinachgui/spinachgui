@@ -355,15 +355,32 @@ Matrix3e Spin::GetTotalInteraction(Interaction::SubType t,Spin* spin2) const {
             if(spin2 && inter->GetOtherSpin(this)!=spin2) {
                 continue;
             }
-            energy xx; energy yy; energy zz;
-            Orientation o;
-            inter->AsEigenvalues().GetEigenvalues(&xx,&yy,&zz,&o);
-            total+=o.GetAsMatrix()*Matrix3e(xx        ,energy(0.0),energy(0.0),
-                                            energy(0.0),yy        ,energy(0.0),
-                                            energy(0.0),energy(0.0),zz        );
+            Matrix3e mat;
+            inter->AsMatrix().GetMatrix(&mat);
+            total+=mat;
         }
     }
-    return total;
+    energy xx,yy,zz;
+    Vector3 vx,vy,vz;
+    total.eig(xx,yy,zz,vx,vy,vz);
+
+    Matrix3 Rotation(vx.GetX(),vy.GetX(),vz.GetX(),
+                     vx.GetY(),vy.GetY(),vz.GetY(),
+                     vx.GetZ(),vy.GetZ(),vz.GetZ());
+    Matrix3e Scaling(xx*10      ,energy(0.0),energy(0.0),
+                     energy(0.0),xx        ,energy(0.0),
+                     energy(0.0),energy(0.0),xx        );
+    if(Rotation.det().si<0) {
+        Rotation=Rotation*(-1.0*no_unit);
+    }
+    //    cout << "====================" << endl;
+    //total.Dump(eV);
+    //Rotation.Dump(no_unit);
+    //Scaling.Dump(eV);
+    Matrix3e combined=Rotation*Scaling;
+    //combined.Dump(eV);
+    //cout << "====================" << endl;
+    return combined;
 }
 
 energy Spin::GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2) const {
@@ -808,14 +825,17 @@ struct getAsMatrixVisitor : public static_visitor<Matrix3e> {
     }
 private:
     Matrix3e fromev(const energy xx,const energy yy,const energy zz,const Orientation& o) const {
+        cout << "Converting " << o.ToString() << endl;
         Matrix3 intMatrix=o.GetAsMatrix();
 
-	energy zero=0.0*Joules;
+        cout << "Rotation Matrix determinate:" << intMatrix.det().si << endl;;
+
+	const static energy zero=0.0*Joules;
 	Matrix3e in_eigen_frame(xx,  zero,zero, 
 				zero,yy  ,zero, 
 				zero,zero,zz   );
-
-	Matrix3e result=intMatrix*in_eigen_frame*intMatrix.Transposed();
+        //Undo the eigensystem decomposition
+	Matrix3e result=intMatrix*in_eigen_frame*intMatrix.Inverted();
         return result;
     }
 };
@@ -833,7 +853,7 @@ struct getAsEigenvaluesVisitor : public static_visitor<eigenvalues_t> {
     }
     eigenvalues_t operator()(const Matrix3e& dat) const {
         energy e1,e2,e3;//Eigenvalues
-        Vector3e v1,v2,v3;//Eigenvectors
+        Vector3 v1,v2,v3;//Eigenvectors
         dat.eig(e1,e2,e3,
                 v1,v2,v3);
         return eigenvalues_t(e1,e2,e3,Orientation(Matrix3(v1.GetX().si,v2.GetX().si,v3.GetX().si,
@@ -911,4 +931,3 @@ void Interaction::ToSpanSkew() {
 Interaction Interaction::AsSpanSkew() const {
     return Interaction(apply_visitor(getAsSpanSkewVisitor(),mData));
 }
-

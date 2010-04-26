@@ -76,7 +76,8 @@ typedef mpl::vector_c<int,0,0,0,0,0,0,1>  _mole;
 typedef mpl::vector_c<int,0,1,-1,0,0,0,0>  _speed;
 typedef mpl::vector_c<int,0,1,-2,0,0,0,0>  _acceleration;
 typedef mpl::vector_c<int,1,1,-2,0,0,0,0>  _force;
-typedef mpl::vector_c<int,1,2,-2,0,0,0,0>  _energy;
+typedef mpl::vector_c<int,1 , 2,-2,0,0,0,0>  _energy;
+typedef mpl::vector_c<int,-1,-2, 2,0,0,0,0>  _inv_energy;
 typedef mpl::vector_c<int,0,0,-1,0,0,0,0>  _frequency;
 
 typedef mpl::vector_c<int,0,2,0,0,0,0,0> _length2;
@@ -204,6 +205,12 @@ struct dreal<T,_unitless> {
     }
     operator T() const {
 	return si;
+    }
+    const dreal_helper<T,_unitless> operator[](const unit<_unitless>& u) {
+	return dreal_helper<T,_unitless>(&si,u);
+    }
+    T operator[](const unit<_unitless>& u) const {
+	return u.fromSI(si);
     }
     T si;
 };
@@ -371,6 +378,7 @@ name_dimension(temp);
 name_dimension(mole);
 
 name_dimension(energy);
+name_dimension(inv_energy);
 
 const unitless_unit no_unit("unitless",1.0);
 
@@ -379,6 +387,8 @@ const energy_unit Hz("Hz",6.626068e-34);
 const energy_unit KHz("KHz",6.626068e-31);
 const energy_unit MHz("MHz",6.626068e-28);
 const energy_unit eV("eV",1.60217646e-19);
+
+const inv_energy_unit inv_eV("inv_eV",1.60217646e-19);
 
 const time_unit seconds("Seconds",1.0);
 

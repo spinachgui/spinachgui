@@ -136,6 +136,7 @@ namespace SpinXML {
 	typedef dreal<T,D> field;
         typedef complex<field> cplex;
         typedef Vector3_t<T,D> Vector3T;
+        typedef Vector3_t<T,_unitless> Vector3U;
 	///Default constructor. Constructs the identity
 	Matrix3_t() {
 	    static const double IDENTITY3[]={1.0,0.0,0.0,
@@ -213,17 +214,15 @@ namespace SpinXML {
             det_t Det = det();
 
             inverse_t mat;
-            mat.Set(0,0,  (raw[8]*raw[4]-raw[7]*raw[5]) / Det);
-            mat.Set(0,1, -(raw[8]*raw[3]-raw[6]*raw[5]) / Det);
-            mat.Set(0,2,  (raw[7]*raw[3]-raw[6]*raw[4]) / Det);
-                                                        
-            mat.Set(1,0, -(raw[8]*raw[1]-raw[7]*raw[2]) / Det);
-            mat.Set(1,1,  (raw[8]*raw[0]-raw[6]*raw[2]) / Det);
-            mat.Set(1,2, -(raw[7]*raw[0]-raw[6]*raw[1]) / Det);
-                                                      
-            mat.Set(2,0,  (raw[5]*raw[1]-raw[4]*raw[2]) / Det);
-            mat.Set(2,1, -(raw[5]*raw[0]-raw[3]*raw[2]) / Det);
-            mat.Set(2,2,  (raw[4]*raw[0]-raw[3]*raw[1]) / Det);
+            mat.Set(0,0 , (Get(1,1)*Get(2,2) - Get(1,2)*Get(2,1))/Det);
+            mat.Set(0,1 , (Get(0,2)*Get(2,1) - Get(0,1)*Get(2,2))/Det);
+            mat.Set(0,2 , (Get(0,1)*Get(1,2) - Get(0,2)*Get(1,1))/Det);
+            mat.Set(1,0 , (Get(1,2)*Get(2,0) - Get(1,0)*Get(2,2))/Det);
+            mat.Set(1,1 , (Get(0,0)*Get(2,2) - Get(0,2)*Get(2,0))/Det);
+            mat.Set(1,2 , (Get(0,2)*Get(1,0) - Get(0,0)*Get(1,2))/Det);
+            mat.Set(2,0 , (Get(1,0)*Get(2,1) - Get(1,1)*Get(2,0))/Det);
+            mat.Set(2,1 , (Get(0,1)*Get(2,0) - Get(0,0)*Get(2,1))/Det);
+            mat.Set(2,2 , (Get(0,0)*Get(1,1) - Get(0,1)*Get(1,0))/Det);
 
             return mat;
         }
@@ -234,9 +233,9 @@ namespace SpinXML {
         void eig(field& e1,
                  field& e2,
                  field& e3,
-                 Vector3T& v1,
-                 Vector3T& v2,
-                 Vector3T& v3
+                 Vector3U& v1,
+                 Vector3U& v2,
+                 Vector3U& v3
                  ) const {
             
             //==============================//
@@ -262,25 +261,25 @@ namespace SpinXML {
             // Output
 
             //We will assume real eigenvectors for now
-            v1=Vector3T(field(real(vx1)),
-                        field(real(vy1)),
-                        field(real(vz1))).normalised();
-            v2=Vector3T(field(real(vx2)),
-                        field(real(vy2)),
-                        field(real(vz2))).normalised();
-            v3=Vector3T(field(real(vx3)),
-                        field(real(vy3)),
-                        field(real(vz3))).normalised();
+            v1=Vector3U(real(vx1),
+                        real(vy1),
+                        real(vz1));
+            v2=Vector3U(real(vx2),
+                        real(vy2),
+                        real(vz2));
+            v3=Vector3U(real(vx3),
+                        real(vy3),
+                        real(vz3));
 
             /*v1=Vector3T(field(1),
-                        field(0),
-                        field(0));
-            v2=Vector3T(field(0),
-                        field(1),
-                        field(0));
-            v3=Vector3T(field(0),
-                        field(0),
-                        field(1));*/
+              field(0),
+              field(0));
+              v2=Vector3T(field(0),
+              field(1),
+              field(0));
+              v3=Vector3T(field(0),
+              field(0),
+              field(1));*/
 
 
             e1 = field(real(xx));
@@ -431,6 +430,13 @@ namespace SpinXML {
 		      << " (" << raw[0][u] << " " <<  raw[1][u] << " " <<  raw[2][u] << std::endl
 		      << "  " << raw[3][u] << " " <<  raw[4][u] << " " <<  raw[5][u] << std::endl
 		      << "  " << raw[6][u] << " " <<  raw[7][u] << " " <<  raw[8][u] << ")" << std::endl;
+        }
+	void Dump() const {
+	    std::cout << "Matrix3:" << std::endl
+		      << " (" << raw[0].si << " " <<  raw[1].si << " " <<  raw[2].si << std::endl
+		      << "  " << raw[3].si << " " <<  raw[4].si << " " <<  raw[5].si << std::endl
+		      << "  " << raw[6].si << " " <<  raw[7].si << " " <<  raw[8].si << ")" << std::endl;
+
 	}
 
     private:

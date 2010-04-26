@@ -262,12 +262,7 @@ public:
         double Y = y * sin_a;
         double Z = z * sin_a;
         double W = cos_a;
-        //Normalise the quaternion
-        double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
-        X=X*inv_mag;
-        Y=Y*inv_mag;
-        Z=Z*inv_mag;
-        W=W*inv_mag;
+
         double xx      = X * X;
         double xy      = X * Y;
         double xz      = X * Z;
@@ -280,14 +275,14 @@ public:
         double zz      = Z * Z;
         double zw      = Z * W;
     
-        return Matrix3(1 - 2 * ( yy + zz ), 2 * ( xy - zw )     ,  2 * ( xz + yw ),
-                       2 * ( xy + zw )    ,  1 - 2 * ( xx + zz ),  2 * ( yz - xw ),
-                       2 * ( xz - yw )    ,  2 * ( yz + xw )    ,   1 - 2 * ( xx + yy ));
-
+        return Matrix3(1 - 2 * ( yy + zz ), 2 * ( xy - zw )    , 2 * ( xz + yw ),
+                     2 * ( xy + zw )    , 1 - 2 * ( xx + zz ), 2 * ( yz - xw ),
+                     2 * ( xz - yw )    , 2 * ( yz + xw )    , 1 - 2 * ( xx + yy ));
     }
 };
 Matrix3 Orientation::GetAsMatrix() const {
-    return apply_visitor(GetAsMatrixVisitor(),mData);
+    Orientation normalised=Normalised();
+    return apply_visitor(GetAsMatrixVisitor(),normalised.mData);
 }
 
 void Orientation::GetEuler(double* alpha,double* beta,double* gamma) const {
@@ -394,7 +389,8 @@ public:
     }
 };
 Orientation Orientation::GetAsEuler() const {
-    return apply_visitor(AsEulerVisitor(),mData);
+    Orientation normalised=Normalised();
+    return apply_visitor(AsEulerVisitor(),normalised.mData);
 }
 
 class AsDCMVisitor : public static_visitor<Orientation> {
@@ -439,7 +435,8 @@ public:
     }
 };
 Orientation Orientation::GetAsEigenSystem() const {
-    return apply_visitor(AsDCMVisitor(),mData);
+    Orientation o=Normalised();
+    return apply_visitor(AsDCMVisitor(),o.mData);
 }
 
 class AsAngleAxisVisitor : public static_visitor<Orientation> {
@@ -467,7 +464,8 @@ public:
     }
 };
 Orientation Orientation::GetAsAngleAxis() const {
-    return apply_visitor(AsAngleAxisVisitor(),mData);
+    Orientation o=Normalised();
+    return apply_visitor(AsAngleAxisVisitor(),o.mData);
 }
 
 class AsQuaternionVisitor : public static_visitor<Orientation> {
@@ -540,7 +538,10 @@ public:
     }
 };
 Orientation Orientation::GetAsQuaternion() const {
-    return apply_visitor(AsQuaternionVisitor(),mData);
+    cout << "Unnormalised" << ToString() << endl;
+    Orientation o=Normalised();
+    cout << "Normalised" << o.ToString() << endl;
+    return apply_visitor(AsQuaternionVisitor(),o.mData);
 }
 
 class NormaliseVisitor : public static_visitor<> {
@@ -582,30 +583,182 @@ Orientation Orientation::Normalised() const {
 }
 
 
+void standalone_eig2x2(C a, C b,
+                       C c, C d,
+                       C* e1, C* e2,
+                       C* vx1, C* vy1,
+                       C* vx2, C* vy2) {
+    cout << a << b << endl
+         << c << d << endl;
+
+    C poly_b = -(a+d);
+    C poly_c = a*d-c*b;
+    //cout << "poly_b=" << poly_b << endl;
+    //cout << "poly_c=" << poly_c << endl;
+    C lambda1 = -poly_b/C(2,0) - sqrt(poly_b*poly_b - C(4,0)*poly_c)/C(2,0);
+    C lambda2 = -poly_b/C(2,0) + sqrt(poly_b*poly_b - C(4,0)*poly_c)/C(2,0);
+
+    C denom1=(C(1,0)*lambda1 -d);
+    C denom2=(C(1,0)*lambda2 -d);
+
+    //cout << "denom1=" << denom1 << endl;
+    //cout << "denom2=" << denom2 << endl;
+
+    C y1 = (b*(lambda1-a) - c*(d-lambda1))/(b*b+(d-lambda1)*(d-lambda1));
+    C y2 = (b*(lambda2-a) - c*(d-lambda2))/(b*b+(d-lambda2)*(d-lambda2));
+
+    //cout << "y1,y2=" << y1 << y2 << endl;
+
+    C norm1 = sqrt(C(1,0)+y1*conj(y1));
+    C norm2 = sqrt(C(1,0)+y2*conj(y2));
+
+    //cout << "norm1,norm2=" << norm1 << norm2 << endl;
+
+    *vx1 = C(1,0)/norm1;
+    *vy1 = y1/norm1;
+
+    *vx2 = C(1,0)/norm2;
+    *vy2 = y2/norm2;
+
+    *e1=lambda1;
+    *e2=lambda2;
+
+    //==============================//
+    // Sanity checks (can be removed safely)
+
+    C x1 = *vx1;
+    C x2 = *vx2;
+    y1=*vy1;
+    y2=*vy2;
+
+    C 
+        t11 = a*x1+b*y1,
+        t12 = c*x1+d*y1;
+    C 
+        t21 = a*x2+b*y2,
+        t22 = c*x2+d*y2;
+
+    /*std::cout << "lambda1 = " << lambda1 << std::endl;
+    std::cout << "lambda2 = " << lambda2 << std::endl;
+
+    std::cout << "First Eigenvector           : ("
+              << x1 << "," << y1 << ")" << std::endl;
+    std::cout << "First Eigenvector tranformed: ("
+              << t11/lambda1 << "," << t12/lambda1 << ")" << std::endl;
+
+    std::cout << "Second Eigenvector           : ("
+              << x2 << "," << y2 << "," << ")" << std::endl;
+    std::cout << "Second Eigenvector tranformed: ("
+    << t21/lambda2 << "," << t22/lambda2 << ")" << std::endl;*/
+}
+
 void SpinXML::standalone_eig(C a, C b, C c,
-                    C d, C e, C f,
-                    C g, C h, C i,
-                    C* e1,C* e2, C* e3,
-                    C* vx1,C* vy1, C* vz1,
-                    C* vx2,C* vy2, C* vz2,
-                    C* vx3,C* vy3, C* vz3) {
+                             C d, C e, C f,
+                             C g, C h, C i,
+                             C* e1,C* e2, C* e3,
+                             C* vx1,C* vy1, C* vz1,
+                             C* vx2,C* vy2, C* vz2,
+                             C* vx3,C* vy3, C* vz3) {
+
+
+    C norm=sqrt(a*a + b*b + c*c +
+                d*d + e*e + f*f +
+                g*g + h*h + i*i);
+
+    if(isZero(norm)) {
+        *e1=C(0,0);
+        *e2=C(0,0);
+        *e3=C(0,0);
+        *vz3 = *vy2 = *vx1 = C(1,0);
+        *vx2 = *vy3 = *vz1 = C(0,0);
+        *vx3 = *vy1 = *vz2 = C(0,0);
+        return;
+    }
+    C inv_norm=C(1,0)/norm;
+    cout << "II:" << a << b << c << d << e << f << g << h << i << endl;
+    a*=inv_norm;    b*=inv_norm;    c*=inv_norm;
+    d*=inv_norm;    e*=inv_norm;    f*=inv_norm;
+    g*=inv_norm;    h*=inv_norm;    i*=inv_norm;
+    a=clampToZero(a);    b=clampToZero(b);    c=clampToZero(c);
+    d=clampToZero(d);    e=clampToZero(e);    f=clampToZero(f);
+    g=clampToZero(g);    h=clampToZero(h);    i=clampToZero(i);
+    cout << "II:" << a << b << c << d << e << f << g << h << i << endl;
+
 
     //==============================//
     // Special cases
     if(isZero(b) && isZero(c) && isZero(f) &&
        isZero(d) && isZero(h) && isZero(g)) {
         //Diagonal matrix. Life is easy
-        *e1=a;
-        *e2=e;
+        *e1=a*norm;
+        *e2=e*norm;
+        *e3=i*norm;
+        *vz3 = *vy2 = *vx1 = C(1,0);
+        *vx2 = *vy3 = *vz1 = C(0,0);
+        *vx3 = *vy1 = *vz2 = C(0,0);
+        return;
+    }
+
+    //==============================//
+    // a b 0
+    // d e 0 
+    // 0 0 i
+
+    if(isZero(c) && isZero(f) &&
+       isZero(g) && isZero(h)) {
+        standalone_eig2x2(a,b,
+                          d,e,
+                          e1,e2,
+                          vx1,vy1,
+                          vx2,vy2);
+        *vz1=*vz2=C(0,0);
         *e3=i;
-        *vx1 = a;
-        *vy2 = e;
-        *vz3 = i;
-        *vx2 = *vy3 = *vz1 = C(0.0);
-        *vx3 = *vy1 = *vz2 = C(0.0);
+        *vx3=C(0,0);
+        *vy3=C(0,0);
+        *vz3=C(1,0);
         return;
     }
     
+    //==============================//
+    // a 0 c
+    // 0 e 0 
+    // g 0 i
+
+    if(isZero(b) && isZero(d) &&
+       isZero(f) && isZero(h)) {
+        standalone_eig2x2(a,c,
+                       g,i,
+                       e1,e3,
+                       vx1,vz1,
+                       vx3,vz3);
+        *vy1=*vy3=C(0,0);
+        *e2=e;
+        *vx2=C(0,0);
+        *vy2=C(1,0);
+        *vz2=C(0,0);
+        return;
+    }
+
+    //==============================//
+    // a 0 0 
+    // 0 e f
+    // 0 h i 
+
+    if(isZero(b) && isZero(c) &&
+       isZero(d) && isZero(g)) {
+        standalone_eig2x2(e,f,
+                       h,i,
+                       e2,e3,
+                       vy2,vz2,
+                       vy3,vz3);
+        *vx2=*vx3=C(0,0);
+        *e1=a;
+        *vx1=C(1,0);
+        *vy1=C(0,0);
+        *vz1=C(0,0);
+        return;
+    }
+
     //==============================//
     // Eigenvalues
 
@@ -617,7 +770,7 @@ void SpinXML::standalone_eig(C a, C b, C c,
     cubic characteristic_polynomial(poly_a,poly_b,poly_c,poly_d);
     C lambda1,lambda2,lambda3;
     characteristic_polynomial.solve2(&lambda1,&lambda2,&lambda3);
-    
+
     //==============================//
     // Eigenvectors
     //Assume the first element of the eigenvector is 1;
@@ -625,6 +778,7 @@ void SpinXML::standalone_eig(C a, C b, C c,
     C x1 = C(1.0,0), y1, z1;
     C x2 = C(1.0,0), y2, z2;
     C x3 = C(1.0,0), y3, z3;
+    cout << "e-lambda2=" << e-lambda2 <<endl;
     overdetermined
         (b        ,c,
          e-lambda1,f,
@@ -668,18 +822,35 @@ void SpinXML::standalone_eig(C a, C b, C c,
     C norm2=sqrt(x2*std::conj(x2) + y2*std::conj(y2) + z2*std::conj(z2));
     C norm3=sqrt(x3*std::conj(x3) + y3*std::conj(y3) + z3*std::conj(z3));
 
+    if(isZero(norm1)) {
+        x1 = C(0,0);
+        y1 = C(0,0);
+        z1 = C(0,0);
+    } else {
+        x1/=norm1;
+        y1/=norm1;
+        z1/=norm1;
+    }
 
-    x1/=norm1;
-    y1/=norm1;
-    z1/=norm1;
+    if(isZero(norm2)) {
+        x2 = C(0,0);
+        y2 = C(0,0);
+        z2 = C(0,0);
+    } else {
+        x2/=norm2;
+        y2/=norm2;
+        z2/=norm2;
+    }
 
-    x2/=norm2;
-    y2/=norm2;
-    z2/=norm2;
-
-    x3/=norm3;
-    y3/=norm3;
-    z3/=norm3;
+    if(isZero(norm3)) {
+        x3 = C(0,0);
+        y3 = C(0,0);
+        z3 = C(0,0);
+    } else {
+        x3/=norm3;
+        y3/=norm3;
+        z3/=norm3;
+    }
 
     //==============================//
     // Output
@@ -697,9 +868,39 @@ void SpinXML::standalone_eig(C a, C b, C c,
     *vy3=y3;
     *vz3=z3;
 
-    *e1 = real(lambda1);
-    *e2 = real(lambda2);
-    *e3 = real(lambda3);
+    *e1 = real(lambda1*norm);
+    *e2 = real(lambda2*norm);
+    *e3 = real(lambda3*norm);
 
+    //==============================//
+    // Sanity checks (can be removed safely)
+    /*
+    C 
+        t11 = a*x1+b*y1+c*z1,
+        t12 = d*x1+e*y1+f*z1,
+        t13 = g*x1+h*y1+i*z1; 
+    C 
+        t21 = a*x2+b*y2+c*z2,
+        t22 = d*x2+e*y2+f*z2,
+        t23 = g*x2+h*y2+i*z2; 
+    C 
+        t31 = a*x3+b*y3+c*z3,
+        t32 = d*x3+e*y3+f*z3,
+        t33 = g*x3+h*y3+i*z3; 
+
+    std::cout << "First Eigenvector           : ("
+              << x1 << "," << y1 << "," << z1 << ")" << std::endl;
+    std::cout << "First Eigenvector tranformed: ("
+              << t11/lambda1 << "," << t12/lambda1 << "," << t13/lambda1 << ")" << std::endl;
+
+    std::cout << "Second Eigenvector           : ("
+              << x2 << "," << y2 << "," << z2 << ")" << std::endl;
+    std::cout << "Second Eigenvector tranformed: ("
+              << t21/lambda2 << "," << t22/lambda2 << "," << t23/lambda2 << ")" << std::endl;
+    std::cout << "Third Eigenvector           : ("
+              << x3 << "," << y3 << "," << z3 << ")" << std::endl;
+    std::cout << "Third Eigenvector tranformed: ("
+              << t31/lambda3 << "," << t32/lambda3 << "," << t33/lambda3 << ")" << std::endl;
+    */
 }
 

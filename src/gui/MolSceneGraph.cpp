@@ -1,4 +1,5 @@
 
+
 #include <gui/MolSceneGraph.hpp>
 #include <shared/nuclear_data.hpp>
 #include <cmath>
@@ -274,6 +275,7 @@ InteractionDrawerNode::InteractionDrawerNode(SpinSystem* ss)
 }
 
 void InteractionDrawerNode::RawDrawInterType(SpinachDC& dc,Interaction::SubType st) {
+    //cout << "==================================================" << endl;
     GLfloat material[4];
     material[0]=dc.mInterColours[st].GetX();
     material[1]=dc.mInterColours[st].GetY();
@@ -284,42 +286,82 @@ void InteractionDrawerNode::RawDrawInterType(SpinachDC& dc,Interaction::SubType 
     long count = mSS->GetSpinCount();
     for(long i=0;i<count;i++) {
 	Spin* spin=mSS->GetSpin(i);
-        Matrix3e mat3=spin->GetTotalInteraction(st);
-        GLfloat mat[16];
-        mat[3 ]=0;
-        mat[7 ]=0;
-        mat[11]=0;
-        mat[12]=0;
-        mat[13]=0;
-        mat[14]=0;
-        mat[15]=1;
+        if(!spin->GetHasInteractionOfType(st)) {
+            continue;
+        }
 
-        mat[0 ]=abs(mat3.Get(0,0)[MHz]);
-	mat[1 ]=abs(mat3.Get(0,1)[MHz]);
-	mat[2 ]=abs(mat3.Get(0,2)[MHz]);
-			
-	mat[4 ]=abs(mat3.Get(1,0)[MHz]);
-	mat[5 ]=abs(mat3.Get(1,1)[MHz]);
-	mat[6 ]=abs(mat3.Get(1,2)[MHz]);
-			
-	mat[8 ]=abs(mat3.Get(2,0)[MHz]);
-	mat[9 ]=abs(mat3.Get(2,1)[MHz]);
-	mat[10]=abs(mat3.Get(2,2)[MHz]);
-
+        bool electron = spin->GetElement()==0;
+        if(electron) {
+            if(st==Interaction::ST_QUADRUPOLAR ||
+               st==Interaction::ST_SHIELDING  ||
+               st==Interaction::ST_HFC        ) {
+                continue; //Do not draw these types around an electron
+            }
+        } else { //Nucleous
+            if(st==Interaction::ST_G_TENSER || st==Interaction::ST_ZFS) {
+                continue; //Do not draw these types around a nucleous
+            } 
+        }
         glPushMatrix(); {
-	    if(spin->GetElement()!=0) {
-		if(st==Interaction::ST_G_TENSER) continue;
-		if(st==Interaction::ST_ZFS)      continue;
-		length x,y,z;
-		spin->GetCoordinates(&x,&y,&z);
-		glTranslatef(x[Angstroms],y[Angstroms],z[Angstroms]);
-	    } else {
-		if(st==Interaction::ST_QUADRUPOLAR) continue;
-		if(st==Interaction::ST_SHIELDING  ) continue;
-		if(st==Interaction::ST_HFC        ) continue;
-	    }
-            double scalling=dc.mScallings[st];
+            if(!electron) {
+                length x,y,z;
+                spin->GetCoordinates(&x,&y,&z);
+                glTranslatef(x[Angstroms],y[Angstroms],z[Angstroms]);
+            }
+            Matrix3e mat3=spin->GetTotalInteraction(st);
+            /*           Orientation R(AngleAxis(3.141592654/2*0.4,Vector3(0,0.3,1)));
+            Matrix3e mat3(10.0*MHz,0.0*MHz,0.0*MHz,
+                          0.0*MHz ,3.0*MHz,0.0*MHz,
+                          0.0*MHz ,0.0*MHz,2.0*MHz);
+            mat3=R.GetAsMatrix().Inverted()*mat3*R.GetAsMatrix();
+
+            energy xx,yy,zz;
+            Vector3 vx,vy,vz;
+            mat3.eig(xx,yy,zz,vx,vy,vz);
+            vx.normalise();
+            vy.normalise();
+            vz.normalise();
+
+            Matrix3 Rot(vx.GetX(),vy.GetX(),vz.GetX(),
+                        vx.GetY(),vy.GetY(),vz.GetY(),
+                        vx.GetZ(),vy.GetZ(),vz.GetZ());
+            if(Rot.det().si<0) {
+                Rot=Rot*(-1.0*no_unit);
+            }
+            Matrix3e Scale(xx      ,energy(0.0),energy(0.0),
+                           energy(0.0),yy        ,energy(0.0),
+                           energy(0.0),energy(0.0),zz        );
+
+            mat3=Rot*Scale;
+*/
+            GLfloat mat[16];
+            mat[3 ]=0;
+            mat[7 ]=0;
+            mat[11]=0;
+            mat[12]=0;
+            mat[13]=0;
+            mat[14]=0;
+            mat[15]=1;
+
+            mat[0 ]=abs(mat3.Get(0,0)[MHz]);
+            mat[1 ]=abs(mat3.Get(0,1)[MHz]);
+            mat[2 ]=abs(mat3.Get(0,2)[MHz]);
+		                
+            mat[4 ]=abs(mat3.Get(1,0)[MHz]);
+            mat[5 ]=abs(mat3.Get(1,1)[MHz]);
+            mat[6 ]=abs(mat3.Get(1,2)[MHz]);
+		                
+            mat[8 ]=abs(mat3.Get(2,0)[MHz]);
+            mat[9 ]=abs(mat3.Get(2,1)[MHz]);
+            mat[10]=abs(mat3.Get(2,2)[MHz]);
+
+            cout << mat[ 0] << " " << mat[ 1] << " " << mat[ 2] << " " << mat[ 3] << endl 
+                 << mat[ 4] << " " << mat[ 5] << " " << mat[ 6] << " " << mat[ 7] << endl
+                 << mat[ 8] << " " << mat[ 9] << " " << mat[10] << " " << mat[11] << endl
+                 << mat[12] << " " << mat[13] << " " << mat[14] << " " << mat[15] << endl << endl;
+
             glMultMatrixf(mat);
+            double scalling=dc.mScallings[st];
             glScalef(scalling,scalling,scalling);
             gluSphere(dc.GetSolidQuadric(),1.0,29,37);
         } glPopMatrix();

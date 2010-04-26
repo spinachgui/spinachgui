@@ -31,14 +31,23 @@ void SpinXML::overdetermined(C a, C b,
     C d11 = a*invB11+b*invB12; C d12 = c*invB11+d*invB12; C d13 = e*invB11+f*invB12;
     C d21 = a*invB21+b*invB22; C d22 = c*invB21+d*invB22; C d23 = e*invB21+f*invB22;
 
-    //Check that the unknowns solve the system
-
     C u1=*unknown1 = d11*x+d12*y+d13*z;
     C u2=*unknown2 = d21*x+d22*y+d23*z;
 
     C xs=a*u1+b*u2;
     C ys=c*u1+d*u2;
     C zs=e*u1+f*u2;
+    /*cout << "Solution:" << endl;
+    cout << "u1" << u1 << endl;
+    cout << "u2" << u2 << endl;
+    cout << endl;
+    
+    cout << "Checking the solution" << endl;
+    cout << "x=" << x << "  xs=" << xs << endl;
+    cout << "y=" << y << "  ys=" << ys << endl;
+    cout << "z=" << z << "  zs=" << zs << endl;
+    cout << endl;*/
+
 }
 
 

@@ -20,7 +20,7 @@ OrientEditPanel::OrientEditPanel(wxWindow* parent,
                                  const wxPoint& pos,
                                  const wxSize& size,
                                  long style)
-    : OrientEditPanelBase(parent,id,pos,size,style),mOrient(),mLoading(false) {
+    : OrientEditPanelBase(parent,id,pos,size,style),mOrient(),mLoading(false),mDirty(false) {
     Enable(false);
 }
 
@@ -28,6 +28,10 @@ void OrientEditPanel::SetOrient(const Orientation& orient) {
     Enable(true);
     mOrient=orient;
     LoadFromOrient();
+}
+
+void OrientEditPanel::LoadFromOrient() {
+    mLoading=true;
     switch(mOrient.GetType()) {
     case Orientation::EULER:
         mOrientTypeChoiceBook->SetSelection(0);
@@ -44,11 +48,6 @@ void OrientEditPanel::SetOrient(const Orientation& orient) {
     case Orientation::UNDEFINED:
         break;
     }
-
-}
-
-void OrientEditPanel::LoadFromOrient() {
-    mLoading=true;
     switch(mOrient.GetType()) {
     case Orientation::EULER: {
         double alpha,beta,gamma;
@@ -98,10 +97,12 @@ void OrientEditPanel::LoadFromOrient() {
         wxLogError(wxT("Internal Error: Orientation Undefined."));
     }  
     }
+    mDirty=false;
     mLoading=false;
 }
 
 void OrientEditPanel::SaveToOrient() {
+    mDirty=false;
     cout << "Saving" << endl;
     switch(mOrientTypeChoiceBook->GetSelection()) {
     case 0: {
@@ -161,16 +162,21 @@ void OrientEditPanel::SaveToOrient() {
             cerr << "Trying to save back to the orientation, but could not determing the orientation's type" << endl;
     }
     }
+    mOrient.Normalise();
 }
 
 void OrientEditPanel::OnTextChange(wxCommandEvent& e) {
-  
+    mDirty=true;
 }
 
 void OrientEditPanel::OnPageChange(wxChoicebookEvent& e) {
     if(mLoading) {
         return;
     }
+    //First we need to save any changes the user made to the orientation
+    if(mDirty) SaveToOrient();  //Only save changes if the user has
+                                //made changes, otherwise we are
+                                //throwing away precision.
     switch(TypeOrder[e.GetSelection()]) {
     case Orientation::EULER:{
         mOrient=mOrient.GetAsEuler();
@@ -198,7 +204,7 @@ void OrientEditPanel::OnPageChange(wxChoicebookEvent& e) {
 
 BEGIN_EVENT_TABLE(OrientEditPanel,wxPanel)
 
-EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,OrientEditPanel::OnPageChange)
+EVT_CHOICEBOOK_PAGE_CHANGING(wxID_ANY,OrientEditPanel::OnPageChange)
 
 END_EVENT_TABLE()
 

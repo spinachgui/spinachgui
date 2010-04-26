@@ -34,6 +34,7 @@ protected:
 private:
   SpinXML::Orientation mOrient;
   bool mLoading;
+  bool mDirty;
 };
 
 //============================================================//

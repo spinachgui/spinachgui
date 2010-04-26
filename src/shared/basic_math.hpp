@@ -17,6 +17,18 @@ namespace SpinXML {
             z==complex<F>(-0.0,-0.0);
     }
 
+    ///Returns true of the complex number is close to zero
+    template<typename F> 
+    bool isNearlyZero(complex<F> z) {
+        return abs(z) < 1e-15;
+    }
+    ///Returns true of the complex number is close to zero
+    template<typename F> 
+    complex<F> clampToZero(complex<F> z) {
+        return abs(z) < 1e-15 ? complex<F>(0) : z;
+    }
+
+
     ///The complex acos function
     template<typename F>
     std::complex<F> acos(complex<F> z) {

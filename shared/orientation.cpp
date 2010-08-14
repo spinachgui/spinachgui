@@ -1,5 +1,5 @@
 
-#include <shared/mathtypes.hpp>
+#include <shared/orientation.hpp>
 #include <iostream>
 #include <cstring>
 #include <sstream>
@@ -19,7 +19,16 @@ const double SpinXML::hbar=6.626068e-34;
 const double SpinXML::bohr_mag=9.27400915e-24;
 const double SpinXML::mu0=1.25663706e-6;
 
+Matrix3d SpinXML::MakeMatrix3d(double a00, double a01, double a02,
+					  double a10, double a11, double a12,
+					  double a20, double a21, double a22) {
+	Matrix3d m;
+	m(0,0)=a00;		m(0,1)=a01;		m(0,2)=a02;
+	m(1,0)=a10;		m(1,1)=a11;		m(1,2)=a12;
+	m(2,0)=a20;		m(2,1)=a21;		m(2,2)=a22;
 
+	return m;
+}
 
 
 
@@ -317,16 +326,4 @@ Orientation Orientation::Normalized() const {
     return apply_visitor(NormalisedVisitor(),mData);
 }
 
-
-Orientation::Type Orientation::GetType() const {
-    if(get<EulerAngles>(&mData)!=NULL) {
-        return EULER;
-    } else if(get<AngleAxis>(&mData)!=NULL) {
-        return ANGLE_AXIS;
-    } else if(get<Matrix3>(&mData)!=NULL) {
-        return EIGENSYSTEM;
-    } else  {
-        return QUATERNION;
-    }
-}
 

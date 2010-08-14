@@ -28,14 +28,7 @@ namespace SpinXML {
 	///Helper function to make a matrix from a bunch of doubles
 	Matrix3d MakeMatrix3d(double a00, double a01, double a02,
 						  double a10, double a11, double a12,
-						  double a20, double a21, double a22) {
-		Matrix3d m;
-		m(0,0)=a00;		m(0,1)=a01;		m(02)=a02;
-		m(1,0)=a10;		m(1,1)=a11;		m(12)=a12;
-		m(2,0)=a20;		m(2,1)=a21;		m(22)=a22;
-
-		return m;
-	}
+						  double a20, double a21, double a22);
 
     ///Euler angle type
     struct EulerAngles {

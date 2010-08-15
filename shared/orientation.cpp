@@ -19,6 +19,9 @@ const double SpinXML::hbar=6.626068e-34;
 const double SpinXML::bohr_mag=9.27400915e-24;
 const double SpinXML::mu0=1.25663706e-6;
 
+//============================================================//
+//Helper functions
+
 Matrix3d SpinXML::MakeMatrix3d(double a00, double a01, double a02,
 					  double a10, double a11, double a12,
 					  double a20, double a21, double a22) {
@@ -30,6 +33,55 @@ Matrix3d SpinXML::MakeMatrix3d(double a00, double a01, double a02,
 	return m;
 }
 
+//============================================================//
+// Rotation Conversions bank
+
+EulerAngles SpinXML::ConvertToEuler(const EulerAngles& rot) {return rot;}
+EulerAngles SpinXML::ConvertToEuler(const Matrix3d&    rot) {return ConvertToEuler(ConvertToQuaternion(rot));}
+EulerAngles SpinXML::ConvertToEuler(const Quaterniond& rot) {return EulerAngles(0.0,0.0,0.0);}
+EulerAngles SpinXML::ConvertToEuler(const AngleAxisd&   rot) {return ConvertToEuler(ConvertToQuaternion(rot));}
+
+Matrix3d    SpinXML::ConvertToDCM(const EulerAngles& rot) {return ConvertToDCM(ConvertToQuaternion(rot));}
+Matrix3d    SpinXML::ConvertToDCM(const Matrix3d&    rot) {return rot;}
+Matrix3d    SpinXML::ConvertToDCM(const Quaterniond& rot) {return rot.toRotationMatrix();}
+Matrix3d    SpinXML::ConvertToDCM(const AngleAxisd&   rot){return ConvertToDCM(ConvertToQuaternion(rot));}
+
+Quaterniond SpinXML::ConvertToQuaternion(const EulerAngles& rot) {
+	Quaterniond q1(AngleAxisd(rot.alpha,Vector3d(0,0,1)));
+	Quaterniond q2(AngleAxisd(rot.beta, Vector3d(0,1,0)));
+	Quaterniond q3(AngleAxisd(rot.gamma,Vector3d(0,0,1)));
+	return q3*q2*q1;
+}
+Quaterniond SpinXML::ConvertToQuaternion(const Matrix3d&    rot) {return Quaterniond(rot);}
+Quaterniond SpinXML::ConvertToQuaternion(const Quaterniond& rot) {return rot;}
+Quaterniond SpinXML::ConvertToQuaternion(const AngleAxisd&   rot) {
+	double vx=rot.axis().x();
+	double vy=rot.axis().y();
+	double vz=rot.axis().z();
+
+	double sin_a=sin(rot.angle()/2);
+	double w=cos(rot.angle()/2);
+	double x=vx*sin_a;
+	double y=vy*sin_a;
+	double z=vz*sin_a;
+	return Quaterniond(w,x,y,z);
+}
+
+AngleAxisd  SpinXML::ConvertToAngleAxis(const EulerAngles& rot) {return ConvertToAngleAxis(ConvertToQuaternion(rot));}
+AngleAxisd  SpinXML::ConvertToAngleAxis(const Matrix3d&    rot) {return ConvertToAngleAxis(ConvertToQuaternion(rot));}
+AngleAxisd  SpinXML::ConvertToAngleAxis(const Quaterniond& rot) {
+	double angle=2*acos(rot.w());
+	if(angle == 0.0 || angle == -0.0) {
+		//Singularty at the identity
+		return AngleAxisd(angle,Vector3d(0,0,0));
+	}
+	double inv_sin_a=1/(sqrt(1-rot.w()*rot.w())*2);
+	double vx=rot.x()*inv_sin_a;
+	double vy=rot.y()*inv_sin_a;
+	double vz=rot.z()*inv_sin_a;
+	return AngleAxisd(angle,Vector3d(vx,vy,vz));
+}
+AngleAxisd  SpinXML::ConvertToAngleAxis(const AngleAxisd&   rot) {return rot;}
 
 
 //==============================================================================//
@@ -41,7 +93,7 @@ Orientation::Type Orientation::GetType() const {
     } else if(get<AngleAxisd>(&mData)!=NULL) {
         return ANGLE_AXIS;
     } else if(get<Matrix3d>(&mData)!=NULL) {
-        return EIGENSYSTEM;
+        return DCM;
     } else  {
         return QUATERNION;
     }
@@ -134,11 +186,8 @@ void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) c
     *k    = get<Quaterniond>(mData).z();
 }
 
-void Orientation::GetEigenSystem(Vector3d* XAxis,Vector3d* YAxis, Vector3d* ZAxis) const {
-    Matrix3d mat = get<Matrix3d>(mData);
-    *XAxis = Vector3d(mat(0,0),mat(0,1),mat(0,2));
-    *YAxis = Vector3d(mat(1,0),mat(1,1),mat(1,2));
-    *ZAxis = Vector3d(mat(2,0),mat(2,1),mat(2,2));
+void Orientation::GetDCM(Matrix3d* matrix) const {
+    *matrix = get<Matrix3d>(mData);
 }
 
 
@@ -182,145 +231,53 @@ void Orientation::FromString(std::string string) {
   cerr << "Not Implimented" << endl;
 }
 
+#define DEFINE_CONVERTER(name,return_type,function)		\
+	struct name : public static_visitor<return_type> {		\
+		return_type operator()(const EulerAngles& dat) const {return function(dat);} \
+		return_type operator()(const Matrix3d& dat) const    {return function(dat);} \
+		return_type operator()(const Quaterniond& dat) const {return function(dat);} \
+		return_type operator()(const AngleAxisd& dat) const  {return function(dat);} \
+	};
 
-class AsEulerVisitor : public static_visitor<Orientation> {
-public:
-    Orientation operator()(const EulerAngles& dat) const {
-        return Orientation(dat);
-    }
-    Orientation operator()(const Matrix3d& dat) const {
-        Orientation q=Orientation(dat).GetAsQuaternion();
-        return q.GetAsEuler();
-    }
-    Orientation operator()(const Quaterniond& dat) const {
-        Quaterniond q(dat.w(),dat.x(),dat.y(),dat.z());
-        return Orientation(EulerAngles(0,0,0)); //TODO
-    }
-    Orientation operator()(const AngleAxisd& dat) const {
-        return Orientation(dat).GetAsQuaternion().GetAsEuler();
-    }
-};
-Orientation Orientation::GetAsEuler() const {
+DEFINE_CONVERTER(AsEulerVisitor,EulerAngles,ConvertToEuler)
+EulerAngles Orientation::GetAsEuler() const {
     Orientation normalised=Normalized();
     return apply_visitor(AsEulerVisitor(),normalised.mData);
 }
 
-class AsDCMVisitor : public static_visitor<Orientation> {
-public:
-    Orientation operator()(const EulerAngles& dat) const {
-        return Orientation(dat).GetAsQuaternion().GetAsEigenSystem();
-    }
-    Orientation operator()(const Matrix3d& dat) const {
-        return Orientation(dat);
-    }
-    Orientation operator()(const Quaterniond& dat) const {
-		return Orientation(dat.toRotationMatrix());
-    }
-    Orientation operator()(const AngleAxisd& dat) const {
-        return Orientation(dat).GetAsQuaternion().GetAsEigenSystem();
-    }
-};
-Orientation Orientation::GetAsEigenSystem() const {
+DEFINE_CONVERTER(AsDCMVisitor,Matrix3d,ConvertToDCM)
+Matrix3d Orientation::GetAsDCM() const {
     Orientation o=Normalized();
     return apply_visitor(AsDCMVisitor(),o.mData);
 }
 
-class AsAngleAxisVisitor : public static_visitor<Orientation> {
-public:
-    Orientation operator()(const EulerAngles& dat) const {
-        return Orientation(dat).GetAsQuaternion().GetAsAngleAxis();
-    }
-    Orientation operator()(const Matrix3d& dat) const {
-        return Orientation(dat).GetAsQuaternion().GetAsAngleAxis();
-    }
-    Orientation operator()(const Quaterniond& dat) const {
-        double angle=2*acos(dat.w());
-        if(angle == 0.0 || angle == -0.0) {
-            //Singularty at the identity
-            return Orientation(AngleAxisd(angle,Vector3d(0,0,0)));
-        }
-        double inv_sin_a=1/(sqrt(1-dat.w()*dat.w())*2);
-        double vx=dat.x()*inv_sin_a;
-        double vy=dat.y()*inv_sin_a;
-        double vz=dat.z()*inv_sin_a;
-        return Orientation(AngleAxisd(angle,Vector3d(vx,vy,vz)));
-    }
-    Orientation operator()(const AngleAxisd& dat) const {
-        return Orientation(dat);
-    }
-};
-Orientation Orientation::GetAsAngleAxis() const {
+DEFINE_CONVERTER(AsAngleAxisVisitor,AngleAxisd,ConvertToAngleAxis)
+AngleAxisd Orientation::GetAsAngleAxis() const {
     Orientation o=Normalized();
     return apply_visitor(AsAngleAxisVisitor(),o.mData);
 }
 
-class AsQuaternionVisitor : public static_visitor<Orientation> {
-public:
-    Orientation operator()(const EulerAngles& dat) const {
-		Quaterniond q1(AngleAxisd(dat.alpha,Vector3d(0,0,1)));
-		Quaterniond q2(AngleAxisd(dat.beta, Vector3d(0,1,0)));
-		Quaterniond q3(AngleAxisd(dat.gamma,Vector3d(0,0,1)));
-		Quaterniond q=q3*q2*q1;
-		return Orientation(q);
-    }
-    Orientation operator()(const Matrix3d& dat) const {
-        return Orientation(Quaterniond(dat));
-    }
-    Orientation operator()(const Quaterniond& dat) const {
-        return Orientation(dat);
-    }
-    Orientation operator()(const AngleAxisd& dat) const {
-        double vx=dat.axis().x();
-        double vy=dat.axis().y();
-        double vz=dat.axis().z();
-
-		double sin_a=sin(dat.angle()/2);
-		double w=cos(dat.angle()/2);
-		double x=vx*sin_a;
-		double y=vy*sin_a;
-		double z=vz*sin_a;
-        return Orientation(Quaterniond(w,x,y,z));
-    }
-};
-Orientation Orientation::GetAsQuaternion() const {
-    cout << "Unnormalised" << ToString() << endl;
+DEFINE_CONVERTER(AsQuaternionVisitor,Quaterniond,ConvertToQuaternion)
+Quaterniond Orientation::GetAsQuaternion() const {
     Orientation o=Normalized();
-    cout << "Normalised" << o.ToString() << endl;
     return apply_visitor(AsQuaternionVisitor(),o.mData);
 }
 
-class NormalizeVisitor : public static_visitor<> {
-public:
-    void operator()(EulerAngles& dat) const {
-        dat.Normalize();
-    }
-    void operator()(Matrix3d& dat) const {
-    }
-    void operator()(Quaterniond& dat) const {
-        dat.normalize();
-    }
-    void operator()(AngleAxisd& dat) const {
-        dat.axis()=dat.axis().normalized();
-    }
+struct NormalizeVisitor : public static_visitor<> {
+    void operator()(EulerAngles& dat) const {dat.Normalize();}
+    void operator()(Matrix3d& dat) const { }
+    void operator()(Quaterniond& dat) const {dat.normalize();}
+    void operator()(AngleAxisd& dat) const {dat.axis()=dat.axis().normalized();}
 };
 void Orientation::Normalize() {
     apply_visitor(NormalizeVisitor(),mData);
 }
 
-class NormalisedVisitor : public static_visitor<Orientation> {
-public:
-    Orientation operator()(const EulerAngles& dat) const {
-        return Orientation(dat.Normalized());
-    }
-    Orientation operator()(const Matrix3d& dat) const {
-		return dat;
-    }
-    Orientation operator()(const Quaterniond& dat) const {
-        return Orientation(dat.normalized());
-    }
-    Orientation operator()(const AngleAxisd& dat) const {
-        return Orientation(AngleAxisd(dat.angle(),dat.axis().normalized()));
-    }
+struct NormalisedVisitor : public static_visitor<Orientation> {
+    Orientation operator()(const EulerAngles& dat) const {return Orientation(dat.Normalized());}
+    Orientation operator()(const Matrix3d& dat) const    {return dat;}
+    Orientation operator()(const Quaterniond& dat) const {return Orientation(dat.normalized());}
+    Orientation operator()(const AngleAxisd& dat) const  {return Orientation(AngleAxisd(dat.angle(),dat.axis().normalized()));}
 };
 Orientation Orientation::Normalized() const {
     return apply_visitor(NormalisedVisitor(),mData);

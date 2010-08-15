@@ -37,6 +37,11 @@ namespace SpinXML {
             : alpha(_alpha),beta(_beta),gamma(_gamma) {
 
         }
+		void Set(double _alpha,double _beta, double _gamma) {
+			alpha=_alpha;
+			beta= _beta;
+			gamma=_gamma;
+		}
         void Normalize() {
             
         }
@@ -45,6 +50,27 @@ namespace SpinXML {
         }
 
     };
+
+	EulerAngles ConvertToEuler(const EulerAngles& rot);
+	EulerAngles ConvertToEuler(const Matrix3d&    rot);
+	EulerAngles ConvertToEuler(const Quaterniond& rot);
+	EulerAngles ConvertToEuler(const AngleAxisd&   rot);
+
+	Matrix3d    ConvertToDCM(const EulerAngles& rot);
+	Matrix3d    ConvertToDCM(const Matrix3d&    rot);
+	Matrix3d    ConvertToDCM(const Quaterniond& rot);
+	Matrix3d    ConvertToDCM(const AngleAxisd&   rot);
+
+	Quaterniond ConvertToQuaternion(const EulerAngles& rot);
+	Quaterniond ConvertToQuaternion(const Matrix3d&    rot);
+	Quaterniond ConvertToQuaternion(const Quaterniond& rot);
+	Quaterniond ConvertToQuaternion(const AngleAxisd&   rot);
+
+	AngleAxisd  ConvertToAngleAxis(const EulerAngles& rot);
+	AngleAxisd  ConvertToAngleAxis(const Matrix3d&    rot);
+	AngleAxisd  ConvertToAngleAxis(const Quaterniond& rot);
+	AngleAxisd  ConvertToAngleAxis(const AngleAxisd&   rot);
+
 
     ///Class for storing a 3 dimentional rotation
     class Orientation {
@@ -65,7 +91,7 @@ namespace SpinXML {
 			EULER,
 			ANGLE_AXIS,
 			QUATERNION,
-			EIGENSYSTEM
+			DCM
 		};
     
 		///Normalise the contained rotation in place.
@@ -91,7 +117,7 @@ namespace SpinXML {
 		///If the eigensystem convention is being used then this function
 		///will set its arguments to the appropriate values otherwise the
 		///result is undefined.
-		void GetEigenSystem(Vector3d* XAxis,Vector3d* YAxis, Vector3d* ZAxis) const;
+		void GetDCM(Matrix3d* matrix) const;
 
 		const Orientation& operator=(const EulerAngles& ea);
 		const Orientation& operator=(const AngleAxisd& aa);
@@ -108,10 +134,10 @@ namespace SpinXML {
 		///the representation should be the same as returned by ToString
 		void FromString(std::string string);
 
-        Orientation GetAsEuler() const;
-        Orientation GetAsEigenSystem() const;
-        Orientation GetAsAngleAxis() const;
-        Orientation GetAsQuaternion() const;
+        EulerAngles GetAsEuler() const;
+        Matrix3d    GetAsDCM() const;
+        AngleAxisd  GetAsAngleAxis() const;
+        Quaterniond GetAsQuaternion() const;
 
     private:
         typedef boost::variant<EulerAngles,AngleAxisd,Quaterniond,Matrix3d> var_t;

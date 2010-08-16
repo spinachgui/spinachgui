@@ -105,6 +105,14 @@ AngleAxisd  SpinXML::ConvertToAngleAxis(const Quaterniond& rot) {
 }
 AngleAxisd  SpinXML::ConvertToAngleAxis(const AngleAxisd&   rot) {return rot;}
 
+//============================================================//
+// Rotation Normalizer bank
+EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Normalized();}							   
+Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {return rot;}
+Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}							   
+AngleAxisd  SpinXML::NormalizeRotation(const AngleAxisd& rot)  {return AngleAxisd(rot.angle(),rot.axis().normalized());}
+
+
 
 //==============================================================================//
 // Orientation

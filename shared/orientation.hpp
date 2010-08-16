@@ -51,6 +51,8 @@ namespace SpinXML {
 
     };
 
+	//Rotation Converions
+
 	EulerAngles ConvertToEuler(const EulerAngles& rot);
 	EulerAngles ConvertToEuler(const Matrix3d&    rot);
 	EulerAngles ConvertToEuler(const Quaterniond& rot);
@@ -71,6 +73,11 @@ namespace SpinXML {
 	AngleAxisd  ConvertToAngleAxis(const Quaterniond& rot);
 	AngleAxisd  ConvertToAngleAxis(const AngleAxisd&   rot);
 
+	//Uniform Rotation Normalisation
+	EulerAngles NormalizeRotation(const EulerAngles& rot);
+	Matrix3d    NormalizeRotation(const Matrix3d& rot);
+	Quaterniond NormalizeRotation(const Quaterniond& rot);
+	AngleAxisd  NormalizeRotation(const AngleAxisd& rot);
 
     ///Class for storing a 3 dimentional rotation
     class Orientation {

@@ -149,8 +149,8 @@ BOOST_FIXTURE_TEST_CASE( OrientationConstructorMatrix, Setup ) {
 	seedType  tmp2 = toSeedConv(tmp1);									\
 																		\
 	for(int itor=0;itor<30;itor++) {									\
-		tmp1 = fromSeedConv(tmp2);										\
-	    tmp2 = toSeedConv(tmp1);										\
+		tmp1 = fromSeedConv(NormalizeRotation(tmp2));					\
+	    tmp2 = toSeedConv  (NormalizeRotation(tmp1));					\
 	}																	\
 	checkMacro(tmp2);													\
 }

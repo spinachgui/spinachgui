@@ -42,6 +42,13 @@ namespace SpinXML {
 			beta= _beta;
 			gamma=_gamma;
 		}
+		bool operator==(const EulerAngles& o) const {
+			return alpha == o.alpha &&	beta == o.beta && gamma == o.gamma;
+		}
+		bool operator!=(const EulerAngles& o) const {
+			return alpha != o.alpha ||	beta != o.beta || gamma != o.gamma;
+		}
+
         void Normalize() {
             
         }
@@ -130,6 +137,19 @@ namespace SpinXML {
 		const Orientation& operator=(const AngleAxisd& aa);
 		const Orientation& operator=(const Matrix3d& m);
 		const Orientation& operator=(const Quaterniond& q);
+
+		bool operator==(const Orientation& o) const {
+			if(o.mData.type()==typeid(EulerAngles))	return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
+			if(o.mData.type()==typeid(AngleAxisd)) 
+				return get<AngleAxisd>(o.mData).angle()==get<AngleAxisd>(mData).angle()
+					&& get<AngleAxisd>(o.mData).axis()==get<AngleAxisd>(mData).axis();
+			if(o.mData.type()==typeid(Quaterniond))
+				return get<Quaterniond>(o.mData).w()==get<Quaterniond>(mData).w()
+					&& get<Quaterniond>(o.mData).x()==get<Quaterniond>(mData).x()
+					&& get<Quaterniond>(o.mData).y()==get<Quaterniond>(mData).y()
+					&& get<Quaterniond>(o.mData).z()==get<Quaterniond>(mData).z();
+			if(o.mData.type()==typeid(Matrix3d))    return get<Matrix3d>   (o.mData)==get<Matrix3d>   (mData);
+		}
 
 		///Converts to a rotation matrix
 		Matrix3d GetAsMatrix() const;

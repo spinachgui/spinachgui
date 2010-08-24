@@ -66,11 +66,11 @@ add_library(spinxml STATIC       ${sharedSources})
 ############################################################
 # Tests specified here
 
-#add_executable(InteractionRawTest "shared/test/raw_interactions_test.cpp")
-#target_link_libraries(InteractionRawTest ${Boost_LIBRARIES})
-#add_test(InteractionRawTest ${EXECUTABLE_OUTPUT_PATH}/InteractionRawTest)
+add_executable(InteractionRawTest "shared/test/interactions_test.cpp")
+target_link_libraries(InteractionRawTest ${Boost_LIBRARIES} spinxml)
+add_test(InteractionRawTest ${EXECUTABLE_OUTPUT_PATH}/InteractionRawTest)
 
 add_executable(OrientationTest "shared/test/orientation_test.cpp" )
-target_link_libraries(OrientationTest spinxml ${Boost_LIBRARIES})
+target_link_libraries(OrientationTest spinxml ${Boost_LIBRARIES} spinxml)
 add_test(OrientationTest ${EXECUTABLE_OUTPUT_PATH}/OrientationTest)
 

@@ -5,7 +5,7 @@
 #include <shared/orientation.hpp>
 #include <shared/test/common.hpp>
 
-
+using namespace SpinXML;
 
 
 //Quaternions have the same physical meaning if inverted (q1 == -q2) so

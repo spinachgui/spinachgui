@@ -75,7 +75,7 @@ BOOST_FIXTURE_TEST_CASE( SpanSkewConstructor, Setup ) {
 	BOOST_CHECK_CLOSE(yy.si,(obj).yy.si ,0.01);							\
 	BOOST_CHECK_CLOSE(zz.si,(obj).zz.si ,0.01);						
 
-#define CHECK_AXRHOM_CLOSE(obj)									\
+#define CHECK_AXRHOM_CLOSE(obj)										\
 	BOOST_CHECK_CLOSE(ar_iso.si,(obj).iso.si,0.01);					\
 	BOOST_CHECK_CLOSE(ax.si,(obj).ax.si ,0.01);						\
 	BOOST_CHECK_CLOSE(rh.si,(obj).rh.si ,0.01);						

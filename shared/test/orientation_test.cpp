@@ -43,6 +43,33 @@ quaternionCompaire(Quaterniond q1,Quaterniond q2,double tolarance)
 	return true;
 }
 
+//Two angle axis rotations have the same meaning if they are the same
+//or if you can flip the vector and set the new angle to 2*pi minus to
+//old angle.
+boost::test_tools::predicate_result
+quaternionCompaire(AngleAxisd a1,AngleAxisd a2,double tolarance)
+{
+	if(!(
+		 (abs(a1.angle()-a2.angle())/(2*PI) < tolarance/100 &&   // is a1 == a2 ?
+		  abs(a1.axis().x()-a2.axis().x())/2 < tolarance/100 &&
+		  abs(a1.axis().y()-a2.axis().y())/2 < tolarance/100 &&
+		  abs(a1.axis().z()-a2.axis().z())/2 < tolarance/100)
+		 ||
+		 (abs(a1.angle()-(2*PI-a2.angle()))/(2*PI) < tolarance/100 &&   // is a1 == inverted a2 ?
+		  abs(a1.axis().x()+a2.axis().x())/2 < tolarance/100 &&
+		  abs(a1.axis().y()+a2.axis().y())/2 < tolarance/100 &&
+		  abs(a1.axis().z()+a2.axis().z())/2 < tolarance/100)
+		 )) {
+		boost::test_tools::predicate_result res(false);
+        res.message() <<   a1.angle() << ",[" << a1.axis().x() << "," << a1.axis().y() << "," << a1.axis().z() << "]" << " !~= "
+					  <<   a2.angle() << ",[" << a2.axis().x() << "," << a2.axis().y() << "," << a2.axis().z() << "]"; 
+        return res;
+	}
+	return true;
+}
+
+
+
 struct Setup {
     Setup() :
 		alpha(0.2),
@@ -161,10 +188,7 @@ BOOST_FIXTURE_TEST_CASE( OrientationConstructorMatrix, Setup ) {
 	BOOST_CHECK(quaternionCompaire(q,(obj),0.01));
 
 #define CHECK_ANGLE_AXIS_CLOSE(obj)						\
-	BOOST_CHECK(boundedCompaire(angle   ,(obj).angle()    ,2*PI,0.01));	\
-	BOOST_CHECK(boundedCompaire(axis.x(),(obj).axis().x() ,1,0.01));	\
-	BOOST_CHECK(boundedCompaire(axis.y(),(obj).axis().y() ,1,0.01));	\
-	BOOST_CHECK(boundedCompaire(axis.z(),(obj).axis().z() ,1,0.01));	
+	quaternionCompaire(aa,obj,0.01)
 
 #define CHECK_MATRIX_CLOSE(obj)							\
 	BOOST_CHECK(boundedCompaire(m(0,0),(obj)(0,0),2,0.01));			\

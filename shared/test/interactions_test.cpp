@@ -9,7 +9,7 @@ using namespace SpinXML;
 
 struct Setup {
 	Setup() :
-		o(Quaterniond(sqrt(2.0),sqrt(2.0),0,0)),
+		o(Quaterniond(1/sqrt(2.0),1/sqrt(2.0),0,0)),
 
 		scalar(20.0*MHz),
 		

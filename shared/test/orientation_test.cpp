@@ -24,16 +24,16 @@ boundedCompaire(double n1,double n2,double range,double tolarance)
 boost::test_tools::predicate_result
 quaternionCompaire(Quaterniond q1,Quaterniond q2,double tolarance)
 {
-	if(!(
-	   (abs(q1.w()-q2.w())/2 < tolarance/100 &&   // is q1 == q2 ?
-		abs(q1.x()-q2.x())/2 < tolarance/100 &&
-		abs(q1.y()-q2.y())/2 < tolarance/100 &&
-		abs(q1.z()-q2.z())/2 < tolarance/100)
-	   ||
-	   (abs(q1.w()+q2.w())/2 < tolarance/100 &&   // is q1 == -q2 ?
-		abs(q1.x()+q2.x())/2 < tolarance/100 &&
-		abs(q1.y()+q2.y())/2 < tolarance/100 &&
-		abs(q1.z()+q2.z())/2 < tolarance/100)
+	if(!( //Watch out for this not operation
+		 (abs(q1.w()-q2.w())/2 < tolarance/100 &&   // is q1 == q2 ?
+		  abs(q1.x()-q2.x())/2 < tolarance/100 &&
+		  abs(q1.y()-q2.y())/2 < tolarance/100 &&
+		  abs(q1.z()-q2.z())/2 < tolarance/100)
+		 ||
+		 (abs(q1.w()+q2.w())/2 < tolarance/100 &&   // is q1 == -q2 ?
+		  abs(q1.x()+q2.x())/2 < tolarance/100 &&
+		  abs(q1.y()+q2.y())/2 < tolarance/100 &&
+		  abs(q1.z()+q2.z())/2 < tolarance/100)
 		 )) {
 		boost::test_tools::predicate_result res(false);
         res.message() << "[" << q1.w() << "," << q1.x() << "," << q1.y() << "," << q1.z() << "]" << " !~= "
@@ -49,7 +49,7 @@ quaternionCompaire(Quaterniond q1,Quaterniond q2,double tolarance)
 boost::test_tools::predicate_result
 quaternionCompaire(AngleAxisd a1,AngleAxisd a2,double tolarance)
 {
-	if(!(
+	if(!( //Watch out for this not operation
 		 (abs(a1.angle()-a2.angle())/(2*PI) < tolarance/100 &&   // is a1 == a2 ?
 		  abs(a1.axis().x()-a2.axis().x())/2 < tolarance/100 &&
 		  abs(a1.axis().y()-a2.axis().y())/2 < tolarance/100 &&

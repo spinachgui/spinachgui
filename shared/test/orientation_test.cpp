@@ -1,23 +1,12 @@
 #define BOOST_TEST_MODULE interactions
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
-#include <boost/test/unit_test.hpp>
+
 #include <shared/orientation.hpp>
-#include <iostream>
+#include <shared/test/common.hpp>
 
-using namespace SpinXML;
-using namespace std;
 
-boost::test_tools::predicate_result
-boundedCompaire(double n1,double n2,double range,double tolarance)
-{
-	if(abs((n1-n2)/range) > (tolarance/100)) {
-		boost::test_tools::predicate_result res(false);
-        res.message() << n1 << " !~= " << n2;
-        return res;
-	}
-	return true;
-}
+
 
 //Quaternions have the same physical meaning if inverted (q1 == -q2) so
 //we need to check both possibilities
@@ -47,7 +36,7 @@ quaternionCompaire(Quaterniond q1,Quaterniond q2,double tolarance)
 //or if you can flip the vector and set the new angle to 2*pi minus to
 //old angle.
 boost::test_tools::predicate_result
-quaternionCompaire(AngleAxisd a1,AngleAxisd a2,double tolarance)
+angleAxisCompaire(AngleAxisd a1,AngleAxisd a2,double tolarance)
 {
 	if(!( //Watch out for this not operation
 		 (abs(a1.angle()-a2.angle())/(2*PI) < tolarance/100 &&   // is a1 == a2 ?
@@ -188,18 +177,8 @@ BOOST_FIXTURE_TEST_CASE( OrientationConstructorMatrix, Setup ) {
 	BOOST_CHECK(quaternionCompaire(q,(obj),0.01));
 
 #define CHECK_ANGLE_AXIS_CLOSE(obj)						\
-	quaternionCompaire(aa,obj,0.01)
+	angleAxisCompaire(aa,obj,0.01)
 
-#define CHECK_MATRIX_CLOSE(obj)							\
-	BOOST_CHECK(boundedCompaire(m(0,0),(obj)(0,0),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(0,1),(obj)(0,1),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(0,2),(obj)(0,2),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(1,0),(obj)(1,0),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(1,1),(obj)(1,1),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(1,2),(obj)(1,2),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(2,0),(obj)(2,0),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(2,1),(obj)(2,1),2,0.01));			\
-	BOOST_CHECK(boundedCompaire(m(2,2),(obj)(2,2),2,0.01));			
 
 #define CHECK_CONVERSION(name, seed, seedType, otherType, fromSeedConv, toSeedConv,checkMacro) \
 	BOOST_FIXTURE_TEST_CASE( name, Setup ) {							\

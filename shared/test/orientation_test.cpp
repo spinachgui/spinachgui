@@ -19,6 +19,30 @@ boundedCompaire(double n1,double n2,double range,double tolarance)
 	return true;
 }
 
+//Quaternions have the same physical meaning if inverted (q1 == -q2) so
+//we need to check both possibilities
+boost::test_tools::predicate_result
+quaternionCompaire(Quaterniond q1,Quaterniond q2,double tolarance)
+{
+	if(!(
+	   (abs(q1.w()-q2.w())/2 < tolarance/100 &&   // is q1 == q2 ?
+		abs(q1.x()-q2.x())/2 < tolarance/100 &&
+		abs(q1.y()-q2.y())/2 < tolarance/100 &&
+		abs(q1.z()-q2.z())/2 < tolarance/100)
+	   ||
+	   (abs(q1.w()+q2.w())/2 < tolarance/100 &&   // is q1 == -q2 ?
+		abs(q1.x()+q2.x())/2 < tolarance/100 &&
+		abs(q1.y()+q2.y())/2 < tolarance/100 &&
+		abs(q1.z()+q2.z())/2 < tolarance/100)
+		 )) {
+		boost::test_tools::predicate_result res(false);
+        res.message() << "[" << q1.w() << "," << q1.x() << "," << q1.y() << "," << q1.z() << "]" << " !~= "
+					  << "[" << q2.w() << "," << q2.x() << "," << q2.y() << "," << q2.z() << "]"; 
+        return res;
+	}
+	return true;
+}
+
 struct Setup {
     Setup() :
 		alpha(0.2),
@@ -134,10 +158,7 @@ BOOST_FIXTURE_TEST_CASE( OrientationConstructorMatrix, Setup ) {
 	BOOST_CHECK(boundedCompaire(gamma,(obj).gamma ,2*PI,0.01));	
 
 #define CHECK_QUAT_CLOSE(obj)					\
-	BOOST_CHECK(boundedCompaire(real,(obj).w(),1,0.01));	\
-	BOOST_CHECK(boundedCompaire(i,   (obj).x(),1,0.01));	\
-	BOOST_CHECK(boundedCompaire(j,   (obj).y(),1,0.01));	\
-	BOOST_CHECK(boundedCompaire(k,   (obj).z(),1,0.01));	
+	BOOST_CHECK(quaternionCompaire(q,(obj),0.01));
 
 #define CHECK_ANGLE_AXIS_CLOSE(obj)						\
 	BOOST_CHECK(boundedCompaire(angle   ,(obj).angle()    ,2*PI,0.01));	\

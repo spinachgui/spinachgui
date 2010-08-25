@@ -32,8 +32,8 @@ struct Setup {
 		aa(angle,axis),
 		angle_axis(aa),
 
-		real(sqrt(2.0)),
-		i(sqrt(2.0)),
+		real(1.0/sqrt(2.0)),
+		i(1.0/sqrt(2.0)),
 		j(0),
 		k(0),
 		q(real,i,j,k),

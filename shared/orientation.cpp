@@ -48,8 +48,8 @@ EulerAngles SpinXML::ConvertToEuler(const Quaterniond& rot) {
 	double beta=atan2(sqrt(z_axis.x()*z_axis.x() + z_axis.y()*z_axis.y()),z_axis.z());
 
 	//Use γ and β to rotate V2 back onto the point 0,0,1
-	Quaterniond gammaTwist(AngleAxisd(-beta, Vector3d(0,1,0)));
-	Quaterniond betaTwist (AngleAxisd(-gamma,Vector3d(0,0,1)));
+	Quaterniond betaTwist(AngleAxisd(-beta, Vector3d(0,1,0)));
+	Quaterniond gammaTwist (AngleAxisd(-gamma,Vector3d(0,0,1)));
 
 	x_axis=(betaTwist*gammaTwist)*x_axis;
 

@@ -76,33 +76,11 @@ Quaterniond SpinXML::ConvertToQuaternion(const EulerAngles& rot) {
 }
 Quaterniond SpinXML::ConvertToQuaternion(const Matrix3d&    rot) {return Quaterniond(rot);}
 Quaterniond SpinXML::ConvertToQuaternion(const Quaterniond& rot) {return rot;}
-Quaterniond SpinXML::ConvertToQuaternion(const AngleAxisd&   rot) {
-	double vx=rot.axis().x();
-	double vy=rot.axis().y();
-	double vz=rot.axis().z();
-
-	double sin_a=sin(rot.angle()/2);
-	double w=cos(rot.angle()/2);
-	double x=vx*sin_a;
-	double y=vy*sin_a;
-	double z=vz*sin_a;
-	return Quaterniond(w,x,y,z);
-}
+Quaterniond SpinXML::ConvertToQuaternion(const AngleAxisd&   rot) {return Quaterniond(rot);}
 
 AngleAxisd  SpinXML::ConvertToAngleAxis(const EulerAngles& rot) {return ConvertToAngleAxis(ConvertToQuaternion(rot));}
 AngleAxisd  SpinXML::ConvertToAngleAxis(const Matrix3d&    rot) {return ConvertToAngleAxis(ConvertToQuaternion(rot));}
-AngleAxisd  SpinXML::ConvertToAngleAxis(const Quaterniond& rot) {
-	double angle=2*acos(rot.w());
-	if(angle == 0.0 || angle == -0.0) {
-		//Singularty at the identity
-		return AngleAxisd(angle,Vector3d(0,0,0));
-	}
-	double inv_sin_a=1/(sqrt(1-rot.w()*rot.w())*2);
-	double vx=rot.x()*inv_sin_a;
-	double vy=rot.y()*inv_sin_a;
-	double vz=rot.z()*inv_sin_a;
-	return AngleAxisd(angle,Vector3d(vx,vy,vz));
-}
+AngleAxisd  SpinXML::ConvertToAngleAxis(const Quaterniond& rot) {return AngleAxisd(rot);}
 AngleAxisd  SpinXML::ConvertToAngleAxis(const AngleAxisd&   rot) {return rot;}
 
 //============================================================//

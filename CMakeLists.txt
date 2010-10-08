@@ -74,3 +74,7 @@ add_executable(OrientationTest "shared/test/orientation_test.cpp" )
 target_link_libraries(OrientationTest spinxml ${Boost_LIBRARIES} spinxml)
 add_test(OrientationTest ${EXECUTABLE_OUTPUT_PATH}/OrientationTest)
 
+add_executable(SpinTest "shared/test/spin_test.cpp" )
+target_link_libraries(SpinTest spinxml ${Boost_LIBRARIES} spinxml)
+add_test(SpinTest ${EXECUTABLE_OUTPUT_PATH}/SpinTest)
+

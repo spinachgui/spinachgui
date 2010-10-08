@@ -6,23 +6,11 @@
 #include <string>
 #include <string.h>
 #include <stdexcept>
-#include <shared/mathtypes.hpp>
 #include <sigc++/sigc++.h>
 #include <shared/unit.hpp>
 #include <boost/variant.hpp>
 
 namespace SpinXML {
-    //============================================================//
-    // Typedefs
-
-    typedef Matrix3_t<double,_length> Matrix3l;
-    typedef Vector3_t<double,_length> Vector3l;
-
-    typedef Matrix3_t<double,_length2> Matrix3l2;
-    typedef Vector3_t<double,_length2> Vector3l2;
-
-    typedef Matrix3_t<double,_energy> Matrix3e;
-    typedef Vector3_t<double,_energy> Vector3e;
 
     //============================================================//
     // 3D vector type
@@ -286,65 +274,6 @@ namespace SpinXML {
 
 
 
-    ///A class representing a spin in a spin system
-    class Spin : public sigc::trackable {
-    private:
-    public:  
-        Spin(Vector3l mPosition,std::string mLabel,long atomicNumber=1);
-        Spin(const Spin& s);
-        ~Spin();
-  
-        Vector3l& GetPosition();
-        void SetPosition(Vector3l Position);
-        void GetCoordinates(length* _x,length* _y, length* _z) const;
-        void SetCoordinates(length _x,length _y, length _z);
-
-        void SetLabel(std::string Label);
-        const char* GetLabel() const;
-
-        const std::vector<Interaction*>& GetInteractions() const {return mInter;}
-        ///Returns a vector of all linear, quadratic interactions and some
-        ///of the bilinear interactions. The bilinear interactions
-        ///included will be chosen so that if GetInteractionsOnce is
-        ///called on both spins involved in the interaction, the bilinear
-        ///interaction will show up exactly once
-        std::vector<Interaction*> GetInteractionsOnce() const;
-
-        void InsertInteraction(Interaction* _Interaction,long Position=END);
-        void RemoveInteraction(Interaction* _Interaction);
-        void OnRemoveInteraction(Interaction* inter,Spin* spin) {
-            if(spin==this){
-                RemoveInteraction(inter);
-            }
-        }
-        void OnInteractionChange() {sigChange();}
-
-        energy GetLinearInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
-        energy GetQuadrapolarInteractionAsScalar(Interaction::SubType t=Interaction::ST_ANY) const;
-
-        Matrix3e GetLinearInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
-        Matrix3e GetQuadrapolarInteractionAsMatrix(Interaction::SubType t=Interaction::ST_ANY) const;
-
-        bool GetHasInteractionOfType(Interaction::SubType t) const;
-        Matrix3e GetTotalInteraction(Interaction::SubType t,Spin* spin2 = NULL) const;
-	energy GetTotalInteractionTrace(Interaction::SubType t,Spin* spin2 = NULL) const;
-        energy GetTotalInteractionNorm(Interaction::SubType t,Spin* spin2 = NULL) const;
-
-        long GetElement() const;
-        void SetElement(long element);
-        std::vector<long> GetIsotopes() const;
-        void SetIsotopes(std::vector<long> isotopes) const;
-
-        sigc::signal<void,Interaction*> sigNewInteraction;
-        sigc::signal<void> sigChange;
-        sigc::signal<void,Spin*> sigDying;
-    private:
-        std::vector<Interaction*> mInter;
-        Vector3l mPosition;
-        std::string mLabel;
-        long mElement;
-        std::vector<long> mIsotopes;
-    };
 
 
 

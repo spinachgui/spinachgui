@@ -78,11 +78,11 @@ struct Setup {
 };
 
 BOOST_FIXTURE_TEST_CASE( InteractionCtor, Setup) {
-    BOOST_CHECK_EQUAL(storage_scalar->GetType(),Interaction::SCALAR);
-    BOOST_CHECK_EQUAL(storage_matrix->GetType(),Interaction::MATRIX);
-    BOOST_CHECK_EQUAL(storage_ev->GetType()    ,Interaction::EIGENVALUES);
-    BOOST_CHECK_EQUAL(storage_ar->GetType()    ,Interaction::AXRHOM);
-    BOOST_CHECK_EQUAL(storage_ss->GetType()   ,Interaction::SPANSKEW);
+    BOOST_CHECK_EQUAL(storage_scalar->GetStorage(),Interaction::STORAGE_SCALAR);
+    BOOST_CHECK_EQUAL(storage_matrix->GetStorage(),Interaction::MATRIX);
+    BOOST_CHECK_EQUAL(storage_ev->GetStorage()    ,Interaction::EIGENVALUES);
+    BOOST_CHECK_EQUAL(storage_ar->GetStorage()    ,Interaction::AXRHOM);
+    BOOST_CHECK_EQUAL(storage_ss->GetStorage()   ,Interaction::SPANSKEW);
 }
 
 

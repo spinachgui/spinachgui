@@ -1,10 +1,23 @@
 
 #include <shared/interaction.hpp>
 #include <Eigen/Eigenvalues> 
+#include <iostream>
+#include <exception>
+#include <stdexcept>
 
 using namespace SpinXML;
+using namespace std;
+
+energy SpinXML::ConvertToScalar(const energy&   I)    {return I;}
+energy SpinXML::ConvertToScalar(const Matrix3d& I)    {return energy(I.trace()/3.0);}
+energy SpinXML::ConvertToScalar(const Eigenvalues& I) {return energy((I.xx+I.yy+I.zz)/3.0);}
+energy SpinXML::ConvertToScalar(const AxRhom& I)      {return energy(I.iso/3.0);}
+energy SpinXML::ConvertToScalar(const SpanSkew& I)    {return energy(I.iso/3.0);}
 
 
+Matrix3d SpinXML::ConvertToMatrix(const energy& I) {return MakeMatrix3d(I.si,0,0,
+                                                                        0,I.si,0,
+                                                                        0,0,I.si);}
 Matrix3d SpinXML::ConvertToMatrix(const Matrix3d& I) {return I;}
 Matrix3d SpinXML::ConvertToMatrix(const Eigenvalues& I) {
 	//Undo the eigensystem decomposition
@@ -17,7 +30,10 @@ Matrix3d SpinXML::ConvertToMatrix(const Eigenvalues& I) {
 Matrix3d SpinXML::ConvertToMatrix(const AxRhom& I)  {return ConvertToMatrix(ConvertToEigenvalues(I));}
 Matrix3d SpinXML::ConvertToMatrix(const SpanSkew& I){return ConvertToMatrix(ConvertToEigenvalues(I));}
 
-
+Eigenvalues SpinXML::ConvertToEigenvalues(const energy& I) {
+    Orientation o(Quaterniond(1,0,0,0));
+    return Eigenvalues(I,I,I,o);
+}
 Eigenvalues SpinXML::ConvertToEigenvalues(const Matrix3d& I) {
 	EigenSolver<Matrix3d> solver(I, true); //true => compute eigenvectors
 	Vector3d v1,v2,v3;//Eigenvectors
@@ -41,6 +57,10 @@ Eigenvalues SpinXML::ConvertToEigenvalues(const SpanSkew& I) {
     return Eigenvalues(xx,yy,zz,I.mOrient);
 }
 
+AxRhom SpinXML::ConvertToAxRhom(const energy& I) {
+    Orientation o(Quaterniond(1,0,0,0));
+    return AxRhom(I,0.0*Joules,0.0*Joules,o);
+}
 AxRhom SpinXML::ConvertToAxRhom(const Matrix3d& I) {return ConvertToAxRhom(ConvertToEigenvalues(I));}
 AxRhom SpinXML::ConvertToAxRhom(const Eigenvalues& I) {
 	energy xx=I.xx;	energy yy=I.yy;	energy zz=I.zz;
@@ -58,6 +78,10 @@ AxRhom SpinXML::ConvertToAxRhom(const Eigenvalues& I) {
 AxRhom SpinXML::ConvertToAxRhom(const AxRhom& I) {return I;}
 AxRhom SpinXML::ConvertToAxRhom(const SpanSkew& I) {return ConvertToAxRhom(ConvertToEigenvalues(I));}
 
+SpanSkew SpinXML::ConvertToSpanSkew(const energy& I) {
+    Orientation o(Quaterniond(1,0,0,0));
+    return SpanSkew(I,0.0*Joules,0.0,o);
+}
 SpanSkew SpinXML::ConvertToSpanSkew(const Matrix3d& I) {return ConvertToSpanSkew(ConvertToEigenvalues(I));}
 SpanSkew SpinXML::ConvertToSpanSkew(const Eigenvalues& I) {
 	energy xx=I.xx;	energy yy=I.yy;	energy zz=I.zz;
@@ -74,3 +98,392 @@ SpanSkew SpinXML::ConvertToSpanSkew(const Eigenvalues& I) {
 }
 SpanSkew SpinXML::ConvertToSpanSkew(const AxRhom& I) {return ConvertToSpanSkew(ConvertToEigenvalues(I));}
 SpanSkew SpinXML::ConvertToSpanSkew(const SpanSkew& I) {return I;}
+
+
+
+//==============================================================================//
+// Interaction
+
+Interaction::~Interaction() {
+    sigDying(this);
+}
+
+class thisVisitor : public static_visitor<> {
+public:
+    void operator()(const energy& dat) const {
+	cout << "    Type=Scalar" <<  endl;
+	cout << "    Value=" << dat[MHz] << "MHz" << endl;
+    }
+    void operator()(const Matrix3d& dat) const {
+	cout << "    Type=Matrix" <<  endl;
+	cout << "    Value=" << endl;
+    }
+    void operator()(const Eigenvalues& dat) const {
+	cout << "    Type=Eigenvalues" <<  endl;
+	cout << "    Value=(XX=" 
+	     << dat.xx[MHz] << "MHz ,YY="
+	     << dat.yy[MHz] << "MHz ,ZZ="
+	     << dat.zz[MHz] << "MHz)"
+	     << endl;
+	cout << "    Orient=";
+    }
+    void operator()(const AxRhom& dat) const {
+	cout << "    Type=Axiality Rhombicity" <<  endl;
+	cout << "    Value=" << endl; 
+	cout << "    Orient=";
+	cout << dat.mOrient.ToString() << endl;
+    }
+    void operator()(const SpanSkew& dat) const {
+	cout << "    Type=Span-Skew" <<  endl;
+	cout << "    Value=" << endl;
+	cout << "    Orient=";
+	cout << dat.mOrient.ToString() << endl;
+    }
+};
+void Interaction::Dump() const {
+    cout << "  Dumping an Interaction" << endl;
+    apply_visitor(thisVisitor(),mData);
+}
+
+const char* Interaction::GetStorageName(Storage t) {
+    switch(t) {
+    case STORAGE_SCALAR:  return "Scalar";      
+    case MATRIX:          return "Matrix";     
+    case EIGENVALUES:     return "Eigenvalues";
+    case AXRHOM:          return "Axiality-Rhombicty";
+    case SPANSKEW:        return "Span-Skew";
+    default:
+        ostringstream stream;
+        stream << "Unknow type submited to Interaction::GetStorageName() (t=";
+        stream << t << ")" << endl;
+        throw std::runtime_error(stream.str());
+        return "Error in Interaction::GetStorageName()";
+    };         
+};
+
+const char* Interaction::GetFormName(Form t) {
+    switch(t) {
+    case LINEAR:      return "Linear";      
+    case BILINEAR:    return "Bilinear";     
+    case QUADRATIC:   return "Quadratic";
+    default:
+        ostringstream stream;
+        stream << "Unknow type submited to Interaction::GetFormName() (t=";
+        stream << t << ")" << endl;
+        throw std::runtime_error(stream.str());
+        return "Error in Interaction::GetFormName()";
+    };         
+}
+
+
+const char* Interaction::GetTypeName(Type t) {
+    switch(t) {
+    case ANY:         return "Any";
+    case EPR:         return "EPR";
+    case NMR:         return "NMR";
+    case HFC:         return "HFC";
+    case G_TENSER:    return "G Tensor";
+    case ZFS: 	       return "Zero Field Splitting";
+    case EXCHANGE:    return "Exchange";
+    case QUADRUPOLAR: return "Quadrupolar";
+    case DIPOLAR:     return "Dipolar";
+    case SHIELDING:   return "Shielding";
+    case SCALAR:      return "Scalar";
+    case CUSTOM_LINEAR:     return "Custom (Linear)";
+    case CUSTOM_BILINEAR:   return "Custom (Bilinear)";
+    case CUSTOM_QUADRATIC:  return "Custom (Quadratic)";
+    default:
+        ostringstream stream;
+        stream << "Unknow type submited to Interaction::GetTypeName() (st=";
+        stream << t << ")" << endl;
+        throw std::runtime_error(stream.str());
+        return "Error in Interaction::GetTypeName()";
+    }
+}
+
+Interaction::Storage Interaction::GetStorage() const {
+    if(get<energy>(&mData)!=NULL) {
+        return STORAGE_SCALAR;
+    } else if(get<Matrix3d>(&mData)!=NULL) {
+        return MATRIX;
+    } else if(get<Eigenvalues>(&mData)!=NULL) {
+        return EIGENVALUES;
+    } else if(get<AxRhom>(&mData)!=NULL) {
+        return AXRHOM;
+    } else  {
+        return SPANSKEW;
+    }
+}
+
+
+
+void Interaction::GetScalar(energy* Scalar) const {
+    *Scalar=get<energy>(mData);
+}
+
+void Interaction::GetMatrix(Matrix3d* OutMatrix) const {
+    *OutMatrix=get<Matrix3d>(mData);
+    return;
+}
+
+void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
+    *XX=get<Eigenvalues>(mData).xx;
+    *YY=get<Eigenvalues>(mData).yy;
+    *ZZ=get<Eigenvalues>(mData).zz;
+    *OrientOut=get<Eigenvalues>(mData).mOrient;
+    return;
+}
+
+void Interaction::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const {
+    *iso=get<AxRhom>(mData).iso;
+    *ax= get<AxRhom>(mData).ax;
+    *rh= get<AxRhom>(mData).rh;
+    *OrientOut=get<AxRhom>(mData).mOrient;
+    return;
+}
+
+void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const {
+    *iso= get<SpanSkew> (mData).iso;
+    *Span=get<SpanSkew> (mData).span;
+    *Skew=get<SpanSkew> (mData).skew;
+    *OrientOut=get<SpanSkew>(mData).mOrient;
+    return;
+}
+
+void Interaction::SetScalar(energy Scalar) {
+    sigChange();
+    mData=Scalar;
+}
+
+void Interaction::SetMatrix(const Matrix3d& Matrix) {
+    sigChange();
+    mData=Matrix3d(Matrix);
+}
+
+void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
+    sigChange();
+    mData=Eigenvalues(XX,YY,ZZ,Orient);
+    return;
+}
+
+void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
+    sigChange();
+    mData=AxRhom(iso,ax,rh,Orient);
+    return;
+}
+
+void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
+    sigChange();
+    mData=SpanSkew(iso,Span,Skew,Orient);
+    return;
+}
+
+
+Interaction::Type Interaction::GetType() const {
+    return mType;
+}
+
+void Interaction::SetType(Type t,Spin* spin1,Spin* spin2) {
+    mType=t;
+    //true if mSpin1 is not mentioned and thus will not be kept.
+    bool loseSpin1=mSpin1!=spin1 && mSpin1!=spin2;
+    //ture if mSpin2 is not mentioned and thus will not be kept.
+    bool loseSpin2=mSpin2!=spin1 && mSpin2!=spin2;
+
+    if((loseSpin1 && loseSpin2) || (mSpin1==mSpin2)) {
+        //Easyest case, we're replacing both spins
+        sigRemoveSpin(this,mSpin1);
+        mDyingConnect1.disconnect();
+
+        sigRemoveSpin(this,mSpin2);
+        mDyingConnect2.disconnect();
+
+        mSpin1=spin1;
+        if(spin1) {
+            mDyingConnect1=mSpin1->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
+        }
+        mSpin2=spin2;
+        if(spin2){
+            mDyingConnect2=mSpin2->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
+        }
+    } else  if(loseSpin1) {
+        sigRemoveSpin(this,mSpin1);
+        mDyingConnect1.disconnect();
+
+        //We're keeping mSpin2. But is it spin1 or spin2 that replaces mSpin1
+        if(spin1==mSpin2) {
+            //Replace with spin2
+            mSpin1=spin2;
+        } else {
+            //Replace with spin1
+            mSpin1=spin1;
+        }
+        if(mSpin1!=NULL){
+            mDyingConnect1=mSpin1->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
+        }
+    } else if (loseSpin2) {
+        //We're keeping mSpin1. But is it spin1 or spin2 that replaces mSpin2
+        sigRemoveSpin(this,mSpin2);
+        mDyingConnect1.disconnect();
+
+        if(spin1==mSpin1) {
+            //Replace with spin2
+            mSpin2=spin2;
+        } else {
+            //Replace with spin1
+            mSpin2=spin1;
+        }
+        if(mSpin2!=NULL) {
+            mDyingConnect2=mSpin2->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
+        }
+    }
+    sigChange();
+}
+
+Interaction::Form Interaction::GetFormFromType(Type st) {
+    switch(st) {
+    case CUSTOM_LINEAR:
+    case SHIELDING:
+    case G_TENSER:
+        return LINEAR;
+
+    case CUSTOM_BILINEAR:
+    case SCALAR:
+    case DIPOLAR:
+    case HFC:
+    case EXCHANGE:
+        return BILINEAR;
+
+    case ZFS: 
+    case QUADRUPOLAR:
+    case CUSTOM_QUADRATIC:
+        return QUADRATIC;
+    case ANY:
+    case NMR:
+    case EPR:
+        throw logic_error("Can't pass ST_ANY,ST_NMR,ST_EPR to GetFromFromType");
+    default:
+        throw logic_error("Unknown type in GetFromFromType");
+    }
+
+}
+
+bool Interaction::IsType(Type t) const {
+    if(t==ANY) {
+        return true;
+    }
+    if(t==EPR) {
+        switch(mType) {
+        case HFC:
+        case G_TENSER:
+        case ZFS: 
+        case EXCHANGE:
+        case QUADRUPOLAR:
+        case DIPOLAR:
+        case CUSTOM_LINEAR:
+        case CUSTOM_BILINEAR:
+        case CUSTOM_QUADRATIC:
+            return true;
+        default:
+            return false;
+        }
+    }
+    if(t==NMR) {
+        switch(mType) {
+        case SHIELDING:
+        case SCALAR:
+        case QUADRUPOLAR:
+        case DIPOLAR:
+        case CUSTOM_LINEAR:
+        case CUSTOM_BILINEAR:
+        case CUSTOM_QUADRATIC:
+            return true;
+        default:
+            return false;
+        }
+    }
+    if(t==mType) {
+        return true;
+    }
+    return false;
+}
+
+
+bool Interaction::GetIsLinear()     {
+    return 
+        mType==EXCHANGE    ||
+        mType==SHIELDING   ||
+        mType==G_TENSER    ||
+        mType==CUSTOM_LINEAR;
+}
+
+bool Interaction::GetIsBilinear()  {
+    return
+        mType==HFC            ||
+        mType==DIPOLAR        ||
+        mType==EXCHANGE       ||
+        mType==SCALAR         ||
+        mType==CUSTOM_BILINEAR;
+
+}
+bool Interaction::GetIsQuadratic() {
+    return 
+        mType==ZFS             ||
+        mType==QUADRUPOLAR     ||
+        mType==CUSTOM_QUADRATIC;
+
+}
+
+
+#define DEFINE_CONVERTER(name,return_type,function)                    \
+    struct name : public static_visitor<return_type> {                  \
+        return_type operator()(const energy& dat)      const {return function(dat);} \
+        return_type operator()(const Matrix3d& dat)    const {return function(dat);} \
+        return_type operator()(const Eigenvalues& dat) const {return function(dat);} \
+        return_type operator()(const AxRhom& dat)      const {return function(dat);} \
+        return_type operator()(const SpanSkew& dat)    const {return function(dat);} \
+    };
+
+DEFINE_CONVERTER(getAsScalarVisitor,energy,ConvertToScalar);
+void Interaction::ToScalar() {
+    mData=apply_visitor(getAsScalarVisitor(),mData);
+}
+energy Interaction::AsScalar() const {
+    return apply_visitor(getAsScalarVisitor(),mData);
+}
+
+DEFINE_CONVERTER(getAsMatrixVisitor,Matrix3d,ConvertToMatrix);
+void Interaction::ToMatrix() {
+    mData=apply_visitor(getAsMatrixVisitor(),mData);
+}
+Matrix3d Interaction::AsMatrix() const {
+    return apply_visitor(getAsMatrixVisitor(),mData);
+}
+
+DEFINE_CONVERTER(getAsEigenvaluesVisitor,Eigenvalues,ConvertToEigenvalues);
+void Interaction::ToEigenvalues() {
+    mData=apply_visitor(getAsEigenvaluesVisitor(),mData);
+}
+Eigenvalues Interaction::AsEigenvalues() const {
+    return apply_visitor(getAsEigenvaluesVisitor(),mData);
+}
+
+DEFINE_CONVERTER(getAsAxRhomVisitor,AxRhom,ConvertToAxRhom);
+void Interaction::ToAxRhom() {
+    cout << "ToAxRhom" << endl;
+    mData=apply_visitor(getAsAxRhomVisitor(),mData);
+}
+AxRhom Interaction::AsAxRhom() const {
+    cout << "AsAxRhom" << endl;
+    return apply_visitor(getAsAxRhomVisitor(),mData);
+}
+
+DEFINE_CONVERTER(getAsSpanSkewVisitor,SpanSkew,ConvertToSpanSkew);
+void Interaction::ToSpanSkew() {
+    mData=apply_visitor(getAsSpanSkewVisitor(),mData);
+}
+SpanSkew Interaction::AsSpanSkew() const {
+    return apply_visitor(getAsSpanSkewVisitor(),mData);
+}
+
+

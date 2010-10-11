@@ -88,7 +88,7 @@ namespace SpinXML {
     public:
         ///Enumeration of the storage conventions used by this interaction
         enum Storage {
-            SCALAR,
+            STORAGE_SCALAR,
             MATRIX,
             EIGENVALUES,
             AXRHOM,
@@ -119,7 +119,7 @@ namespace SpinXML {
 
             //NMR INTERACTIONS
             SHIELDING,
-            TYPE_SCALAR,   
+            SCALAR,   
 
             //Interactions relevent to both nmr and epr
             QUADRUPOLAR,
@@ -161,17 +161,24 @@ namespace SpinXML {
         ///Get a human readable name for a member of the enum Storage
         static const char* GetStorageName(Storage t);
         ///Get a human readable name for a member of the enum Type
-        static const char* GetTypeName(Type st);
+        static const char* GetTypeName(Type t);
+        ///Get a human readable name for a member of the enum Form
+        static const char* GetFormName(Form t);
+
+
         ///Each Type implies a form (for example, HFC is bilinear)
         ///which can be retrieved via this function
         static Form GetFormFromType(Type st);
 
         ///Get the storage convention being used
-        Form GetForm() const;
+        Storage GetStorage() const;
         ///Get the physical source of this interaction
         Type GetType() const;
+        ///Get the algebrake form of the interaction
+        Form GetForm() const;
+
         ///Set a flag indicating the physical source of this interaction.
-        void SetSubType(Type st, Spin* spin1, Spin* spin2=NULL);
+        void SetType(Type st, Spin* spin1, Spin* spin2=NULL);
         ///Returns true if the physical source of this interaction is t. The
         ///members ST_NMR, ST_EPR and ST_ANY may be used here and will be
         ///interpreted coorectly. For example, if inter is of SubType
@@ -243,11 +250,11 @@ namespace SpinXML {
         void ToAxRhom();
         void ToSpanSkew();
 
-        Interaction AsScalar() const;
-        Interaction AsMatrix() const;
-        Interaction AsEigenvalues() const;
-        Interaction AsAxRhom() const;
-        Interaction AsSpanSkew() const;
+        energy      AsScalar() const;
+        Matrix3d    AsMatrix() const;
+        Eigenvalues AsEigenvalues() const;
+        AxRhom      AsAxRhom() const;
+        SpanSkew    AsSpanSkew() const;
 
 
         Spin* GetSpin1() const {return mSpin1;}
@@ -265,10 +272,8 @@ namespace SpinXML {
         Type mType;
 
         Spin* mSpin1;
-        sigc::connection mConnect1;
         sigc::connection mDyingConnect1;
         Spin* mSpin2;
-        sigc::connection mConnect2;
         sigc::connection mDyingConnect2;
     };
 };

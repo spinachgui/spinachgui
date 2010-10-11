@@ -12,61 +12,6 @@ using namespace SpinXML;
 using namespace sigc;
 using namespace boost;
 
-//============================================================//
-// Eigenvalue/AxRhom/SpanSkew conversions
-
-/// eigenvalues -> ax rhom
-ax_rhom_t     eigenvalues_t::AsAxRhom() const {
-        //Sort so that xx <= yy <= zz
-        energy tmp;
-        //if(zz < yy) tmp=zz; zz=yy; yy=tmp;
-        //if(zz < xx) tmp=zz; zz=xx; xx=tmp; //Now zz is definatly bigest
-        //if(yy < xx) tmp=xx; xx=yy; yy=tmp;
-
-        energy iso = (xx+yy+zz)/3.0;
-        energy ax=2*zz -  xx - yy;
-        energy rh=xx - yy;
-        cout << "done conversion" << endl;
-        return ax_rhom_t(iso,ax,rh,mOrient);
-}
-/// eigenvalues -> span skew
-span_skew_t   eigenvalues_t::AsSpanSkew() const {
-
-        //Sort so that xx <= yy <= zz
-        energy tmp;
-        //if(zz < yy) tmp=zz; zz=yy; yy=tmp;
-        //if(zz < xx) tmp=zz; zz=xx; xx=tmp; //Now zz is definatly bigest
-        //if(yy < xx) tmp=xx; xx=yy; yy=tmp;
-
-        energy iso = (xx+yy+zz)/3.0;
-        energy span=zz - xx;
-        double skew=span == energy(0.0) && span == energy(-0.0) ? 0.5 : ((3.0/2.0)*((iso-yy)/span)).si;
-        return span_skew_t(iso,span,skew,mOrient);
-}
-
-/// ax rhom -> eigenvalues
-eigenvalues_t ax_rhom_t::AsEigenvalues() const {
-    energy xx=iso - ax/6.0 + rh/2.0;
-    energy yy=iso - ax/6.0 - rh/2.0;
-    energy zz=iso + ax/3.0;
-    return eigenvalues_t(xx,yy,zz,mOrient);
-}
-/// ax rhom -> span skew
-span_skew_t   ax_rhom_t::AsSpanSkew() const {
-    return AsEigenvalues().AsSpanSkew();
-}
-
-/// span skew -> eigenvalues
-eigenvalues_t span_skew_t::AsEigenvalues() const {
-    energy xx=iso+span*skew/6.0-span/2.0;
-    energy yy=iso-span*skew/3.0;
-    energy zz=iso+span*skew/6.0+span/2.0;
-    return eigenvalues_t(xx,yy,zz,mOrient);
-}
-/// span skew -> ax rhom
-ax_rhom_t     span_skew_t::AsAxRhom() const {
-    return AsEigenvalues().AsAxRhom();
-}
 
 //==============================================================================//
 // SpinSystem

@@ -9,8 +9,8 @@ Matrix3d SpinXML::ConvertToMatrix(const Matrix3d& I) {return I;}
 Matrix3d SpinXML::ConvertToMatrix(const Eigenvalues& I) {
 	//Undo the eigensystem decomposition
 	Matrix3d in_eigen_frame(MakeMatrix3d(I.xx.si,0      ,0       , 
-										 0      ,I.yy.si,0       , 
-										 0      ,0      ,I.zz.si));
+                                             0      ,I.yy.si,0       , 
+                                             0      ,0      ,I.zz.si));
 	Matrix3d rotMatrix=I.mOrient.GetAsMatrix();
  	return rotMatrix*in_eigen_frame*rotMatrix.inverse();
 }

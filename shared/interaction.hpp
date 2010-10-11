@@ -95,33 +95,6 @@ namespace SpinXML {
             SPANSKEW
         };
 
-        ///Construct from a scalar
-        Interaction(energy inter)          
-            : mData(inter){}
-        ///Construct from a matrix
-        Interaction(const Matrix3d& inter)
-            : mData(inter){}
-        ///Construct from a matrix
-        Interaction(const Eigenvalues& inter)
-            : mData(inter){}
-        ///Construct from a matrix
-        Interaction(const AxRhom& inter)
-            : mData(inter){}
-        ///Construct from a matrix
-        Interaction(const SpanSkew& inter)
-            : mData(inter){}
-        ///Copy constructor
-        Interaction(const Interaction& inter);
-        ///Destructor
-        ~Interaction();
-
-        //TODO: This function should probably assert that it's a HFC, linear or quadratic
-        void OnSpinDying(Spin*) {delete this;}
-    
-        ///Print the interaction to the strandard output in a human readable
-        ///form.
-        void Dump() const;
-
         ///Enumeration of the algebraic forms
         enum Form {
             LINEAR,
@@ -155,6 +128,35 @@ namespace SpinXML {
             CUSTOM_BILINEAR,
             CUSTOM_QUADRATIC
         };
+
+        ///Construct from a scalar
+        Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+        ///Construct from a matrix
+        Interaction(const Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+        ///Construct from a matrix
+        Interaction(const Eigenvalues& inter ,Type t,Spin* spin1, Spin* spin2=NULL)
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+        ///Construct from a matrix
+        Interaction(const AxRhom& inter      ,Type t,Spin* spin1, Spin* spin2=NULL)
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+        ///Construct from a matrix
+        Interaction(const SpanSkew& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+        ///Copy constructor
+        Interaction(const Interaction& inter);
+        ///Destructor
+        ~Interaction();
+
+        //TODO: This function should probably assert that it's a HFC, linear or quadratic
+        void OnSpinDying(Spin*) {delete this;}
+    
+        ///Print the interaction to the strandard output in a human readable
+        ///form.
+        void Dump() const;
+
+
 
         ///Get a human readable name for a member of the enum Storage
         static const char* GetStorageName(Storage t);
@@ -260,6 +262,7 @@ namespace SpinXML {
 
 	typedef boost::variant<energy,Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
 	var_t mData;
+        Type mType;
 
         Spin* mSpin1;
         sigc::connection mConnect1;
@@ -267,7 +270,6 @@ namespace SpinXML {
         Spin* mSpin2;
         sigc::connection mConnect2;
         sigc::connection mDyingConnect2;
-    private:
     };
 };
 

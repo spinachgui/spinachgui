@@ -70,3 +70,28 @@ BOOST_FIXTURE_TEST_CASE( Signals, Setup ) {
 	s=NULL;
 }
 
+
+BOOST_FIXTURE_TEST_CASE( SettersAndGetters, Setup ) {
+    Vector3d pos(1,2,3);
+    s->SetPosition(pos);
+    BOOST_CHECK_EQUAL(s->GetPosition(),pos);
+
+    length
+        x = 3.0*Angstroms,
+        y = 5.0*Angstroms,
+        z = 2.0*Angstroms;
+    s->SetCoordinates(x,y,z);
+    length xt,yt,zt;
+    s->GetCoordinates(&xt,&yt,&zt);
+    BOOST_CHECK_EQUAL(x.si,xt.si);
+    BOOST_CHECK_EQUAL(y.si,yt.si);
+    BOOST_CHECK_EQUAL(z.si,zt.si);
+
+    string str="Actually, call my spin this";
+    s->SetLabel(str);
+    BOOST_CHECK_EQUAL(s->GetLabel(),str);
+
+    
+}
+
+

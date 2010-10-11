@@ -1,5 +1,5 @@
 
-#include <shared/raw_interactions.hpp>
+#include <shared/interaction.hpp>
 #include <Eigen/Eigenvalues> 
 
 using namespace SpinXML;

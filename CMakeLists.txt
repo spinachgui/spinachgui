@@ -66,7 +66,7 @@ add_library(spinxml STATIC       ${sharedSources})
 ############################################################
 # Tests specified here
 
-add_executable(InteractionRawTest "shared/test/interactions_test.cpp")
+add_executable(InteractionRawTest "shared/test/interaction_test.cpp")
 target_link_libraries(InteractionRawTest ${Boost_LIBRARIES} spinxml sigc-2.0)
 add_test(InteractionRawTest ${EXECUTABLE_OUTPUT_PATH}/InteractionRawTest)
 

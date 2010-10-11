@@ -3,7 +3,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <shared/test/common.hpp>
-#include <shared/raw_interactions.hpp>
+#include <shared/interaction.hpp>
 
 using namespace SpinXML;
 

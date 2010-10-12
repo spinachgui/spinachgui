@@ -20,6 +20,10 @@ namespace SpinXML {
 		return true;
 	}
 
+#define SAFE_DELETE(obj)						\
+	if((obj)!=NULL) {							\
+		delete obj;								\
+	}
 
 #define CHECK_MATRIX_CLOSE(obj)								\
 	BOOST_CHECK(boundedCompaire(m(0,0),(obj)(0,0),2,0.01));	\

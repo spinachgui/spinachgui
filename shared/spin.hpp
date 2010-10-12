@@ -1,4 +1,6 @@
 
+#ifndef SPIN_H
+#define SPIN_H
 
 #include <sigc++/sigc++.h>
 #include <Eigen/Dense>
@@ -43,3 +45,5 @@ namespace SpinXML {
 
 
 };
+
+#endif

@@ -1,4 +1,4 @@
-#if 0
+
 #include <shared/spinsys.hpp>
 #include <fstream>
 #include <sstream>
@@ -72,12 +72,12 @@ long SpinSystem::GetSpinNumber(Spin* spin) const {
     return -1;
 }
 
-vector<Spin*> SpinSystem::GetNearbySpins(Vector3l pos,length distance,Spin* Ignore) {
+vector<Spin*> SpinSystem::GetNearbySpins(Vector3d pos,length distance,Spin* Ignore) {
     std::vector<Spin*> result;
     length2 dist2=distance*distance;
-    length x1=pos.GetX();
-    length y1=pos.GetY();
-    length z1=pos.GetZ();
+    length x1=pos.x() * metres;
+    length y1=pos.x() * metres;
+    length z1=pos.x() * metres;
 
     long spinCount=mSpins.size();
 
@@ -112,7 +112,7 @@ void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
         sigNewSpin(_Spin,Position);
     }
 
-    _Spin->sigDying.connect(mem_fun(*this,&SpinSystem::OnSpinDeleted));
+    _Spin->sigDying.connect(mem_fun(this,&SpinSystem::OnSpinDeleted));
 }
 
 
@@ -164,8 +164,10 @@ void SpinSystem::CalcNuclearDipoleDipole() {
 
             //A unit vector pointing from spin1 tp spin2
             length rx,ry,rz;
-            Vector3l r_1_2=spin2->GetPosition()-spin1->GetPosition();
-            r_1_2.GetCoordinates(&rx,&ry,&rz);
+            Vector3d r_1_2=spin2->GetPosition()-spin1->GetPosition();
+            rx=r_1_2.x() * metres;
+			ry=r_1_2.y() * metres;
+			rz=r_1_2.z() * metres;
 
             long element2=spin2->GetElement();
             long isotope2=spin2->GetIsotopes()[0];
@@ -175,38 +177,31 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             //cout << "isotope1=" << isotope1 << "  isotope2="<< isotope2 << endl;
             //cout << "g1="<< g1 << "  g2="<< g2 << endl;
 
-            length r=(r_1_2.GetLength());
+            length r=r_1_2.norm()*metres;
             length2 r2=r*r;
             length3 r3=r2*r;
             length5 r5=r2*r3;
 
-            Matrix3l2 dipole(length2(r2-length2(3.0*rx*rx)),
-			     length2(3.0*rx*ry),
-			     length2(3.0*rx*rz),
-
-		             length2(3.0*rx*ry),
-			     length2(r2-length2(3.0*ry*ry)),
-			     length2(3.0*ry*rz),
-			     
-			     length2(3.0*rx*rz),
-			     length2(3.0*ry*rz),
-			     length2(r2-length2(3.0*rz*rz)));
+            Matrix3d dipole=MakeMatrix3d(r2.si-3.0*rx.si*rx.si, 3.0*rx.si*ry.si,      3.0*rx.si*rz.si,
+										 3.0*rx.si*ry.si,       r2.si-3.0*ry.si*ry.si,3.0*ry.si*rz.si,
+										 3.0*rx.si*rz.si,       3.0*ry.si*rz.si,      r2.si-3.0*rz.si*rz.si);
             static const double four_pi=12.5663706;
-#warning "Still need to check this calculation is producing sensible numbers"
             double coeff=(mu0*hbar*g1*g2/(r5.si*four_pi));
 
-	    dreal<double,_mass_per_time2>
-		dcoeff(coeff);
-            Matrix3e dipole_inter=dipole * dcoeff;
-            Interaction* inter=new Interaction;
-            inter->SetMatrix(dipole_inter);
-            inter->SetSubType(Interaction::ST_DIPOLAR,spin1,spin2);
+			dreal<double,_mass_per_time2> dcoeff(coeff);
+			Matrix3d dipole_inter=dcoeff.si*dipole;
+            Interaction* inter=new Interaction(dipole_inter,Interaction::DIPOLAR,spin1,spin2);
+			this->InsertInteraction(inter);
         }
     }
 }
 
+void SpinSystem::InsertInteraction(Interaction* inter) {
+	mInteractions.push_back(inter);
+	sigNewInter.emit(inter);
+}
 
 
-
-
-#endif
+void SpinSystem::OnSpinDeleted(Spin* spin) {
+	RemoveSpin(spin);
+}

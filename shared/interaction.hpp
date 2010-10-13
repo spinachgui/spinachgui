@@ -86,6 +86,7 @@ namespace SpinXML {
 
     class Interaction : public sigc::trackable {
     public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Enumeration of the storage conventions used by this interaction
         enum Storage {
             STORAGE_SCALAR,
@@ -228,14 +229,9 @@ namespace SpinXML {
         ///Set the value of the interaction using the span-skew covention.
         void SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient);
 
-        ///Cach the form of the interaction
-        bool SetLinear();   
-        bool SetBilinear(); 
-        bool SetQuadratic();
-
-        bool GetIsLinear();   
-        bool GetIsBilinear(); 
-        bool GetIsQuadratic();
+        bool GetIsLinear() const;   
+        bool GetIsBilinear() const; 
+        bool GetIsQuadratic() const;
 
         sigc::signal<void> sigChange;
         sigc::signal<void,Interaction*> sigDying;

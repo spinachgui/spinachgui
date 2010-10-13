@@ -283,6 +283,16 @@ Interaction::Type Interaction::GetType() const {
     return mType;
 }
 
+Interaction::Form Interaction::GetForm() const {
+	if(GetIsLinear())
+		return LINEAR;
+	if(GetIsBilinear())
+		return BILINEAR;
+	if(GetIsQuadratic())
+		return QUADRATIC;
+	throw runtime_error("GetForm failed");
+}
+
 void Interaction::SetType(Type t,Spin* spin1,Spin* spin2) {
     mType=t;
     //true if mSpin1 is not mentioned and thus will not be kept.
@@ -409,7 +419,7 @@ bool Interaction::IsType(Type t) const {
 }
 
 
-bool Interaction::GetIsLinear()     {
+bool Interaction::GetIsLinear() const {
     return 
         mType==EXCHANGE    ||
         mType==SHIELDING   ||
@@ -417,7 +427,7 @@ bool Interaction::GetIsLinear()     {
         mType==CUSTOM_LINEAR;
 }
 
-bool Interaction::GetIsBilinear()  {
+bool Interaction::GetIsBilinear() const {
     return
         mType==HFC            ||
         mType==DIPOLAR        ||
@@ -426,7 +436,7 @@ bool Interaction::GetIsBilinear()  {
         mType==CUSTOM_BILINEAR;
 
 }
-bool Interaction::GetIsQuadratic() {
+bool Interaction::GetIsQuadratic() const {
     return 
         mType==ZFS             ||
         mType==QUADRUPOLAR     ||

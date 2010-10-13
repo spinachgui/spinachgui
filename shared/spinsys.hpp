@@ -64,14 +64,16 @@ namespace SpinXML {
         void RemoveSpin(long Position);
         void RemoveSpin(Spin* _Spin);
 
+		void OnSpinDeleted(Spin* spin);
+
 		void InsertInteraction(Interaction* inter);
 		
 		//Returns all interactions involving Spin spin
-		vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
+		std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
 		//Get all the interactions involving both spin1 and spin2
-		vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
+		std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
 		//Returns all interactions involving Spin spin
-		vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
+		std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
 		
 
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
@@ -82,6 +84,7 @@ namespace SpinXML {
         std::vector<Spin*> GetNearbySpins(Vector3d pos,length distance,Spin* Ignore=NULL);
 
         sigc::signal<void,Spin*,long> sigNewSpin;
+        sigc::signal<void,Interaction*> sigNewInter;
         sigc::signal<void> sigReloaded;
         sigc::signal<void> sigDying;
 
@@ -92,6 +95,7 @@ namespace SpinXML {
     private:
 		std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;
+		Spin* mIgnoreSpinKill;
     };
 
 }; //End Namespace

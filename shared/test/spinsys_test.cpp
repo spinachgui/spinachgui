@@ -71,52 +71,68 @@ struct Setup {
 
 //Tests InsertSpin,sigNewSpin,GetSpinCount,GetSpin(long),GetSpinNumber(Spin*)
 BOOST_FIXTURE_TEST_CASE( InsertSpin, Setup ) {
-	Spin* spin = new Spin(Vector3d(),"Test Hydrogen",1);
-	blank->InsertSpin(spin);
-	BOOST_CHECK_EQUAL(newSpinCount,1);
-	BOOST_CHECK_EQUAL(blank->GetSpinCount(),1);
-	BOOST_CHECK_EQUAL(blank->GetSpin(0),spin);
-	BOOST_CHECK_EQUAL(blank->GetSpinNumber(spin),0);
+    Spin* spin = new Spin(Vector3d(),"Test Hydrogen",1);
+    blank->InsertSpin(spin);
+    BOOST_CHECK_EQUAL(newSpinCount,1);
+    BOOST_CHECK_EQUAL(blank->GetSpinCount(),1);
+    BOOST_CHECK_EQUAL(blank->GetSpin(0),spin);
+    BOOST_CHECK_EQUAL(blank->GetSpinNumber(spin),0);
 }
 
 BOOST_FIXTURE_TEST_CASE( RemoveSpinN, Setup) {
-	//Removing spin 5 should leave 4 invarient but move 6 back to 5
-	Spin* spin4 = populated->GetSpin(4);
-	Spin* spin6 = populated->GetSpin(6);
+    //Removing spin 5 should leave 4 invarient but move 6 back to 5
+    Spin* spin4 = populated->GetSpin(4);
+    Spin* spin5 = populated->GetSpin(5);
+    Spin* spin6 = populated->GetSpin(6);
 	
-	populated->RemoveSpin(5);
+    Spin* removed=populated->RemoveSpin(5);
+    BOOST_CHECK_EQUAL(removed,spin5);
 
-	BOOST_CHECK_EQUAL(populated->GetSpin(4),spin4);
-	BOOST_CHECK_EQUAL(populated->GetSpin(5),spin6);
+    BOOST_CHECK_EQUAL(populated->GetSpin(4),spin4);
+    BOOST_CHECK_EQUAL(populated->GetSpin(5),spin6);
+    
+    delete removed;
 }
 
 BOOST_FIXTURE_TEST_CASE( RemoveSpinP, Setup) {
-	//Repate the RemoveSpinN with RemoveSpin(Spin*)
-	//Removing spin 5 should leave 4 invarient but move 6 back to 5
-	Spin* spin4 = populated->GetSpin(4);
-	Spin* spin5 = populated->GetSpin(5);
-	Spin* spin6 = populated->GetSpin(6);
+    //Repate the RemoveSpinN with RemoveSpin(Spin*)
+    //Removing spin 5 should leave 4 invarient but move 6 back to 5
+    Spin* spin4 = populated->GetSpin(4);
+    Spin* spin5 = populated->GetSpin(5);
+    Spin* spin6 = populated->GetSpin(6);
 	
-	delete populated->RemoveSpin(spin5);
+    Spin* removed=populated->RemoveSpin(spin5);
+    BOOST_CHECK_EQUAL(removed,spin5);    
 
-	BOOST_CHECK_EQUAL(populated->GetSpin(4),spin4);
-	BOOST_CHECK_EQUAL(populated->GetSpin(5),spin6);
+    BOOST_CHECK_EQUAL(populated->GetSpin(4),spin4);
+    BOOST_CHECK_EQUAL(populated->GetSpin(5),spin6);
+
+    delete removed;
 }
 
 
 BOOST_FIXTURE_TEST_CASE( NuclearDipoleDipole, Setup) {
-	//Insert two hydrogens a distance of 1 Angstrom appart
-	blank->InsertSpin(new Spin(Vector3d(0,0,0),"Hydrogen 1",1));
-	blank->InsertSpin(new Spin(Vector3d(1e-10,0,0),"Hydrogen 2",1));
-	blank->CalcNuclearDipoleDipole();
+    //Insert two hydrogens a distance of 1 Angstrom appart
+    blank->InsertSpin(new Spin(Vector3d(0,0,0),"Hydrogen 1",1));
+    blank->InsertSpin(new Spin(Vector3d(1e-10,0,0),"Hydrogen 2",1));
+    blank->CalcNuclearDipoleDipole();
 
-	BOOST_CHECK(false); //Test not finished!
-	BOOST_CHECK_CLOSE(1.0,1.0,0.001);
+    BOOST_CHECK(false); //Test not finished!
+    BOOST_CHECK_CLOSE(1.0,1.0,0.001);
 }
 
-BOOST_FIXTURE_TEST_CASE( Signals, Setup) {
-	//Insert two hydrogens a distance of 1 Angstrom appart
-	blank->InsertSpin(new Spin(Vector3d(0,0,0),"Hydrogen 1",1));
-	blank->InsertSpin(new Spin(Vector3d(1e-10,0,0),"Hydrogen 2",1));
+
+BOOST_FIXTURE_TEST_CASE( DeleteSpin, Setup ) {
+    //Deleting a spin should remove it from a spin system automatically
+    long count1 = populated->GetSpinCount();
+
+    Spin* spin4 = populated->GetSpin(4);
+    delete spin4;
+
+    long count2 = populated->GetSpinCount();
+
+    BOOST_CHECK_EQUAL(count1,count2);
 }
+
+
 

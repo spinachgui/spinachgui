@@ -27,8 +27,8 @@ namespace SpinXML {
 
 
     class SpinSystem;
-	class Spin;
-	class Interaction;
+    class Spin;
+    class Interaction;
 
     class ISpinSystemLoader {
     public:
@@ -67,16 +67,16 @@ namespace SpinXML {
         ///Remove a spin from the spin system. If it's no longer required it still has to be deleted.
         Spin* RemoveSpin(Spin* _Spin);
 
-		void OnSpinDeleted(Spin* spin);
+        void OnSpinDeleted(Spin* spin);
 
-		void InsertInteraction(Interaction* inter);
+        void InsertInteraction(Interaction* inter);
 		
-		//Returns all interactions involving Spin spin
-		std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
-		//Get all the interactions involving both spin1 and spin2
-		std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
-		//Returns all interactions involving Spin spin
-		std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
+        //Returns all interactions involving Spin spin
+        std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
+        //Get all the interactions involving both spin1 and spin2
+        std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
+        //Returns all interactions involving Spin spin
+        std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
 		
 
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
@@ -96,9 +96,9 @@ namespace SpinXML {
         void CalcNuclearDipoleDipole();
   
     private:
-		std::vector<Interaction*> mInteractions;
+        std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;
-		Spin* mIgnoreSpinKill;
+        Spin* mIgnoreSpinKill;
     };
 
 }; //End Namespace

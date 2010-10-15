@@ -42,39 +42,39 @@ struct Setup {
         storage_ar(    new Interaction(ar,    Interaction::QUADRUPOLAR,spin1)),
         storage_ss(    new Interaction(ss,    Interaction::QUADRUPOLAR,spin1)),
 
-		type_HFC             (new Interaction(scalar,Interaction::HFC			   ,spin1,spin2)),
-		type_G_TENSER        (new Interaction(scalar,Interaction::G_TENSER		   ,spin1)),			   
-		type_ZFS             (new Interaction(scalar,Interaction::ZFS			   ,spin1)),			   
-		type_EXCHANGE        (new Interaction(scalar,Interaction::EXCHANGE		   ,spin1,spin2)),		   
-		type_SHIELDING       (new Interaction(scalar,Interaction::SHIELDING 	   ,spin1)),	   
-		type_SCALAR          (new Interaction(scalar,Interaction::SCALAR		   ,spin1,spin2)),		   
-		type_QUADRUPOLAR     (new Interaction(scalar,Interaction::QUADRUPOLAR	   ,spin1)),	   
-		type_DIPOLAR         (new Interaction(scalar,Interaction::DIPOLAR		   ,spin1,spin2)),		   
-		type_CUSTOM_LINEAR   (new Interaction(scalar,Interaction::CUSTOM_LINEAR    ,spin1)),   
-		type_CUSTOM_BILINEAR (new Interaction(scalar,Interaction::CUSTOM_BILINEAR  ,spin1,spin2)), 
-		type_CUSTOM_QUADRATIC(new Interaction(scalar,Interaction::CUSTOM_QUADRATIC ,spin1))	{
+        type_HFC             (new Interaction(scalar,Interaction::HFC			   ,spin1,spin2)),
+        type_G_TENSER        (new Interaction(scalar,Interaction::G_TENSER		   ,spin1)),			   
+        type_ZFS             (new Interaction(scalar,Interaction::ZFS			   ,spin1)),			   
+        type_EXCHANGE        (new Interaction(scalar,Interaction::EXCHANGE		   ,spin1,spin2)),		   
+        type_SHIELDING       (new Interaction(scalar,Interaction::SHIELDING 	   ,spin1)),	   
+        type_SCALAR          (new Interaction(scalar,Interaction::SCALAR		   ,spin1,spin2)),		   
+        type_QUADRUPOLAR     (new Interaction(scalar,Interaction::QUADRUPOLAR	   ,spin1)),	   
+        type_DIPOLAR         (new Interaction(scalar,Interaction::DIPOLAR		   ,spin1,spin2)),		   
+        type_CUSTOM_LINEAR   (new Interaction(scalar,Interaction::CUSTOM_LINEAR    ,spin1)),   
+        type_CUSTOM_BILINEAR (new Interaction(scalar,Interaction::CUSTOM_BILINEAR  ,spin1,spin2)), 
+        type_CUSTOM_QUADRATIC(new Interaction(scalar,Interaction::CUSTOM_QUADRATIC ,spin1))	{
     }
     ~Setup() {
-        delete spin1;
-        delete spin2;
+        SAFE_DELETE(spin1);
+        SAFE_DELETE(spin2);
 
-        delete storage_scalar;
-        delete storage_matrix;
-        delete storage_ev;
-        delete storage_ar;
-        delete storage_ss;
+        SAFE_DELETE(storage_scalar);
+        SAFE_DELETE(storage_matrix);
+        SAFE_DELETE(storage_ev);
+        SAFE_DELETE(storage_ar);
+        SAFE_DELETE(storage_ss);
 		
-		delete type_HFC;        
-		delete type_G_TENSER;        
-		delete type_ZFS;             
-		delete type_EXCHANGE;        
-		delete type_SHIELDING;       
-		delete type_SCALAR;          
-		delete type_QUADRUPOLAR;     
-		delete type_DIPOLAR;         
-		delete type_CUSTOM_LINEAR;   
-		delete type_CUSTOM_BILINEAR; 
-		delete type_CUSTOM_QUADRATIC;
+        SAFE_DELETE(type_HFC);        
+        SAFE_DELETE(type_G_TENSER);        
+        SAFE_DELETE(type_ZFS);             
+        SAFE_DELETE(type_EXCHANGE);        
+        SAFE_DELETE(type_SHIELDING);       
+        SAFE_DELETE(type_SCALAR);          
+        SAFE_DELETE(type_QUADRUPOLAR);     
+        SAFE_DELETE(type_DIPOLAR);         
+        SAFE_DELETE(type_CUSTOM_LINEAR);   
+        SAFE_DELETE(type_CUSTOM_BILINEAR); 
+        SAFE_DELETE(type_CUSTOM_QUADRATIC);
     }
     Orientation o;
 
@@ -124,101 +124,128 @@ BOOST_FIXTURE_TEST_CASE( InteractionCtor, Setup) {
 
 
 BOOST_FIXTURE_TEST_CASE( InteractionIsType, Setup) {
-	energy en = 1.0*Joules;
-	BOOST_CHECK(type_HFC			 ->IsType(Interaction::HFC			    ) );
-	BOOST_CHECK(type_G_TENSER		 ->IsType(Interaction::G_TENSER		) );
-	BOOST_CHECK(type_ZFS			 ->IsType(Interaction::ZFS		    	) );
-	BOOST_CHECK(type_EXCHANGE		 ->IsType(Interaction::EXCHANGE		) );
-	BOOST_CHECK(type_SHIELDING   	 ->IsType(Interaction::SHIELDING   	) );
-	BOOST_CHECK(type_SCALAR		     ->IsType(Interaction::SCALAR		    ) );
-	BOOST_CHECK(type_QUADRUPOLAR	 ->IsType(Interaction::QUADRUPOLAR	    ) );
-	BOOST_CHECK(type_DIPOLAR		 ->IsType(Interaction::DIPOLAR		    ) );
-	BOOST_CHECK(type_CUSTOM_LINEAR   ->IsType(Interaction::CUSTOM_LINEAR   ) );
-	BOOST_CHECK(type_CUSTOM_BILINEAR ->IsType(Interaction::CUSTOM_BILINEAR ) );
-	BOOST_CHECK(type_CUSTOM_QUADRATIC->IsType(Interaction::CUSTOM_QUADRATIC) );
+    energy en = 1.0*Joules;
+    BOOST_CHECK(type_HFC			 ->IsType(Interaction::HFC			    ) );
+    BOOST_CHECK(type_G_TENSER		 ->IsType(Interaction::G_TENSER		) );
+    BOOST_CHECK(type_ZFS			 ->IsType(Interaction::ZFS		    	) );
+    BOOST_CHECK(type_EXCHANGE		 ->IsType(Interaction::EXCHANGE		) );
+    BOOST_CHECK(type_SHIELDING   	 ->IsType(Interaction::SHIELDING   	) );
+    BOOST_CHECK(type_SCALAR		     ->IsType(Interaction::SCALAR		    ) );
+    BOOST_CHECK(type_QUADRUPOLAR	 ->IsType(Interaction::QUADRUPOLAR	    ) );
+    BOOST_CHECK(type_DIPOLAR		 ->IsType(Interaction::DIPOLAR		    ) );
+    BOOST_CHECK(type_CUSTOM_LINEAR   ->IsType(Interaction::CUSTOM_LINEAR   ) );
+    BOOST_CHECK(type_CUSTOM_BILINEAR ->IsType(Interaction::CUSTOM_BILINEAR ) );
+    BOOST_CHECK(type_CUSTOM_QUADRATIC->IsType(Interaction::CUSTOM_QUADRATIC) );
 }									   
 
 
 //Check that exceptions are thrown for invalid types
 BOOST_FIXTURE_TEST_CASE( CorrectFormFromType, Setup) {
-	energy en = 1.0*Joules;
-	BOOST_CHECK(type_HFC			 ->GetForm()==Interaction::BILINEAR);
-	BOOST_CHECK(type_G_TENSER		 ->GetForm()==Interaction::LINEAR);
-	BOOST_CHECK(type_ZFS			 ->GetForm()==Interaction::QUADRATIC);
-	BOOST_CHECK(type_EXCHANGE		 ->GetForm()==Interaction::BILINEAR);
-	BOOST_CHECK(type_SHIELDING   	 ->GetForm()==Interaction::LINEAR);
-	BOOST_CHECK(type_SCALAR		     ->GetForm()==Interaction::BILINEAR);
-	BOOST_CHECK(type_QUADRUPOLAR	 ->GetForm()==Interaction::QUADRATIC);
-	BOOST_CHECK(type_DIPOLAR		 ->GetForm()==Interaction::BILINEAR);
-	BOOST_CHECK(type_CUSTOM_LINEAR   ->GetForm()==Interaction::LINEAR);
-	BOOST_CHECK(type_CUSTOM_BILINEAR ->GetForm()==Interaction::BILINEAR);
-	BOOST_CHECK(type_CUSTOM_QUADRATIC->GetForm()==Interaction::QUADRATIC);
+    energy en = 1.0*Joules;
+    BOOST_CHECK(type_HFC			 ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_G_TENSER		 ->GetForm()==Interaction::LINEAR);
+    BOOST_CHECK(type_ZFS			 ->GetForm()==Interaction::QUADRATIC);
+    BOOST_CHECK(type_EXCHANGE		 ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_SHIELDING   	 ->GetForm()==Interaction::LINEAR);
+    BOOST_CHECK(type_SCALAR		     ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_QUADRUPOLAR	 ->GetForm()==Interaction::QUADRATIC);
+    BOOST_CHECK(type_DIPOLAR		 ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_CUSTOM_LINEAR   ->GetForm()==Interaction::LINEAR);
+    BOOST_CHECK(type_CUSTOM_BILINEAR ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_CUSTOM_QUADRATIC->GetForm()==Interaction::QUADRATIC);
 }									   
 
 
 //Check that exceptions are thrown for invalid types
 BOOST_FIXTURE_TEST_CASE( InvalidType, Setup) {
-	energy en = 1.0*Joules;
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::HFC,		      	spin1      ),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::G_TENSER,		    spin1,spin2),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::ZFS,			  	spin1,spin2),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::EXCHANGE,		  	spin1      ),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::SHIELDING,	  	spin1,spin2),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::SCALAR,   	  	spin1      ),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::QUADRUPOLAR,	    spin1,spin2),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::DIPOLAR,		    spin1      ),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::CUSTOM_LINEAR,  	spin1,spin2),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::CUSTOM_BILINEAR,  spin1      ),runtime_error);
-	BOOST_CHECK_THROW(new Interaction(en,Interaction::CUSTOM_QUADRATIC, spin1,spin2),runtime_error);
+    energy en = 1.0*Joules;
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::HFC,		      	spin1      ),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::G_TENSER,		    spin1,spin2),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::ZFS,			  	spin1,spin2),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::EXCHANGE,		  	spin1      ),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::SHIELDING,	  	spin1,spin2),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::SCALAR,   	  	spin1      ),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::QUADRUPOLAR,	    spin1,spin2),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::DIPOLAR,		    spin1      ),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::CUSTOM_LINEAR,  	spin1,spin2),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::CUSTOM_BILINEAR,  spin1      ),runtime_error);
+    BOOST_CHECK_THROW(new Interaction(en,Interaction::CUSTOM_QUADRATIC, spin1,spin2),runtime_error);
 }
 
 BOOST_FIXTURE_TEST_CASE( SetAndGetMatrix, Setup) {
-	type_HFC->SetMatrix(m);
-	BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::MATRIX);
-	Matrix3d m2;
-	type_HFC->GetMatrix(&m2);
-	BOOST_CHECK_EQUAL(m,m2);
+    type_HFC->SetMatrix(m);
+    BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::MATRIX);
+    Matrix3d m2;
+    type_HFC->GetMatrix(&m2);
+    BOOST_CHECK_EQUAL(m,m2);
 };
 
 BOOST_FIXTURE_TEST_CASE( SetAndGetEV, Setup) {
-	type_HFC->SetEigenvalues(xx,yy,zz,o);
-	BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::EIGENVALUES);
-	energy xx2,yy2,zz2; Orientation o2(EulerAngles(0,0,0));
-	type_HFC->GetEigenvalues(&xx2,&yy2,&zz2,&o2);
-	BOOST_CHECK_EQUAL(xx.si,xx2.si);
-	BOOST_CHECK_EQUAL(yy.si,yy2.si);
-	BOOST_CHECK_EQUAL(zz.si,zz2.si);
-	BOOST_CHECK(o==o2);
+    type_HFC->SetEigenvalues(xx,yy,zz,o);
+    BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::EIGENVALUES);
+    energy xx2,yy2,zz2; Orientation o2(EulerAngles(0,0,0));
+    type_HFC->GetEigenvalues(&xx2,&yy2,&zz2,&o2);
+    BOOST_CHECK_EQUAL(xx.si,xx2.si);
+    BOOST_CHECK_EQUAL(yy.si,yy2.si);
+    BOOST_CHECK_EQUAL(zz.si,zz2.si);
+    BOOST_CHECK(o==o2);
 };
 
 BOOST_FIXTURE_TEST_CASE( SetAndGetAX, Setup) {
-	type_HFC->SetAxRhom(ar_iso,ax,rh,o);
-	BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::AXRHOM);
-	energy ar_iso2,ax2,rh2; Orientation o3(EulerAngles(0,0,0));
-	type_HFC->GetAxRhom(&ar_iso2,&ax2,&rh2,&o3);
-	BOOST_CHECK_EQUAL(ar_iso.si,ar_iso2.si);
-	BOOST_CHECK_EQUAL(ax.si,ax2.si);
-	BOOST_CHECK_EQUAL(rh.si,rh2.si);
-	BOOST_CHECK(o==o3);
+    type_HFC->SetAxRhom(ar_iso,ax,rh,o);
+    BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::AXRHOM);
+    energy ar_iso2,ax2,rh2; Orientation o3(EulerAngles(0,0,0));
+    type_HFC->GetAxRhom(&ar_iso2,&ax2,&rh2,&o3);
+    BOOST_CHECK_EQUAL(ar_iso.si,ar_iso2.si);
+    BOOST_CHECK_EQUAL(ax.si,ax2.si);
+    BOOST_CHECK_EQUAL(rh.si,rh2.si);
+    BOOST_CHECK(o==o3);
 };
 
 BOOST_FIXTURE_TEST_CASE( SetAndGetSS, Setup) {
-	type_HFC->SetSpanSkew(ss_iso,span,skew,o);
-	BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::SPANSKEW);
-	energy ss_iso2,span2; double skew2; Orientation o4(EulerAngles(0,0,0));
-	type_HFC->GetSpanSkew(&ss_iso2,&span,&skew,&o4);
-	BOOST_CHECK_EQUAL(ss_iso.si,ss_iso2.si);
-	BOOST_CHECK_EQUAL(span.si,span2.si);
-	BOOST_CHECK_EQUAL(skew,skew2);
-	BOOST_CHECK(o==o4);
+    type_HFC->SetSpanSkew(ss_iso,span,skew,o);
+    BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::SPANSKEW);
+    energy ss_iso2,span2; double skew2; Orientation o4(EulerAngles(0,0,0));
+    type_HFC->GetSpanSkew(&ss_iso2,&span,&skew,&o4);
+    BOOST_CHECK_EQUAL(ss_iso.si,ss_iso2.si);
+    BOOST_CHECK_EQUAL(span.si,span2.si);
+    BOOST_CHECK_EQUAL(skew,skew2);
+    BOOST_CHECK(o==o4);
 };
 
 BOOST_FIXTURE_TEST_CASE( SetAndGetScalar, Setup) {
-	type_HFC->SetMatrix(m); //Already set to scalar, so we should change that before testing.
-	type_HFC->SetScalar(scalar);
-	BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::STORAGE_SCALAR);
-	energy scalar2;
-	type_HFC->GetScalar(&scalar2);
-	BOOST_CHECK_EQUAL(scalar.si,scalar2.si);
+    type_HFC->SetMatrix(m); //Already set to scalar, so we should change that before testing.
+    type_HFC->SetScalar(scalar);
+    BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::STORAGE_SCALAR);
+    energy scalar2;
+    type_HFC->GetScalar(&scalar2);
+    BOOST_CHECK_EQUAL(scalar.si,scalar2.si);
 };
+
+
+struct inter_sig_counter {
+    inter_sig_counter(Interaction* inter) : mInter(inter), died(false) {
+        this->mDyingConnect=inter->sigDying.connect(mem_fun(this,&inter_sig_counter::onDie));
+    }
+    ~inter_sig_counter() {
+        mDyingConnect.disconnect();
+    }
+    void onDie(Interaction* inter) {
+        died=true;
+        mDyingConnect.disconnect();
+    }
+    Interaction* mInter;
+    bool died;
+    sigc::connection mDyingConnect;
+};
+
+BOOST_FIXTURE_TEST_CASE( DeleteSpin, Setup ) {
+    //Deleting a spin should also cause the any attached interactions
+    //to delete themselves
+    inter_sig_counter watcher(type_HFC);
+    delete spin1;
+    spin1=NULL;
+    BOOST_CHECK(watcher.died);
+}
+
 

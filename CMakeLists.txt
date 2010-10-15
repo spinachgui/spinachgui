@@ -81,3 +81,8 @@ add_test(SpinTest ${EXECUTABLE_OUTPUT_PATH}/SpinTest)
 add_executable(SpinSystemTest "shared/test/spinsys_test.cpp" )
 target_link_libraries(SpinSystemTest spinxml ${Boost_LIBRARIES} spinxml sigc-2.0)
 add_test(SpinSystemTest ${EXECUTABLE_OUTPUT_PATH}/SpinSystemTest)
+
+
+############################################################
+# Copy the dat directory
+file(COPY data/ DESTINATION data/)

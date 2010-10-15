@@ -116,21 +116,24 @@ void SpinSystem::InsertSpin(Spin* _Spin,long Position) {
 }
 
 
-void SpinSystem::RemoveSpin(long Position) {
+Spin* SpinSystem::RemoveSpin(long Position) {
+    Spin* spin = mSpins[Position];
     mSpins.erase(mSpins.begin()+Position);
+    return spin;
 }
 
-void SpinSystem::RemoveSpin(Spin* _Spin) {
+Spin* SpinSystem::RemoveSpin(Spin* _Spin) {
     if(_Spin==mIgnoreSpinKill) {
         mIgnoreSpinKill=NULL;
-        return;
+        return NULL;
     }
     for(unsigned long i=0;i<mSpins.size();i++) {
         if(mSpins[i]==_Spin) {
             mSpins.erase(mSpins.begin()+i);
-            return;
+            return _Spin;
         }
     }
+    return NULL;
 }
 
 
@@ -166,8 +169,8 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             length rx,ry,rz;
             Vector3d r_1_2=spin2->GetPosition()-spin1->GetPosition();
             rx=r_1_2.x() * metres;
-			ry=r_1_2.y() * metres;
-			rz=r_1_2.z() * metres;
+            ry=r_1_2.y() * metres;
+            rz=r_1_2.z() * metres;
 
             long element2=spin2->GetElement();
             long isotope2=spin2->GetIsotopes()[0];
@@ -183,15 +186,15 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             length5 r5=r2*r3;
 
             Matrix3d dipole=MakeMatrix3d(r2.si-3.0*rx.si*rx.si, 3.0*rx.si*ry.si,      3.0*rx.si*rz.si,
-										 3.0*rx.si*ry.si,       r2.si-3.0*ry.si*ry.si,3.0*ry.si*rz.si,
-										 3.0*rx.si*rz.si,       3.0*ry.si*rz.si,      r2.si-3.0*rz.si*rz.si);
+                                         3.0*rx.si*ry.si,       r2.si-3.0*ry.si*ry.si,3.0*ry.si*rz.si,
+                                         3.0*rx.si*rz.si,       3.0*ry.si*rz.si,      r2.si-3.0*rz.si*rz.si);
             static const double four_pi=12.5663706;
             double coeff=(mu0*hbar*g1*g2/(r5.si*four_pi));
 
-			dreal<double,_mass_per_time2> dcoeff(coeff);
-			Matrix3d dipole_inter=dcoeff.si*dipole;
+            dreal<double,_mass_per_time2> dcoeff(coeff);
+            Matrix3d dipole_inter=dcoeff.si*dipole;
             Interaction* inter=new Interaction(dipole_inter,Interaction::DIPOLAR,spin1,spin2);
-			this->InsertInteraction(inter);
+            this->InsertInteraction(inter);
         }
     }
 }

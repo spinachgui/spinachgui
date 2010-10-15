@@ -26,7 +26,7 @@ namespace SpinXML {
     const long END=-1;
 
 
-	class SpinSystem;
+    class SpinSystem;
 	class Spin;
 	class Interaction;
 
@@ -61,8 +61,11 @@ namespace SpinXML {
 
         const std::vector<Spin*>& GetSpins() const;
         void InsertSpin(Spin* _Spin,long Position=END);
-        void RemoveSpin(long Position);
-        void RemoveSpin(Spin* _Spin);
+
+        ///Remove a spin from the spin system. If it's no longer required it still has to be deleted.
+        Spin* RemoveSpin(long Position);
+        ///Remove a spin from the spin system. If it's no longer required it still has to be deleted.
+        Spin* RemoveSpin(Spin* _Spin);
 
 		void OnSpinDeleted(Spin* spin);
 

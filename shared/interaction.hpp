@@ -86,7 +86,7 @@ namespace SpinXML {
 
     class Interaction : public sigc::trackable {
     public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Enumeration of the storage conventions used by this interaction
         enum Storage {
             STORAGE_SCALAR,
@@ -132,19 +132,29 @@ namespace SpinXML {
 
         ///Construct from a scalar
         Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            valid_or_throw();
+        }
         ///Construct from a matrix
         Interaction(const Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            valid_or_throw();
+        }
         ///Construct from a matrix
         Interaction(const Eigenvalues& inter ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            valid_or_throw();
+        }
         ///Construct from a matrix
         Interaction(const AxRhom& inter      ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            valid_or_throw();
+        }
         ///Construct from a matrix
         Interaction(const SpanSkew& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){}
+            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            valid_or_throw();
+        }
         ///Copy constructor
         Interaction(const Interaction& inter);
         ///Destructor
@@ -262,6 +272,8 @@ namespace SpinXML {
                                                             (mSpin2==spin ? mSpin1 : NULL));}
 
     private:
+
+        void valid_or_throw() const;
 
 	typedef boost::variant<energy,Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
 	var_t mData;

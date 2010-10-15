@@ -496,4 +496,31 @@ SpanSkew Interaction::AsSpanSkew() const {
     return apply_visitor(getAsSpanSkewVisitor(),mData);
 }
 
-
+void Interaction::valid_or_throw() const {
+    switch(mType) {
+    case ANY:
+    case NMR:
+    case EPR:
+        throw runtime_error("Invalid type in Interaction");
+        break;
+    case SCALAR:
+    case EXCHANGE:
+    case HFC:
+    case CUSTOM_BILINEAR:
+    case DIPOLAR:
+        if(mSpin1 == NULL || mSpin2 == NULL)
+            throw runtime_error("Bilinar Interactions but one of mSpin1 or mSpin2 is null!");
+        break;
+    case CUSTOM_LINEAR:
+    case SHIELDING:
+    case G_TENSER:
+    case ZFS:
+    case QUADRUPOLAR:
+    case CUSTOM_QUADRATIC:
+        if(mSpin1 != NULL && mSpin2 != NULL) 
+            throw runtime_error("Linear or quadratic interaction but both mSpin1 and mSpin2 are not null");
+        break;
+    default:
+        throw runtime_error("Unknown, invalid type in Interaction");
+    }
+}

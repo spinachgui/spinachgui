@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE raw_interactions
+#define BOOST_TEST_MODULE interactions
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
@@ -142,14 +142,14 @@ BOOST_FIXTURE_TEST_CASE( InteractionIsType, Setup) {
 //Check that exceptions are thrown for invalid types
 BOOST_FIXTURE_TEST_CASE( CorrectFormFromType, Setup) {
     energy en = 1.0*Joules;
-    BOOST_CHECK(type_HFC			 ->GetForm()==Interaction::BILINEAR);
-    BOOST_CHECK(type_G_TENSER		 ->GetForm()==Interaction::LINEAR);
-    BOOST_CHECK(type_ZFS			 ->GetForm()==Interaction::QUADRATIC);
-    BOOST_CHECK(type_EXCHANGE		 ->GetForm()==Interaction::BILINEAR);
-    BOOST_CHECK(type_SHIELDING   	 ->GetForm()==Interaction::LINEAR);
-    BOOST_CHECK(type_SCALAR		     ->GetForm()==Interaction::BILINEAR);
-    BOOST_CHECK(type_QUADRUPOLAR	 ->GetForm()==Interaction::QUADRATIC);
-    BOOST_CHECK(type_DIPOLAR		 ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_HFC	     ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_G_TENSER	     ->GetForm()==Interaction::LINEAR);
+    BOOST_CHECK(type_ZFS	     ->GetForm()==Interaction::QUADRATIC);
+    BOOST_CHECK(type_EXCHANGE	     ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_SHIELDING       ->GetForm()==Interaction::LINEAR);
+    BOOST_CHECK(type_SCALAR	     ->GetForm()==Interaction::BILINEAR);
+    BOOST_CHECK(type_QUADRUPOLAR     ->GetForm()==Interaction::QUADRATIC);
+    BOOST_CHECK(type_DIPOLAR	     ->GetForm()==Interaction::BILINEAR);
     BOOST_CHECK(type_CUSTOM_LINEAR   ->GetForm()==Interaction::LINEAR);
     BOOST_CHECK(type_CUSTOM_BILINEAR ->GetForm()==Interaction::BILINEAR);
     BOOST_CHECK(type_CUSTOM_QUADRATIC->GetForm()==Interaction::QUADRATIC);

@@ -112,64 +112,16 @@ Orientation::Type Orientation::GetType() const {
 class GetAsMatrixVisitor : public static_visitor<Matrix3d> {
 public:
     Matrix3d operator()(const EulerAngles& dat) const {
-        double cos_alpha = cos(dat.alpha);
-        double cos_beta  = cos(dat.beta); 
-        double cos_gamma = cos(dat.gamma);
-
-        double sin_alpha = sin(dat.alpha);
-        double sin_beta  = sin(dat.beta);
-        double sin_gamma = sin(dat.gamma);
-
-        double a11 = cos_alpha*cos_gamma - cos_beta * sin_gamma * sin_alpha;
-        double a22 =-sin_alpha*sin_gamma + cos_beta * cos_gamma * cos_alpha;
-        double a33 = cos_beta;
-
-        double a12 = cos_alpha*sin_gamma + cos_beta * cos_gamma * sin_alpha;
-        double a21 =-sin_alpha*cos_gamma + cos_beta * sin_gamma * sin_alpha;
-    
-        double a13 = sin_alpha*sin_beta;
-        double a31 = sin_beta *sin_gamma;
-    
-        double a23 = cos_alpha* sin_beta;
-        double a32 =-sin_beta * cos_gamma;
-        return MakeMatrix3d(a11,a12,a13,
-							a21,a22,a23,
-							a31,a32,a33);
+        return ConvertToDCM(dat);
     }
     Matrix3d operator()(const Matrix3d& dat) const {
-        return dat;
+        return ConvertToDCM(dat);
     }
     Matrix3d operator()(const Quaterniond& dat) const {
-        double W = dat.w();
-        double X = dat.x();
-        double Y = dat.y();
-        double Z = dat.z();
-
-        //Normalise the quaternion
-        double inv_mag = 1/(X*X + Y*Y + Z*Z + W*W);
-        X=X*inv_mag;
-        Y=Y*inv_mag;
-        Z=Z*inv_mag;
-        W=W*inv_mag;
-    
-        double xx      = X * X;
-        double xy      = X * Y;
-        double xz      = X * Z;
-        double xw      = X * W;
-
-        double yy      = Y * Y;
-        double yz      = Y * Z;
-        double yw      = Y * W;
-
-        double zz      = Z * Z;
-        double zw      = Z * W;
-    
-        return MakeMatrix3d(1 - 2 * ( yy + zz ), 2 * ( xy - zw )    , 2 * ( xz + yw ),
-							2 * ( xy + zw )    , 1 - 2 * ( xx + zz ), 2 * ( yz - xw ),
-							2 * ( xz - yw )    , 2 * ( yz + xw )    , 1 - 2 * ( xx + yy ));
+        return ConvertToDCM(dat);
     }
     Matrix3d operator()(const AngleAxisd& dat) const {
-        return dat.toRotationMatrix();
+        return ConvertToDCM(dat);
     }
 };
 Matrix3d Orientation::GetAsMatrix() const {

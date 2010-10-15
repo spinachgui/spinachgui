@@ -4,6 +4,9 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
+
 using namespace std;
 
 namespace SpinXML {
@@ -37,4 +40,9 @@ namespace SpinXML {
 	BOOST_CHECK(boundedCompaire(m(2,2),(obj)(2,2),2,0.01));			
 
 }
+
+double getRandomDouble() {
+    return double(rand())/double(RAND_MAX);
+}
+
 #endif

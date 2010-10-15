@@ -203,3 +203,33 @@ CONVERSION_CHECK_ROUND(Euler    ,ea,EulerAngles,ConvertToEuler     ,CHECK_EULER_
 CONVERSION_CHECK_ROUND(Quat     ,q ,Quaterniond,ConvertToQuaternion,CHECK_QUAT_CLOSE);
 CONVERSION_CHECK_ROUND(AngleAxis,aa,AngleAxisd ,ConvertToAngleAxis ,CHECK_ANGLE_AXIS_CLOSE);
 CONVERSION_CHECK_ROUND(DCM      ,m, Matrix3d   ,ConvertToDCM       ,CHECK_MATRIX_CLOSE);
+
+
+#define DIRECT_CHECK(name, seed, seedType, otherType, fromSeedConv) \
+    BOOST_FIXTURE_TEST_CASE( name, Setup ) {                            \
+        otherType converted = fromSeedConv(seed);                       \
+        Orientation o(converted);                                       \
+        Orientation oZero(seed);                                        \
+        for(long i=0;i<300;i++) {                                       \
+            Vector3d v(getRandomDouble(),getRandomDouble(),getRandomDouble()); \
+            Vector3d v1=o.Apply(v);                                     \
+            Vector3d v2=oZero.Apply(v);                                  \
+            BOOST_CHECK_CLOSE(v1.x(),v2.x() ,0.01);                     \
+            BOOST_CHECK_CLOSE(v1.y(),v2.y() ,0.01);                     \
+            BOOST_CHECK_CLOSE(v1.z(),v2.z() ,0.01);                     \
+        }                                                               \
+    }
+
+#define DIRECT_CHECK_ROUND(prefix,seed,seedType)                \
+    DIRECT_CHECK(prefix##EulerDirect     ,seed,seedType,EulerAngles,ConvertToEuler     ); \
+    DIRECT_CHECK(prefix##QuaternionDirect,seed,seedType,Quaterniond,ConvertToQuaternion); \
+    DIRECT_CHECK(prefix##AngleAxisDirect ,seed,seedType,AngleAxisd ,ConvertToAngleAxis ); \
+    DIRECT_CHECK(prefix##DCMDirect       ,seed,seedType,Matrix3d   ,ConvertToDCM       );
+
+DIRECT_CHECK_ROUND(Euler    ,ea,EulerAngles);
+DIRECT_CHECK_ROUND(Quat     ,q ,Quaterniond);
+DIRECT_CHECK_ROUND(AngleAxis,aa,AngleAxisd );
+DIRECT_CHECK_ROUND(DCM      ,m, Matrix3d   );
+
+
+

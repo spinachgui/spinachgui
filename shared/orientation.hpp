@@ -133,6 +133,8 @@ namespace SpinXML {
         ///result is undefined.
         void GetDCM(Matrix3d* matrix) const;
 
+        Vector3d Apply(Vector3d v) const;
+
         const Orientation& operator=(const EulerAngles& ea);
         const Orientation& operator=(const AngleAxisd& aa);
         const Orientation& operator=(const Matrix3d& m);

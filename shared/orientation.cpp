@@ -6,6 +6,7 @@
 #include <cmath>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
+#include <Eigen/Dense>
 
 using namespace std;
 using namespace Eigen;
@@ -174,6 +175,23 @@ public:
 Matrix3d Orientation::GetAsMatrix() const {
     Orientation normalized=Normalized();
     return apply_visitor(GetAsMatrixVisitor(),normalized.mData);
+}
+
+Vector3d Orientation::Apply(Vector3d v) const {
+    if(get<EulerAngles>(&mData)!=NULL) {
+        EulerAngles ea=*get<EulerAngles>(&mData);
+        AngleAxisd one(ea.alpha ,Vector3d(0,0,1));
+        AngleAxisd two(ea.beta  ,Vector3d(0,1,0));
+        AngleAxisd three(ea.gamma ,Vector3d(0,0,1));
+        
+        return three*(two*(one*v));
+    } else if(get<AngleAxisd>(&mData)!=NULL) {
+        return (*(get<AngleAxisd>(&mData)))*v;
+    } else if(get<Matrix3d>(&mData)!=NULL) {
+        return (*(get<Matrix3d>(&mData)))*v;
+    } else  {
+        return (*(get<Quaterniond>(&mData)))*v;
+    }
 }
 
 void Orientation::GetEuler(double* alpha,double* beta,double* gamma) const {

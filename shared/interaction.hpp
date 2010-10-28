@@ -1,4 +1,7 @@
 
+#ifndef INTERACTION_H
+#define INTERACTION_H
+
 #include <sigc++/sigc++.h>
 #include <shared/unit.hpp>
 #include <boost/variant.hpp>
@@ -286,3 +289,4 @@ namespace SpinXML {
     };
 };
 
+#endif

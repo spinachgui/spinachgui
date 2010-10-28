@@ -223,21 +223,6 @@ BOOST_FIXTURE_TEST_CASE( SetAndGetScalar, Setup) {
 };
 
 
-struct inter_sig_counter {
-    inter_sig_counter(Interaction* inter) : mInter(inter), died(false) {
-        this->mDyingConnect=inter->sigDying.connect(mem_fun(this,&inter_sig_counter::onDie));
-    }
-    ~inter_sig_counter() {
-        mDyingConnect.disconnect();
-    }
-    void onDie(Interaction* inter) {
-        died=true;
-        mDyingConnect.disconnect();
-    }
-    Interaction* mInter;
-    bool died;
-    sigc::connection mDyingConnect;
-};
 
 BOOST_FIXTURE_TEST_CASE( DeleteSpin, Setup ) {
     //Deleting a spin should also cause the any attached interactions

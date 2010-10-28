@@ -70,7 +70,9 @@ namespace SpinXML {
         void OnSpinDeleted(Spin* spin);
 
         void InsertInteraction(Interaction* inter);
-		
+        Interaction* RemoveInteraction(Interaction* inter);
+        long GetInterCount() const {return mInteractions.size();}
+
         //Returns all interactions involving Spin spin
         std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
         //Get all the interactions involving both spin1 and spin2

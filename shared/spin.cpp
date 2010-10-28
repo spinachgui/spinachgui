@@ -9,17 +9,18 @@ using namespace sigc;
 //==============================================================================//
 // Spin
 
-Spin::Spin(Vector3d Position,string Label,long atomicNumber) 
-    : mPosition(Position),mLabel(Label),mElement(atomicNumber) {
-    long isotope=getCommonIsotope(atomicNumber);
-    mIsotopes.push_back(isotope);
+Spin::Spin(Vector3d Position,string Label,long atomicNumber,long isotope) 
+    : mPosition(Position),
+      mLabel(Label),
+      mElement(atomicNumber),
+      mIsotope(isotope) {
 }
 
 Spin::Spin(const Spin& s) :
     mPosition(s.mPosition),
     mLabel(s.mLabel),
     mElement(s.mElement),
-    mIsotopes(s.mIsotopes){
+    mIsotope(s.mIsotope){
 }
 
 Spin::~Spin() {
@@ -67,12 +68,12 @@ void Spin::SetElement(long element) {
     mElement=element;
 }
 
-void Spin::SetIsotopes(std::vector<long> isotopes) const {
-
+void Spin::SetIsotope(long isotope) {
+    mIsotope=isotope;
 }
 
-vector<long> Spin::GetIsotopes() const {
-    return mIsotopes;
+long Spin::GetIsotope() const {
+    return mIsotope;
 }
 
 

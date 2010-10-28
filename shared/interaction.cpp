@@ -284,13 +284,13 @@ Interaction::Type Interaction::GetType() const {
 }
 
 Interaction::Form Interaction::GetForm() const {
-	if(GetIsLinear())
-		return LINEAR;
-	if(GetIsBilinear())
-		return BILINEAR;
-	if(GetIsQuadratic())
-		return QUADRATIC;
-	throw runtime_error("GetForm failed");
+    if(GetIsLinear())
+        return LINEAR;
+    if(GetIsBilinear())
+        return BILINEAR;
+    if(GetIsQuadratic())
+        return QUADRATIC;
+    throw runtime_error("GetForm failed");
 }
 
 void Interaction::SetType(Type t,Spin* spin1,Spin* spin2) {

@@ -158,7 +158,7 @@ void SpinSystem::CalcNuclearDipoleDipole() {
     for(unsigned long i=0;i<mSpins.size();i++) {
         Spin* spin1=mSpins[i];
         long element1=spin1->GetElement();
-        long isotope1=spin1->GetIsotopes()[0];
+        long isotope1=spin1->GetIsotope();
         double g1=getGyromagneticRatio(element1,isotope1);
         if(abs(g1)<1e-10) continue;
 
@@ -173,7 +173,7 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             rz=r_1_2.z() * metres;
 
             long element2=spin2->GetElement();
-            long isotope2=spin2->GetIsotopes()[0];
+            long isotope2=spin2->GetIsotope();
             double g2=getGyromagneticRatio(element2,isotope2);
             if(abs(g2)<1e-10) continue;
             

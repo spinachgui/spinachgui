@@ -16,7 +16,7 @@ using namespace SpinXML;
 struct Setup {
     Setup()
         : blank(new SpinSystem), populated(new SpinSystem),
-          newSpinCount(0),reloadedCount(0),dyingCount(0) {
+          newSpinCount(0),reloadedCount(0),newInterCount(0),dyingCount(0) {
         //Distribute the spins on a regular grid on a 5x5x5 angstrom cube
         for(long i=0;i<5;i++) {
             for(long j=0;j<5;j++) {
@@ -56,9 +56,15 @@ struct Setup {
         newSpinCount++;
     }
 
+
     long reloadedCount;
     void onReloaded() {
         reloadedCount++;
+    }
+
+    long newInterCount;
+    void onNewInter(Interaction*) {
+        newInterCount++;
     }
 
     long dyingCount;
@@ -68,6 +74,8 @@ struct Setup {
 
 };
 
+//============================================================//
+// Spin and SpinSystem tests
 
 //Tests InsertSpin,sigNewSpin,GetSpinCount,GetSpin(long),GetSpinNumber(Spin*)
 BOOST_FIXTURE_TEST_CASE( InsertSpin, Setup ) {
@@ -134,5 +142,31 @@ BOOST_FIXTURE_TEST_CASE( DeleteSpin, Setup ) {
     BOOST_CHECK_EQUAL(count1,count2);
 }
 
+//============================================================//
+// Interaction and SpinSystem tests
 
+BOOST_FIXTURE_TEST_CASE(InsertAndRemoveInteraction, Setup ) {
+    Spin* spin1=new Spin(Vector3d(0,0,0),"Hydrogen 1",1);
+    Spin* spin2=new Spin(Vector3d(1e-10,0,0),"Hydrogen 2",1);
+    Interaction* inter = new Interaction(1.0*Joules,Interaction::HFC,spin1,spin2);
+
+    blank->InsertSpin(spin1);
+    blank->InsertSpin(spin2);
+    blank->InsertInteraction(inter);
+
+    BOOST_CHECK_EQUAL(blank->GetInterCount(),1);
+
+    delete inter;
+    inter=0;
+
+    BOOST_CHECK(false);  //Test not finished yet.
+}
+
+//============================================================//
+// Other tests
+
+BOOST_FIXTURE_TEST_CASE(clear, Setup) {
+    populated->Clear();
+    BOOST_CHECK_EQUAL(populated->GetSpinCount(),0);
+}
 

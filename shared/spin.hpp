@@ -44,25 +44,34 @@ namespace SpinXML {
         long mIsotope;
     };
 
-    class SpinView : public ViewBase<SpinView> {
-        SpinView(Spin* spin,Frame* frame, UnitSystem* unitSystem);
+    class SpinView : public ViewBase<SpinView,Spin> {
+    public:
+        typedef ViewBase<SpinView,Spin> Base;
+
+        SpinView(Spin* spin,const Frame* frame, const UnitSystem* unitSystem) 
+            : Base(spin,frame,unitSystem) {
+            mData->sigChange.connect(sigChange);
+            mData->sigDying.connect(sigDying);
+            mData->sigDying.connect(sigc::mem_fun(this,&SpinView::OnObjectDie));
+        }
 
         ///When the SpinView detects the spin it is watching has been
         ///deleted it deletes itself and passes the signal upwards.
-        void OnSpinDie();
 
-        Vector3d& GetPosition() const;
+
+        Vector3d GetPosition() const;
         void SetPosition(Vector3d Position);
         void GetCoordinates(double* _x,double* _y, double* _z) const;
         void SetCoordinates(double  _x,double  _y, double  _z);
 
-        void SetLabel(std::string Label);
-        const char* GetLabel() const;
+        ///All these are compleatly trivial
+        void SetLabel(std::string Label)    {mData->SetLabel(Label);}
+        const char* GetLabel() const        {return mData->GetLabel();}
 
-        long GetElement() const;
-        void SetElement(long element);
-        long GetIsotope() const;
-        void SetIsotope(long isotope) const;
+        long GetElement() const             {return mData->GetElement();}
+        void SetElement(long element)       {mData->SetElement(element);}
+        long GetIsotope() const             {return mData->GetIsotope();}
+        void SetIsotope(long isotope) const {mData->SetIsotope(isotope);}
 
         sigc::signal<void> sigChange;
         sigc::signal<void,Spin*> sigDying;

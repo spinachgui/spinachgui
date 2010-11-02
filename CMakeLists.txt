@@ -8,7 +8,7 @@ enable_testing()
 
 ############################################################
 #Tell me what commands are being executed.
-set(CMAKE_VERBOSE_MAKEFILE FALSE)
+#set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
@@ -75,12 +75,16 @@ target_link_libraries(OrientationTest spinxml ${Boost_LIBRARIES} spinxml sigc-2.
 add_test(OrientationTest ${EXECUTABLE_OUTPUT_PATH}/OrientationTest)
 
 add_executable(SpinTest "shared/test/spin_test.cpp" )
-target_link_libraries(SpinTest spinxml ${Boost_LIBRARIES} spinxml sigc-2.0)
+target_link_libraries(SpinTest spinxml ${Boost_LIBRARIES} sigc-2.0)
 add_test(SpinTest ${EXECUTABLE_OUTPUT_PATH}/SpinTest)
 
 add_executable(SpinSystemTest "shared/test/spinsys_test.cpp" )
-target_link_libraries(SpinSystemTest spinxml ${Boost_LIBRARIES} spinxml sigc-2.0)
+target_link_libraries(SpinSystemTest spinxml ${Boost_LIBRARIES}  sigc-2.0)
 add_test(SpinSystemTest ${EXECUTABLE_OUTPUT_PATH}/SpinSystemTest)
+
+add_executable(FrameTest "shared/test/frame_test.cpp" )
+target_link_libraries(FrameTest spinxml ${Boost_LIBRARIES}  sigc-2.0)
+add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/SpinSystemTest)
 
 
 ############################################################

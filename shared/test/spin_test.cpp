@@ -36,8 +36,8 @@ BOOST_FIXTURE_TEST_CASE( SpinConstructor, Setup ) {
     BOOST_CHECK_EQUAL(tx.si,x.si);
     BOOST_CHECK_EQUAL(ty.si,y.si);
     BOOST_CHECK_EQUAL(tz.si,z.si);
-	BOOST_CHECK_EQUAL(s->GetElement(),element);
-	BOOST_CHECK_EQUAL(s->GetLabel(),label);
+    BOOST_CHECK_EQUAL(s->GetElement(),element);
+    BOOST_CHECK_EQUAL(s->GetLabel(),label);
 }
 
 

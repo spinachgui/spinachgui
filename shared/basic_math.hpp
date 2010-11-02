@@ -2,6 +2,8 @@
 #include <cmath>
 #include <complex>
 
+#define pi M_PI
+
 namespace SpinXML {
     using std::complex;
 
@@ -34,5 +36,6 @@ namespace SpinXML {
     std::complex<F> acos(complex<F> z) {
         return log(z + complex<F>(0,1) * sqrt(complex<F>(1,0)-z*z))/complex<F>(0,1);
     }
+
 }
 

@@ -31,7 +31,7 @@ namespace SpinXML {
         void SetTranslation(const Vector3d& vec);
         const Vector3d& GetTranslation() const {return mTranslate;}
 
-        void SetTranslation(const Orientation orient);
+        void SetOrientation(const Orientation orient);
         const Orientation& GetOrientation() const {return mOrient;}
 
         ///Return a 4x4 isometary matrix in openGL convention a
@@ -55,7 +55,7 @@ namespace SpinXML {
         ///Emited when a ancesstor of this frame is changed.
         sigc::signal<Frame*> sigAncestorChange;
     private:
-        void updateAfline();
+        void updateAfine();
 
         Frame* mParent;
         Vector3d mTranslate;

@@ -84,11 +84,11 @@ struct Setup {
 
 
 BOOST_FIXTURE_TEST_CASE( CorrectHomogenious, Setup ) {
-    Vector4d v4(FrameA_V.x(),FrameA_V.y(),FrameA_V.z(),1.0);
+    Vector4d v4(2,-4,8,1.0);
     v4=FrameA->getTransformFromLab()*v4;
-    BOOST_CHECK_CLOSE(v4.x(),FrameA_V.x(),0.01);
-    BOOST_CHECK_CLOSE(v4.y(),FrameA_V.y(),0.01);
-    BOOST_CHECK_CLOSE(v4.z(),FrameA_V.z(),0.01);
+    BOOST_CHECK_CLOSE(v4.x(), 2+FrameA_V.x(),0.01);
+    BOOST_CHECK_CLOSE(v4.y(),-4+FrameA_V.y(),0.01);
+    BOOST_CHECK_CLOSE(v4.z(), 8+FrameA_V.z(),0.01);
     BOOST_CHECK_CLOSE(v4.w(),1.0,0.01);
 
 }

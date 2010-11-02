@@ -1,27 +1,30 @@
 
 #include <shared/frame.hpp>
+#include <Eigen/Geometry>
 
 using namespace SpinXML;
 using namespace Eigen;
 
 Frame::Frame(Vector3d translation, Orientation rotation, Frame* parent) 
     : mParent(parent),mTranslate(translation),mOrient(rotation) {
-    updateAfline();
+    updateAfine();
 }
 
 void Frame::SetTranslation(const Vector3d& vec) {
     mTranslate = vec;
-    updateAfline();
+    updateAfine();
 }
 
-void Frame::SetTranslation(const Orientation orient) {
+void Frame::SetOrientation(const Orientation orient) {
     mOrient = orient;
-    updateAfline();
+    updateAfine();
 }
 
 
-void Frame::updateAfline() {
-
+void Frame::updateAfine() {
+    Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsQuaternion());
+    Matrix4d mat=T.matrix();
+    mAffine = (mParent==NULL) ? mat : mParent->mAffine*mat;
 }
 
 

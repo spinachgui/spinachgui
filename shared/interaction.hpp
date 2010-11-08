@@ -12,48 +12,48 @@
 
 namespace SpinXML {
 
-    struct Eigenvalues;
-    struct AxRhom;
-    struct SpanSkew;
-
     ///============================================================//
-    struct Eigenvalues {
-        Eigenvalues(const energy _XX,const energy _YY,const energy _ZZ, const Orientation& o) 
+	template<typename T>
+    struct Eigenvalues_T {
+        Eigenvalues_T(const T _XX,const T _YY,const T _ZZ, const Orientation& o) 
             : xx(_XX), yy(_YY), zz(_ZZ), mOrient(o) {
         }
-        AxRhom AsAxRhom() const;
-        SpanSkew AsSpanSkew() const;
-        energy xx;
-        energy yy;
-        energy zz;
+        T xx;
+        T yy;
+        T zz;
         Orientation mOrient;
     };
+	typedef Eigenvalues_T<energy> Eigenvalues;
+	typedef Eigenvalues_T<double> UEigenvalues;
 
     ///============================================================//
-    struct AxRhom {
-        AxRhom(const energy _iso,const energy _ax,const energy _rh, const Orientation& o) 
+	template<typename T>
+    struct AxRhom_T {
+        AxRhom_T(const T _iso,const T _ax,const T _rh, const Orientation& o) 
             : iso(_iso), ax(_ax), rh(_rh), mOrient(o) {
         }
-        Eigenvalues AsEigenvalues() const;
-        SpanSkew AsSpanSkew() const;
-        energy iso;
-        energy ax;
-        energy rh;
+        T iso;
+        T ax;
+        T rh;
         Orientation mOrient;
     };
+	typedef AxRhom_T<energy> AxRhom;
+	typedef AxRhom_T<double> UAxRhom;
+	
 
     ///============================================================//
-    struct SpanSkew {
-        SpanSkew(const energy _iso,const energy _span,const double _skew, const Orientation& o) 
+	template<typename T>
+    struct SpanSkew_T {
+        SpanSkew_T(const T _iso,const T _span,const double _skew, const Orientation& o) 
             : iso(_iso), span(_span), skew(_skew), mOrient(o) {
         }
-        Eigenvalues AsEigenvalues() const;
-        AxRhom AsAxRhom() const;
-        energy iso;
-        energy span;
+        T iso;
+        T span;
         double skew;
         Orientation mOrient;
     };
+	typedef SpanSkew_T<energy> SpanSkew;
+	typedef SpanSkew_T<double> USpanSkew;
 
     //Interaction converstions
     energy ConvertToScalar(const energy& inter);
@@ -278,8 +278,8 @@ namespace SpinXML {
 
         void valid_or_throw() const;
 
-	typedef boost::variant<energy,Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
-	var_t mData;
+		typedef boost::variant<energy,Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
+		var_t mData;
         Type mType;
 
         Spin* mSpin1;
@@ -287,6 +287,86 @@ namespace SpinXML {
         Spin* mSpin2;
         sigc::connection mDyingConnect2;
     };
+
+
+
+
+
+    class InteractionView : public ViewBase<InteractionView,Interaction> {
+    public:
+        typedef ViewBase<InteractionView,Interaction> Base;
+
+        ///Construct from a scalar
+        InteractionView(Interaction* inter   ,const Frame* frame, const UnitSystem* unitSystem)
+			: Base(inter,frame,unitSystem) {
+			mData->sigChange.connect    (sigChange);
+			mData->sigDying.connect     (sigDying);
+			mData->sigRemoveSpin.connect(sigRemoveSpin);
+
+            mData->sigDying.connect(sigc::mem_fun(this,&InteractionView::OnObjectDie));
+        }
+
+        ///Get the storage convention being used
+        Interaction::Storage GetStorage() const                   {return mData->GetStorage();}
+        ///Get the physical source of this interaction
+        Interaction::Type GetType() const                         {return mData->GetType();}
+        ///Get the algebrake form of the interaction
+        Interaction::Form GetForm() const                         {return mData->GetForm();}
+
+        ///Set a flag indicating the physical source of this interaction.
+        void SetType(Interaction::Type st, Spin* spin1, Spin* spin2=NULL) {return mData->SetType(st,spin1,spin2);}
+        ///Returns true if the physical source of this interaction is t. The
+        ///members ST_NMR, ST_EPR and ST_ANY may be used here and will be
+        ///interpreted coorectly. For example, if inter is of SubType
+        ///ST_SCALAR then inter.IsSubType(ST_NMR) is true.
+        bool IsType(Interaction::Type t) const {return mData->IsType(t);}
+    
+        ///For a bilinear interaction, get the spin that is not spinA
+        Spin* GetOtherSpin(Spin* spinA) {return mData->GetOtherSpin(spinA);}
+
+        ///Set the value of the interaction using the scalar covention.
+        void SetScalar(double Scalar);
+        ///Set the value of the interaction using the matrix covention.
+        void SetMatrix(const Matrix3d& InMatrix);
+        ///Set the value of the interaction using the eigenvalue covention.
+        void SetEigenvalues(double XX,double YY,   double ZZ,  const Orientation& Orient);
+        ///Set the value of the interaction using the axiality-rhombicity covention.
+        void SetAxRhom(double iso,    double ax,   double rh,  const Orientation& Orient);
+        ///Set the value of the interaction using the span-skew covention.
+        void SetSpanSkew(double iso,  double Span, double Skew,const Orientation& Orient);
+
+        bool GetIsLinear() const    {return mData->GetIsLinear();}
+        bool GetIsBilinear() const  {return mData->GetIsBilinear();}
+        bool GetIsQuadratic() const {return mData->GetIsQuadratic();}
+
+        void ToScalar()      {mData->ToScalar();}
+        void ToMatrix()      {mData->ToMatrix();}
+        void ToEigenvalues() {mData->ToEigenvalues();}
+        void ToAxRhom()      {mData->ToAxRhom();}
+        void ToSpanSkew()    {mData->ToSpanSkew();}
+
+        double       AsScalar() const;
+        Matrix3d     AsMatrix() const;
+        UEigenvalues AsEigenvalues() const;
+        UAxRhom      AsAxRhom() const;
+        USpanSkew    AsSpanSkew() const;
+
+
+        Spin* GetSpin1() const {return mData->GetSpin1();}
+        Spin* GetSpin2() const {return mData->GetSpin2();}
+        ///If the interaction involves two spins and this function is
+        ///given a pointer to one of those spins, return a pointer to
+        ///the other spin. In all other cases return NULL
+        Spin* GetOtherSpin(const Spin* spin) const {return mData->GetOtherSpin(spin);}
+
+        sigc::signal<void> sigChange;
+        sigc::signal<void,Interaction*> sigDying;
+        sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
+    };
+
 };
+
+
+
 
 #endif

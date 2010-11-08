@@ -11,6 +11,7 @@ using namespace Eigen;
 namespace SpinXML {
 
     class UnitSystem {
+	public:
         //SI by default
         UnitSystem() : energyUnit(Joules),lengthUnit(metres),timeUnit(seconds) {
         }
@@ -24,7 +25,7 @@ namespace SpinXML {
     ///precomputation as soon as possible possible so that all queries
     ///involving transforming to and from the lab frame are as fast as
     ///possible.
-    class Frame {
+    class Frame : public sigc::trackable {
     public:
         Frame(Vector3d translation, Orientation rotation, Frame* parent=NULL);
 
@@ -62,9 +63,11 @@ namespace SpinXML {
         Orientation mOrient;
         Matrix4d mAffine;
         Matrix4d mInvertedAffine;
+		UnitSystem* mUnitSystem;
     };
 
-    template <typename Base,typename T> class ViewBase {
+    template <typename Base,typename T>
+	class ViewBase : public sigc::trackable {
     public:
         ViewBase(T* data,const Frame* frame, const UnitSystem* unitSystem)
             : mData(data),mFrame(frame),mUnitSystem(unitSystem) {
@@ -74,6 +77,7 @@ namespace SpinXML {
         void SetUnitSystem(UnitSystem* unitSystem) {mUnitSystem=unitSystem;}
 
         T* operator ->() {return mData;}
+		T* get() {return mData;}
         
     protected:
         T* mData;

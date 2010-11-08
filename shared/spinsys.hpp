@@ -67,6 +67,12 @@ namespace SpinXML {
         ///Remove a spin from the spin system. If it's no longer required it still has to be deleted.
         Spin* RemoveSpin(Spin* _Spin);
 
+        ///Remove a spin from the spin system.
+		void DiscardSpin(long Position) {delete RemoveSpin(Position);}
+        ///Remove a spin from the spin system.
+		void DiscardSpin(Spin* _Spin)   {delete RemoveSpin(_Spin);}
+
+
         void OnSpinDeleted(Spin* spin);
 
         void InsertInteraction(Interaction* inter);
@@ -91,7 +97,7 @@ namespace SpinXML {
         sigc::signal<void,Spin*,long> sigNewSpin;
         sigc::signal<void,Interaction*> sigNewInter;
         sigc::signal<void> sigReloaded;
-        sigc::signal<void> sigDying;
+        sigc::signal<void,SpinSystem*> sigDying;
 
         ///Automacially calculate the nuclear dipole-dipole couplings
         ///from the positions off the nuclear spins
@@ -102,6 +108,62 @@ namespace SpinXML {
         std::vector<Spin*> mSpins;
         Spin* mIgnoreSpinKill;
     };
+
+	class SpinSystemView  : public ViewBase<SpinSystemView,SpinSystem> {
+	public:
+        typedef ViewBase<SpinSystemView,SpinSystem> Base;
+
+		SpinSystemView(SpinSystem* spinsys,const Frame* frame, const UnitSystem* unitSystem) 
+            : Base(spinsys,frame,unitSystem) {
+            mData->sigNewSpin.connect(sigNewSpin);
+            mData->sigNewInter.connect(sigNewInter);
+            mData->sigReloaded.connect(sigReloaded);
+            mData->sigDying.connect(sigDying);
+            mData->sigDying.connect(mem_fun(this,&SpinSystemView::OnObjectDie));
+		}
+
+
+        void Clear() {mData->Clear();}
+    
+        long GetSpinCount()   const {return mData->GetSpinCount();}
+        Spin* GetSpin(long n) const {return mData->GetSpin(n);}
+        long GetSpinNumber(Spin* spin) const {return GetSpinNumber(spin);}
+
+        const std::vector<Spin*>& GetSpins() const {return mData->GetSpins();}
+
+        void InsertSpin(Spin* _Spin,long Position=END) {mData->InsertSpin(_Spin,Position);}
+
+		void DiscardSpin(long Position) {mData->DiscardSpin(Position);}
+		void DiscardSpin(Spin* _Spin)   {mData->DiscardSpin(_Spin);}
+
+        void InsertInteraction(Interaction* inter) {;}
+        Interaction* RemoveInteraction(Interaction* inter);
+        long GetInterCount() const {return mData->GetInterCount();}
+
+        //Returns all interactions involving Spin spin
+        std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
+        //Get all the interactions involving both spin1 and spin2
+        std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
+        //Returns all interactions involving Spin spin
+        std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
+		
+
+        void LoadFromFile(const char* filename,ISpinSystemLoader* loader)    {mData->LoadFromFile(filename,loader);}
+        void SaveToFile(const char* filename,ISpinSystemLoader* saver) const {mData->SaveToFile(filename,saver);}
+
+        ///Return all spins withing distance of point pos. Do not return
+        ///skip all spins below Ignore
+        std::vector<Spin*> GetNearbySpins(Vector3d pos,double distance,Spin* Ignore=NULL);
+
+        sigc::signal<void,Spin*,long> sigNewSpin;
+        sigc::signal<void,Interaction*> sigNewInter;
+        sigc::signal<void> sigReloaded;
+        sigc::signal<void,SpinSystem*> sigDying;
+
+        ///Automacially calculate the nuclear dipole-dipole couplings
+        ///from the positions off the nuclear spins
+        void CalcNuclearDipoleDipole() {mData->CalcNuclearDipoleDipole();}
+	};
 
 }; //End Namespace
 

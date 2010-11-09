@@ -31,13 +31,15 @@ struct Setup {
 
 
 
-     */
+	*/
 
-#define SETUP_FRAME(fName,V,O,P)                                        \
-    fName##_V(V),                                                       \
-        fName##_O(Orientation(O)),                                       \
-        fName(new Frame(fName##_V,fName##_O,P))                       
+#define SETUP_FRAME(fName,V,O,P)				\
+    fName##_V(V),								\
+        fName##_O(Orientation(O)),				\
+        fName(new Frame(fName##_V,fName##_O,unitSystem,P))
+
     Setup() :
+		unitSystem(new UnitSystem()),
         // Frames A,B and C are pure translational
         SETUP_FRAME(FrameA,Vector3d(1,0,0),Quaterniond(1,0,0,0),NULL),
         SETUP_FRAME(FrameB,Vector3d(0,2,0),Quaterniond(1,0,0,0),NULL),
@@ -65,9 +67,13 @@ struct Setup {
 
         SAFE_DELETE(SubFrameA3a);
         SAFE_DELETE(SubFrameA3b);
+
+		SAFE_DELETE(unitSystem);
     }
-#define DECLARE_FRAME(fName)                    \
+#define DECLARE_FRAME(fName)									\
     Vector3d fName##_V; Orientation fName##_O; Frame* fName;
+
+	UnitSystem* unitSystem;
 
     DECLARE_FRAME(FrameA);
     DECLARE_FRAME(FrameB);

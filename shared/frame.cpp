@@ -5,8 +5,8 @@
 using namespace SpinXML;
 using namespace Eigen;
 
-Frame::Frame(Vector3d translation, Orientation rotation, Frame* parent) 
-    : mParent(parent),mTranslate(translation),mOrient(rotation) {
+Frame::Frame(Vector3d translation, Orientation rotation, UnitSystem* unitSystem, Frame* parent) 
+    : mParent(parent),mTranslate(translation * unitSystem->lengthUnit.get_to_si()),mOrient(rotation),mUnitSystem(unitSystem) {
     updateAfine();
 }
 

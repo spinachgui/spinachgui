@@ -27,7 +27,7 @@ namespace SpinXML {
     ///possible.
     class Frame : public sigc::trackable {
     public:
-        Frame(Vector3d translation, Orientation rotation, Frame* parent=NULL);
+        Frame(Vector3d translation, Orientation rotation, UnitSystem* unitSystem, Frame* parent=NULL);
 
         void SetTranslation(const Vector3d& vec);
         const Vector3d& GetTranslation() const {return mTranslate;}
@@ -38,12 +38,12 @@ namespace SpinXML {
         ///Return a 4x4 isometary matrix in openGL convention a
         ///transformation into this frame. In other words if v is a
         ///vector in the lab frame then f.getTransformFromLab() * v is a
-        ///vector in the f frame
+        ///vector in the f frame. Units are SI
         Matrix4d getTransformFromLab() const {return mAffine;}
         ///Return a 4x4 isometary matrix expression a transformation
         ///into this frame. In other words if v is a vector in the f
         ///frame then: f.getTransformToLab() * v is a vector in the
-        ///lab frame
+        ///lab frame. Units are SI
         Matrix4d getTransformToLab() const {return mInvertedAffine;}
 
         ///Returns the parent frame of this frame

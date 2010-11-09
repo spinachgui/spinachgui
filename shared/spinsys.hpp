@@ -141,13 +141,18 @@ namespace SpinXML {
         long GetInterCount() const {return mData->GetInterCount();}
 
         //Returns all interactions involving Spin spin
-        std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
+        std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY) {
+			return mData->GetInteractionBySpin(spin,t);
+		}
         //Get all the interactions involving both spin1 and spin2
-        std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
+        std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY) {
+			return mData->GetInteractionBySpin(spin1,spin2,t);
+		}
         //Returns all interactions involving Spin spin
-        std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
+        std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY) {
+			return mData->GetInteractionBySpinOnce(spin,t);
+		}
 		
-
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader)    {mData->LoadFromFile(filename,loader);}
         void SaveToFile(const char* filename,ISpinSystemLoader* saver) const {mData->SaveToFile(filename,saver);}
 

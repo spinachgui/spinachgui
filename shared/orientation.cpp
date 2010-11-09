@@ -21,20 +21,6 @@ const double SpinXML::bohr_mag=9.27400915e-24;
 const double SpinXML::mu0=1.25663706e-6;
 
 //============================================================//
-//Helper functions
-
-Matrix3d SpinXML::MakeMatrix3d(double a00, double a01, double a02,
-					  double a10, double a11, double a12,
-					  double a20, double a21, double a22) {
-	Matrix3d m;
-	m(0,0)=a00;		m(0,1)=a01;		m(0,2)=a02;
-	m(1,0)=a10;		m(1,1)=a11;		m(1,2)=a12;
-	m(2,0)=a20;		m(2,1)=a21;		m(2,2)=a22;
-
-	return m;
-}
-
-//============================================================//
 // Rotation Conversions bank
 
 EulerAngles SpinXML::ConvertToEuler(const EulerAngles& rot) {return rot;}

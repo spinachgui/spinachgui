@@ -68,7 +68,7 @@ struct Setup {
     }
 
     long dyingCount;
-    void onDyingBlank() {
+    void onDyingBlank(SpinSystem*) {
         dyingCount++;
     }
 

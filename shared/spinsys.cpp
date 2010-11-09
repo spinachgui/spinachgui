@@ -6,11 +6,21 @@
 #include <shared/nuclear_data.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
+#include <shared/basic_math.hpp>
 
 using namespace std;
 using namespace SpinXML;
 using namespace sigc;
 using namespace boost;
+
+//============================================================//
+// SpinSystemView
+
+std::vector<Spin*> SpinSystemView::GetNearbySpins(Vector3d pos,double distance,Spin* Ignore) {
+	Vector4d v=Vector4d(pos.x(),pos.y(),pos.z(),1);
+	v=mFrame->getTransformToLab()*v;
+	return mData->GetNearbySpins(Vector3d(v.x(),v.y(),v.z()),distance * mUnitSystem->lengthUnit);
+}
 
 
 //==============================================================================//

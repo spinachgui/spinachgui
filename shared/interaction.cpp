@@ -1,9 +1,11 @@
 
 #include <shared/interaction.hpp>
 #include <Eigen/Eigenvalues> 
+#include <Eigen/Geometry>
 #include <iostream>
 #include <exception>
 #include <stdexcept>
+#include <shared/basic_math.hpp>
 
 using namespace SpinXML;
 using namespace std;
@@ -98,6 +100,92 @@ SpanSkew SpinXML::ConvertToSpanSkew(const Eigenvalues& I) {
 }
 SpanSkew SpinXML::ConvertToSpanSkew(const AxRhom& I) {return ConvertToSpanSkew(ConvertToEigenvalues(I));}
 SpanSkew SpinXML::ConvertToSpanSkew(const SpanSkew& I) {return I;}
+
+
+//============================================================//
+// InteractionView
+
+void InteractionView::SetScalar(double Scalar) {
+	mData->SetScalar(Scalar * mUnitSystem->energyUnit);
+}
+
+void InteractionView::SetMatrix(const Matrix3d& InMatrix) {
+	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
+	Matrix3d rotation= Transform3d(mFrame->getTransformToLab()).rotation();
+	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
+}
+
+
+void InteractionView::SetEigenvalues(double XX,double YY,   double ZZ,  const Orientation& Orient) {
+	Matrix3d InMatrix = ConvertToMatrix(Eigenvalues(XX * mUnitSystem->energyUnit,
+													YY * mUnitSystem->energyUnit,
+													ZZ * mUnitSystem->energyUnit,Orient));
+	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
+	Matrix3d rotation=Transform3d(mFrame->getTransformToLab()).rotation();
+	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
+	mData->ToEigenvalues();
+}
+
+void InteractionView::SetAxRhom(double iso,    double ax,   double rh,  const Orientation& Orient) {
+	Matrix3d InMatrix = ConvertToMatrix(AxRhom(iso * mUnitSystem->energyUnit,
+											   ax * mUnitSystem->energyUnit,
+											   rh * mUnitSystem->energyUnit,Orient));
+	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
+	Matrix3d rotation=Transform3d(mFrame->getTransformToLab()).rotation();
+	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
+	mData->ToAxRhom();
+}
+
+void InteractionView::SetSpanSkew(double iso,  double Span, double Skew,const Orientation& Orient) {
+	Matrix3d InMatrix = ConvertToMatrix(SpanSkew(iso  * mUnitSystem->energyUnit,
+												 Span * mUnitSystem->energyUnit,
+												 Skew,Orient));
+	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
+	Matrix3d rotation=Transform3d(mFrame->getTransformToLab()).rotation();
+	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
+	mData->ToSpanSkew();
+}
+
+double InteractionView::AsScalar() const {
+	return mData->AsScalar()[mUnitSystem->energyUnit];
+}
+
+Matrix3d InteractionView::AsMatrix() const {
+	Matrix3d MatInSI  = mData->AsMatrix();
+	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	return (rotation * MatInSI * rotation.inverse()) * mUnitSystem->energyUnit.get_from_si();
+}
+
+UEigenvalues InteractionView::AsEigenvalues() const {
+	Matrix3d MatInSI  = mData->AsMatrix();
+	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	Matrix3d AsMatrix = (rotation * MatInSI * rotation.inverse());
+	Eigenvalues eig = ConvertToEigenvalues(AsMatrix);
+	return UEigenvalues(eig.xx[mUnitSystem->energyUnit],
+						eig.yy[mUnitSystem->energyUnit],
+						eig.zz[mUnitSystem->energyUnit],eig.mOrient);
+}
+
+UAxRhom      InteractionView::AsAxRhom() const {
+	Matrix3d MatInSI  = mData->AsMatrix();
+	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
+	AxRhom ax_rhom=ConvertToAxRhom(Matrix);
+	return UAxRhom(ax_rhom.iso[mUnitSystem->energyUnit],
+				   ax_rhom.ax[mUnitSystem->energyUnit],
+				   ax_rhom.rh[mUnitSystem->energyUnit],ax_rhom.mOrient);
+}
+
+USpanSkew    InteractionView::AsSpanSkew() const {
+	Matrix3d MatInSI  = mData->AsMatrix();
+	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
+	SpanSkew span_skew = ConvertToSpanSkew(Matrix);
+	return USpanSkew(span_skew.iso[mUnitSystem->energyUnit],
+				   span_skew.span[mUnitSystem->energyUnit],
+				   span_skew.skew,span_skew.mOrient);
+}
+
 
 
 

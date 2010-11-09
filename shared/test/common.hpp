@@ -8,6 +8,7 @@
 #include <ctime>
 #include <shared/spin.hpp>
 #include <shared/interaction.hpp>
+#include <shared/basic_math.hpp>
 
 using namespace std;
 using namespace SpinXML;

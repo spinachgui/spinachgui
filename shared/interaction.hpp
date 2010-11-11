@@ -321,7 +321,7 @@ namespace SpinXML {
         bool IsType(Interaction::Type t) const {return mData->IsType(t);}
     
         ///For a bilinear interaction, get the spin that is not spinA
-        Spin* GetOtherSpin(Spin* spinA) {return mData->GetOtherSpin(spinA);}
+        SpinView GetOtherSpin(SpinView spinA) {return mData->GetOtherSpin(spinA.Get())->GetView(mFrame,mUnitSystem);}
 
         ///Set the value of the interaction using the scalar covention.
         void SetScalar(double Scalar);
@@ -351,12 +351,12 @@ namespace SpinXML {
         USpanSkew    AsSpanSkew() const;
 
 
-        Spin* GetSpin1() const {return mData->GetSpin1();}
-        Spin* GetSpin2() const {return mData->GetSpin2();}
+        SpinView GetSpin1() const {return mData->GetSpin1()->GetView(mFrame,mUnitSystem);}
+        SpinView GetSpin2() const {return mData->GetSpin2()->GetView(mFrame,mUnitSystem);}
         ///If the interaction involves two spins and this function is
         ///given a pointer to one of those spins, return a pointer to
         ///the other spin. In all other cases return NULL
-        Spin* GetOtherSpin(const Spin* spin) const {return mData->GetOtherSpin(spin);}
+        SpinView GetOtherSpin(const SpinView spin) const {return mData->GetOtherSpin(spin.Get())->GetView(mFrame,mUnitSystem);}
 
         sigc::signal<void> sigChange;
         sigc::signal<void,Interaction*> sigDying;

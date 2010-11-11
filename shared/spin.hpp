@@ -14,6 +14,7 @@ using namespace Eigen;
 
 
 namespace SpinXML {
+	class SpinView;
 
     ///A class representing a spin in a spin system
     class Spin : public sigc::trackable {
@@ -37,6 +38,8 @@ namespace SpinXML {
 
         sigc::signal<void> sigChange;
         sigc::signal<void,Spin*> sigDying;
+
+		SpinView GetView(const Frame* frame,const UnitSystem* unitSystem);
     private:
         Vector3d mPosition;
         std::string mLabel;

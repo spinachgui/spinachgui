@@ -5,6 +5,7 @@
 
 #include <sigc++/sigc++.h>
 #include <shared/orientation.hpp>
+#include <vector>
 
 using namespace Eigen;
 
@@ -66,9 +67,11 @@ namespace SpinXML {
 		UnitSystem* mUnitSystem;
     };
 
-    template <typename Base,typename T>
+    template <typename Derived,typename T>
 	class ViewBase : public sigc::trackable {
     public:
+		typedef T ViewedType;
+
         ViewBase(T* data,const Frame* frame, const UnitSystem* unitSystem)
             : mData(data),mFrame(frame),mUnitSystem(unitSystem) {
         }
@@ -77,9 +80,19 @@ namespace SpinXML {
         void SetUnitSystem(UnitSystem* unitSystem) {mUnitSystem=unitSystem;}
 
         T* operator ->() {return mData;}
-		T* get() {return mData;}
+		T* Get() {return mData;}
+		const T* Get() const {return mData;}
         
     protected:
+		template <typename ViewType>
+		std::vector<ViewType> MapVectorToViewVector(const std::vector<typename ViewType::ViewedType*>& v) const {
+			std::vector<ViewType> ret;
+			for(long i=0;i<v.size();i++) {
+				ret.push_back(v[i]->GetView(mFrame,mUnitSystem));
+			}
+			return ret;
+		}
+
         T* mData;
         const Frame* mFrame;
         const UnitSystem* mUnitSystem;

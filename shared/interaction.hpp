@@ -11,6 +11,7 @@
 
 
 namespace SpinXML {
+	class InteractionView;
 
     ///============================================================//
 	template<typename T>
@@ -274,6 +275,7 @@ namespace SpinXML {
         Spin* GetOtherSpin(const Spin* spin) const {return (mSpin1==spin ? mSpin2 : 
                                                             (mSpin2==spin ? mSpin1 : NULL));}
 
+		InteractionView GetView(const Frame* frame,const UnitSystem* unitSystem);
     private:
 
         void valid_or_throw() const;

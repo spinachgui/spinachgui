@@ -16,10 +16,10 @@ using namespace boost;
 //============================================================//
 // SpinSystemView
 
-std::vector<Spin*> SpinSystemView::GetNearbySpins(Vector3d pos,double distance,Spin* Ignore) {
+std::vector<SpinView> SpinSystemView::GetNearbySpins(Vector3d pos,double distance,SpinView Ignore) {
 	Vector4d v=Vector4d(pos.x(),pos.y(),pos.z(),1);
 	v=mFrame->getTransformToLab()*v;
-	return mData->GetNearbySpins(Vector3d(v.x(),v.y(),v.z()),distance * mUnitSystem->lengthUnit);
+	return MapVectorToViewVector<SpinView>(mData->GetNearbySpins(Vector3d(v.x(),v.y(),v.z()),distance * mUnitSystem->lengthUnit,Ignore.Get()));
 }
 
 

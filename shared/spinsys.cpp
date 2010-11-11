@@ -43,7 +43,6 @@ SpinSystem::SpinSystem(const SpinSystem& system)  {
 
 SpinSystem::~SpinSystem() {
     Clear();
-    sigDying(this);
 }
 
 void SpinSystem::Clear() {

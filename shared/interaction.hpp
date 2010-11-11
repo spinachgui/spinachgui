@@ -88,7 +88,7 @@ namespace SpinXML {
     SpanSkew ConvertToSpanSkew(const SpanSkew& inter);
 
 
-    class Interaction : public sigc::trackable {
+    class Interaction : public SpinXMLBase<Interaction,InteractionView> {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Enumeration of the storage conventions used by this interaction
@@ -248,7 +248,6 @@ namespace SpinXML {
         bool GetIsQuadratic() const;
 
         sigc::signal<void> sigChange;
-        sigc::signal<void,Interaction*> sigDying;
         ///This signal is emited whenever one of the spins this interaction
         ///referes to changes. The first argument is a pointer to the old
         ///spin
@@ -274,8 +273,6 @@ namespace SpinXML {
         ///the other spin. In all other cases return NULL
         Spin* GetOtherSpin(const Spin* spin) const {return (mSpin1==spin ? mSpin2 : 
                                                             (mSpin2==spin ? mSpin1 : NULL));}
-
-		InteractionView GetView(const Frame* frame,const UnitSystem* unitSystem);
     private:
 
         void valid_or_throw() const;

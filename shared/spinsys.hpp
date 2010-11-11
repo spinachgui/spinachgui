@@ -46,7 +46,7 @@ namespace SpinXML {
     };
 
 
-    class SpinSystem : public sigc::trackable {
+    class SpinSystem : public SpinXMLBase<SpinSystem,SpinSystemView> {
     public:
         SpinSystem();
         SpinSystem(const SpinSystem& system);
@@ -98,13 +98,10 @@ namespace SpinXML {
         sigc::signal<void,Spin*,long> sigNewSpin;
         sigc::signal<void,Interaction*> sigNewInter;
         sigc::signal<void> sigReloaded;
-        sigc::signal<void,SpinSystem*> sigDying;
 
         ///Automacially calculate the nuclear dipole-dipole couplings
         ///from the positions off the nuclear spins
         void CalcNuclearDipoleDipole();
-
-		SpinSystemView GetView(const Frame* frame,const UnitSystem* unitSystem);
     private:
         std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;

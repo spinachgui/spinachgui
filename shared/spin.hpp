@@ -36,8 +36,6 @@ namespace SpinXML {
         void SetElement(long element);
         long GetIsotope() const;
         void SetIsotope(long isotope);
-
-        sigc::signal<void> sigChange;
     private:
         Vector3d mPosition;
         std::string mLabel;
@@ -51,9 +49,6 @@ namespace SpinXML {
 
         SpinView(Spin* spin,const Frame* frame, const UnitSystem* unitSystem) 
             : Base(spin,frame,unitSystem) {
-            mData->sigChange.connect(sigChange);
-            mData->sigDying.connect(sigDying);
-            mData->sigDying.connect(sigc::mem_fun(this,&SpinView::OnObjectDie));
         }
 
         ///When the SpinView detects the spin it is watching has been
@@ -73,9 +68,6 @@ namespace SpinXML {
         void SetElement(long element)       {mData->SetElement(element);}
         long GetIsotope() const             {return mData->GetIsotope();}
         void SetIsotope(long isotope) const {mData->SetIsotope(isotope);}
-
-        sigc::signal<void> sigChange;
-        sigc::signal<void,Spin*> sigDying;
     };
 
 };

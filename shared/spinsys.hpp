@@ -117,8 +117,6 @@ namespace SpinXML {
             mData->sigNewSpin.connect(sigNewSpin);
             mData->sigNewInter.connect(sigNewInter);
             mData->sigReloaded.connect(sigReloaded);
-            mData->sigDying.connect(sigDying);
-            mData->sigDying.connect(mem_fun(this,&SpinSystemView::OnObjectDie));
 		}
 
 
@@ -164,7 +162,6 @@ namespace SpinXML {
         sigc::signal<void,Spin*,long> sigNewSpin;
         sigc::signal<void,Interaction*> sigNewInter;
         sigc::signal<void> sigReloaded;
-        sigc::signal<void,SpinSystem*> sigDying;
 
         ///Automacially calculate the nuclear dipole-dipole couplings
         ///from the positions off the nuclear spins

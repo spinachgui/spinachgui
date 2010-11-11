@@ -247,7 +247,6 @@ namespace SpinXML {
         bool GetIsBilinear() const; 
         bool GetIsQuadratic() const;
 
-        sigc::signal<void> sigChange;
         ///This signal is emited whenever one of the spins this interaction
         ///referes to changes. The first argument is a pointer to the old
         ///spin
@@ -298,11 +297,7 @@ namespace SpinXML {
         ///Construct from a scalar
         InteractionView(Interaction* inter   ,const Frame* frame, const UnitSystem* unitSystem)
 			: Base(inter,frame,unitSystem) {
-			mData->sigChange.connect    (sigChange);
-			mData->sigDying.connect     (sigDying);
 			mData->sigRemoveSpin.connect(sigRemoveSpin);
-
-            mData->sigDying.connect(sigc::mem_fun(this,&InteractionView::OnObjectDie));
         }
 
         ///Get the storage convention being used
@@ -358,8 +353,6 @@ namespace SpinXML {
         ///the other spin. In all other cases return NULL
         SpinView GetOtherSpin(const SpinView spin) const {return mData->GetOtherSpin(spin.Get())->GetView(mFrame,mUnitSystem);}
 
-        sigc::signal<void> sigChange;
-        sigc::signal<void,Interaction*> sigDying;
         sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
     };
 

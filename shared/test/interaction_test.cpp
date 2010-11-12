@@ -124,7 +124,6 @@ BOOST_FIXTURE_TEST_CASE( InteractionCtor, Setup) {
 
 
 BOOST_FIXTURE_TEST_CASE( InteractionIsType, Setup) {
-    energy en = 1.0*Joules;
     BOOST_CHECK(type_HFC			 ->IsType(Interaction::HFC			    ) );
     BOOST_CHECK(type_G_TENSER		 ->IsType(Interaction::G_TENSER		) );
     BOOST_CHECK(type_ZFS			 ->IsType(Interaction::ZFS		    	) );
@@ -141,7 +140,6 @@ BOOST_FIXTURE_TEST_CASE( InteractionIsType, Setup) {
 
 //Check that exceptions are thrown for invalid types
 BOOST_FIXTURE_TEST_CASE( CorrectFormFromType, Setup) {
-    energy en = 1.0*Joules;
     BOOST_CHECK(type_HFC	     ->GetForm()==Interaction::BILINEAR);
     BOOST_CHECK(type_G_TENSER	     ->GetForm()==Interaction::LINEAR);
     BOOST_CHECK(type_ZFS	     ->GetForm()==Interaction::QUADRATIC);
@@ -185,9 +183,9 @@ BOOST_FIXTURE_TEST_CASE( SetAndGetEV, Setup) {
     BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::EIGENVALUES);
     energy xx2,yy2,zz2; Orientation o2(EulerAngles(0,0,0));
     type_HFC->GetEigenvalues(&xx2,&yy2,&zz2,&o2);
-    BOOST_CHECK_EQUAL(xx.si,xx2.si);
-    BOOST_CHECK_EQUAL(yy.si,yy2.si);
-    BOOST_CHECK_EQUAL(zz.si,zz2.si);
+    BOOST_CHECK_EQUAL(xx,xx2);
+    BOOST_CHECK_EQUAL(yy,yy2);
+    BOOST_CHECK_EQUAL(zz,zz2);
     BOOST_CHECK(o==o2);
 };
 
@@ -196,9 +194,9 @@ BOOST_FIXTURE_TEST_CASE( SetAndGetAX, Setup) {
     BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::AXRHOM);
     energy ar_iso2,ax2,rh2; Orientation o3(EulerAngles(0,0,0));
     type_HFC->GetAxRhom(&ar_iso2,&ax2,&rh2,&o3);
-    BOOST_CHECK_EQUAL(ar_iso.si,ar_iso2.si);
-    BOOST_CHECK_EQUAL(ax.si,ax2.si);
-    BOOST_CHECK_EQUAL(rh.si,rh2.si);
+    BOOST_CHECK_EQUAL(ar_iso,ar_iso2);
+    BOOST_CHECK_EQUAL(ax,ax2);
+    BOOST_CHECK_EQUAL(rh,rh2);
     BOOST_CHECK(o==o3);
 };
 
@@ -207,8 +205,8 @@ BOOST_FIXTURE_TEST_CASE( SetAndGetSS, Setup) {
     BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::SPANSKEW);
     energy ss_iso2,span2; double skew2; Orientation o4(EulerAngles(0,0,0));
     type_HFC->GetSpanSkew(&ss_iso2,&span,&skew,&o4);
-    BOOST_CHECK_EQUAL(ss_iso.si,ss_iso2.si);
-    BOOST_CHECK_EQUAL(span.si,span2.si);
+    BOOST_CHECK_EQUAL(ss_iso,ss_iso2);
+    BOOST_CHECK_EQUAL(span,span2);
     BOOST_CHECK_EQUAL(skew,skew2);
     BOOST_CHECK(o==o4);
 };
@@ -219,7 +217,7 @@ BOOST_FIXTURE_TEST_CASE( SetAndGetScalar, Setup) {
     BOOST_CHECK_EQUAL(type_HFC->GetStorage(),Interaction::STORAGE_SCALAR);
     energy scalar2;
     type_HFC->GetScalar(&scalar2);
-    BOOST_CHECK_EQUAL(scalar.si,scalar2.si);
+    BOOST_CHECK_EQUAL(scalar,scalar2);
 };
 
 

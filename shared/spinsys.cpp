@@ -189,19 +189,18 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             //cout << "isotope1=" << isotope1 << "  isotope2="<< isotope2 << endl;
             //cout << "g1="<< g1 << "  g2="<< g2 << endl;
 
-            length r=r_1_2.norm()*metres;
-            length2 r2=r*r;
-            length3 r3=r2*r;
-            length5 r5=r2*r3;
+            double r=r_1_2.norm();
+            double r2=r*r;
+            double r3=r2*r;
+            double r5=r2*r3;
 
-            Matrix3d dipole=MakeMatrix3d(r2.si-3.0*rx.si*rx.si, 3.0*rx.si*ry.si,      3.0*rx.si*rz.si,
-                                         3.0*rx.si*ry.si,       r2.si-3.0*ry.si*ry.si,3.0*ry.si*rz.si,
-                                         3.0*rx.si*rz.si,       3.0*ry.si*rz.si,      r2.si-3.0*rz.si*rz.si);
+            Matrix3d dipole=MakeMatrix3d(r2-3.0*rx*rx, 3.0*rx*ry,      3.0*rx*rz,
+                                         3.0*rx*ry,       r2-3.0*ry*ry,3.0*ry*rz,
+                                         3.0*rx*rz,       3.0*ry*rz,   r2-3.0*rz*rz);
             static const double four_pi=12.5663706;
-            double coeff=(mu0*hbar*g1*g2/(r5.si*four_pi));
+            double coeff=(mu0*hbar*g1*g2/(r5*four_pi));
 
-            dreal<double,_mass_per_time2> dcoeff(coeff);
-            Matrix3d dipole_inter=dcoeff.si*dipole;
+            Matrix3d dipole_inter=coeff*dipole;
             Interaction* inter=new Interaction(dipole_inter,Interaction::DIPOLAR,spin1,spin2);
             this->InsertInteraction(inter);
         }

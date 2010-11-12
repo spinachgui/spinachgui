@@ -17,15 +17,15 @@ energy SpinXML::ConvertToScalar(const AxRhom& I)      {return energy(I.iso/3.0);
 energy SpinXML::ConvertToScalar(const SpanSkew& I)    {return energy(I.iso/3.0);}
 
 
-Matrix3d SpinXML::ConvertToMatrix(const energy& I) {return MakeMatrix3d(I.si,0,0,
-                                                                        0,I.si,0,
-                                                                        0,0,I.si);}
+Matrix3d SpinXML::ConvertToMatrix(const energy& I) {return MakeMatrix3d(I,0,0,
+                                                                        0,I,0,
+                                                                        0,0,I);}
 Matrix3d SpinXML::ConvertToMatrix(const Matrix3d& I) {return I;}
 Matrix3d SpinXML::ConvertToMatrix(const Eigenvalues& I) {
 	//Undo the eigensystem decomposition
-	Matrix3d in_eigen_frame(MakeMatrix3d(I.xx.si,0      ,0       , 
-                                             0      ,I.yy.si,0       , 
-                                             0      ,0      ,I.zz.si));
+	Matrix3d in_eigen_frame(MakeMatrix3d(I.xx,0      ,0       , 
+										 0      ,I.yy,0       , 
+										 0      ,0      ,I.zz));
 	Matrix3d rotMatrix=I.mOrient.GetAsMatrix();
  	return rotMatrix*in_eigen_frame*rotMatrix.inverse();
 }
@@ -95,7 +95,7 @@ SpanSkew SpinXML::ConvertToSpanSkew(const Eigenvalues& I) {
 
 	energy iso = (xx+yy+zz)/3.0;
 	energy span=zz - xx;
-	double skew=span == energy(0.0) && span == energy(-0.0) ? 0.5 : ((3.0/2.0)*((iso-yy)/span)).si;
+	double skew=span == energy(0.0) && span == energy(-0.0) ? 0.5 : ((3.0/2.0)*((iso-yy)/span));
 	return SpanSkew(iso,span,skew,I.mOrient);
 }
 SpanSkew SpinXML::ConvertToSpanSkew(const AxRhom& I) {return ConvertToSpanSkew(ConvertToEigenvalues(I));}
@@ -147,7 +147,7 @@ void InteractionView::SetSpanSkew(double iso,  double Span, double Skew,const Or
 }
 
 double InteractionView::AsScalar() const {
-	return mData->AsScalar()[mUnitSystem->energyUnit];
+	return mData->AsScalar()*mUnitSystem->energyUnit;
 }
 
 Matrix3d InteractionView::AsMatrix() const {
@@ -161,9 +161,9 @@ UEigenvalues InteractionView::AsEigenvalues() const {
 	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d AsMatrix = (rotation * MatInSI * rotation.inverse());
 	Eigenvalues eig = ConvertToEigenvalues(AsMatrix);
-	return UEigenvalues(eig.xx[mUnitSystem->energyUnit],
-						eig.yy[mUnitSystem->energyUnit],
-						eig.zz[mUnitSystem->energyUnit],eig.mOrient);
+	return UEigenvalues(eig.xx * mUnitSystem->energyUnit,
+						eig.yy * mUnitSystem->energyUnit,
+						eig.zz * mUnitSystem->energyUnit,eig.mOrient);
 }
 
 UAxRhom      InteractionView::AsAxRhom() const {
@@ -171,9 +171,9 @@ UAxRhom      InteractionView::AsAxRhom() const {
 	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
 	AxRhom ax_rhom=ConvertToAxRhom(Matrix);
-	return UAxRhom(ax_rhom.iso[mUnitSystem->energyUnit],
-				   ax_rhom.ax[mUnitSystem->energyUnit],
-				   ax_rhom.rh[mUnitSystem->energyUnit],ax_rhom.mOrient);
+	return UAxRhom(ax_rhom.iso * mUnitSystem->energyUnit,
+				   ax_rhom.ax  * mUnitSystem->energyUnit,
+				   ax_rhom.rh  * mUnitSystem->energyUnit,ax_rhom.mOrient);
 }
 
 USpanSkew    InteractionView::AsSpanSkew() const {
@@ -181,8 +181,8 @@ USpanSkew    InteractionView::AsSpanSkew() const {
 	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
 	SpanSkew span_skew = ConvertToSpanSkew(Matrix);
-	return USpanSkew(span_skew.iso[mUnitSystem->energyUnit],
-				   span_skew.span[mUnitSystem->energyUnit],
+	return USpanSkew(span_skew.iso*mUnitSystem->energyUnit,
+				   span_skew.span*mUnitSystem->energyUnit,
 				   span_skew.skew,span_skew.mOrient);
 }
 
@@ -200,7 +200,7 @@ class thisVisitor : public static_visitor<> {
 public:
     void operator()(const energy& dat) const {
 	cout << "    Type=Scalar" <<  endl;
-	cout << "    Value=" << dat[MHz] << "MHz" << endl;
+	cout << "    Value=" << dat * MHz << "MHz" << endl;
     }
     void operator()(const Matrix3d& dat) const {
 	cout << "    Type=Matrix" <<  endl;
@@ -209,9 +209,9 @@ public:
     void operator()(const Eigenvalues& dat) const {
 	cout << "    Type=Eigenvalues" <<  endl;
 	cout << "    Value=(XX=" 
-	     << dat.xx[MHz] << "MHz ,YY="
-	     << dat.yy[MHz] << "MHz ,ZZ="
-	     << dat.zz[MHz] << "MHz)"
+	     << dat.xx * MHz << "MHz ,YY="
+	     << dat.yy * MHz << "MHz ,ZZ="
+	     << dat.zz * MHz << "MHz)"
 	     << endl;
 	cout << "    Orient=";
     }

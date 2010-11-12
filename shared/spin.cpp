@@ -29,9 +29,9 @@ void SpinView::SetPosition(Vector3d Position) {
 void SpinView::GetCoordinates(double* _x,double* _y, double* _z) const {
     length ux,uy,uz;
     mData->GetCoordinates(&ux,&uy,&uz);
-	Vector4d v=mFrame->getTransformFromLab()*Vector4d(ux[mUnitSystem->lengthUnit],
-													  uy[mUnitSystem->lengthUnit],
-													  uz[mUnitSystem->lengthUnit],1);
+	Vector4d v=mFrame->getTransformFromLab()*Vector4d(ux/mUnitSystem->lengthUnit,
+													  uy/mUnitSystem->lengthUnit,
+													  uz/mUnitSystem->lengthUnit,1);
 	*_x=v.x();
 	*_y=v.y();
 	*_z=v.z();
@@ -77,17 +77,17 @@ void Spin::SetPosition(Vector3d Position) {
 }
 
 void Spin::GetCoordinates(length* _x,length* _y, length* _z) const {
-	_x->si=mPosition.x();
-	_y->si=mPosition.y();
-	_z->si=mPosition.z();
+	*_x=mPosition.x();
+	*_y=mPosition.y();
+	*_z=mPosition.z();
 }
 
 
 void Spin::SetCoordinates(length _x,length _y, length _z) {
     sigChange();
-	mPosition[0]=_x.si;
-	mPosition[1]=_y.si;
-	mPosition[2]=_z.si;
+	mPosition[0]=_x;
+	mPosition[1]=_y;
+	mPosition[2]=_z;
 }
 
 void Spin::SetLabel(string Label) {

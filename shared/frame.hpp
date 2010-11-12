@@ -16,9 +16,9 @@ namespace SpinXML {
         //SI by default
         UnitSystem() : energyUnit(Joules),lengthUnit(metres),timeUnit(seconds) {
         }
-        energy_unit energyUnit;
-        length_unit lengthUnit;
-        time_unit timeUnit;
+        unit energyUnit;
+        unit lengthUnit;
+        unit timeUnit;
     };
 
     ///Class representing a frame in a hiraci of nested reference

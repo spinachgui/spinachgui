@@ -10,6 +10,7 @@
 #include <Eigen/Geometry> 
 
 using namespace Eigen;
+using namespace boost;
 
 #define PI 3.141592653589793238462643
 using std::complex;

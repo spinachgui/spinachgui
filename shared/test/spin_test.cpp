@@ -16,7 +16,7 @@ struct Setup {
         z(-3.0 * Angstroms),
 		label("Hello world"),
 		element(5),
-        s(new Spin(Vector3d(x.si,y.si,z.si),label,element)) {
+        s(new Spin(Vector3d(x,y,z),label,element)) {
     }
     ~Setup() {
         if(s != NULL) {
@@ -33,9 +33,9 @@ struct Setup {
 BOOST_FIXTURE_TEST_CASE( SpinConstructor, Setup ) {
     length tx,ty,tz;
     s->GetCoordinates(&tx,&ty,&tz);
-    BOOST_CHECK_EQUAL(tx.si,x.si);
-    BOOST_CHECK_EQUAL(ty.si,y.si);
-    BOOST_CHECK_EQUAL(tz.si,z.si);
+    BOOST_CHECK_EQUAL(tx,x);
+    BOOST_CHECK_EQUAL(ty,y);
+    BOOST_CHECK_EQUAL(tz,z);
     BOOST_CHECK_EQUAL(s->GetElement(),element);
     BOOST_CHECK_EQUAL(s->GetLabel(),label);
 }
@@ -83,9 +83,9 @@ BOOST_FIXTURE_TEST_CASE( SettersAndGetters, Setup ) {
     s->SetCoordinates(x,y,z);
     length xt,yt,zt;
     s->GetCoordinates(&xt,&yt,&zt);
-    BOOST_CHECK_EQUAL(x.si,xt.si);
-    BOOST_CHECK_EQUAL(y.si,yt.si);
-    BOOST_CHECK_EQUAL(z.si,zt.si);
+    BOOST_CHECK_EQUAL(x,xt);
+    BOOST_CHECK_EQUAL(y,yt);
+    BOOST_CHECK_EQUAL(z,zt);
 
     string str="Actually, call my spin this";
     s->SetLabel(str);

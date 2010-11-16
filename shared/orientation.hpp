@@ -86,6 +86,7 @@ namespace SpinXML {
     ///Class for storing a 3 dimentional rotation
     class Orientation {
     public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Constructs an orientation from euler angles
         Orientation(const EulerAngles& ea) : mData(ea) {}
         ///Constructs an orientation from a matrix
@@ -132,10 +133,10 @@ namespace SpinXML {
 
         Vector3d Apply(Vector3d v) const;
 
-        const Orientation& operator=(const EulerAngles& ea);
-        const Orientation& operator=(const AngleAxisd& aa);
-        const Orientation& operator=(const Matrix3d& m);
-        const Orientation& operator=(const Quaterniond& q);
+        const Orientation& operator=(const EulerAngles& ea) {mData = ea;}
+        const Orientation& operator=(const AngleAxisd& aa)  {mData = aa;}
+        const Orientation& operator=(const Matrix3d& m)     {mData = m;}
+        const Orientation& operator=(const Quaterniond& q)  {mData = q;}
 
         bool operator==(const Orientation& o) const {
             if(o.mData.type()==typeid(EulerAngles))	return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);

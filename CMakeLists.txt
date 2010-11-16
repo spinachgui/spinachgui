@@ -12,10 +12,10 @@ enable_testing()
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
+set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wno-write-strings -Wall")
 
 SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS}")
-
 
 #Choose a build type:
 
@@ -36,14 +36,18 @@ set(buildDir ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
 #number of debuggers that can.
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-strings ")
 
+############################################################
+# Do automatic library detection
 
+find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
 find_package(Boost REQUIRED program_options unit_test_framework)
-set(CMAKE_CXX_COMPILER "g++")
 
 ############################################################
 #List of source files for all the targets
 
 file(GLOB sharedSources shared/*.cpp)
+file(GLOB guiSources gui/*.cpp)
+file(GLOB autoSources ${CMAKE_CURRENT_BINARY_DIR}/auto/*.cpp)
 
 ############################################################
 # Link and include directories
@@ -62,6 +66,12 @@ include_directories(SYSTEM /usr/local/include/eigen3/)
 # Link the non graphical code into a library
 
 add_library(spinxml STATIC       ${sharedSources})
+
+############################################################
+# GUI code build here
+
+add_executable(SpinachGUI ${guiSources} ${autoSources})
+target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
 # Tests specified here

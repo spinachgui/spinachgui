@@ -20,6 +20,7 @@ namespace SpinXML {
     ///A class representing a spin in a spin system
     class Spin : public SpinXMLBase<Spin,SpinView> {
     public:  
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         Spin(Vector3d mPosition,std::string mLabel,long atomicNumber=1,long isotope=1);
         Spin(const Spin& s);
         ~Spin();

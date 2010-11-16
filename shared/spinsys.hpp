@@ -78,6 +78,9 @@ namespace SpinXML {
 
         void InsertInteraction(Interaction* inter);
         Interaction* RemoveInteraction(Interaction* inter);
+
+		void DiscardInteraction(Interaction* inter) {delete RemoveInteraction(inter);}
+
         long GetInterCount() const {return mInteractions.size();}
 
         //Returns all interactions involving Spin spin
@@ -86,7 +89,7 @@ namespace SpinXML {
         std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
         //Returns all interactions involving Spin spin
         std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
-		
+
 
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
         void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;

@@ -207,6 +207,24 @@ void SpinSystem::CalcNuclearDipoleDipole() {
     }
 }
 
+std::vector<Interaction*> SpinSystem::GetInteractionBySpin(Spin* spin,Interaction::Type t) {
+	
+}
+
+std::vector<Interaction*> SpinSystem::GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t) {
+
+}
+
+std::vector<Interaction*> SpinSystem::GetInteractionBySpinOnce(Spin* spin,Interaction::Type t) {
+	
+}
+
+Interaction* SpinSystem::RemoveInteraction(Interaction* inter) {
+
+}
+
+
+
 void SpinSystem::InsertInteraction(Interaction* inter) {
 	mInteractions.push_back(inter);
 	sigNewInter.emit(inter);

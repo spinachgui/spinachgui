@@ -84,11 +84,11 @@ namespace SpinXML {
         long GetInterCount() const {return mInteractions.size();}
 
         //Returns all interactions involving Spin spin
-        std::vector<Interaction*> GetInteractionBySpin(Spin* spin,Interaction::Type t=Interaction::ANY); 
+        std::vector<Interaction*> GetInteractionsBySpin(const Spin* spin,Interaction::Type t=Interaction::ANY) const; 
         //Get all the interactions involving both spin1 and spin2
-        std::vector<Interaction*> GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY);
+        std::vector<Interaction*> GetInteractionsBySpin(const Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY) const;
         //Returns all interactions involving Spin spin
-        std::vector<Interaction*> GetInteractionBySpinOnce(Spin* spin,Interaction::Type t=Interaction::ANY); 
+        std::vector<Interaction*> GetInteractionsBySpinOnce(const Spin* spin,Interaction::Type t=Interaction::ANY) const; 
 
 
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
@@ -143,16 +143,16 @@ namespace SpinXML {
         long GetInterCount() const {return mData->GetInterCount();}
 
         //Returns all interactions involving Spin spin
-        std::vector<InteractionView> GetInteractionBySpin(SpinView spin,Interaction::Type t=Interaction::ANY) {
-			return MapVectorToViewVector<InteractionView>(mData->GetInteractionBySpin(spin.Get(),t));
+        std::vector<InteractionView> GetInteractionsBySpin(SpinView spin,Interaction::Type t=Interaction::ANY) {
+			return MapVectorToViewVector<InteractionView>(mData->GetInteractionsBySpin(spin.Get(),t));
 		}
         //Get all the interactions involving both spin1 and spin2
-        std::vector<InteractionView> GetInteractionBySpin(SpinView spin1, SpinView spin2,Interaction::Type t=Interaction::ANY) {
-			return MapVectorToViewVector<InteractionView>(mData->GetInteractionBySpin(spin1.Get(),spin2.Get(),t));
+        std::vector<InteractionView> GetInteractionsBySpin(SpinView spin1, SpinView spin2,Interaction::Type t=Interaction::ANY) {
+			return MapVectorToViewVector<InteractionView>(mData->GetInteractionsBySpin(spin1.Get(),spin2.Get(),t));
 		}
         //Returns all interactions involving Spin spin
-        std::vector<InteractionView> GetInteractionBySpinOnce(SpinView spin,Interaction::Type t=Interaction::ANY) {
-			return MapVectorToViewVector<InteractionView>(mData->GetInteractionBySpinOnce(spin.Get(),t));
+        std::vector<InteractionView> GetInteractionsBySpinOnce(SpinView spin,Interaction::Type t=Interaction::ANY) {
+			return MapVectorToViewVector<InteractionView>(mData->GetInteractionsBySpinOnce(spin.Get(),t));
 		}
 		
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader)    {mData->LoadFromFile(filename,loader);}

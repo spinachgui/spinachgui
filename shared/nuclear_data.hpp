@@ -20,6 +20,7 @@ double getElementB(long p);
 long getCommonIsotope(long p);
 
 long getElementBySymbol(const char* symb);
+long getIsotopeBySymbol(const char* symb);
 
 
 //Isotope functions

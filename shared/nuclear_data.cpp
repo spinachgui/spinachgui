@@ -89,6 +89,16 @@ long getElementBySymbol(const char* symb) {
     return -1;
 }
 
+long getIsotopeBySymbol(const char* symb) {
+    for(long i=0;i<gKnownElements;i++) {
+        if(strcmp(symb,gElements[i].symbol)==0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
 double getElementR(long p) {
     if(p>=gKnownElements) {
         return 1.0;

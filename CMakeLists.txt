@@ -46,6 +46,7 @@ find_package(Boost REQUIRED program_options unit_test_framework)
 #List of source files for all the targets
 
 file(GLOB sharedSources shared/*.cpp)
+file(GLOB formatSources shared/formats/*.cpp)
 file(GLOB guiSources gui/*.cpp)
 file(GLOB autoSources ${CMAKE_CURRENT_BINARY_DIR}/auto/*.cpp)
 
@@ -65,7 +66,7 @@ include_directories(SYSTEM /usr/local/include/eigen3/)
 ############################################################
 # Link the non graphical code into a library
 
-add_library(spinxml STATIC       ${sharedSources})
+add_library(spinxml STATIC ${sharedSources} ${formatSources})
 
 ############################################################
 # GUI code build here

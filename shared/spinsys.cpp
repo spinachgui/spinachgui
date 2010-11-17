@@ -207,20 +207,46 @@ void SpinSystem::CalcNuclearDipoleDipole() {
     }
 }
 
-std::vector<Interaction*> SpinSystem::GetInteractionBySpin(Spin* spin,Interaction::Type t) {
-	
+std::vector<Interaction*> SpinSystem::GetInteractionsBySpin(const Spin* spin,Interaction::Type t) const {
+    vector<Interaction*> retVal;
+    for(unsigned long i=0;i<mInteractions.size();i++) {
+		if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin)) { 
+			retVal.push_back(mInteractions[i]);
+		}
+    }
+    return retVal;
 }
 
-std::vector<Interaction*> SpinSystem::GetInteractionBySpin(Spin* spin1, Spin* spin2,Interaction::Type t) {
-
+std::vector<Interaction*> SpinSystem::GetInteractionsBySpin(const Spin* spin1, Spin* spin2,Interaction::Type t) const {
+    vector<Interaction*> retVal;
+    for(unsigned long i=0;i<mInteractions.size();i++) {
+		if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin1) && mInteractions[i]->GetHasSpin(spin2)) { 
+			retVal.push_back(mInteractions[i]);
+		}
+    }
+    return retVal;
 }
 
-std::vector<Interaction*> SpinSystem::GetInteractionBySpinOnce(Spin* spin,Interaction::Type t) {
-	
+std::vector<Interaction*> SpinSystem::GetInteractionsBySpinOnce(const Spin* spin,Interaction::Type t) const {
+    vector<Interaction*> retVal;
+    for(unsigned long i=0;i<mInteractions.size();i++) {
+		if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin)) { 
+			if(mInteractions[i]->GetOtherSpin(spin) < spin) {
+				retVal.push_back(mInteractions[i]);
+			}
+		}
+    }
+    return retVal;
 }
 
 Interaction* SpinSystem::RemoveInteraction(Interaction* inter) {
-
+    for(unsigned long i=0;i<mInteractions.size();i++) {
+        if(mInteractions[i]==inter) {
+            mInteractions.erase(mInteractions.begin()+i);
+            return inter;
+        }
+    }
+    return NULL;
 }
 
 

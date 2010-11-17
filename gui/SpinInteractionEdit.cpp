@@ -86,7 +86,7 @@ void SpinInterEditPanel::LoadFromSpin() {
     Enable(true);
   }
 
-  std::vector<Interaction*> oldInteractions=mSpinSystem->GetInteractionBySpin(mSpin);
+  std::vector<Interaction*> oldInteractions=mSpinSystem->GetInteractionsBySpin(mSpin);
   //Make sure all the interactions here are copies
   for(unsigned long i=0;i<oldInteractions.size();i++) {
     ListBoxInteraction lbi;

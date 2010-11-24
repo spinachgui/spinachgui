@@ -72,7 +72,7 @@ add_library(spinxml STATIC ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${autoSources})
-target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml xerces-c sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
 # Tests specified here

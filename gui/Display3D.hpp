@@ -21,6 +21,8 @@ using namespace boost;
 using namespace SpinXML;
 
 enum LAYER {
+	LAYER_DEFAULT = 0,
+    LAYER_AXIS,
     LAYER_SPINS,
     LAYER_BONDS,
     LAYER_INTERACTIONS,

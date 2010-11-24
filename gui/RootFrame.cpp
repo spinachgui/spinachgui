@@ -352,47 +352,6 @@ void RootFrame::OnEpr(wxCommandEvent& e) {
 
 void RootFrame::OnResize(wxSizeEvent&e) {
     mAuiManager->Update();
-    static bool firstTime=true;
-    if(firstTime) {
-        firstTime=false;
-        //Execute this testing code once when the main window is
-        //created. Doing this in an onrezise should ensure that the window
-        //is on the screne at the time.
-        LoadFromFile(wxT("../../testing_kit/Gaussian/ESR spectroscopy/cpdyad_cation.log"),
-                     wxT("../../testing_kit/Gaussian/ESR spectroscopy/"),
-                     wxT("cpdyad_cation.log"));
-        LoadFromFile(wxT("data/OFNAPH01_NMR.magres"),
-                     wxT("data/"),
-                     wxT("OFNAPH01_NMR.magres"));
-        LoadFromFile(wxT("data/tryosine.log"),
-                     wxT("data/"),
-                     wxT("tryosine.log"));
-        //GetSS()->CalcNuclearDipoleDipole();
-        for(unsigned long i=0;i<wxGetApp().GetIOFilters().size();i++) {
-            ISpinSystemLoader* saver=wxGetApp().GetIOFilters()[i];
-            if(saver->GetFilterType()==ISpinSystemLoader::SAVE ||
-               saver->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
-                GetSS()->SaveToFile((string("test.")+saver->GetFilter()).c_str(),saver);
-            }
-        }
-        /*GetSS()->Clear();
-        Spin* spin0=new Spin(Vector3l(length(0),length(0),length(0)),"0,0,0",1);
-        Spin* spinx=new Spin(Vector3l(length(3e-10),length(0),length(0)),"1,0,0",6);
-        Spin* spiny=new Spin(Vector3l(length(0),length(3e-10),length(0)),"0,1,0",7);
-        Spin* spinz=new Spin(Vector3l(length(0),length(0),length(3e-10)),"0,0,1",8);
-        //Interaction* inter0=new Interaction(eigenvalues_t(10e-6*eV,1e-6*eV,1e-6*eV  ,Orientation(AngleAxis(3.141592654/2*0.0,Vector3(1,0,0)))));
-        //Interaction* inter1=new Interaction(eigenvalues_t(10e-6*eV,1e-6*eV,1e-6*eV  ,Orientation(AngleAxis(3.141592654/2*0.5,Vector3(1,0,0)))));
-        Interaction* inter2=new Interaction(eigenvalues_t(10e-6*eV,1e-6*eV,1e-6*eV  ,Orientation(AngleAxis(3.141592654/2*0.5,Vector3(0.5,0.5,0)))));
-        //Interaction* inter3=new Interaction(eigenvalues_t(10e-6*eV,1.1e-6*eV,1e-6*eV  ,Orientation(AngleAxis(3.141592654/2*0.5,Vector3(0,0,1)))));
-        //inter0->SetSubType(Interaction::ST_SHIELDING,spin0);
-        //inter1->SetSubType(Interaction::ST_SHIELDING,spinx);
-        inter2->SetSubType(Interaction::ST_SHIELDING,spiny);
-        //inter3->SetSubType(Interaction::ST_SHIELDING,spinz);
-        GetSS()->InsertSpin(spin0);
-        GetSS()->InsertSpin(spinx);
-        GetSS()->InsertSpin(spiny);
-        GetSS()->InsertSpin(spinz);*/
-    }
 }
 
 

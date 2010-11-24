@@ -142,6 +142,7 @@ MoleculeNodeNew::MoleculeNodeNew(SpinSystem* ss)
 	//Add spin drawer node, bond drawer node, interaction drawer
 	//node. This node provides a common center for them to rotate
 	//about.
+	mPickingName = LAYER_AXIS;
     AddNode(new SpinDrawerNode(mSS));
     AddNode(new BondDrawerNode(mSS));
     AddNode(new InteractionDrawerNode(mSS));

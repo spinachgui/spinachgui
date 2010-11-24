@@ -57,7 +57,7 @@ namespace SpinXML {
         void Dump() const;
 
         long GetSpinCount() const;
-        Spin* GetSpin(long n) const;
+        Spin* GetSpin(unsigned long n) const;
         long GetSpinNumber(Spin* spin) const;
 
         const std::vector<Spin*>& GetSpins() const;

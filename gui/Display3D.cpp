@@ -258,6 +258,7 @@ Display3D::Display3D(wxWindow* parent)
                  0,wxT("Display3D"),
                  gl_attribs),
       mRootNode(NULL),
+	  mForgroundNode(NULL),
       mDC(),
       mHover(-1) {
     mGLContext=NULL;

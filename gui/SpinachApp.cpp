@@ -7,15 +7,17 @@
 #include <gui/RootFrame.hpp>
 #include <wx/log.h>
 
-//#include <shared/formats/xyz.hpp>
-//#include <shared/formats/g03.hpp>
-//#include <shared/formats/xml.hpp>
-//#include <shared/formats/castep.hpp>
-//#include <shared/formats/simpson.hpp>
+#include <shared/formats/xyz.hpp>
+#include <shared/formats/g03.hpp>
+#include <shared/formats/xml.hpp>
+#include <shared/formats/castep.hpp>
+#include <shared/formats/simpson.hpp>
 
 #include <wx/filename.h>
 
 #include <shared/unit.hpp>
+
+using namespace SpinXML;
 
 SpinachApp* gApp;
 
@@ -54,23 +56,23 @@ bool SpinachApp::OnInit() {
 
     //Load the I/O Filters
 
-    //mIOFilters.push_back(new G03Loader);
-    //mIOFilters.push_back(new SIMPSONLoader);
-    //mIOFilters.push_back(new CASTEPLoader);
+    mIOFilters.push_back(new G03Loader);
+    mIOFilters.push_back(new SIMPSONLoader);
+    mIOFilters.push_back(new CASTEPLoader);
 
     //Load the xml schema, it's more complicated, of course
-    /*wxFileName fn(argv[0]);
+    wxFileName fn(argv[0]);
     fn.Normalize();
     fn=fn.GetPath();
     fn.AppendDir(wxT("data"));
     fn.SetFullName(wxT("spinxml_schema.xsd"));
     wxString url(wxString(wxT("file://")) << fn.GetFullPath());
-    mIOFilters.push_back(new XMLLoader(url.char_str()));*/
+    mIOFilters.push_back(new XMLLoader(url.char_str()));
   
     //Load the isotopes
 
     try {
-        LoadIsotopes();
+		LoadIsotopes();
     } catch(runtime_error e) {
         cout << "Isotopes not loaded" << endl;
         wxLogError(wxString() <<

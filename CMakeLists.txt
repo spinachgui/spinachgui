@@ -12,7 +12,7 @@ enable_testing()
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
-set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__")
+set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -DEIGEN_DONT_ALIGN")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wno-write-strings -Wall")
 
 SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS}")
@@ -40,7 +40,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-string
 # Do automatic library detection
 
 find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
-find_package(Boost REQUIRED program_options unit_test_framework)
+find_package(Boost REQUIRED program_options unit_test_framework filesystem)
 
 ############################################################
 #List of source files for all the targets
@@ -48,7 +48,8 @@ find_package(Boost REQUIRED program_options unit_test_framework)
 file(GLOB sharedSources shared/*.cpp)
 file(GLOB formatSources shared/formats/*.cpp)
 file(GLOB guiSources gui/*.cpp)
-file(GLOB autoSources ${CMAKE_CURRENT_BINARY_DIR}/auto/*.cpp)
+set(wxformbuilderSources ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp)
+set(xmlSources           ${CMAKE_CURRENT_BINARY_DIR}/auto/spinxml_schema.cpp)
 
 ############################################################
 # Link and include directories
@@ -66,12 +67,12 @@ include_directories(SYSTEM /usr/local/include/eigen3/)
 ############################################################
 # Link the non graphical code into a library
 
-add_library(spinxml STATIC ${sharedSources} ${formatSources})
+add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 
 ############################################################
 # GUI code build here
 
-add_executable(SpinachGUI ${guiSources} ${autoSources})
+add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
 target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml xerces-c sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
@@ -97,7 +98,12 @@ add_executable(FrameTest "shared/test/frame_test.cpp" )
 target_link_libraries(FrameTest spinxml ${Boost_LIBRARIES}  sigc-2.0)
 add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/SpinSystemTest)
 
+add_executable(FormatTest "shared/test/format_test.cpp" )
+target_link_libraries(FormatTest spinxml ${Boost_LIBRARIES}  sigc-2.0 xerces-c)
+add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/FormatTest)
+
 
 ############################################################
 # Copy the dat directory
 file(COPY data/ DESTINATION data/)
+file(COPY examples/ DESTINATION examples/)

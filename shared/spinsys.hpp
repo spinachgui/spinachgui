@@ -48,6 +48,7 @@ namespace SpinXML {
 
     class SpinSystem : public SpinXMLBase<SpinSystem,SpinSystemView> {
     public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         SpinSystem();
         SpinSystem(const SpinSystem& system);
         ~SpinSystem();
@@ -89,7 +90,8 @@ namespace SpinXML {
         std::vector<Interaction*> GetInteractionsBySpin(const Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY) const;
         //Returns all interactions involving Spin spin
         std::vector<Interaction*> GetInteractionsBySpinOnce(const Spin* spin,Interaction::Type t=Interaction::ANY) const; 
-
+		//Returns all interactions. Good for writing output filters
+		std::vector<Interaction*> GetAllInteractions() const {return mInteractions;}
 
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
         void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;

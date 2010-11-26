@@ -14,47 +14,44 @@ namespace SpinXML {
 	class InteractionView;
 
     ///============================================================//
-	template<typename T>
-    struct Eigenvalues_T {
-        Eigenvalues_T(const T _XX,const T _YY,const T _ZZ, const Orientation& o) 
+    struct Eigenvalues {
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        Eigenvalues(const double _XX,const double _YY,const double _ZZ, const Orientation& o) 
             : xx(_XX), yy(_YY), zz(_ZZ), mOrient(o) {
         }
-        T xx;
-        T yy;
-        T zz;
+        double xx;
+        double yy;
+        double zz;
         Orientation mOrient;
     };
-	typedef Eigenvalues_T<energy> Eigenvalues;
-	typedef Eigenvalues_T<double> UEigenvalues;
+	typedef Eigenvalues UEigenvalues;
 
     ///============================================================//
-	template<typename T>
-    struct AxRhom_T {
-        AxRhom_T(const T _iso,const T _ax,const T _rh, const Orientation& o) 
+    struct AxRhom {
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        AxRhom(const double _iso,const double _ax,const double _rh, const Orientation& o) 
             : iso(_iso), ax(_ax), rh(_rh), mOrient(o) {
         }
-        T iso;
-        T ax;
-        T rh;
+        double iso;
+        double ax;
+        double rh;
         Orientation mOrient;
     };
-	typedef AxRhom_T<energy> AxRhom;
-	typedef AxRhom_T<double> UAxRhom;
+	typedef AxRhom UAxRhom;
 	
 
     ///============================================================//
-	template<typename T>
-    struct SpanSkew_T {
-        SpanSkew_T(const T _iso,const T _span,const double _skew, const Orientation& o) 
+    struct SpanSkew {
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        SpanSkew(const double _iso,const double _span,const double _skew, const Orientation& o) 
             : iso(_iso), span(_span), skew(_skew), mOrient(o) {
         }
-        T iso;
-        T span;
+        double iso;
+        double span;
         double skew;
         Orientation mOrient;
     };
-	typedef SpanSkew_T<energy> SpanSkew;
-	typedef SpanSkew_T<double> USpanSkew;
+	typedef SpanSkew USpanSkew;
 
     //Interaction converstions
     energy ConvertToScalar(const energy& inter);

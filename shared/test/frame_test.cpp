@@ -33,9 +33,9 @@ struct Setup {
 
 	*/
 
-#define SETUP_FRAME(fName,V,O,P)				\
-    fName##_V(V),								\
-        fName##_O(Orientation(O)),				\
+#define SETUP_FRAME(fName,V,O,P)							\
+    fName##_V(V),											\
+        fName##_O(Orientation(O)),							\
         fName(new Frame(fName##_V,fName##_O,unitSystem,P))
 
     Setup() :
@@ -55,6 +55,8 @@ struct Setup {
         //These are both rotational and translational.
         SETUP_FRAME(SubFrameA3a,Vector3d(2,1,2) ,AngleAxisd(3*pi/2,Vector3d(1,-1,1)),SubFrameA3),
         SETUP_FRAME(SubFrameA3b,Vector3d(-2,1,2),AngleAxisd(pi    ,Vector3d(0, 1,0)),SubFrameA3) {
+
+
     }
     ~Setup() {
         SAFE_DELETE(FrameA);

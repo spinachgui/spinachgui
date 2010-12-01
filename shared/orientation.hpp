@@ -87,6 +87,8 @@ namespace SpinXML {
     class Orientation {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        ///Constructs the identity rotation
+        Orientation() : mData(Quaterniond(1,0,0,0)) {}
         ///Constructs an orientation from euler angles
         Orientation(const EulerAngles& ea) : mData(ea) {}
         ///Constructs an orientation from a matrix

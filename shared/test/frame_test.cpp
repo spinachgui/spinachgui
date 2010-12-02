@@ -34,43 +34,36 @@ struct Setup {
 	*/
 
 #define SETUP_FRAME(fName,V,O,P)							\
-    fName##_V(V),											\
-        fName##_O(Orientation(O)),							\
-        fName(new Frame(fName##_V,fName##_O,unitSystem,P))
+    fName##_V = (V);										\
+	fName##_O = Orientation((O));							\
+	fName = new Frame(fName##_V,fName##_O,unitSystem);		\
+	if(P != NULL) {fName->AddChild((P));}
 
-    Setup() :
-		unitSystem(new UnitSystem()),
+    Setup()	
+		: unitSystem(new UnitSystem) {
+
         // Frames A,B and C are pure translational
-        SETUP_FRAME(FrameA,Vector3d(1,0,0),Quaterniond(1,0,0,0),NULL),
-        SETUP_FRAME(FrameB,Vector3d(0,2,0),Quaterniond(1,0,0,0),NULL),
-        SETUP_FRAME(FrameC,Vector3d(1,2,3),Quaterniond(1,0,0,0),NULL),
+        SETUP_FRAME(FrameA,Vector3d(1,0,0),Quaterniond(1,0,0,0),NULL);
+        SETUP_FRAME(FrameB,Vector3d(0,2,0),Quaterniond(1,0,0,0),NULL);
+        SETUP_FRAME(FrameC,Vector3d(1,2,3),Quaterniond(1,0,0,0),NULL);
 
         //A1 is another translation
-        SETUP_FRAME(SubFrameA1,Vector3d(2,1,2),Quaterniond(1,0,0,0),FrameA),
+        SETUP_FRAME(SubFrameA1,Vector3d(2,1,2),Quaterniond(1,0,0,0),FrameA);
         //A2 is a rotation
-        SETUP_FRAME(SubFrameA2,Vector3d(0,0,0),AngleAxisd(pi/2,Vector3d(1,0,0)),FrameA),
+        SETUP_FRAME(SubFrameA2,Vector3d(0,0,0),AngleAxisd(pi/2,Vector3d(1,0,0)),FrameA);
         //A3 is a translation and a rotation of pi/2 about 1,0,0
-        SETUP_FRAME(SubFrameA3,Vector3d(1,1,1),AngleAxisd(pi/2,Vector3d(1,0,0)),FrameA),
+        SETUP_FRAME(SubFrameA3,Vector3d(1,1,1),AngleAxisd(pi/2,Vector3d(1,0,0)),FrameA);
 
         //These are both rotational and translational.
-        SETUP_FRAME(SubFrameA3a,Vector3d(2,1,2) ,AngleAxisd(3*pi/2,Vector3d(1,-1,1)),SubFrameA3),
-        SETUP_FRAME(SubFrameA3b,Vector3d(-2,1,2),AngleAxisd(pi    ,Vector3d(0, 1,0)),SubFrameA3) {
-
+		SETUP_FRAME(SubFrameA3a,Vector3d(2,1,2) ,AngleAxisd(3*pi/2,Vector3d(1,-1,1)),SubFrameA3);
+		SETUP_FRAME(SubFrameA3b,Vector3d(-2,1,2),AngleAxisd(pi    ,Vector3d(0, 1,0)),SubFrameA3);
+		
 
     }
     ~Setup() {
         SAFE_DELETE(FrameA);
         SAFE_DELETE(FrameB);
         SAFE_DELETE(FrameC);
-
-        SAFE_DELETE(SubFrameA1);
-        SAFE_DELETE(SubFrameA2);
-        SAFE_DELETE(SubFrameA3);
-
-        SAFE_DELETE(SubFrameA3a);
-        SAFE_DELETE(SubFrameA3b);
-
-		SAFE_DELETE(unitSystem);
     }
 #define DECLARE_FRAME(fName)									\
     Vector3d fName##_V; Orientation fName##_O; Frame* fName;

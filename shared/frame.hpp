@@ -14,13 +14,15 @@ namespace SpinXML {
     class UnitSystem {
 	public:
         //SI by default
-        UnitSystem() : energyUnit(Joules),lengthUnit(metres),timeUnit(seconds) {
-        }
+        UnitSystem();
         unit energyUnit;
         unit lengthUnit;
         unit timeUnit;
-    };
+		static const UnitSystem* GetDefault() {return &singleton;}
+	private:
+		static UnitSystem singleton;
 
+    };
     ///Class representing a frame in a hiraci of nested reference
     ///frames. This class will try to do a resonable amount of
     ///precomputation as soon as possible possible so that all queries
@@ -28,7 +30,8 @@ namespace SpinXML {
     ///possible.
     class Frame : public sigc::trackable {
     public:
-        Frame(Vector3d translation, Orientation rotation, UnitSystem* unitSystem, Frame* parent=NULL);
+        Frame(Vector3d translation, Orientation rotation, const UnitSystem* unitSystem);
+		~Frame();
 
         void SetTranslation(const Vector3d& vec);
         const Vector3d& GetTranslation() const {return mTranslate;}
@@ -50,21 +53,26 @@ namespace SpinXML {
         ///Returns the parent frame of this frame
         Frame* upOne() const {return mParent;}
 
+		void AddChild(Frame* frame);
+		const std::vector<Frame*>& GetChildren() const {return mChildren;}
+
         ///Emited when Frame is about to be deleted
-        sigc::signal<Frame*> sigDying;
+        sigc::signal<void,Frame*> sigDying;
         ///Emited when the Frame has been edited
-        sigc::signal<Frame*> sigChange;
+        sigc::signal<void,Frame*> sigChange;
         ///Emited when a ancesstor of this frame is changed.
-        sigc::signal<Frame*> sigAncestorChange;
+        sigc::signal<void,Frame*> sigAncestorChange;
     private:
         void updateAfine();
 
         Frame* mParent;
+		std::vector<Frame*> mChildren;
+
         Vector3d mTranslate;
         Orientation mOrient;
         Matrix4d mAffine;
         Matrix4d mInvertedAffine;
-		UnitSystem* mUnitSystem;
+		const UnitSystem* mUnitSystem;
     };
 
     template <typename Derived,typename T>

@@ -107,9 +107,13 @@ namespace SpinXML {
         ///Automacially calculate the nuclear dipole-dipole couplings
         ///from the positions off the nuclear spins
         void CalcNuclearDipoleDipole();
+
+		///Get the lab frame, which is always an unrotated frame centred at the origin
+		Frame* GetLabFrame() const {return mRootFrame;}
     private:
         std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;
+		Frame* mRootFrame;
         Spin* mIgnoreSpinKill;
     };
 

@@ -40,7 +40,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-string
 # Do automatic library detection
 
 find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
-find_package(Boost REQUIRED program_options unit_test_framework filesystem)
+find_package(Boost REQUIRED program_options filesystem unit_test_framework) 
+#set(Boost_INCLUDE_DIRS /usr/shared/include)
+#set(Boost_LIBRARIES  -lboost_program_options-mt -lboost_unit_test_framework-mt -lboost_filesystem-mt)
 
 ############################################################
 #List of source files for all the targets
@@ -99,7 +101,7 @@ target_link_libraries(FrameTest spinxml ${Boost_LIBRARIES}  sigc-2.0)
 add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/SpinSystemTest)
 
 add_executable(FormatTest "shared/test/format_test.cpp" )
-target_link_libraries(FormatTest spinxml ${Boost_LIBRARIES}  sigc-2.0 xerces-c)
+target_link_libraries(FormatTest spinxml ${Boost_LIBRARIES} sigc-2.0 xerces-c)
 add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/FormatTest)
 
 

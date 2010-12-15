@@ -2,70 +2,37 @@
 #include <fstream>
 
 #include <shared/formats/pdb.hpp>
-
-#define BOOST_SYSTEM_NO_DEPRECATED
-
-#include <boost/spirit/include/support_istream_iterator.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/version.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-
 #include <shared/nuclear_data.hpp>
 #include <shared/spinsys.hpp>
 
 #include <shared/basic_math.hpp>
 
-using namespace boost::spirit::qi;
+#include <shared/formats/spirit_common.hpp>
+#include <boost/spirit/home/phoenix/object/new.hpp>
+#include <boost/bind.hpp>
 
 using namespace std;
 using namespace SpinXML;
 
-template <typename Expr, typename Iterator = spirit::unused_type>
-struct attribute_of_parser
-{
-    typedef typename spirit::result_of::compile<
-        spirit::qi::domain, Expr
-    >::type parser_expression_type;
- 
-    typedef typename spirit::traits::attribute_of<
-        parser_expression_type, spirit::unused_type, Iterator
-    >::type type;
-};
-
-template <typename T>
-void display_attribute_of_parser(T const&)
-{
-    typedef typename attribute_of_parser<T>::type attribute_type;
-    std::cout << typeid(attribute_type).name() << std::endl;
-}
- 
-
-
-/*
-struct element_parser_type : symbols<unsigned> {
-  element_parser_type() {
-      for(long i=0;i<getElementCount();i++) {
-          add(getElementSymbol(i),i);
-      }
-    }
-
-} element_p;
-*/
-
-
-///Important note: the global pdb_p parser is not thread safe (in
-///case it ever becomes relevent)
-
-void P(std::string str) {
-	cout << str << endl;
-}
-
 template<typename Iterator>
-struct pdb : grammar<Iterator> {
-	pdb() : pdb::base_type(file) {
+struct pdb : qi::grammar<Iterator> {
+	pdb(SpinSystem* spinsys) : pdb::base_type(file), ss(spinsys) {
+		using qi::blank;
+		using qi::alnum;
+		using qi::char_;
+		using qi::int_;
+		using qi::double_;
+		using qi::lit;
+		using qi::eol;
+		using qi::eoi;
+		using qi::omit;
+
 		//Grammer definition here
-		validChar %=
+
+		//There appears to be a bug in charset in the version of boost 1.42 to this:
+		//alnum | char_("`=-[]\\;',./~!@#$%^&*()_+{}|:\"<>?");
+		//Doesn't work.
+		validChar =  	
 			alnum      | char_('`') | char_('-') | char_('=') |
 			char_('[') | char_(']') | char_('\\')| char_(';') |
 			char_('\'')| char_(',') | char_('.') | char_('/') |
@@ -75,54 +42,50 @@ struct pdb : grammar<Iterator> {
 			char_('+') | char_('{') | char_('}') | char_('|') |
 			char_(':') | char_('"') | char_('<') | char_('>') |
 			char_('?');
-		validCharS %= validChar | char_(" ");
-		element = validChar | (validChar >> validChar);
-		residue = validChar >> validChar >> validChar;
-		vector = *char_(" ") >> double_ >> *char_(" ") >> double_ >> *char_(" ") >> double_ >> *char_(" ");
+
+		validCharS = validChar | blank;
+		element  = (validChar >> -validChar);
+		vector   = omit[*blank] >> double_ >> omit[*blank] >> double_ >> omit[*blank] >>  double_ >> omit[*blank];
 		atomName = validCharS >> validCharS >> validCharS >> validCharS;
 
 		uninterestingRecordName = (validCharS >> validCharS >> validCharS >> validCharS >> validCharS >> validCharS) - lit("ATOM  ");
-		otherRecord %= uninterestingRecordName >> *validCharS >> eol;
+		otherRecord = uninterestingRecordName >> *validCharS >> eol;
 	
 		atomRecord =
-			lit("ATOM  ") >> *char_(" ") >>
-			int_ >> char_(" ") >>
-			atomName >> //Atom Name
-			omit[validCharS >> //Alternate location indicator (can be blank)
-			residue >> char_(" ") >> //Residue name
-			validChar >> *char_(" ") >> //Chain identifier
-			int_ >>      //Residue sequence number.
-			validCharS] >> //Code for insertion of residues
-			vector >>   //XYZ coordinates
-			double_ >> *char_(" ") >> double_ >> *char_(" ") >> //occupancy and Temperature factor
-			element >>
-			*validCharS >>
-			eol;
-		//file = *(atomRecord[cout << "End of Record " << _1 << endl] | otherRecord) >> eoi;
-		file = *(otherRecord | atomRecord) >> eoi;
+			(omit[lit("ATOM  ") >> *blank >> int_ >> blank] >>
+			 atomName >> //Atom Name
+			 omit[validCharS >> //Alternate location indicator (can be blank)
+				 validChar >> validChar >> validChar >> blank >> //Residue name
+				 validChar >> *blank >> //Chain identifier
+				 int_ >>      //Residue sequence number.
+				 validCharS] >> //Code for insertion of residues
+			 vector >>   //XYZ coordinates
+			 omit[double_ >> *blank >> double_ >> *blank] >> //occupancy and Temperature factor
+			 element >>
+			 omit[*validCharS >> eol]);
+		file =
+			*(otherRecord | atomRecord) >> eoi;
 	}
 
 	//List of rules
-	rule<Iterator> file;
-	rule<Iterator,std::string()> uninterestingRecordName; /*Consumes the first 6 characters
+	qi::rule<Iterator> file;
+	qi::rule<Iterator,std::string()> uninterestingRecordName; /*Consumes the first 6 characters
 															of input after checking it's not
 															a recond type we are interesting
 															in */
-	rule<Iterator> atomRecord;
-	rule<Iterator,std::string()> otherRecord;
-	rule<Iterator,char()> validChar;
-	rule<Iterator,char()> validCharS;
-	rule<Iterator> element;
-	rule<Iterator> residue;
-	rule<Iterator> vector;
-	rule<Iterator> atomName;
+	qi::rule<Iterator> atomRecord;
+	qi::rule<Iterator> otherRecord;
+	qi::rule<Iterator,char()> validChar;
+	qi::rule<Iterator,char()> validCharS;
+	qi::rule<Iterator> element;
+	qi::rule<Iterator,fusion::vector<double,double,double>() > vector;
+	qi::rule<Iterator,std::string()> atomName;
 
-	void print_tree() const {
-		
-	}
+	SpinSystem* ss;
 };
 
 void PDBLoader::LoadFile(SpinSystem* ss,const char* filename) const {
+	boost::bind(&SpinSystem::InsertSpin,new Spin(Vector3d(0,0,0),"",1,0));
 
     ss->Clear();
 
@@ -139,9 +102,9 @@ void PDBLoader::LoadFile(SpinSystem* ss,const char* filename) const {
         throw runtime_error("Couldn't open file");
     }
 
-	pdb<spirit::istream_iterator> pdb_parser;
+	pdb<spirit::istream_iterator> pdb_parser(ss);
 
-    if(parse(begin,end,pdb_parser)) {
+    if(qi::phrase_parse(begin,end,pdb_parser,qi::blank)) {
 		cout << "Parsing suceeded" << endl;
     } else {
         throw runtime_error("Parsing failed.");

@@ -82,11 +82,11 @@ BOOST_FIXTURE_TEST_CASE( g03Load, setup) {
 }
 
 BOOST_FIXTURE_TEST_CASE( pdbLoad, setup) {
-	ss->LoadFromFile("examples/pdb/2X9B.pdb",mPDBLoader);
+	//	ss->LoadFromFile("examples/pdb/2X9B.pdb",mPDBLoader);
 }
 
 BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
-	/*	Spin* spin0=new Spin(Vector3d(0    ,0    ,0	   ),"0,0,0",1);
+	Spin* spin0=new Spin(Vector3d(0    ,0    ,0	   ),"0,0,0",1);
 	Spin* spinx=new Spin(Vector3d(3e-10,0    ,0	   ),"1,0,0",6);
 	Spin* spiny=new Spin(Vector3d(0    ,3e-10,0	   ),"0,1,0",7);
 	Spin* spinz=new Spin(Vector3d(0    ,0    ,3e-10),"0,0,1",8);
@@ -114,6 +114,12 @@ BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
 	//Rotation about the x axis
 
 	Frame* withChildrenAndParent = new Frame(Vector3d(1,0,0),Orientation(Quaterniond(sqrt(0.5),sqrt(0.5),0,0)),unitSystem);
+
+	spin0->SetPreferedFrame(withChildrenAndParent);
+	spiny->SetPreferedFrame(withChildrenAndParent);
+
+	inter2->SetPreferedFrame(withChildrenAndParent);
+
 	rootFrame->AddChild(withChildrenAndParent);
 	withChildrenAndParent->AddChild(new Frame(Vector3d(4,4,0),Orientation(EulerAngles(1,0.2,0.5)),unitSystem));
 
@@ -124,7 +130,7 @@ BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
 	LoadedSpinSystem->SaveToFile("test_out/synthetic2.xml",mXMLLoader);
 	
 
-	SAFE_DELETE(LoadedSpinSystem);*/
+	SAFE_DELETE(LoadedSpinSystem);
 }
 
 

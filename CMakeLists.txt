@@ -42,7 +42,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-string
 find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
 find_package(Boost REQUIRED program_options filesystem unit_test_framework) 
 #set(Boost_INCLUDE_DIRS /usr/shared/include)
-#set(Boost_LIBRARIES  -lboost_program_options-mt -lboost_unit_test_framework-mt -lboost_filesystem-mt)
+set(Boost_LIBRARIES  -lboost_program_options -lboost_unit_test_framework -lboost_filesystem)
 
 ############################################################
 #List of source files for all the targets

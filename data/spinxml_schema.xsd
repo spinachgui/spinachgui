@@ -132,7 +132,7 @@
             </xs:complexContent>
           </xs:complexType>
         </xs:element>
-        <xs:element minOccurs="0" maxOccurs="1" name="reference_frame">
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="reference_frame">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="origin" type="vector" />

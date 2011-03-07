@@ -14,7 +14,7 @@ struct Setup {
 		o(Quaterniond(1/sqrt(2.0),1/sqrt(2.0),0,0)),
 
 		scalar(20.0*MHz),
-		
+
 		m(MakeMatrix3d(1.0,0.0,0.0,
                                0.0,1.0,0.0,
                                0.0,0.0,1.0)),
@@ -53,41 +53,41 @@ struct Setup {
 };
 
 BOOST_FIXTURE_TEST_CASE( EigenvaluesConstructor, Setup) {
-	BOOST_CHECK_EQUAL(xx.si,ev.xx.si);
-	BOOST_CHECK_EQUAL(yy.si,ev.yy.si);
-	BOOST_CHECK_EQUAL(zz.si,ev.zz.si);
+	BOOST_CHECK_EQUAL(xx,ev.xx);
+	BOOST_CHECK_EQUAL(yy,ev.yy);
+	BOOST_CHECK_EQUAL(zz,ev.zz);
 	BOOST_CHECK(o==ev.mOrient);
 }
 
 BOOST_FIXTURE_TEST_CASE( AxRhomConstructor, Setup ) {
-	BOOST_CHECK_EQUAL(ar_iso.si,ar.iso.si);
-	BOOST_CHECK_EQUAL(ax.si, 	 ar.ax.si);
-	BOOST_CHECK_EQUAL(rh.si, 	 ar.rh.si);
+	BOOST_CHECK_EQUAL(ar_iso,ar.iso);
+	BOOST_CHECK_EQUAL(ax, 	 ar.ax);
+	BOOST_CHECK_EQUAL(rh, 	 ar.rh);
 	BOOST_CHECK(o==ar.mOrient);
 }
 
 BOOST_FIXTURE_TEST_CASE( SpanSkewConstructor, Setup ) {
-	BOOST_CHECK_EQUAL(ss_iso.si,ss.iso.si);
-	BOOST_CHECK_EQUAL(span.si,	 ss.span.si);
+	BOOST_CHECK_EQUAL(ss_iso,ss.iso);
+	BOOST_CHECK_EQUAL(span,	 ss.span);
 	BOOST_CHECK_EQUAL(skew,  	 ss.skew);
 	BOOST_CHECK(o==ss.mOrient);
 }
 
 #define CHECK_EIGENVALUES_CLOSE(obj)									\
-	BOOST_CHECK_CLOSE(xx.si,(obj).xx.si ,0.01);							\
-	BOOST_CHECK_CLOSE(yy.si,(obj).yy.si ,0.01);							\
-	BOOST_CHECK_CLOSE(zz.si,(obj).zz.si ,0.01);						
+	BOOST_CHECK_CLOSE(xx,(obj).xx ,0.01);							\
+	BOOST_CHECK_CLOSE(yy,(obj).yy ,0.01);							\
+	BOOST_CHECK_CLOSE(zz,(obj).zz ,0.01);
 
 #define CHECK_AXRHOM_CLOSE(obj)										\
-    BOOST_CHECK_CLOSE(ar_iso.si,(obj).iso.si,0.01);                     \
-    BOOST_CHECK_CLOSE(ax.si,(obj).ax.si ,0.01);                         \
-    BOOST_CHECK_CLOSE(rh.si,(obj).rh.si ,0.01);						
+    BOOST_CHECK_CLOSE(ar_iso,(obj).iso,0.01);                     \
+    BOOST_CHECK_CLOSE(ax,(obj).ax ,0.01);                         \
+    BOOST_CHECK_CLOSE(rh,(obj).rh ,0.01);
 
 
 #define CHECK_SPANSKEW_CLOSE(obj)                                       \
-    BOOST_CHECK_CLOSE(ss_iso.si,(obj).iso.si ,0.01);                    \
-    BOOST_CHECK_CLOSE(span.si,(obj).span.si ,0.01);                     \
-	BOOST_CHECK_CLOSE(skew,(obj).skew ,0.01);						
+    BOOST_CHECK_CLOSE(ss_iso,(obj).iso ,0.01);                    \
+    BOOST_CHECK_CLOSE(span,(obj).span ,0.01);                     \
+	BOOST_CHECK_CLOSE(skew,(obj).skew ,0.01);
 
 #define CHECK_CONVERSION(name, seed, seedType, otherType, fromSeedConv, toSeedConv,checkMacro) \
     BOOST_FIXTURE_TEST_CASE( name, Setup ) {                            \

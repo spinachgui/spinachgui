@@ -21,7 +21,7 @@ public:
     void OnRightClick(wxGridEvent& e);
     void OnDeleteSpinHover(wxCommandEvent& e);
     void OnMouseMove(wxMouseEvent& e);
-  
+
     //sigc slots
     void OnNewSpin(SpinXML::Spin* newSpin,long number);
 
@@ -29,16 +29,16 @@ public:
     bool DeleteRows(int pos=0,int numRows=1,bool updateLables=true);
 
     enum COL_TYPE {
-        COL_SELECTED,   
-        COL_LABEL,       
+        COL_SELECTED,
+        COL_LABEL,
         COL_ELEMENT,
         COL_ISOTOPES,
         COL_X,
-        COL_Y,          
+        COL_Y,
         COL_Z
     };
 
-    enum MENU_EVENT {
+    enum MENU_EVT {
         MENU_SPIN_DIALOG,
         MENU_DELETE_SPINS,
         MENU_NEW_SPIN

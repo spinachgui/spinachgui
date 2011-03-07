@@ -7,7 +7,10 @@
 #include <wx/glcanvas.h>
 #include <boost/shared_ptr.hpp>
 
+#ifdef __linux__
 #include <GL/glx.h>
+#endif
+
 #include <GL/glu.h>
 #include <sigc++/sigc++.h>
 
@@ -52,7 +55,7 @@ public:
     bool depthOnly;
 
     enum PASS {
-        OPAQUE,
+        SOLID,
         TRANSLUCENT,
         PICKING
     };
@@ -66,7 +69,7 @@ public:
     GLUquadric* mWireQuadric;
     int width,height;
     const float* mRotationMatrix;
-  
+
     ///The size of the displayed interaction in units of energy/length,
     ///e.g. MHz/Nm
     std::map<SpinXML::Interaction::Type,double> mScallings;
@@ -134,7 +137,7 @@ private:
 
     bool mUseMaterial;
     const float* mMaterial;
-  
+
     ///If true, skip the transform step
 protected:
     bool mIdentity;
@@ -152,7 +155,7 @@ class OpenGLText : public SGNode {
 public:
     OpenGLText(const wxString& str)  {UpdateString(str);}
     void SetStr(const wxString& str) {UpdateString(str);}
-  
+
 private:
     virtual void RawDraw(SpinachDC& dc);
     virtual void ToPovRay(wxString& src) {}
@@ -193,7 +196,7 @@ protected:
     DECLARE_EVENT_TABLE();
 
     ///Call whenever the size of the viewport changes
-  
+
 
     void EnableGL();
     void ChangeViewport();

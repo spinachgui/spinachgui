@@ -1,6 +1,6 @@
 
-#ifndef SPINSYS_H;
-#define SPINSYS_H;
+#ifndef SPINSYS_H
+#define SPINSYS_H
 
 #include <vector>
 #include <string>
@@ -54,7 +54,7 @@ namespace SpinXML {
         ~SpinSystem();
 
         void Clear();
-    
+
         void Dump() const;
 
         long GetSpinCount() const;
@@ -85,11 +85,11 @@ namespace SpinXML {
         long GetInterCount() const {return mInteractions.size();}
 
         //Returns all interactions involving Spin spin
-        std::vector<Interaction*> GetInteractionsBySpin(const Spin* spin,Interaction::Type t=Interaction::ANY) const; 
+        std::vector<Interaction*> GetInteractionsBySpin(const Spin* spin,Interaction::Type t=Interaction::ANY) const;
         //Get all the interactions involving both spin1 and spin2
         std::vector<Interaction*> GetInteractionsBySpin(const Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY) const;
         //Returns all interactions involving Spin spin
-        std::vector<Interaction*> GetInteractionsBySpinOnce(const Spin* spin,Interaction::Type t=Interaction::ANY) const; 
+        std::vector<Interaction*> GetInteractionsBySpinOnce(const Spin* spin,Interaction::Type t=Interaction::ANY) const;
 		//Returns all interactions. Good for writing output filters
 		std::vector<Interaction*> GetAllInteractions() const {return mInteractions;}
 
@@ -121,7 +121,7 @@ namespace SpinXML {
 	public:
         typedef ViewBase<SpinSystemView,SpinSystem> Base;
 
-		SpinSystemView(SpinSystem* spinsys,const Frame* frame, const UnitSystem* unitSystem) 
+		SpinSystemView(SpinSystem* spinsys,const Frame* frame, const UnitSystem* unitSystem)
             : Base(spinsys,frame,unitSystem) {
             mData->sigNewSpin.connect(sigNewSpin);
             mData->sigNewInter.connect(sigNewInter);
@@ -130,7 +130,7 @@ namespace SpinXML {
 
 
         void Clear() {mData->Clear();}
-    
+
         long GetSpinCount()   const {return mData->GetSpinCount();}
         SpinView GetSpin(long n) const {return mData->GetSpin(n)->GetView(mFrame,mUnitSystem);}
         long GetSpinNumber(SpinView spin) const {return mData->GetSpinNumber(spin.Get());}
@@ -160,7 +160,7 @@ namespace SpinXML {
         std::vector<InteractionView> GetInteractionsBySpinOnce(SpinView spin,Interaction::Type t=Interaction::ANY) {
 			return MapVectorToViewVector<InteractionView>(mData->GetInteractionsBySpinOnce(spin.Get(),t));
 		}
-		
+
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader)    {mData->LoadFromFile(filename,loader);}
         void SaveToFile(const char* filename,ISpinSystemLoader* saver) const {mData->SaveToFile(filename,saver);}
 

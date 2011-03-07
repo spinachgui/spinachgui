@@ -16,7 +16,7 @@ using std::cout;
 using std::cerr;
 
 #define LAB_FRAME 0
-
+/*
 kind::value GetXSDTypeFromSpinXMLType(SpinXML::Interaction::Type subtype) {
   switch(subtype) {
   case SpinXML::Interaction::HFC:
@@ -96,13 +96,13 @@ void SetReferenceFrameNumber(orientation& o,long n) {
 }
 
 
-orientation ConvertOrientationToXML(const SpinXML::Orientation& o,long frame) {
+orientation ConvertOrientationToXML(const SpinXML::Orientation& o) {
   SpinXML::Orientation::Type type=o.GetType();
   orientation oout;
   switch(type) {
   case SpinXML::Orientation::EULER:{
     EulerAngles ea=o.GetAsEuler();
-    euler_angles xsd_ea(ea.alpha,ea.beta,ea.gamma,frame);
+    euler_angles xsd_ea(ea.alpha,ea.beta,ea.gamma,LAB_FRAME);
     oout.euler_angles(xsd_ea);
     break;
   }
@@ -111,14 +111,14 @@ orientation ConvertOrientationToXML(const SpinXML::Orientation& o,long frame) {
     AngleAxisd aa=o.GetAsAngleAxis();
     vector axis_prime(double(aa.axis().x()),
 					  double(aa.axis().y()),
-					  double(aa.axis().z()),frame);
+					  double(aa.axis().z()),LAB_FRAME);
     angle_axis xsd_aa(aa.angle(),axis_prime);
     oout.angle_axis(xsd_aa);
     break;
   }
   case SpinXML::Orientation::QUATERNION: {
     Quaterniond q=o.GetAsQuaternion();
-    quaternion xsd_q(q.w(),q.x(),q.y(),q.z(),frame);
+    quaternion xsd_q(q.w(),q.x(),q.y(),q.z(),LAB_FRAME);
     oout.quaternion(xsd_q);
     break;
   }
@@ -163,15 +163,16 @@ SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
 		ret = MakeMatrix3d(xsd_dcm.xx(),xsd_dcm.xy(),xsd_dcm.xz(),
 						   xsd_dcm.yx(),xsd_dcm.yy(),xsd_dcm.yz(),
 						   xsd_dcm.zx(),xsd_dcm.zy(),xsd_dcm.zz());
-    
+
 	} else {
 		throw std::runtime_error("Unknown orientation form encounted. Is the XSD schema corrupt?");
 	}
 	return ret;
 }
 
-
+*/
 void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const {
+	/*
 	//libss => "library spin system" as apposed to the xml spin system ss
 	std::auto_ptr<spin_system> ss;
 	try {
@@ -221,10 +222,10 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
 		}
 		frameMap[parent]->AddChild(frameMap[frames[i].number()]);
 	}
-	
+
 
 	//Load the spins
-	spin_system::spin_sequence spins=ss->spin(); 
+	spin_system::spin_sequence spins=ss->spin();
 	long spinCount=spins.size();
 	for(long i=0;i<spinCount;i++) {
 		spin xsdSpin=spins[i];
@@ -235,20 +236,10 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
 		y=coords.y();
 		z=coords.z();
 
-
-
 		SpinXML::Spin* newSpin = new Spin(Vector3d(x,y,z),
 										  xsdSpin.label().present() ? xsdSpin.label().get() : "",
 										  getElementBySymbol(xsdSpin.isotope().c_str()),
 										  getIsotopeBySymbol(xsdSpin.isotope().c_str()));
-		long xmlFrame = coords.reference_frame();
-		if(xmlFrame != 0) {
-			if(frameMap.find(xmlFrame) != frameMap.end()) {
-				newSpin->SetPreferedFrame(frameMap[xmlFrame]);
-			} else {
-				throw std::runtime_error("Unknown frame number");
-			}
-		}
 		libss->InsertSpin(newSpin);
 	}
 
@@ -311,6 +302,8 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
 				throw std::runtime_error("Quadrupolar interaction was of a non linear subtype");
 			}
 		}
+
+
 		//Get the numerical value of the teser
 		if(xsdInter.scalar().present()) {
 			double scalar;
@@ -337,73 +330,26 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const 
 		} else {
 			throw std::runtime_error("Interaction appeared to not be specified (is the xsd schema corrupt?)");
 		}
-		if(xsdInter.orientation().present()) {
-			long xmlFrame = GetReferenceFrameNumber(xsdInter.orientation().get());
-			if(xmlFrame != 0) {
-				if(frameMap.find(xmlFrame) != frameMap.end()) {
-					thisInter->SetPreferedFrame(frameMap[xmlFrame]);
-				} else {
-					throw std::runtime_error("Unknown frame number");
-				}
-			}
-		}
-
-
 		//Save the interation
 		libss->InsertInteraction(thisInter);
-	}
+	}*/
 }
 
 void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) const {
+    /*
 	spin_system ss;
 
-
-
-	//Hack to get a nested function
-	std::map<Frame*,long> frameMap;
-
-	struct walkFrameTree {
-		static void Walk(Frame* frame,spin_system::reference_frame_sequence* XMLFrameSequence,long* counter,long parent,std::map<Frame*,long>* frameMap) {
-			//Write out this reference frame
-			Vector3d T = frame->GetTranslation();
-			orientation o = ConvertOrientationToXML(frame->GetOrientation(),LAB_FRAME);
-			SetReferenceFrameNumber(o,parent);
-			reference_frame xmlFrame = reference_frame(vector(T.x(),T.y(),T.z(),parent),o,++(*counter));
-			frameMap->insert(std::pair<Frame*,long>(frame,*counter));
-			xmlFrame.label("Reference Frame Labels in implimented yet.");
-			XMLFrameSequence->push_back(xmlFrame);
-
-			//Recuse down the reference frames
-			std::vector<Frame*> children = frame->GetChildren();
-			unsigned long len = children.size();
-			for(unsigned long i = 0; i < len; i++) {
-				Walk(children[i],XMLFrameSequence,counter,*counter,frameMap);
-			}
-		}
-	};
-	std::vector<Frame*> frames = libss->GetLabFrame()->GetChildren();
-    spin_system::reference_frame_sequence XMLFrameSequence;
-	//Lab frame is implied
-	unsigned long len = frames.size();
-	long counter=0;
-	for(unsigned long i = 0; i<len; i++) {
-		walkFrameTree::Walk(frames[i],&XMLFrameSequence,&counter,0,&frameMap);	
-	}
-	ss.reference_frame(XMLFrameSequence);
-
-
-    spin_system::spin_sequence spins; 
+    spin_system::spin_sequence spins;
     for(long i=0;i<libss->GetSpinCount();i++) {
 		SpinXML::Spin* thisSpin=libss->GetSpin(i);
 
 		double x,y,z;
 		thisSpin->GetCoordinates(&x,&y,&z);
 		std::string label(thisSpin->GetLabel());
-		
+
 
 		spin outSpin(i,"");
-		Frame* frame = thisSpin->GetPreferedFrame();
-		outSpin.coordinates(vector(x,y,z,frame == NULL ? LAB_FRAME : frameMap[frame]));
+		outSpin.coordinates(vector(x,y,z,LAB_FRAME));
 		outSpin.label(label);
 		outSpin.isotope(getElementSymbol(thisSpin->GetElement()));
 		spins.push_back(outSpin);
@@ -419,13 +365,10 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
 		interaction1 inter(GetXSDTypeFromSpinXMLType(thisInter->GetType()),
 						  "MHz",
 						  libss->GetSpinNumber(thisInter->GetSpin1()));
-		
+
 		if(thisInter->GetSpin2() != NULL) {
 			inter.spin_2(libss->GetSpinNumber(thisInter->GetSpin2()));
 		}
-
-		Frame* interFrame = thisInter->GetPreferedFrame();
-		long xmlFrame = interFrame == NULL ? LAB_FRAME : frameMap[interFrame];
 
 		switch(thisInter->GetStorage()) {
 		case SpinXML::Interaction::STORAGE_SCALAR: {
@@ -439,7 +382,7 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
 			thisInter->GetMatrix(&mat);
 			tensor xml_matrix(mat(0,0),mat(1,0),mat(2,0),
 							  mat(0,1),mat(1,1),mat(2,1),
-							  mat(0,2),mat(1,2),mat(2,2),xmlFrame);
+							  mat(0,2),mat(1,2),mat(2,2),LAB_FRAME);
 			inter.tensor(xml_matrix);
 			break;
 		}
@@ -448,7 +391,7 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
 			double xx,yy,zz;
 			thisInter->GetEigenvalues(&xx,&yy,&zz,&o);
 			eigenvalues eigv(xx,yy,zz);
-			inter.orientation(ConvertOrientationToXML(o,xmlFrame));
+			inter.orientation(ConvertOrientationToXML(o));
 			inter.eigenvalues(eigv);
 			break;
 		}
@@ -457,7 +400,7 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
 			double ax,rhom,iso;
 			thisInter->GetAxRhom(&ax,&rhom,&iso,&o);
 			axiality_rhombicity ar(iso,ax,rhom);
-			inter.orientation(ConvertOrientationToXML(o,xmlFrame));
+			inter.orientation(ConvertOrientationToXML(o));
 			inter.axiality_rhombicity(ar);
 			break;
 		}
@@ -466,7 +409,7 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
 			double span,skew,iso;
 			thisInter->GetSpanSkew(&span,&skew,&iso,&o);
 			span_skew spsk(iso,span,skew);
-			inter.orientation(ConvertOrientationToXML(o,xmlFrame));
+			inter.orientation(ConvertOrientationToXML(o));
 			inter.span_skew(spsk);
 			break;
 		}
@@ -475,9 +418,36 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
 		};
 		inters.push_back(inter);
 	}
-
     ss.interaction(inters);
 
+	//Hack to get a nested function
+	struct walkFrameTree {
+		static void Walk(Frame* frame,spin_system::reference_frame_sequence* XMLFrameSequence,long* counter,long parent) {
+			//Write out this reference frame
+			Vector3d T = frame->GetTranslation();
+			orientation o = ConvertOrientationToXML(frame->GetOrientation());
+			SetReferenceFrameNumber(o,parent);
+			reference_frame xmlFrame = reference_frame(vector(T.x(),T.y(),T.z(),parent),o,++(*counter));
+			xmlFrame.label("Reference Frame Labels in implimented yet.");
+			XMLFrameSequence->push_back(xmlFrame);
+
+			//Recuse down the reference frames
+			std::vector<Frame*> children = frame->GetChildren();
+			unsigned long length = children.size();
+			for(unsigned long i = 0; i < length; i++) {
+				Walk(children[i],XMLFrameSequence,counter,*counter);
+			}
+		}
+	};
+    spin_system::reference_frame_sequence XMLFrameSequence;
+	std::vector<Frame*> frames = libss->GetLabFrame()->GetChildren();
+	//Lab frame is implied
+	unsigned long length = frames.size();
+	long counter=0;
+	for(unsigned long i; i<length; i++) {
+		walkFrameTree::Walk(frames[i],&XMLFrameSequence,&counter,0);
+	}
+	ss.reference_frame(XMLFrameSequence);
 
 	//Write to disk
 
@@ -498,6 +468,6 @@ void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) 
 		std::ostringstream errStream;
 		errStream << e << std::endl;
 		throw std::runtime_error(errStream.str());
-	}
+	}*/
 }
 

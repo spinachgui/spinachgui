@@ -1,6 +1,6 @@
 
 #include <shared/interaction.hpp>
-#include <Eigen/Eigenvalues> 
+#include <Eigen/Eigenvalues>
 #include <Eigen/Geometry>
 #include <iostream>
 #include <exception>
@@ -23,8 +23,8 @@ Matrix3d SpinXML::ConvertToMatrix(const energy& I) {return MakeMatrix3d(I,0,0,
 Matrix3d SpinXML::ConvertToMatrix(const Matrix3d& I) {return I;}
 Matrix3d SpinXML::ConvertToMatrix(const Eigenvalues& I) {
 	//Undo the eigensystem decomposition
-	Matrix3d in_eigen_frame(MakeMatrix3d(I.xx,0      ,0       , 
-										 0      ,I.yy,0       , 
+	Matrix3d in_eigen_frame(MakeMatrix3d(I.xx,0      ,0       ,
+										 0      ,I.yy,0       ,
 										 0      ,0      ,I.zz));
 	Matrix3d rotMatrix=I.mOrient.GetAsMatrix();
  	return rotMatrix*in_eigen_frame*rotMatrix.inverse();
@@ -39,7 +39,7 @@ Eigenvalues SpinXML::ConvertToEigenvalues(const energy& I) {
 Eigenvalues SpinXML::ConvertToEigenvalues(const Matrix3d& I) {
 	EigenSolver<Matrix3d> solver(I, true); //true => compute eigenvectors
 	Vector3d v1,v2,v3;//Eigenvectors
-	
+
 	double e1=real(solver.eigenvalues()[0]);
 	double e2=real(solver.eigenvalues()[1]);
 	double e3=real(solver.eigenvalues()[2]);
@@ -111,7 +111,7 @@ void InteractionView::SetScalar(double Scalar) {
 
 void InteractionView::SetMatrix(const Matrix3d& InMatrix) {
 	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
-	Matrix3d rotation= Transform3d(mFrame->getTransformToLab()).rotation();
+	Matrix3d rotation= Affine3d(mFrame->getTransformToLab()).rotation();
 	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
 }
 
@@ -121,7 +121,7 @@ void InteractionView::SetEigenvalues(double XX,double YY,   double ZZ,  const Or
 													YY * mUnitSystem->energyUnit,
 													ZZ * mUnitSystem->energyUnit,Orient));
 	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
-	Matrix3d rotation=Transform3d(mFrame->getTransformToLab()).rotation();
+	Matrix3d rotation=Affine3d(mFrame->getTransformToLab()).rotation();
 	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
 	mData->ToEigenvalues();
 }
@@ -131,7 +131,7 @@ void InteractionView::SetAxRhom(double iso,    double ax,   double rh,  const Or
 											   ax * mUnitSystem->energyUnit,
 											   rh * mUnitSystem->energyUnit,Orient));
 	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
-	Matrix3d rotation=Transform3d(mFrame->getTransformToLab()).rotation();
+	Matrix3d rotation=Affine3d(mFrame->getTransformToLab()).rotation();
 	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
 	mData->ToAxRhom();
 }
@@ -141,7 +141,7 @@ void InteractionView::SetSpanSkew(double iso,  double Span, double Skew,const Or
 												 Span * mUnitSystem->energyUnit,
 												 Skew,Orient));
 	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
-	Matrix3d rotation=Transform3d(mFrame->getTransformToLab()).rotation();
+	Matrix3d rotation=Affine3d(mFrame->getTransformToLab()).rotation();
 	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
 	mData->ToSpanSkew();
 }
@@ -152,13 +152,13 @@ double InteractionView::AsScalar() const {
 
 Matrix3d InteractionView::AsMatrix() const {
 	Matrix3d MatInSI  = mData->AsMatrix();
-	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	Matrix3d rotation = Affine3d(mFrame->getTransformFromLab()).rotation();
 	return (rotation * MatInSI * rotation.inverse()) * mUnitSystem->energyUnit.get_from_si();
 }
 
 UEigenvalues InteractionView::AsEigenvalues() const {
 	Matrix3d MatInSI  = mData->AsMatrix();
-	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	Matrix3d rotation = Affine3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d AsMatrix = (rotation * MatInSI * rotation.inverse());
 	Eigenvalues eig = ConvertToEigenvalues(AsMatrix);
 	return UEigenvalues(eig.xx * mUnitSystem->energyUnit,
@@ -168,7 +168,7 @@ UEigenvalues InteractionView::AsEigenvalues() const {
 
 UAxRhom      InteractionView::AsAxRhom() const {
 	Matrix3d MatInSI  = mData->AsMatrix();
-	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	Matrix3d rotation = Affine3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
 	AxRhom ax_rhom=ConvertToAxRhom(Matrix);
 	return UAxRhom(ax_rhom.iso * mUnitSystem->energyUnit,
@@ -178,7 +178,7 @@ UAxRhom      InteractionView::AsAxRhom() const {
 
 USpanSkew    InteractionView::AsSpanSkew() const {
 	Matrix3d MatInSI  = mData->AsMatrix();
-	Matrix3d rotation = Transform3d(mFrame->getTransformFromLab()).rotation();
+	Matrix3d rotation = Affine3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
 	SpanSkew span_skew = ConvertToSpanSkew(Matrix);
 	return USpanSkew(span_skew.iso*mUnitSystem->energyUnit,
@@ -208,7 +208,7 @@ public:
     }
     void operator()(const Eigenvalues& dat) const {
 	cout << "    Type=Eigenvalues" <<  endl;
-	cout << "    Value=(XX=" 
+	cout << "    Value=(XX="
 	     << dat.xx * MHz << "MHz ,YY="
 	     << dat.yy * MHz << "MHz ,ZZ="
 	     << dat.zz * MHz << "MHz)"
@@ -217,7 +217,7 @@ public:
     }
     void operator()(const AxRhom& dat) const {
 	cout << "    Type=Axiality Rhombicity" <<  endl;
-	cout << "    Value=" << endl; 
+	cout << "    Value=" << endl;
 	cout << "    Orient=";
 	cout << dat.mOrient.ToString() << endl;
     }
@@ -235,8 +235,8 @@ void Interaction::Dump() const {
 
 const char* Interaction::GetStorageName(Storage t) {
     switch(t) {
-    case STORAGE_SCALAR:  return "Scalar";      
-    case MATRIX:          return "Matrix";     
+    case STORAGE_SCALAR:  return "Scalar";
+    case MATRIX:          return "Matrix";
     case EIGENVALUES:     return "Eigenvalues";
     case AXRHOM:          return "Axiality-Rhombicty";
     case SPANSKEW:        return "Span-Skew";
@@ -246,13 +246,13 @@ const char* Interaction::GetStorageName(Storage t) {
         stream << t << ")" << endl;
         throw std::runtime_error(stream.str());
         return "Error in Interaction::GetStorageName()";
-    };         
+    };
 };
 
 const char* Interaction::GetFormName(Form t) {
     switch(t) {
-    case LINEAR:      return "Linear";      
-    case BILINEAR:    return "Bilinear";     
+    case LINEAR:      return "Linear";
+    case BILINEAR:    return "Bilinear";
     case QUADRATIC:   return "Quadratic";
     default:
         ostringstream stream;
@@ -260,7 +260,7 @@ const char* Interaction::GetFormName(Form t) {
         stream << t << ")" << endl;
         throw std::runtime_error(stream.str());
         return "Error in Interaction::GetFormName()";
-    };         
+    };
 }
 
 
@@ -452,7 +452,7 @@ Interaction::Form Interaction::GetFormFromType(Type st) {
     case EXCHANGE:
         return BILINEAR;
 
-    case ZFS: 
+    case ZFS:
     case QUADRUPOLAR:
     case CUSTOM_QUADRATIC:
         return QUADRATIC;
@@ -474,7 +474,7 @@ bool Interaction::IsType(Type t) const {
         switch(mType) {
         case HFC:
         case G_TENSER:
-        case ZFS: 
+        case ZFS:
         case EXCHANGE:
         case QUADRUPOLAR:
         case DIPOLAR:
@@ -508,7 +508,7 @@ bool Interaction::IsType(Type t) const {
 
 
 bool Interaction::GetIsLinear() const {
-    return 
+    return
         mType==EXCHANGE    ||
         mType==SHIELDING   ||
         mType==G_TENSER    ||
@@ -525,7 +525,7 @@ bool Interaction::GetIsBilinear() const {
 
 }
 bool Interaction::GetIsQuadratic() const {
-    return 
+    return
         mType==ZFS             ||
         mType==QUADRUPOLAR     ||
         mType==CUSTOM_QUADRATIC;
@@ -605,7 +605,7 @@ void Interaction::valid_or_throw() const {
     case ZFS:
     case QUADRUPOLAR:
     case CUSTOM_QUADRATIC:
-        if(mSpin1 != NULL && mSpin2 != NULL) 
+        if(mSpin1 != NULL && mSpin2 != NULL)
             throw runtime_error("Linear or quadratic interaction but both mSpin1 and mSpin2 are not null");
         break;
     default:

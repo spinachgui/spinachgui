@@ -7,7 +7,7 @@
 #include <shared/unit.hpp>
 #include <boost/variant.hpp>
 #include <Eigen/Dense>
-#include <Eigen/Geometry> 
+#include <Eigen/Geometry>
 
 using namespace Eigen;
 using namespace boost;
@@ -22,7 +22,7 @@ namespace SpinXML {
 
     ///Bohr magneton in SI units
     extern const double bohr_mag;
-    
+
     ///Ther permeability of free space
     extern const double mu0;
 
@@ -30,7 +30,7 @@ namespace SpinXML {
     ///Euler angle type
     struct EulerAngles {
         double alpha,beta,gamma;
-        EulerAngles(double _alpha,double _beta, double _gamma) 
+        EulerAngles(double _alpha,double _beta, double _gamma)
             : alpha(_alpha),beta(_beta),gamma(_gamma) {
 
         }
@@ -47,10 +47,10 @@ namespace SpinXML {
         }
 
         void Normalize() {
-            
+
         }
         EulerAngles Normalized() const {
-            
+            return *this;
         }
 
     };
@@ -99,7 +99,7 @@ namespace SpinXML {
         Orientation(const AngleAxisd& aa) : mData(aa) {}
         ///Destructor
         ~Orientation() {};
-    
+
         ///Enumeration of the four conventions on storing rotations
         enum Type {
             EULER,
@@ -107,7 +107,7 @@ namespace SpinXML {
             QUATERNION,
             DCM
         };
-    
+
         ///Normalise the contained rotation in place.
         void Normalize();
         ///Normalise the contained rotation.
@@ -135,14 +135,14 @@ namespace SpinXML {
 
         Vector3d Apply(Vector3d v) const;
 
-        const Orientation& operator=(const EulerAngles& ea) {mData = ea;}
-        const Orientation& operator=(const AngleAxisd& aa)  {mData = aa;}
-        const Orientation& operator=(const Matrix3d& m)     {mData = m;}
-        const Orientation& operator=(const Quaterniond& q)  {mData = q;}
+        const Orientation& operator=(const EulerAngles& ea) {mData = ea; return *this;}
+        const Orientation& operator=(const AngleAxisd& aa)  {mData = aa; return *this;}
+        const Orientation& operator=(const Matrix3d& m)     {mData = m;  return *this;}
+        const Orientation& operator=(const Quaterniond& q)  {mData = q;  return *this;}
 
         bool operator==(const Orientation& o) const {
             if(o.mData.type()==typeid(EulerAngles))	return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
-            if(o.mData.type()==typeid(AngleAxisd)) 
+            if(o.mData.type()==typeid(AngleAxisd))
                 return get<AngleAxisd>(o.mData).angle()==get<AngleAxisd>(mData).angle()
                     && get<AngleAxisd>(o.mData).axis()==get<AngleAxisd>(mData).axis();
             if(o.mData.type()==typeid(Quaterniond))

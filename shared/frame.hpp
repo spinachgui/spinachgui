@@ -100,7 +100,7 @@ namespace SpinXML {
 		template <typename ViewType>
 		std::vector<ViewType> MapVectorToViewVector(const std::vector<typename ViewType::ViewedType*>& v) const {
 			std::vector<ViewType> ret;
-			for(long i=0;i<v.size();i++) {
+			for(unsigned long i=0;i<v.size();i++) {
 				ret.push_back(v[i]->GetView(mFrame,mUnitSystem));
 			}
 			return ret;

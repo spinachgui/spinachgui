@@ -14,6 +14,7 @@
 using namespace std;
 using namespace SpinXML;
 
+
 template<typename Iterator>
 struct pdb : qi::grammar<Iterator> {
 	pdb(SpinSystem* spinsys) : pdb::base_type(file), ss(spinsys) {
@@ -32,13 +33,13 @@ struct pdb : qi::grammar<Iterator> {
 		//There appears to be a bug in charset in the version of boost 1.42 to this:
 		//alnum | char_("`=-[]\\;',./~!@#$%^&*()_+{}|:\"<>?");
 		//Doesn't work.
-		validChar =  	
+		validChar =
 			alnum      | char_('`') | char_('-') | char_('=') |
 			char_('[') | char_(']') | char_('\\')| char_(';') |
 			char_('\'')| char_(',') | char_('.') | char_('/') |
 			char_('~') | char_('!') | char_('@') | char_('#') |
 			char_('$') | char_('%') | char_('^') | char_('&') |
-			char_('*') | char_('(') | char_(')') | char_('_') | 
+			char_('*') | char_('(') | char_(')') | char_('_') |
 			char_('+') | char_('{') | char_('}') | char_('|') |
 			char_(':') | char_('"') | char_('<') | char_('>') |
 			char_('?');
@@ -49,8 +50,9 @@ struct pdb : qi::grammar<Iterator> {
 		atomName = validCharS >> validCharS >> validCharS >> validCharS;
 
 		uninterestingRecordName = (validCharS >> validCharS >> validCharS >> validCharS >> validCharS >> validCharS) - lit("ATOM  ");
+
 		otherRecord = uninterestingRecordName >> *validCharS >> eol;
-	
+
 		atomRecord =
 			(omit[lit("ATOM  ") >> *blank >> int_ >> blank] >>
 			 atomName >> //Atom Name
@@ -73,6 +75,7 @@ struct pdb : qi::grammar<Iterator> {
 															of input after checking it's not
 															a recond type we are interesting
 															in */
+
 	qi::rule<Iterator> atomRecord;
 	qi::rule<Iterator> otherRecord;
 	qi::rule<Iterator,char()> validChar;
@@ -82,6 +85,7 @@ struct pdb : qi::grammar<Iterator> {
 	qi::rule<Iterator,std::string()> atomName;
 
 	SpinSystem* ss;
+
 };
 
 void PDBLoader::LoadFile(SpinSystem* ss,const char* filename) const {
@@ -89,7 +93,7 @@ void PDBLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 
     ss->Clear();
 
-	ifstream fin(filename);
+	/*ifstream fin(filename);
 	if(!fin.is_open()) {
 		throw runtime_error("Couldn't open file");
 	}
@@ -108,7 +112,7 @@ void PDBLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 		cout << "Parsing suceeded" << endl;
     } else {
         throw runtime_error("Parsing failed.");
-    }
+    }*/
 
     ss->sigReloaded();
 }

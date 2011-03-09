@@ -65,7 +65,6 @@ private:
 
 	//Data
 	SpinXML::Spin* mSpin;
-	SpinXML::SpinSystem* mSpinSystem;
   
 	///True when the GUI list box is being updated.  Events generated
 	///when mUpdatingListBox is true should usually be ignored

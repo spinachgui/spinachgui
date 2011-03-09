@@ -11,26 +11,27 @@ using namespace std;
 
 class SpinDialog : public SpinDialogBase {
 public:
-  SpinDialog(wxWindow* parent,SpinXML::Spin* spin,wxWindowID id= -1); 
+	SpinDialog(wxWindow* parent,SpinXML::Spin* spin,wxWindowID id= -1); 
 
-  void OnApply(wxCommandEvent& e);
+	void OnApply(wxCommandEvent& e);
 
-  int ShowModal();
+	int ShowModal();
 
-  void SaveToSpin();
-  void LoadFromSpin();
+	void SaveToSpin();
+	void LoadFromSpin();
 
-  void UpdateIsotopeDropDown();
+	void UpdateIsotopeDropDown();
 
-  //Event Handlers
-  void OnElementChange(wxCommandEvent& e);
+	//Event Handlers
+	void OnElementChange(wxCommandEvent& e);
 
 protected:
-  DECLARE_EVENT_TABLE();
+	DECLARE_EVENT_TABLE();
 
 private:
-  SpinXML::Spin* mSpin;
-  SpinInterEditPanel* mInterEdit;
+	SpinXML::Spin* mSpin;
+	SpinXML::SpinSystem* mSpinSystem;
+	SpinInterEditPanel* mInterEdit;
 };
 
 

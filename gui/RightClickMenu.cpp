@@ -28,8 +28,8 @@ void RightClickMenu::Build() {
 }
 
 void RightClickMenu::OnShowSpinProperties(wxCommandEvent& e) {
-  SpinDialog* dialog=new SpinDialog(mParent,mOptionSpinProperties);
-  dialog->ShowModal(); 
+	SpinDialog* dialog=new SpinDialog(mParent,mOptionSpinProperties);
+	dialog->ShowModal(); 
 }
 
 void RightClickMenu::OnDeleteSpin(wxCommandEvent& e) {

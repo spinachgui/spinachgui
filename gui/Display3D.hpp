@@ -77,7 +77,6 @@ public:
     std::map<SpinXML::Interaction::Type,Vector3d> mInterColours;
     ///The visibility of the displayed interactions
     std::map<SpinXML::Interaction::Type,bool> mVisible;
-
 };
 
 class SGNode : public sigc::trackable {
@@ -201,6 +200,8 @@ protected:
     void EnableGL();
     void ChangeViewport();
 
+	// Do an openGL picking render and record the objects found under the mouse.
+	void DoPickingPass();
 private:
 
     //These nodes can be rotated and translated  with the mouse

@@ -414,6 +414,10 @@ void Display3D::ChangeViewport() {
 }
 
 
+void Display3D::DoPickingPass() {
+	
+}
+
 void Display3D::OnMouseMove(wxMouseEvent& e) {
     if(e.Dragging() && e.RightIsDown()) {
         mXTranslate=mXTranslate+(e.GetX()-mMouseX);
@@ -623,13 +627,17 @@ void Display3D::OnPaint(wxPaintEvent& e) {
                     GetSelMgr()->SetHover(GetSS()->GetSpin(closestNames[1]));
                     break;
                 case LAYER_INTERACTIONS:
+                    GetSelMgr()->SetHover(NULL);
                     //NO_OP
                     break;
                 case LAYER_BONDS:
+                    GetSelMgr()->SetHover(NULL);
                     //NO_OP
                     break;
                 }
-            }
+            } else {
+				GetSelMgr()->SetHover(NULL);
+			}
         }
 
         //Now draw the forground objects

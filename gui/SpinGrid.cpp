@@ -21,7 +21,8 @@ public:
     SpinGridRow(SpinGrid* parent,Spin* spin,long row) 
         : mParent(parent),
           mSpin(spin),
-          rowNumber(row) {
+          rowNumber(row),
+	      selected(false) {
         parent->sigDying.connect(    mem_fun(this,&SpinGridRow::OnGridDying));
         parent->sigClearing.connect( mem_fun(this,&SpinGridRow::OnGridDying));
         parent->sigRowSelect.connect(mem_fun(this,&SpinGridRow::OnRowSelect));
@@ -89,10 +90,18 @@ public:
     }
     void OnSpinHover(Spin* spin) {
         if(spin==mSpin) {
+			selected = true;
             for(int i=0;i<mParent->GetNumberCols();i++){
                 mParent->SetCellBackgroundColour(rowNumber,i,wxColor(200,255,200));
             }
-        }
+			mParent->Refresh();
+        } else if(selected) {
+			selected=false;
+            for(int i=0;i<mParent->GetNumberCols();i++){
+                mParent->SetCellBackgroundColour(rowNumber,i,wxColor(255,255,255));
+            }
+			mParent->Refresh();
+		}
     }
     void OnRowSelect(int row) {
         if(row==rowNumber) {
@@ -113,6 +122,7 @@ private:
     SpinGrid* mParent;
     Spin* mSpin;
     long rowNumber;
+	bool selected;
 };
 
 
@@ -326,6 +336,7 @@ void SpinGrid::OnMouseMove(wxMouseEvent& e) {
         }
     }
 }
+
 
 
 BEGIN_EVENT_TABLE(SpinGrid,wxGrid)

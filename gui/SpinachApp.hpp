@@ -9,6 +9,8 @@
 
 #include <gui/SpinSysManager.hpp>
 
+#include <set>
+
 class SelectionManager;
 
 class SpinachApp : public wxApp {
@@ -38,18 +40,22 @@ public:
     ~SelectionManager();
 
     void SetHover(SpinXML::Spin* spin);
-    void SetSelection(const std::vector<SpinXML::Spin*>& selection);
+    void SetSelection(SpinXML::Spin* spin);
+    void SetSelection(const std::set<SpinXML::Spin*>& selection);
+	void AddSelection(SpinXML::Spin* spinToAdd);
+	bool IsSelected(SpinXML::Spin* spin);
+	void RemoveSelection(SpinXML::Spin* spin);
 
     SpinXML::Spin* GetHover() const {return mHover;}
-    const std::vector<SpinXML::Spin*>& GetSelection() const {return mSelection;}
+    const std::set<SpinXML::Spin*>& GetSelection() const {return mSelection;}
 
     static SelectionManager* Instance();
 
-    sigc::signal<void,SpinXML::Spin*>          sigHover;
-    sigc::signal<void,std::vector<SpinXML::Spin*> > sigSelect;
+    sigc::signal<void,SpinXML::Spin*>               sigHover;
+    sigc::signal<void,std::set<SpinXML::Spin*> > sigSelectChange;
 private:
     SpinXML::Spin* mHover;
-    std::vector<SpinXML::Spin*> mSelection;
+    std::set<SpinXML::Spin*> mSelection;
     static SelectionManager* static_this;
 };
 

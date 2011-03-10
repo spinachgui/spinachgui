@@ -23,16 +23,17 @@ public:
           mSpin(spin),
           rowNumber(row),
 	      selected(false) {
-        parent->sigDying.connect(    mem_fun(this,&SpinGridRow::OnGridDying));
-        parent->sigClearing.connect( mem_fun(this,&SpinGridRow::OnGridDying));
-        parent->sigRowSelect.connect(mem_fun(this,&SpinGridRow::OnRowSelect));
-        parent->sigRowHover.connect( mem_fun(this,&SpinGridRow::OnRowHover));
+        parent->sigDying.connect(      mem_fun(this,&SpinGridRow::OnGridDying));
+        parent->sigClearing.connect(   mem_fun(this,&SpinGridRow::OnGridDying));
+        parent->sigRowSelect.connect(  mem_fun(this,&SpinGridRow::OnRowSelect));
+        parent->sigRowUnselect.connect(mem_fun(this,&SpinGridRow::OnRowUnselect));
+        parent->sigRowHover.connect(   mem_fun(this,&SpinGridRow::OnRowHover));
 
         spin->sigChange.connect(mem_fun(this,&SpinGridRow::UpdateRow));
         spin->sigDying.connect(mem_fun(this,&SpinGridRow::OnSpinDying));
 
         SelectionManager::Instance()->sigHover.connect( mem_fun(this,&SpinGridRow::OnSpinHover));
-        SelectionManager::Instance()->sigSelect.connect(mem_fun(this,&SpinGridRow::OnSpinSelect));
+        SelectionManager::Instance()->sigSelectChange.connect(mem_fun(this,&SpinGridRow::OnSpinSelectChange));
 
         UpdateRow();
     }
@@ -79,37 +80,48 @@ public:
     void OnGridDying() {
         delete this;
     }
-    void OnSpinSelect(vector<Spin*> spins) {
-        for(vector<Spin*>::iterator i=spins.begin();i != spins.end(); ++i) {
-            if((*i)==mSpin) {
-                for(int i=0;i<mParent->GetNumberCols();i++){
-                    mParent->SetCellBackgroundColour(rowNumber,i,wxColor(200,255,255));
-                }
-            }
+	void ColourRow(wxColor c) {
+		for(int i=0;i<mParent->GetNumberCols();i++){
+			mParent->SetCellBackgroundColour(rowNumber,i,c);
+		}
+		mParent->Refresh();
+	}
+
+    void OnSpinSelectChange(set<Spin*> spins) {
+		if(spins.find(mSpin) != spins.end()) {
+			selected = true;
+			ColourRow(wxColor(255,255,200));
+			return;
         }
+		if(selected)  ColourRow(wxColor(255,255,255));
+		selected = false;
     }
     void OnSpinHover(Spin* spin) {
-        if(spin==mSpin) {
-			selected = true;
-            for(int i=0;i<mParent->GetNumberCols();i++){
-                mParent->SetCellBackgroundColour(rowNumber,i,wxColor(200,255,200));
-            }
-			mParent->Refresh();
-        } else if(selected) {
-			selected=false;
-            for(int i=0;i<mParent->GetNumberCols();i++){
-                mParent->SetCellBackgroundColour(rowNumber,i,wxColor(255,255,255));
-            }
-			mParent->Refresh();
+        if(spin==mSpin) { //User is hovering over this spin
+			ColourRow(wxColor(200,255,200));
+        } else if(selected) { 
+			ColourRow(wxColor(255,255,200));
+		} else {
+			ColourRow(wxColor(255,255,255));
+
 		}
     }
+
+	//----------------------------------------//
+	// Functions called by SpinGrid
+
     void OnRowSelect(int row) {
         if(row==rowNumber) {
-            vector<SpinXML::Spin*> v;
-            v.push_back(mSpin);
-            SelectionManager::Instance()->SetSelection(v);
+            SelectionManager::Instance()->AddSelection(mSpin);
         }
     }
+    void OnRowUnselect(int row) {
+		cout << "Unselect " << row << endl;
+        if(row==rowNumber) {
+            SelectionManager::Instance()->RemoveSelection(mSpin);
+        }
+    }
+
     void OnRowHover(int row) {
         if(row==rowNumber) {
             SelectionManager::Instance()->SetHover(mSpin);
@@ -290,7 +302,7 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         if(value == wxT("1")) {
             sigRowSelect(e.GetRow());
         } else {
-
+            sigRowUnselect(e.GetRow());
         }
     }
 }

@@ -50,6 +50,7 @@ public:
     sigc::signal<void,int,int> sigRowDelete;
 
     sigc::signal<void,int> sigRowSelect;
+    sigc::signal<void,int> sigRowUnselect;
     sigc::signal<void,int> sigRowHover;
 protected:
     DECLARE_EVENT_TABLE();

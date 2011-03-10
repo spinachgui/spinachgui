@@ -1,4 +1,6 @@
 
+#include<algorithm>
+
 #include <gui/SpinachApp.hpp>
 
 #include <gui/SpinDialog.hpp>
@@ -112,17 +114,43 @@ SelectionManager* SelectionManager::Instance() {
     return static_this;
 }
 
+bool SelectionManager::IsSelected(SpinXML::Spin* spin) {
+	return mSelection.find(spin) != mSelection.end();
+}
 
 void SelectionManager::SetHover(SpinXML::Spin* spin) {
     mHover=spin;
     sigHover(spin);
 }
 
-void SelectionManager::SetSelection(const std::vector<SpinXML::Spin*>& selection) {
-    mSelection=selection;
-    sigSelect(mSelection);
+void SelectionManager::SetSelection(Spin* spin) {
+    mSelection.clear();
+	mSelection.insert(spin);
+    sigSelectChange(mSelection);
 }
 
 
+void SelectionManager::SetSelection(const std::set<SpinXML::Spin*>& selection) {
+    mSelection=selection;
+    sigSelectChange(mSelection);
+}
+
+void SelectionManager::AddSelection(SpinXML::Spin* spinToAdd) {
+	mSelection.insert(spinToAdd);
+	sigSelectChange(mSelection);
+}
+
+struct eq {
+	eq(Spin* _spin):mSpin(_spin){}
+	bool operator()(Spin* x) const {
+		return true;//x==mSpin;
+	}
+private:
+	Spin* mSpin;
+};
+void SelectionManager::RemoveSelection(SpinXML::Spin* spin) {
+	mSelection.erase(spin);
+	sigSelectChange(mSelection);
+}
 
 

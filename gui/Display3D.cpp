@@ -461,13 +461,10 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(!e.ShiftDown()) {
-        //selected=[];
-    }
-    if (mHover != -1) {
-        //selected.append(self.hover);
-        Refresh();
-    }
-
+		GetSelMgr()->AddSelection(GetSS()->GetSpin(mHover));
+    } else {
+		GetSelMgr()->AddSelection(GetSS()->GetSpin(mHover));
+	}
 }
 
 void Display3D::OnResize(wxSizeEvent& e) {

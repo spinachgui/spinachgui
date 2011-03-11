@@ -9,7 +9,7 @@ using namespace sigc;
 //============================================================//
 // Gobal Singals
 
-signal<void,Spin*> sigAnySpinDying;
+sigc::signal<void,Spin*> SpinXML::sigAnySpinDying;
 
 //============================================================//
 // Spin-view

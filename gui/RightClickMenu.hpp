@@ -9,18 +9,20 @@
 ///take care of ensuing the required actions are carried out.
 class RightClickMenu : public wxMenu {
 public:
-  RightClickMenu(wxWindow* parent);
+	RightClickMenu(wxWindow* parent);
 
-  //Event Handlers
-  void OnShowSpinProperties(wxCommandEvent& e);
-  void OnDeleteSpin(wxCommandEvent& e);
+	//Event Handlers
+	void OnDeleteHover(wxCommandEvent& e);
+	void OnShowSpinProperties(wxCommandEvent& e);
+	void OnDeleteSpin(wxCommandEvent& e);
 
-  ///Call to build the menu. inserts the menu items in a sensible
-  ///order.
-  void Build();
+	///Call to build the menu. inserts the menu items in a sensible
+	///order.
+	void Build();
 protected:
-  DECLARE_EVENT_TABLE();
-  wxWindow* mParent;
+	DECLARE_EVENT_TABLE();
+	wxWindow* mParent;
+	SpinXML::Spin* mHoverAtTimeOfOpening;
 };
 
 

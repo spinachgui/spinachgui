@@ -11,7 +11,8 @@ using namespace std;
 
 enum {
   MENU_SPIN_PROP,
-  MENU_SPIN_DELETE
+  MENU_SPIN_DELETE,
+  MENU_DELETE_HOVER,
 };
 
 RightClickMenu::RightClickMenu(wxWindow* parent) : wxMenu(),
@@ -20,8 +21,12 @@ RightClickMenu::RightClickMenu(wxWindow* parent) : wxMenu(),
 
 void RightClickMenu::Build() {
 	unsigned int count = GetSelectedCount();
+	mHoverAtTimeOfOpening = GetHover();
+	if(mHoverAtTimeOfOpening != NULL) {
+		Append(MENU_SPIN_DELETE, wxT("Delete Spin (Under Mouse)"));    
+	}
 	if(count > 0) {
-		wxString str = count == 1 ? wxT("Delete Spin"):wxT("Delete Spins");
+		wxString str = count == 1 ? wxT("Delete Spin (Selected)"):wxT("Delete Spins (Selected)");
 		Append(MENU_SPIN_DELETE, str);    
 	}
 	if (count == 1) {
@@ -37,15 +42,21 @@ void RightClickMenu::OnShowSpinProperties(wxCommandEvent& e) {
 	}
 }
 
+void RightClickMenu::OnDeleteHover(wxCommandEvent& e) {
+	delete mHoverAtTimeOfOpening;
+}
+
 void RightClickMenu::OnDeleteSpin(wxCommandEvent& e) {
   Chkpoint(wxT("Delete Spin"));
   DeleteSelectedSpins();
 }
 
 
+
 BEGIN_EVENT_TABLE(RightClickMenu,wxMenu)
 
 EVT_MENU  (  MENU_SPIN_PROP,          RightClickMenu::OnShowSpinProperties)
 EVT_MENU  (  MENU_SPIN_DELETE,        RightClickMenu::OnDeleteSpin)
+EVT_MENU  (  MENU_DELETE_HOVER,       RightClickMenu::OnDeleteHover)
 
 END_EVENT_TABLE()

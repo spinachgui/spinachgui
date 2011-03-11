@@ -44,6 +44,8 @@ namespace SpinXML {
         long mIsotope;
     };
 
+	extern sigc::signal<void,Spin*> sigAnySpinDying;
+
     class SpinView : public ViewBase<SpinView,Spin> {
     public:
         typedef ViewBase<SpinView,Spin> Base;

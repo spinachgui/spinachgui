@@ -11,9 +11,6 @@ class RightClickMenu : public wxMenu {
 public:
   RightClickMenu(wxWindow* parent);
 
-  void OptionDeleteSpin(SpinXML::Spin* spin) {mOptionDelete=spin;}
-  void OptionShowSpinProperties(SpinXML::Spin* spin) {mOptionSpinProperties=spin;}
-
   //Event Handlers
   void OnShowSpinProperties(wxCommandEvent& e);
   void OnDeleteSpin(wxCommandEvent& e);
@@ -24,11 +21,6 @@ public:
 protected:
   DECLARE_EVENT_TABLE();
   wxWindow* mParent;
-
-  SpinXML::Spin* mOptionDelete;
-  SpinXML::Spin* mOptionSpinProperties;
-
-
 };
 
 

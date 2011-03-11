@@ -1,4 +1,5 @@
 
+
 #include<algorithm>
 
 #include <gui/SpinachApp.hpp>
@@ -47,15 +48,9 @@ SpinachApp::~SpinachApp() {
     for(unsigned long i=0;i<mIOFilters.size();i++) {
         delete mIOFilters[i];
     }
-    delete mSelectionManager;
 }
 
 bool SpinachApp::OnInit() {
-    
-
-    //Create the global selection manager
-    mSelectionManager = new SelectionManager;
-
     //Load the I/O Filters
 
     mIOFilters.push_back(new G03Loader);
@@ -70,6 +65,10 @@ bool SpinachApp::OnInit() {
     fn.SetFullName(wxT("spinxml_schema.xsd"));
     wxString url(wxString(wxT("file://")) << fn.GetFullPath());
     mIOFilters.push_back(new XMLLoader(url.char_str()));
+
+	//Connect up the selection manager so that when a spin is deleted
+	//it also gets unselected
+	sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
   
     //Load the isotopes
 
@@ -96,61 +95,122 @@ bool SpinachApp::OnInit() {
 
 //============================================================//
 // Selection Manager
-SelectionManager* SelectionManager::static_this=NULL;
 
-SelectionManager::SelectionManager() {
-    //There can be only one
-    assert(NULL==static_this);
-    static_this=this;
+sigc::signal<void,SpinXML::Spin*>            sigHover;
+sigc::signal<void,std::set<SpinXML::Spin*> > sigSelectChange;
+
+struct SelSpin {
+	SelSpin(Spin* s,sigc::connection c) :spin(s),connect(c) {}
+	bool operator < (const SelSpin& o) const {return spin < o.spin;}
+
+	Spin* spin;
+	sigc::connection connect;
+};
+struct SelSpinEq {
+	SelSpinEq(Spin* spin) : s(spin){}
+	bool operator()(SelSpin sel) {return sel.spin==s;}
+	Spin* s;
+};
+
+Spin* gHover;
+set<SelSpin> gSelection;
+
+//Private
+
+SelSpin packf(Spin* spin) {
+	return SelSpin(spin,spin->sigDying.connect(sigc::ptr_fun<Spin*,void>(RemoveSelection)));
+}
+set<SelSpin> packSet(const set<Spin*>& s) {
+	set<SelSpin> out;
+	for(set<Spin*>::iterator i=s.begin();i!=s.end();++i) {
+		out.insert(packf(*i));
+	}
+	return out;
+}
+set<Spin*> unpackSet(const set<SelSpin>& s) {
+	set<Spin*> out;
+	for(set<SelSpin>::iterator i=s.begin();i!=s.end();++i) {
+		out.insert((*i).spin);
+	}
+	return out;
 }
 
-SelectionManager::~SelectionManager() {
-    assert(this==static_this);
-    static_this=NULL;
+//Selection Readers
+
+bool IsSelected(SpinXML::Spin* spin)  {
+	return find_if(gSelection.begin(),gSelection.end(),SelSpinEq(spin)) != gSelection.end();
 }
 
-SelectionManager* SelectionManager::Instance() {
-    assert(static_this != NULL);
-    return static_this;
+unsigned int GetSelectedCount(){
+	return gSelection.size();
 }
 
-bool SelectionManager::IsSelected(SpinXML::Spin* spin) {
-	return mSelection.find(spin) != mSelection.end();
+set<Spin*> GetSelection() {
+	return unpackSet(gSelection);
 }
 
-void SelectionManager::SetHover(SpinXML::Spin* spin) {
-    mHover=spin;
+//Selection Writers
+
+void ClearSelection() {
+	gSelection.clear();
+}
+
+void DeleteSelectedSpins(){
+	for(set<SelSpin>::iterator i=gSelection.begin();i!=gSelection.end();++i) {
+		delete (*i).spin;
+	}
+};
+
+void SetHover(SpinXML::Spin* spin) {
+    gHover=spin;
     sigHover(spin);
 }
 
-void SelectionManager::SetSelection(Spin* spin) {
-    mSelection.clear();
-	mSelection.insert(spin);
-    sigSelectChange(mSelection);
+
+void SetSelection(Spin* spin) {
+	ClearSelection();
+	gSelection.insert(packf(spin));
+    sigSelectChange(unpackSet(gSelection));
 }
 
 
-void SelectionManager::SetSelection(const std::set<SpinXML::Spin*>& selection) {
-    mSelection=selection;
-    sigSelectChange(mSelection);
-}
-
-void SelectionManager::AddSelection(SpinXML::Spin* spinToAdd) {
-	mSelection.insert(spinToAdd);
-	sigSelectChange(mSelection);
-}
-
-struct eq {
-	eq(Spin* _spin):mSpin(_spin){}
-	bool operator()(Spin* x) const {
-		return true;//x==mSpin;
+void SetSelection(set<SpinXML::Spin*>& selection) {
+	ClearSelection();
+	for(set<Spin*>::iterator i = selection.begin();i!=selection.end();++i) {
+		gSelection.insert(packf(*i));
 	}
-private:
-	Spin* mSpin;
-};
-void SelectionManager::RemoveSelection(SpinXML::Spin* spin) {
-	mSelection.erase(spin);
-	sigSelectChange(mSelection);
+    sigSelectChange(selection);
 }
+
+void AddSelection(SpinXML::Spin* spinToAdd) {
+	gSelection.insert(packf(spinToAdd));
+	sigSelectChange(unpackSet(gSelection));
+}
+
+void RemoveSelection(SpinXML::Spin* spin) {
+	// Tried
+	//	set<SelSpin>::iterator i = find_if(gSelection.begin(),gSelection.end(),SelSpinEq(spin));
+	// 	(*i).connect.disconnect();
+	// Got  error: passing ‘const sigc::connection’ as ‘this’ argument of ‘void sigc::connection::disconnect()’ discards qualifiers
+	// And yet i is not a const iterator. WTF? Standard Template Library, you have failed me again
+
+	for(set<SelSpin>::iterator i = gSelection.begin();i != gSelection.end() ; ++i) {
+		if((*i).spin == spin) {
+			gSelection.erase(i);
+			sigSelectChange(unpackSet(gSelection));
+			return;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
 
 

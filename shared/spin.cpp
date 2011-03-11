@@ -7,6 +7,11 @@ using namespace SpinXML;
 using namespace sigc;
 
 //============================================================//
+// Gobal Singals
+
+signal<void,Spin*> sigAnySpinDying;
+
+//============================================================//
 // Spin-view
 
 Vector3d SpinView::GetPosition() const {
@@ -65,6 +70,7 @@ Spin::Spin(const Spin& s) :
 
 Spin::~Spin() {
     sigDying(this);
+	sigAnySpinDying(this);
 }
 
 Vector3d& Spin::GetPosition() {

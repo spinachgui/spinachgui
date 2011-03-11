@@ -32,8 +32,8 @@ public:
         spin->sigChange.connect(mem_fun(this,&SpinGridRow::UpdateRow));
         spin->sigDying.connect(mem_fun(this,&SpinGridRow::OnSpinDying));
 
-        SelectionManager::Instance()->sigHover.connect( mem_fun(this,&SpinGridRow::OnSpinHover));
-        SelectionManager::Instance()->sigSelectChange.connect(mem_fun(this,&SpinGridRow::OnSpinSelectChange));
+        sigHover.connect( mem_fun(this,&SpinGridRow::OnSpinHover));
+        sigSelectChange.connect(mem_fun(this,&SpinGridRow::OnSpinSelectChange));
 
         UpdateRow();
     }
@@ -112,19 +112,19 @@ public:
 
     void OnRowSelect(int row) {
         if(row==rowNumber) {
-            SelectionManager::Instance()->AddSelection(mSpin);
+            AddSelection(mSpin);
         }
     }
     void OnRowUnselect(int row) {
 		cout << "Unselect " << row << endl;
         if(row==rowNumber) {
-            SelectionManager::Instance()->RemoveSelection(mSpin);
+            RemoveSelection(mSpin);
         }
     }
 
     void OnRowHover(int row) {
         if(row==rowNumber) {
-            SelectionManager::Instance()->SetHover(mSpin);
+            SetHover(mSpin);
         }
     }
 
@@ -325,10 +325,6 @@ void SpinGrid::OnCellSelect(wxGridEvent& e) {
 
 void SpinGrid::OnRightClick(wxGridEvent& e) {
     RightClickMenu* menu=new RightClickMenu(this);
-    if(e.GetRow()<mSS->GetSpinCount()) {
-        menu->OptionDeleteSpin        (GetSS()->GetSpin(e.GetRow()));
-        menu->OptionShowSpinProperties(GetSS()->GetSpin(e.GetRow()));
-    }
     menu->Build();
     PopupMenu(menu);
     delete menu;

@@ -450,8 +450,6 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 
     if(mHover>=0) {
       RightClickMenu* menu = new RightClickMenu(this);
-      menu->OptionDeleteSpin(GetSS()->GetSpin(mHover));
-      menu->OptionShowSpinProperties(GetSS()->GetSpin(mHover));
       menu->Build();
       PopupMenu(menu);
       delete menu;
@@ -461,9 +459,9 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(!e.ShiftDown()) {
-		GetSelMgr()->AddSelection(GetSS()->GetSpin(mHover));
+		AddSelection(GetSS()->GetSpin(mHover));
     } else {
-		GetSelMgr()->AddSelection(GetSS()->GetSpin(mHover));
+		AddSelection(GetSS()->GetSpin(mHover));
 	}
 }
 
@@ -621,19 +619,19 @@ void Display3D::OnPaint(wxPaintEvent& e) {
                 }
                 switch(closestNames[0]){
                 case LAYER_SPINS:
-                    GetSelMgr()->SetHover(GetSS()->GetSpin(closestNames[1]));
+                    SetHover(GetSS()->GetSpin(closestNames[1]));
                     break;
                 case LAYER_INTERACTIONS:
-                    GetSelMgr()->SetHover(NULL);
+                    SetHover(NULL);
                     //NO_OP
                     break;
                 case LAYER_BONDS:
-                    GetSelMgr()->SetHover(NULL);
+                    SetHover(NULL);
                     //NO_OP
                     break;
                 }
             } else {
-				GetSelMgr()->SetHover(NULL);
+				SetHover(NULL);
 			}
         }
 

@@ -12,6 +12,9 @@
 #include <set>
 #include <algorithm>
 
+void PANIC(std::string s);
+
+
 class SelectionManager;
 
 class SpinachApp : public wxApp {

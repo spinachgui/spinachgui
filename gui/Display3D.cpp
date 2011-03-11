@@ -259,8 +259,7 @@ Display3D::Display3D(wxWindow* parent)
                  gl_attribs),
       mRootNode(NULL),
 	  mForgroundNode(NULL),
-      mDC(),
-      mHover(-1) {
+      mDC() {
     mGLContext=NULL;
     mGLEnabled=false;
 
@@ -446,22 +445,22 @@ void Display3D::OnWheel(wxMouseEvent& e) {
 }
 
 void Display3D::OnRightClick(wxMouseEvent& e) {
-  if(!e.Dragging()) {
+	if(!e.Dragging()) {
 
-    if(mHover>=0) {
-      RightClickMenu* menu = new RightClickMenu(this);
-      menu->Build();
-      PopupMenu(menu);
-      delete menu;
-    }
-  }
+		if(GetHover()!=NULL) {
+			RightClickMenu* menu = new RightClickMenu(this);
+			menu->Build();
+			PopupMenu(menu);
+			delete menu;
+		}
+	}
 }
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(!e.ShiftDown()) {
-		AddSelection(GetSS()->GetSpin(mHover));
+		AddSelection(GetHover());
     } else {
-		AddSelection(GetSS()->GetSpin(mHover));
+		AddSelection(GetHover());
 	}
 }
 

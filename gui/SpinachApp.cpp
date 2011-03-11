@@ -16,11 +16,37 @@
 #include <shared/formats/castep.hpp>
 #include <shared/formats/simpson.hpp>
 
+#include <shared/has_invariants.hpp>
+
 #include <wx/filename.h>
 
 #include <shared/unit.hpp>
 
 using namespace SpinXML;
+
+void PANIC(string s) {
+	cout << "Panicking, " << s << endl;
+	int* x = NULL;
+	x++;
+	x--;
+	//Make use we use x with a side effect
+	cout << (*x) << endl;
+}
+
+template<typename T>
+  class InvariantChecker {
+  public:
+    InvariantChecker(const T* x) : m(x) {
+      m->CheckInvariant();
+    }
+    ~InvariantChecker() {
+      m->CheckInvariant();
+    }
+  private:
+    const T* m;
+  };
+
+
 
 SpinachApp* gApp;
 
@@ -28,20 +54,21 @@ SpinachApp& wxGetApp() {
   return *gApp;
 }
 
+
 int main(int argc,char** argv) {
-  try {
-    gApp = new SpinachApp;
-    wxApp::SetInstance(gApp);
-    wxEntry(argc,argv);
-  } catch (logic_error& e) {
-    cerr << "Uncaught logic_error what()=" << e.what() << endl;
-  } catch (runtime_error& e) {
-    cerr << "Uncaught runtime_error what()=" << e.what() << endl;
-  } catch (...) {
-    cerr << "Uncaught unknown exception." << endl;
-    throw;
-  }
-  return 0;
+	try {
+		gApp = new SpinachApp;
+		wxApp::SetInstance(gApp);
+		wxEntry(argc,argv);
+	} catch (logic_error& e) {
+		cerr << "Uncaught logic_error what()=" << e.what() << endl;
+	} catch (runtime_error& e) {
+		cerr << "Uncaught runtime_error what()=" << e.what() << endl;
+	} catch (...) {
+		cerr << "Uncaught unknown exception." << endl;
+		throw;
+	}
+	return 0;
 }
 
 SpinachApp::~SpinachApp() {
@@ -93,6 +120,7 @@ bool SpinachApp::OnInit() {
 }
 
 
+
 //============================================================//
 // Selection Manager
 
@@ -103,27 +131,49 @@ sigc::signal<void,std::set<SpinXML::Spin*> > sigSelectChange;
 Spin* gHover;
 set<Spin*> gSelection;
 
+typedef set<Spin*>::iterator itor;
+
+//Selection Manager Invariants
+
+void AssertSelectionExists() {
+	std::vector<Spin*> spins = GetSS()->GetSpins();
+	for(itor i = gSelection.begin();i!=gSelection.end();++i) {
+		if(find(spins.begin(),spins.end(),*i) == spins.end()) {
+			PANIC("A spin in the selection manager was not present in the spin system");
+		}
+	}
+}
+
 //Selection Readers
 
 bool IsSelected(SpinXML::Spin* spin)  {
+	AssertSelectionExists();
 	return gSelection.find(spin) != gSelection.end();
 }
 
 unsigned int GetSelectedCount(){
+	AssertSelectionExists();
 	return gSelection.size();
 }
 
 set<Spin*> GetSelection() {
+	AssertSelectionExists();
 	return gSelection;
+}
+
+Spin* GetHover() {
+	return gHover;
 }
 
 //Selection Writers
 
 void ClearSelection() {
+	AssertSelectionExists();
 	gSelection.clear();
 }
 
 void DeleteSelectedSpins(){
+	AssertSelectionExists();
 	for(set<Spin*>::iterator i=gSelection.begin();i!=gSelection.end();) {
 		//i is about to be invalidated, so save it and incriment before erasing
 		set<Spin*>::iterator j = i;
@@ -132,6 +182,7 @@ void DeleteSelectedSpins(){
 		delete (*i);
 		i = j;
 	}
+	AssertSelectionExists();
 };
 
 void SetHover(SpinXML::Spin* spin) {
@@ -141,21 +192,28 @@ void SetHover(SpinXML::Spin* spin) {
 
 
 void SetSelection(Spin* spin) {
+	AssertSelectionExists();
 	ClearSelection();
 	gSelection.insert(spin);
     sigSelectChange(gSelection);
+	AssertSelectionExists();
 }
 
 
 void SetSelection(set<SpinXML::Spin*>& selection) {
+	AssertSelectionExists();
 	ClearSelection();
 	gSelection = selection;
     sigSelectChange(gSelection);
+	AssertSelectionExists();
 }
 
 void AddSelection(SpinXML::Spin* spinToAdd) {
+	if(spinToAdd == NULL) return;
+	AssertSelectionExists();
 	gSelection.insert(spinToAdd);
 	sigSelectChange(gSelection);
+	AssertSelectionExists();
 }
 
 void RemoveSelection(SpinXML::Spin* spin) {
@@ -165,12 +223,8 @@ void RemoveSelection(SpinXML::Spin* spin) {
 		gSelection.erase(i);
 		sigSelectChange(gSelection);
 	}
+	AssertSelectionExists();
 }
-
-
-
-
-
 
 
 

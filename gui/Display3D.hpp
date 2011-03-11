@@ -223,7 +223,6 @@ private:
     GLuint mFB;
 
     //GUI State Variables
-    long mHover;
     double mHoverDist;
     long mMouseX,mMouseY;
     double mZoom;

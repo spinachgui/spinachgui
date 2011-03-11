@@ -183,36 +183,36 @@ SpinDrawerNode::SpinDrawerNode(SpinSystem* ss)
 void SpinDrawerNode::RawDraw(SpinachDC& dc) {
     long count=mSS->GetSpinCount();
     for(long i=0;i<count;i++) {
-	Spin* spin=mSS->GetSpin(i);
-	if(spin->GetElement() != 0){
-	    glPushMatrix();
-	    glTranslatef(spin->GetPosition().x() * Angstroms,
-					 spin->GetPosition().y() * Angstroms,
-					 spin->GetPosition().z() * Angstroms);
-	}
-	const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
-	GLfloat material[4]; material[3]=0.0f;
+		Spin* spin=mSS->GetSpin(i);
+		if(spin->GetElement() != 0){
+			glPushMatrix();
+			glTranslatef(spin->GetPosition().x() / Angstroms,
+						 spin->GetPosition().y() / Angstroms,
+						 spin->GetPosition().z() / Angstroms);
+		}
+		const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
+		GLfloat material[4]; material[3]=0.0f;
 
-	material[0] = getElementR(spin->GetElement());
-	material[1] = getElementG(spin->GetElement());
-	material[2] = getElementB(spin->GetElement());
+		material[0] = getElementR(spin->GetElement());
+		material[1] = getElementG(spin->GetElement());
+		material[2] = getElementB(spin->GetElement());
 
-	glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
-	if(spin->GetElement()==0) {
-            //Bug resulting in drawing no content after a g03 load tracked to this line:
-	    //glTranslatef(40.0f,dc.height-40.0f,0.0f);
-	    //glMultMatrixf(dc.mRotationMatrix);
-	    //gluSphere(dc.GetSolidQuadric(),9,14,14);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
+		if(spin->GetElement()==0) {
+			//Bug resulting in drawing no content after a g03 load tracked to this line:
+			glTranslatef(40.0f,dc.height-40.0f,0.0f);
+			glMultMatrixf(dc.mRotationMatrix);
+			gluSphere(dc.GetSolidQuadric(),9,14,14);
 
-	} else {
+		} else {
             glPushName(i);
-	    gluSphere(dc.GetSolidQuadric(),0.1,14,14);
+			gluSphere(dc.GetSolidQuadric(),0.1,14,14);
             glPopName();
-	}
-	if(spin->GetElement() != 0){
-	    glPopMatrix();
-	}
+		}
+		if(spin->GetElement() != 0){
+			glPopMatrix();
+		}
 
     }
 }

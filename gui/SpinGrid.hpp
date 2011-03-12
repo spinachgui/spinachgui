@@ -6,7 +6,7 @@
 #include <shared/spinsys.hpp>
 #include <sigc++/sigc++.h>
 #include <wx/grid.h>
-
+#include <set>
 
 
 class SpinGrid : public wxGrid, public sigc::trackable {
@@ -24,6 +24,8 @@ public:
 
     //sigc slots
     void OnNewSpin(SpinXML::Spin* newSpin,long number);
+	void SlotHover(SpinXML::Spin* spin);
+	void SlotSelectChange(std::set<SpinXML::Spin*> spins);
 
     //Overridden in order to emit a signal
     bool DeleteRows(int pos=0,int numRows=1,bool updateLables=true);
@@ -48,16 +50,14 @@ public:
     sigc::signal<void> sigDying;
     sigc::signal<void> sigClearing;
     sigc::signal<void,int,int> sigRowDelete;
-
-    sigc::signal<void,int> sigRowSelect;
-    sigc::signal<void,int> sigRowUnselect;
-    sigc::signal<void,int> sigRowHover;
 protected:
     DECLARE_EVENT_TABLE();
 
     void RefreshFromSpinSystem();
     void UpdateRowIsotopes(long row);
     void SetupRow(long rowNumber);
+    void UpdateRow(long rowNumber);
+	void ColourRow(long rowNumber,const wxColor& c);
 
 private:
     ~SpinGrid() {sigDying();}
@@ -69,7 +69,7 @@ private:
     const static SpinGridColum columns[];
     SpinXML::SpinSystem* mSS;
     bool mUpdating;
-
+	long mLastHover;
 };
 
 

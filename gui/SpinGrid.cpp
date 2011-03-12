@@ -10,132 +10,14 @@ using namespace std;
 
 using namespace SpinXML;
 
-const long ColumCount=7;  
+const long ColumCount=7; 
+ 
+const wxColor defaultC(255,255,255);
+const wxColor selectedC(200,255,255);
+const wxColor hoverC(200,255,200);
 
 //============================================================//
 // Utility functions.
-
-
-class SpinGridRow : public sigc::trackable {
-public:
-    SpinGridRow(SpinGrid* parent,Spin* spin,long row) 
-        : mParent(parent),
-          mSpin(spin),
-          rowNumber(row),
-	      selected(false) {
-        parent->sigDying.connect(      mem_fun(this,&SpinGridRow::OnGridDying));
-        parent->sigClearing.connect(   mem_fun(this,&SpinGridRow::OnGridDying));
-        parent->sigRowSelect.connect(  mem_fun(this,&SpinGridRow::OnRowSelect));
-        parent->sigRowUnselect.connect(mem_fun(this,&SpinGridRow::OnRowUnselect));
-        parent->sigRowHover.connect(   mem_fun(this,&SpinGridRow::OnRowHover));
-
-        spin->sigChange.connect(mem_fun(this,&SpinGridRow::UpdateRow));
-        spin->sigDying.connect(mem_fun(this,&SpinGridRow::OnSpinDying));
-
-        sigHover.connect( mem_fun(this,&SpinGridRow::OnSpinHover));
-        sigSelectChange.connect(mem_fun(this,&SpinGridRow::OnSpinSelectChange));
-
-        UpdateRow();
-    }
-
-    void ChangeRow(long newRow) {
-        if(rowNumber<0 || rowNumber>=GetSS()->GetSpinCount()) {
-            return;
-        }
-        rowNumber=newRow;
-        UpdateRow();
-    }
-
-    void OtherRowsDeleted(int pos,int number) {
-        if(pos<rowNumber && pos > 0) {
-            rowNumber-=number;
-        }
-    }
-    void UpdateRow() {
-        length x,y,z;
-        mSpin->GetCoordinates(&x,&y,&z);
-
-        //Setup the label and the element columns
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(mSpin->GetLabel(),wxConvUTF8));
-
-        //Setup the x,y,z coordinates
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x * Angstroms);
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y * Angstroms);
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z * Angstroms);
-
-        //Set the element and isotope
-        long element=mSpin->GetElement();
-        wxString str(getElementSymbol(element),wxConvUTF8);
-        str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
-        mParent->SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
-    }
-  
-    void OnSpinChange() {
-        UpdateRow();
-    }
-    void OnSpinDying(Spin* /*unused*/) {
-        mParent->DeleteRows(rowNumber,1);
-        delete this;
-    }
-    void OnGridDying() {
-        delete this;
-    }
-	void ColourRow(wxColor c) {
-		for(int i=0;i<mParent->GetNumberCols();i++){
-			mParent->SetCellBackgroundColour(rowNumber,i,c);
-		}
-		mParent->Refresh();
-	}
-
-    void OnSpinSelectChange(set<Spin*> spins) {
-		if(spins.find(mSpin) != spins.end()) {
-			selected = true;
-			ColourRow(wxColor(255,255,200));
-			return;
-        }
-		if(selected)  ColourRow(wxColor(255,255,255));
-		selected = false;
-    }
-    void OnSpinHover(Spin* spin) {
-        if(spin==mSpin) { //User is hovering over this spin
-			ColourRow(wxColor(200,255,200));
-        } else if(selected) { 
-			ColourRow(wxColor(255,255,200));
-		} else {
-			ColourRow(wxColor(255,255,255));
-
-		}
-    }
-
-	//----------------------------------------//
-	// Functions called by SpinGrid
-
-    void OnRowSelect(int row) {
-        if(row==rowNumber) {
-            AddSelection(mSpin);
-        }
-    }
-    void OnRowUnselect(int row) {
-		cout << "Unselect " << row << endl;
-        if(row==rowNumber) {
-            RemoveSelection(mSpin);
-        }
-    }
-
-    void OnRowHover(int row) {
-        if(row==rowNumber) {
-            SetHover(mSpin);
-        }
-    }
-
-private:
-    SpinGridRow(const SpinGridRow&);
-    ~SpinGridRow(){}
-    SpinGrid* mParent;
-    Spin* mSpin;
-    long rowNumber;
-	bool selected;
-};
 
 
 //============================================================//
@@ -154,7 +36,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 
 SpinGrid::SpinGrid(wxWindow* parent)
-    :wxGrid(parent,wxID_ANY),mSS(GetSS()),mUpdating(false) {
+    :wxGrid(parent,wxID_ANY),mSS(GetSS()),mUpdating(false),mLastHover(-1) {
 
     CreateGrid(0, ColumCount);
 
@@ -177,11 +59,47 @@ SpinGrid::SpinGrid(wxWindow* parent)
     SetRowLabelSize(40);
     SetRowLabelAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
 
+	//Signals
+
     mSS->sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
     mSS->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
+
+	sigHover.connect(mem_fun(this,&SpinGrid::SlotHover));
+	sigSelectChange.connect(mem_fun(this,&SpinGrid::SlotSelectChange));
+	
     RefreshFromSpinSystem();
 }
-    
+
+void SpinGrid::ColourRow(long rowNumber,const wxColor& c) {
+	for(int i=0;i<GetNumberCols();i++){
+		SetCellBackgroundColour(rowNumber,i,c);
+	}
+	Refresh();
+}
+
+void SpinGrid::SlotHover(Spin* spin) {
+	if(mLastHover != -1) {
+		ColourRow(mLastHover,wxColor(defaultC));
+		mLastHover = -1;
+	}
+	if(spin == NULL) {
+		return;
+	}
+	long spinN = GetSS()->GetSpinNumber(spin);
+	ColourRow(spinN,wxColor(hoverC));
+	mLastHover = spinN;
+}
+
+void SpinGrid::SlotSelectChange(set<Spin*> spins) {
+	for(long i=0;i<GetNumberRows();i++) {
+		ColourRow(i,defaultC);
+	}
+	for(set<Spin*>::iterator i = spins.begin();i!=spins.end();++i) {
+		long row = GetSS()->GetSpinNumber(*i);
+		ColourRow(row,selectedC);
+	}
+}
+
 
 void SpinGrid::OnEdit(wxGridEvent& e) {
     long sc=GetSS()->GetSpinCount();
@@ -195,14 +113,9 @@ void SpinGrid::OnEdit(wxGridEvent& e) {
 void SpinGrid::OnNewSpin(Spin* newSpin,long number) {
     //Somehow, somewhere a new spin has been created, so create a new
     //row for it at the end of the grid
-    long sc=GetSS()->GetSpinCount();
-    SetupRow(sc);
+    SetupRow(number);
+	UpdateRow(number);
     AppendRows(1);
-    sigRowDelete.connect(mem_fun(
-                                 new SpinGridRow(this,GetSS()->GetSpin(sc-1),sc-1),
-                                 &SpinGridRow::OtherRowsDeleted
-                                 ));
-
 }
 
 void SpinGrid::OnEndEdit(wxGridEvent& e) {
@@ -223,19 +136,35 @@ void SpinGrid::RefreshFromSpinSystem() {
         //remain and are black. wxGrid::DeleteRows solves this
         DeleteRows(0,GetNumberRows());
     }
-    long count=GetSS()->GetSpinCount()+1;
-    AppendRows(count);
+    long count=GetSS()->GetSpinCount();
+    AppendRows(count+1);
     for (long i=0; i < count; i++) {
         SetupRow(i);
-        if(i<count-1) {
-            sigRowDelete.connect(mem_fun(
-                                         new SpinGridRow(this,GetSS()->GetSpin(i),i),
-                                         &SpinGridRow::OtherRowsDeleted
-                                         ));
-	
-        }
+		UpdateRow(i);
     }
+	SetupRow(count); //The last row is for clicking on to make a new spin
     mUpdating=false;
+}
+
+void SpinGrid::UpdateRow(long rowNumber) {
+        length x,y,z;
+		cout << rowNumber << endl;
+        Spin* spin = GetSS()->GetSpin(rowNumber);
+		spin->GetCoordinates(&x,&y,&z);
+
+        //Setup the label and the element columns
+        SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
+
+        //Setup the x,y,z coordinates
+        SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x * Angstroms);
+        SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y * Angstroms);
+        SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z * Angstroms);
+
+        //Set the element and isotope
+        long element=spin->GetElement();
+        wxString str(getElementSymbol(element),wxConvUTF8);
+        str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
+        SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
 }
 
 void SpinGrid::SetupRow(long rowNumber) {
@@ -300,9 +229,9 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     } else if(e.GetCol()==COL_SELECTED){
         wxString value=GetCellValue(e.GetRow(),e.GetCol());
         if(value == wxT("1")) {
-            sigRowSelect(e.GetRow());
+            AddSelection(GetSS()->GetSpin(e.GetRow()));
         } else {
-            sigRowUnselect(e.GetRow());
+            RemoveSelection(GetSS()->GetSpin(e.GetRow()));
         }
     }
 }

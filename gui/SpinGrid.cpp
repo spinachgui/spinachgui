@@ -36,7 +36,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
 
 
 SpinGrid::SpinGrid(wxWindow* parent)
-    :wxGrid(parent,wxID_ANY),mSS(GetSS()),mUpdating(false),mLastHover(-1) {
+    :wxGrid(parent,wxID_ANY),mUpdating(false),mLastHover(-1) {
 
     CreateGrid(0, ColumCount);
 
@@ -61,8 +61,8 @@ SpinGrid::SpinGrid(wxWindow* parent)
 
 	//Signals
 
-    mSS->sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
-    mSS->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
+    GetSS().sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
+    GetSS().sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
 
 	sigHover.connect(mem_fun(this,&SpinGrid::SlotHover));
 	sigSelectChange.connect(mem_fun(this,&SpinGrid::SlotSelectChange));
@@ -149,16 +149,16 @@ void SpinGrid::RefreshFromSpinSystem() {
 void SpinGrid::UpdateRow(long rowNumber) {
         length x,y,z;
 		cout << rowNumber << endl;
-        Spin* spin = GetSS()->GetSpin(rowNumber);
+        SpinView spin = GetSS().GetSpin(rowNumber);
 		spin->GetCoordinates(&x,&y,&z);
 
         //Setup the label and the element columns
         SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
 
         //Setup the x,y,z coordinates
-        SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x * Angstroms);
-        SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y * Angstroms);
-        SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z * Angstroms);
+        SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
+        SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y);
+        SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z);
 
         //Set the element and isotope
         long element=spin->GetElement();
@@ -198,17 +198,17 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         double x;
         GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
         Chkpoint(wxT("Spin Coordinates"));
-        mSS->GetSpin(e.GetRow())->GetPosition()(0)=x*Angstroms;
+        GetSS().GetSpin(e.GetRow())->GetPosition()(0)=x;
     } else if(e.GetCol()==COL_Y) {
         double y;
         GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&y);
         Chkpoint(wxT("Spin Coordinates"));
-        mSS->GetSpin(e.GetRow())->GetPosition()(1)=y*Angstroms;
+        GetSS().GetSpin(e.GetRow())->GetPosition()(1)=y;
     } else if(e.GetCol()==COL_Z) {
         double z;
         GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
         Chkpoint(wxT("Spin Coordinates"));
-        mSS->GetSpin(e.GetRow())->GetPosition()(2)=z*Angstroms;
+        GetSS().GetSpin(e.GetRow())->GetPosition()(2)=z;
     } else if(e.GetCol()==COL_ELEMENT) {
         wxString content=GetCellValue(e.GetRow(),e.GetCol());
         long space=content.Find(wxT(" "));
@@ -219,7 +219,7 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         } else {
             UpdateRowIsotopes(e.GetRow());
             Chkpoint(wxT("Spin Element"));
-            mSS->GetSpin(e.GetRow())->SetElement(element);
+            GetSS().GetSpin(e.GetRow())->SetElement(element);
         }
         cout << space << " " << symbol.char_str() << endl;
     } else if(e.GetCol()==COL_LABEL) {

@@ -96,6 +96,11 @@ bool SpinachApp::OnInit() {
 	//Connect up the selection manager so that when a spin is deleted
 	//it also gets unselected
 	sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
+
+	//Setup a sensible system of units
+	gUnitSystem.energyUnit = unit("Joules",1.0);
+	gUnitSystem.energyUnit = unit("Metres",1.0);
+	gUnitSystem.energyUnit = unit("Seconds",1.0);
   
     //Load the isotopes
 
@@ -228,7 +233,4 @@ void RemoveSelection(SpinXML::Spin* spin) {
 
 
 
-
-
-
-
+UnitSystem gUnitSystem;

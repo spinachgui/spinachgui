@@ -5,6 +5,7 @@
 
 #include <wx/app.h>
 #include <shared/spinsys.hpp>
+#include <shared/frame.hpp>
 #include <assert.h>
 
 #include <gui/SpinSysManager.hpp>
@@ -21,7 +22,7 @@ class SpinachApp : public wxApp {
 public:
     ~SpinachApp();
     virtual bool OnInit();
-    SpinXML::SpinSystem* GetSS() const {return mSS;}
+    SpinXML::SpinSystem* GetSpinSystem() const {return mSS;}
     SelectionManager* GetSelectionManager() const {return mSelectionManager;}
     const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
 
@@ -34,6 +35,11 @@ private:
 
 #include <map>
 #include <sigc++/sigc++.h>
+
+//================================================================================//
+// Unit systems
+
+extern SpinXML::UnitSystem gUnitSystem;
 
 //================================================================================//
 // Selection Manager functions
@@ -65,7 +71,8 @@ void DeleteSelectedSpins();
 SpinachApp& wxGetApp();
 
 //Define macros for accessing the most up to date spin system
-#define GetSS() (wxGetApp().GetSS())
+#define GetSS() (wxGetApp().GetSpinSystem()->GetView(NULL,&gUnitSystem))
+#define GetRawSS() (wxGetApp().GetSpinSystem())
 #define Chkpoint(x) 
 
 #endif

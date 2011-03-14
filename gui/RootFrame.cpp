@@ -58,7 +58,7 @@ void RootFrame::InitFrame() {
     mSpinInterEdit = new SpinInterEditPanel(this);
     mDisplay3D     = new Display3D(this);
 
-    MoleculeNodeNew* mn = new MoleculeNodeNew(GetSS());
+    MoleculeNodeNew* mn = new MoleculeNodeNew(GetRawSS());
 
     SpinachDC& spinDC=mDisplay3D->GetDC();
 
@@ -148,7 +148,7 @@ void RootFrame::InitFrame() {
 
     mDisplay3D->SetRootSGNode(mn);
 
-    mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
+    mDisplay3D->SetRootFGNode(new MoleculeFG(GetRawSS()));
     // mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));
 
     mDisplay3D->GetDC().depthOnly=false;
@@ -173,7 +173,7 @@ void RootFrame::InitFrame() {
 
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
-    GetSS()->sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
+    GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
 }
 
 
@@ -356,7 +356,7 @@ void RootFrame::OnResize(wxSizeEvent&e) {
 
 
 void RootFrame::OnGLReset(wxCommandEvent& e) {
-    mDisplay3D->SetRootSGNode(new MoleculeNodeNew(GetSS()));  
+    mDisplay3D->SetRootSGNode(new MoleculeNodeNew(GetRawSS()));  
 }
 
 void RootFrame::OnBondToggle(wxCommandEvent& e) {

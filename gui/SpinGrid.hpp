@@ -67,7 +67,6 @@ private:
         long width;
     };
     const static SpinGridColum columns[];
-    SpinXML::SpinSystem* mSS;
     bool mUpdating;
 	long mLastHover;
 };

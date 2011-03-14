@@ -263,7 +263,7 @@ Display3D::Display3D(wxWindow* parent)
     mGLContext=NULL;
     mGLEnabled=false;
 
-    mSS=GetSS();
+    mSS=GetRawSS();
 
     mZoom=0.01;
     mCamX=0.0;

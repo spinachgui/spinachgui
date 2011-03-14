@@ -46,7 +46,30 @@ template<typename T>
     const T* m;
   };
 
+//------------------------------------------------------------//
+// Unit Systems
 
+UnitSystem gUnitSystem;
+sigc::signal<void> sigUnitSystemChange;
+
+
+const UnitSystem* GetUnitSystem() {
+	return &gUnitSystem;
+}
+
+void SetUnitSystem(const UnitSystem& us) {
+	gUnitSystem = us;
+	sigUnitSystemChange();
+}
+
+void CheesyUnitSystemChangerHandler() {
+	//Quick hack for making sure everything gets updated, emit a
+	//sigReloaded signal
+	GetRawSS()->sigReloaded();
+}
+
+//--------------------------------------------------------------------------------//
+// The Application Object
 
 SpinachApp* gApp;
 
@@ -101,6 +124,8 @@ bool SpinachApp::OnInit() {
 	gUnitSystem.energyUnit = unit("Joules",1.0);
 	gUnitSystem.energyUnit = unit("Metres",1.0);
 	gUnitSystem.energyUnit = unit("Seconds",1.0);
+
+	sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
   
     //Load the isotopes
 
@@ -231,6 +256,3 @@ void RemoveSelection(SpinXML::Spin* spin) {
 	AssertSelectionExists();
 }
 
-
-
-UnitSystem gUnitSystem;

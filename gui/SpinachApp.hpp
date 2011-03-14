@@ -39,7 +39,8 @@ private:
 //================================================================================//
 // Unit systems
 
-extern SpinXML::UnitSystem gUnitSystem;
+const SpinXML::UnitSystem* GetUnitSystem();
+extern sigc::signal<void> sigUnitSystemChange;
 
 //================================================================================//
 // Selection Manager functions
@@ -71,7 +72,7 @@ void DeleteSelectedSpins();
 SpinachApp& wxGetApp();
 
 //Define macros for accessing the most up to date spin system
-#define GetSS() (wxGetApp().GetSpinSystem()->GetView(NULL,&gUnitSystem))
+#define GetSS() (wxGetApp().GetSpinSystem()->GetView(NULL,GetUnitSystem()))
 #define GetRawSS() (wxGetApp().GetSpinSystem())
 #define Chkpoint(x) 
 

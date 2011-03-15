@@ -8,7 +8,10 @@
 #include <wx/aui/aui.h>
 #include <wx/splitter.h>
 
-class RootFrame : public RootFrameBase {
+#include <shared/unit.hpp>
+#include <gui/EventTranslator.hpp>
+
+class RootFrame : public RootFrameBase,public EventTranslator<RootFrame> {
 public:
     RootFrame(wxWindow* parent) : RootFrameBase(parent) {
         SetSize(wxSize(1024,768));
@@ -20,7 +23,7 @@ public:
     void InitFrame();
 
     void LoadFromFile(const wxString& path, const wxString& dir, const wxString& filename);
-    void SaveToFile(const wxString& filename,ISpinSystemLoader* saver=NULL);
+    void SaveToFile(const wxString& filename,SpinXML::ISpinSystemLoader* saver=NULL);
 
     //Utility Functions
     void SaveAs();
@@ -42,6 +45,9 @@ public:
     void OnEpr(wxCommandEvent& e);
     void OnBondToggle(wxCommandEvent& e);
 
+	//Unit Menu Event Handlers
+	void OnUnitChange(PhysDimenstion d,unit u,wxCommandEvent& e);
+
     //Resize Event
     void OnResize(wxSizeEvent& e);
 
@@ -61,7 +67,7 @@ private:
     wxPanel* mInterSizePanel;
     SpinInterEditPanel* mSpinInterEdit;
     Display3D* mDisplay3D;
-    ISpinSystemLoader* mSaver;
+    SpinXML::ISpinSystemLoader* mSaver;
 
     ///Full path of the open file
     wxString mOpenPath;
@@ -69,6 +75,13 @@ private:
     wxString mOpenDir;
     ///Just the name of the open file
     wxString mOpenFile;
+
+	///translate wxEventID into a physical dimension + unit. This
+	///seems to be the best way to get around the wxWidgets event
+	///system without defining loads of OnUnitChange functions, one
+	///for each unit
+	//std::vector<std::pair<PhysDimenstion,unit> > mIdToUnit;
+
 };
 
 

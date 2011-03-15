@@ -4,6 +4,9 @@
 #include <gui/MolSceneGraph.hpp>
 #include <stdexcept>
 #include <wx/log.h>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <shared/unit.hpp>
 
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
@@ -12,6 +15,9 @@ using namespace std;
 using namespace SpinXML;
 using sigc::bind;
 using sigc::mem_fun;
+
+#define ID_UNIT_START 12345
+
 //============================================================//
 // Utility Functions
 
@@ -21,11 +27,15 @@ wxString GetExtension(const wxString& filename) {
     return ext;
 }
 
+
+
 //============================================================//
 // RootFrame
 
+
+
 void RootFrame::InitFrame() {
-    mAuiManager=new wxAuiManager(this);
+	/* mAuiManager=new wxAuiManager(this);
 
     mInterSizePanel=new wxPanel(this);
 
@@ -176,6 +186,36 @@ void RootFrame::InitFrame() {
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
     GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
+	*/
+	//Setup the units menu
+	typedef pair<PhysDimenstion,unit> p;
+	vector<p> mIdToUnit;
+	mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
+	mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
+	mIdToUnit.push_back(p(DIM_LENGTH,metres));
+
+	mIdToUnit.push_back(p(DIM_ENERGY,Hz));  //Default
+	mIdToUnit.push_back(p(DIM_ENERGY,KHz));
+	mIdToUnit.push_back(p(DIM_ENERGY,MHz));
+	mIdToUnit.push_back(p(DIM_ENERGY,eV));
+	mIdToUnit.push_back(p(DIM_ENERGY,Joules));
+
+	for(unsigned long i = 0;i<mIdToUnit.size();i++) {
+		PhysDimenstion d = mIdToUnit[i].first;
+		unit u = mIdToUnit[i].second;
+
+		//Curry the callback function
+		boost::function<void(wxCommandEvent&)> f = boost::bind(&RootFrame::OnUnitChange,this,d,u,_1);
+
+		wxMenu *menu = d == DIM_LENGTH ? mMenuLength : mMenuEnergy;
+		menu->AppendRadioItem(ID_UNIT_START+i,wxString(u.get_name().c_str(),wxConvUTF8));
+		WxConnect(ID_UNIT_START+i,f);
+	}
+}
+
+
+void RootFrame::OnUnitChange(PhysDimenstion d,unit u,wxCommandEvent& e) {
+	cout << "UnitChange d=" << d << " u=" << u.get_name() << endl;
 }
 
 
@@ -353,7 +393,8 @@ void RootFrame::OnEpr(wxCommandEvent& e) {
 
 
 void RootFrame::OnResize(wxSizeEvent&e) {
-    mAuiManager->Update();
+	cout << "OnResize, mFunc.size() = " << mFunc.size() << endl;
+    //mAuiManager->Update();
 }
 
 
@@ -387,6 +428,9 @@ EVT_MENU(ID_NMR,    RootFrame::OnNmr)
 EVT_MENU(ID_EPR,    RootFrame::OnEpr)
 
 EVT_MENU(ID_BOND_TOGGLE,  RootFrame::OnBondToggle)
+
+//Unit Menu
+//EVT_MENU(ID_UNIT,RootFrame::OnUnitChange)
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)

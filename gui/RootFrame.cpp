@@ -32,9 +32,14 @@ wxString GetExtension(const wxString& filename) {
 //============================================================//
 // RootFrame
 
+RootFrame::RootFrame(wxWindow* parent) 
+	: EventTranslator<RootFrame>::EventTranslator(this),RootFrameBase(parent,-1) {
+	InitFrame();
+}
 
 
 void RootFrame::InitFrame() {
+	SetSize(wxSize(1024,768));
 	/* mAuiManager=new wxAuiManager(this);
 
     mInterSizePanel=new wxPanel(this);

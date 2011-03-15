@@ -11,12 +11,10 @@
 #include <shared/unit.hpp>
 #include <gui/EventTranslator.hpp>
 
-class RootFrame : public RootFrameBase,public EventTranslator<RootFrame> {
+class RootFrame : public RootFrameBase, public EventTranslator<RootFrame> {
+	EventTranslator<RootFrame> mTranslator;
 public:
-    RootFrame(wxWindow* parent) : RootFrameBase(parent) {
-        SetSize(wxSize(1024,768));
-        InitFrame();
-    }
+    RootFrame(wxWindow* parent);
     
     ~RootFrame() {};
 

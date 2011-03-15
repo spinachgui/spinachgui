@@ -11,8 +11,8 @@
 template<typename Derived>
 class EventTranslator {
 public:
+	EventTranslator(Derived* derived) : mDerived(derived) {}
 	typedef boost::function<void (wxCommandEvent&)> CommandFType;
-
 
 	void CommandEvtAttach(wxCommandEvent& e) {
 		int id = e.GetId();
@@ -32,10 +32,11 @@ protected:
 		std::cout << "mFunc.size() = " << mFunc.size() << std::endl;
 		wxObjectEventFunction afterCast = 
 			(wxObjectEventFunction)(wxEventFunction)(&EventTranslator::CommandEvtAttach);
-		static_cast<Derived*>(this)->Connect(id,wxEVT_COMMAND_MENU_SELECTED,
+		mDerived->Connect(id,wxEVT_COMMAND_MENU_SELECTED,
 						afterCast);
 	}
 
+	Derived* mDerived;
 	int mTest;
 	std::map<int,CommandFType> mFunc;
 };

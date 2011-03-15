@@ -10,7 +10,6 @@
 #include <Eigen/Geometry>
 
 using namespace Eigen;
-using namespace boost;
 
 #define PI 3.141592653589793238462643
 using std::complex;
@@ -141,6 +140,7 @@ namespace SpinXML {
         const Orientation& operator=(const Quaterniond& q)  {mData = q;  return *this;}
 
         bool operator==(const Orientation& o) const {
+			using boost::get;
             if(o.mData.type()==typeid(EulerAngles))	return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
             if(o.mData.type()==typeid(AngleAxisd))
                 return get<AngleAxisd>(o.mData).angle()==get<AngleAxisd>(mData).angle()

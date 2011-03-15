@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(popi)
 
+#SET(CMAKE_CXX_COMPILER "gcc-4.4")
+
 ############################################################
 # Enable Testing
 

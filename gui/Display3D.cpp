@@ -9,6 +9,7 @@
 #include <wx/file.h>
 
 using namespace std;
+using namespace SpinXML;
 
 //============================================================//
 // Device Context

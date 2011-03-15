@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Eigen;
 using namespace SpinXML;
-
+using namespace boost;
 
 //============================================================//
 // Constants

@@ -7,6 +7,7 @@
 #include <gui/SpinachApp.hpp>
 
 using namespace std;
+using namespace SpinXML;
 
 const double pi=3.141592654;
 

@@ -9,7 +9,9 @@
 #include <gui/InterDisplaySettings.hpp>
 
 using namespace std;
-using namespace sigc;
+using namespace SpinXML;
+using sigc::bind;
+using sigc::mem_fun;
 //============================================================//
 // Utility Functions
 

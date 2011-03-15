@@ -9,6 +9,7 @@
 
 using namespace SpinXML;
 using namespace std;
+using namespace boost;
 
 energy SpinXML::ConvertToScalar(const energy&   I)    {return I;}
 energy SpinXML::ConvertToScalar(const Matrix3d& I)    {return energy(I.trace()/3.0);}

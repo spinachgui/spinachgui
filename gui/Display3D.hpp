@@ -20,8 +20,6 @@
 #include <gui/SpinSysManager.hpp>
 
 
-using namespace boost;
-using namespace SpinXML;
 
 enum LAYER {
 	LAYER_DEFAULT = 0,
@@ -41,13 +39,13 @@ public:
     GLUquadric* GetSolidQuadric() const {return mSolidQuadric;}
     GLUquadric* GetWireQuadric() const {return mWireQuadric;}
 
-    void SetScalling(double scalling,Interaction::Type t) {
+    void SetScalling(double scalling,SpinXML::Interaction::Type t) {
         mScallings[t]=scalling;
     }
-    void SetColour(float r,float g,float b,Interaction::Type t) {
+    void SetColour(float r,float g,float b,SpinXML::Interaction::Type t) {
         mInterColours[t]=Vector3d(r,g,b);
     }
-    void SetVisible(bool v,Interaction::Type t) {
+    void SetVisible(bool v,SpinXML::Interaction::Type t) {
         mVisible[t]=v;
     }
 

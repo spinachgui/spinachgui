@@ -9,54 +9,54 @@
 
 class MoleculeFG : public SGNode {
 public:
-    MoleculeFG(SpinSystem* ss);
+    MoleculeFG(SpinXML::SpinSystem* ss);
 
     void OnNewElectron(SpinXML::Spin* newSpin,long number);
 
 private:
     virtual void RawDraw(SpinachDC& dc) {}
     virtual void ToPovRay(wxString& src) {}
-    SpinSystem* mSS;
+    SpinXML::SpinSystem* mSS;
 };
 
 //============================================================//
 class MoleculeNodeNew : public SGNode {
 public:
-    MoleculeNodeNew(SpinSystem* ss);
+    MoleculeNodeNew(SpinXML::SpinSystem* ss);
 private:
     virtual void RawDraw(SpinachDC& dc);
     virtual void ToPovRay(wxString& src);
-    SpinSystem* mSS;
+    SpinXML::SpinSystem* mSS;
 };
 
 class SpinDrawerNode : public SGNode {
 public:
-    SpinDrawerNode(SpinSystem* ss);
+    SpinDrawerNode(SpinXML::SpinSystem* ss);
 private:
     virtual void RawDraw(SpinachDC& dc);
     virtual void ToPovRay(wxString& src);
-    SpinSystem* mSS;
+    SpinXML::SpinSystem* mSS;
 };
 
 
 class BondDrawerNode : public SGNode {
 public:
-    BondDrawerNode(SpinSystem* ss);
+    BondDrawerNode(SpinXML::SpinSystem* ss);
 private:
     virtual void RawDraw(SpinachDC& dc);
     virtual void ToPovRay(wxString& src);
-    SpinSystem* mSS;
+    SpinXML::SpinSystem* mSS;
 };
 
 class InteractionDrawerNode : public SGNode {
 public:
-    InteractionDrawerNode(SpinSystem* ss);
+    InteractionDrawerNode(SpinXML::SpinSystem* ss);
 private:
     virtual void RawDraw(SpinachDC& dc);
     virtual void ToPovRay(wxString& src);
-    void RawDrawInterType(SpinachDC& dc,Interaction::Type t);
-    void RawDrawBilinInterType(SpinachDC& dc,Interaction::Type t);
-    SpinSystem* mSS;
+    void RawDrawInterType(SpinachDC& dc,SpinXML::Interaction::Type t);
+    void RawDrawBilinInterType(SpinachDC& dc,SpinXML::Interaction::Type t);
+	SpinXML::SpinSystem* mSS;
 };
 
 

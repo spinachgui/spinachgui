@@ -20,7 +20,7 @@ public:
     void InitFrame();
 
     void LoadFromFile(const wxString& path, const wxString& dir, const wxString& filename);
-    void SaveToFile(const wxString& filename,ISpinSystemLoader* saver=NULL);
+    void SaveToFile(const wxString& filename,SpinXML::ISpinSystemLoader* saver=NULL);
 
     //Utility Functions
     void SaveAs();
@@ -61,7 +61,7 @@ private:
     wxPanel* mInterSizePanel;
     SpinInterEditPanel* mSpinInterEdit;
     Display3D* mDisplay3D;
-    ISpinSystemLoader* mSaver;
+	SpinXML::ISpinSystemLoader* mSaver;
 
     ///Full path of the open file
     wxString mOpenPath;

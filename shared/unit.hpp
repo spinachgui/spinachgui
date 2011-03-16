@@ -84,7 +84,7 @@ const unit Angstroms("Angstroms",1e-10);
 //============================================================//
 // Define an enum of physical dimensions that we care about
 
-enum PhysDimenstion {
+enum PhysDimension {
 	DIM_LENGTH,
 	DIM_ENERGY
 };

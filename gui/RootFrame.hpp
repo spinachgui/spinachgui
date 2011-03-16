@@ -73,7 +73,7 @@ private:
     ///Just the name of the open file
     wxString mOpenFile;
 
-	std::vector<std::pair<PhysDimenstion,unit> > mIdToUnit;
+	std::vector<std::pair<PhysDimension,unit> > mIdToUnit;
 };
 
 

@@ -184,7 +184,7 @@ void RootFrame::InitFrame() {
 	//(which would make making units configurable impossible) we
 	//connect them all to the same handler and setup a lookup for
 	//translating the id into a unit and physical dimension.
-	typedef pair<PhysDimenstion,unit> p;
+	typedef pair<PhysDimension,unit> p;
 
 	mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
 	mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
@@ -197,7 +197,7 @@ void RootFrame::InitFrame() {
 	mIdToUnit.push_back(p(DIM_ENERGY,Joules));
 
 	for(unsigned long i = 0;i<mIdToUnit.size();i++) {
-		PhysDimenstion d = mIdToUnit[i].first;
+		PhysDimension d = mIdToUnit[i].first;
 		unit u = mIdToUnit[i].second;
 
 		wxMenu *menu = d == DIM_LENGTH ? mMenuLength : mMenuEnergy;
@@ -209,8 +209,8 @@ void RootFrame::InitFrame() {
 }
 
 void RootFrame::OnUnitChange(wxCommandEvent& e) {
-	pair<PhysDimenstion,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
-	PhysDimenstion d = thePair.first;
+	pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
+	PhysDimension d = thePair.first;
 	unit u = thePair.second;
 	cout << "UnitChange d=" << d << " u=" << u.get_name() << endl;
 }

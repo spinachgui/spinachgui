@@ -50,6 +50,32 @@ public:
 };
 
 //============================================================//
+// Custom menu bar
+/*
+class MenuBar : public wxMenuBar {
+public:
+	MenuBar() {
+		
+	}
+};
+
+class Menu : public wxMenu {
+public:
+	typedef boost::function<void()> TCommand;
+	Menu(const wxString& title) : wxMenu(title) {
+		
+	}
+
+	void AttachCommand(TCommand command) {
+
+	}
+
+	void AttachRadio(vector<TCommand> commands) {
+		
+	}
+};
+*/
+//============================================================//
 // RootFrame
 
 void RootFrame::InitFrame() {

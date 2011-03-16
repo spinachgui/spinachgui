@@ -4,6 +4,7 @@
 #include <gui/MolSceneGraph.hpp>
 #include <stdexcept>
 #include <wx/log.h>
+#include <wx/statusbr.h>
 
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
@@ -24,9 +25,36 @@ wxString GetExtension(const wxString& filename) {
 }
 
 //============================================================//
+// Custom Status Bar
+
+class StatusBar : public wxStatusBar {
+public:
+	StatusBar(wxWindow* parent) : wxStatusBar(parent) {
+		int widths_field[] = {-1,80,80};
+		SetFieldsCount(3,widths_field);
+	}
+
+	void SlotUnitChange(PhysDimension d,unit u) {
+		wxString str = wxString(u.get_name().c_str(),wxConvUTF8);
+		switch(d) {
+		case DIM_LENGTH:
+			SetStatusText(str,1);
+			break;
+		case DIM_ENERGY:
+			SetStatusText(str,2);
+			break;
+		}
+	}
+};
+
+//============================================================//
 // RootFrame
 
 void RootFrame::InitFrame() {
+	//Setup the status bar
+	StatusBar* statusBar = new StatusBar(this);
+	SetStatusBar(statusBar);
+
     mAuiManager=new wxAuiManager(this);
 
     mInterSizePanel=new wxPanel(this);
@@ -178,7 +206,7 @@ void RootFrame::InitFrame() {
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
     GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
-
+	sigChangeUnit.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
 
 	//Units menu. To avoid writing an On* function for every unit
 	//(which would make making units configurable impossible) we
@@ -208,11 +236,12 @@ void RootFrame::InitFrame() {
 	Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
 }
 
+
 void RootFrame::OnUnitChange(wxCommandEvent& e) {
 	pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
 	PhysDimension d = thePair.first;
 	unit u = thePair.second;
-	cout << "UnitChange d=" << d << " u=" << u.get_name() << endl;
+	sigChangeUnit(d,u);
 }
 
 void RootFrame::OnUndo(wxCommandEvent& e) {

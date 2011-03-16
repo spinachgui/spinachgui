@@ -53,6 +53,7 @@ public:
 
     //Signals
     sigc::signal<void,bool> sigSetShowBonds;
+	sigc::signal<void,PhysDimension,unit> sigChangeUnit;
 
     DECLARE_EVENT_TABLE();
 

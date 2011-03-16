@@ -38,15 +38,8 @@ void Frame::SetOrientation(const Orientation orient) {
 
 void Frame::updateAfine() {
     Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsQuaternion());
-	#warning "All afine transforms in reference frames are identities for debuging purposes"
-	//Matrix4d mat = T.matrix();
-    Matrix4d mat;
-	mat <<
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1;
-    mAffine = mat;//(mParent==NULL) ? mat : mParent->mAffine*mat;
+	Matrix4d mat = T.matrix();
+    mAffine = (mParent==NULL) ? mat : mParent->mAffine*mat;
 }
 
 void Frame::AddChild(Frame* frame) {
@@ -58,25 +51,11 @@ void Frame::AddChild(Frame* frame) {
 
 
 Matrix4d Frame::getTransformFromLab() const {
-    Matrix4d mat;
-	mat <<
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1;
-	return mat;
-	//return mAffine;
+	return mAffine;
 }
 
 Matrix4d Frame::getTransformToLab() const {
-    Matrix4d mat;
-	mat <<
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1;
-	return mat;
-	//return mInvertedAffine;
+	return mInvertedAffine;
 }
 
 

@@ -27,12 +27,12 @@ std::vector<SpinView> SpinSystemView::GetNearbySpins(Vector3d pos,double distanc
 // SpinSystem
 
 SpinSystem::SpinSystem()
-	: mRootFrame(new Frame(Vector3d(1,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
 }
 
 
 SpinSystem::SpinSystem(const SpinSystem& system)
-	: mRootFrame(new Frame(Vector3d(1,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
     long spinCount=system.mSpins.size();
 
     mSpins.resize(spinCount);

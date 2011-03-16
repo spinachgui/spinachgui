@@ -424,7 +424,6 @@ FrameDrawerNode::FrameDrawerNode(SpinSystem*) {
 void DrawFrameRecursive(Frame* frame) {
 	glPushMatrix();
 	glMultMatrixd(frame->getTransformFromLab().data());
-	cout << "Drawing" << frame << endl;
     //Draw some coordiante axese
     glBegin(GL_LINES); {
         glVertex3f(0,0,0);

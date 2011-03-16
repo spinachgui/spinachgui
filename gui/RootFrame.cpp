@@ -8,6 +8,8 @@
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
 
+#define ID_UNIT_START 12345
+
 using namespace std;
 using namespace SpinXML;
 using sigc::bind;
@@ -176,8 +178,42 @@ void RootFrame::InitFrame() {
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
     GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
+
+
+	//Units menu. To avoid writing an On* function for every unit
+	//(which would make making units configurable impossible) we
+	//connect them all to the same handler and setup a lookup for
+	//translating the id into a unit and physical dimension.
+	typedef pair<PhysDimenstion,unit> p;
+
+	mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
+	mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
+	mIdToUnit.push_back(p(DIM_LENGTH,metres));
+
+	mIdToUnit.push_back(p(DIM_ENERGY,Hz));  //Default
+	mIdToUnit.push_back(p(DIM_ENERGY,KHz));
+	mIdToUnit.push_back(p(DIM_ENERGY,MHz));
+	mIdToUnit.push_back(p(DIM_ENERGY,eV));
+	mIdToUnit.push_back(p(DIM_ENERGY,Joules));
+
+	for(unsigned long i = 0;i<mIdToUnit.size();i++) {
+		PhysDimenstion d = mIdToUnit[i].first;
+		unit u = mIdToUnit[i].second;
+
+		wxMenu *menu = d == DIM_LENGTH ? mMenuLength : mMenuEnergy;
+		menu->AppendRadioItem(ID_UNIT_START+i,wxString(u.get_name().c_str(),wxConvUTF8));
+	}
+	wxObjectEventFunction afterCast = 
+		(wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
+	Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
 }
 
+void RootFrame::OnUnitChange(wxCommandEvent& e) {
+	pair<PhysDimenstion,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
+	PhysDimenstion d = thePair.first;
+	unit u = thePair.second;
+	cout << "UnitChange d=" << d << " u=" << u.get_name() << endl;
+}
 
 void RootFrame::OnUndo(wxCommandEvent& e) {
 

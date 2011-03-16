@@ -45,6 +45,9 @@ public:
     //Resize Event
     void OnResize(wxSizeEvent& e);
 
+	//Unit Menu
+	void OnUnitChange(wxCommandEvent& e);
+
     //Debug Menu
     void OnGLReset(wxCommandEvent& e);
 
@@ -69,6 +72,8 @@ private:
     wxString mOpenDir;
     ///Just the name of the open file
     wxString mOpenFile;
+
+	std::vector<std::pair<PhysDimenstion,unit> > mIdToUnit;
 };
 
 

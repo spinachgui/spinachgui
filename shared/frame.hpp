@@ -43,12 +43,12 @@ namespace SpinXML {
         ///transformation into this frame. In other words if v is a
         ///vector in the lab frame then f.getTransformFromLab() * v is a
         ///vector in the f frame. Units are SI
-        Matrix4d getTransformFromLab() const {return mAffine;}
+        Matrix4d getTransformFromLab() const;
         ///Return a 4x4 isometary matrix expression a transformation
         ///into this frame. In other words if v is a vector in the f
         ///frame then: f.getTransformToLab() * v is a vector in the
         ///lab frame. Units are SI
-        Matrix4d getTransformToLab() const {return mInvertedAffine;}
+        Matrix4d getTransformToLab() const;
 
         ///Returns the parent frame of this frame
         Frame* upOne() const {return mParent;}

@@ -48,6 +48,14 @@ extern sigc::signal<void> sigUnitSystemChange;
 extern sigc::signal<void,PhysDimension,unit> sigUnitChange;
 
 //================================================================================//
+// Reference frames, there is exactly on active reference frame at a time
+
+void SetFrame(SpinXML::Frame* frame);
+SpinXML::Frame* GetFrame();
+
+extern sigc::signal<void,SpinXML::Frame*> sigFrameChange;
+
+//================================================================================//
 // Selection Manager functions
 
 //readers
@@ -77,7 +85,7 @@ void DeleteSelectedSpins();
 SpinachApp& wxGetApp();
 
 //Define macros for accessing the most up to date spin system
-#define GetSS() (wxGetApp().GetSpinSystem()->GetView(NULL,GetUnitSystem()))
+#define GetSS() (wxGetApp().GetSpinSystem()->GetView(GetFrame(),GetUnitSystem()))
 #define GetRawSS() (wxGetApp().GetSpinSystem())
 #define Chkpoint(x) 
 

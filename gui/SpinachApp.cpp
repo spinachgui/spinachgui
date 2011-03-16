@@ -144,6 +144,7 @@ bool SpinachApp::OnInit() {
 
 	sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
   
+
     //Load the isotopes
 
     try {
@@ -159,6 +160,8 @@ bool SpinachApp::OnInit() {
 
 
     mSS = new SpinSystem;
+	//Set the active frame as the lab frame
+	SetFrame(mSS->GetLabFrame());
 
     RootFrame* frame = new RootFrame(NULL);
     frame->Show();
@@ -272,4 +275,22 @@ void RemoveSelection(SpinXML::Spin* spin) {
 	}
 	AssertSelectionExists();
 }
+
+//================================================================================//
+// Set and get gobal reference frame
+
+Frame labFrame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),&gUnitSystem);
+
+Frame* gFrame = &labFrame;
+
+void SetFrame(SpinXML::Frame* frame) {
+	//gFrame = frame;
+	sigFrameChange(frame);
+}
+
+SpinXML::Frame* GetFrame() {
+	return gFrame;
+}
+
+sigc::signal<void,SpinXML::Frame*> sigFrameChange;
 

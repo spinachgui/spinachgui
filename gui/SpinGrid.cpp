@@ -150,7 +150,7 @@ void SpinGrid::UpdateRow(long rowNumber) {
         length x,y,z;
 		cout << rowNumber << endl;
         SpinView spin = GetSS().GetSpin(rowNumber);
-		spin->GetCoordinates(&x,&y,&z);
+		spin.GetCoordinates(&x,&y,&z);
 
         //Setup the label and the element columns
         SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
@@ -194,21 +194,16 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     if(mUpdating) {
         return;
     }
-    if(e.GetCol()==COL_X) {
+    if(e.GetCol()==COL_X || e.GetCol()==COL_Y || e.GetCol()==COL_Z) {
         double x;
-        GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&x);
-        Chkpoint(wxT("Spin Coordinates"));
-        GetSS().GetSpin(e.GetRow())->GetPosition()(0)=x;
-    } else if(e.GetCol()==COL_Y) {
         double y;
-        GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&y);
-        Chkpoint(wxT("Spin Coordinates"));
-        GetSS().GetSpin(e.GetRow())->GetPosition()(1)=y;
-    } else if(e.GetCol()==COL_Z) {
         double z;
-        GetCellValue(e.GetRow(),e.GetCol()).ToDouble(&z);
+        GetCellValue(e.GetRow(),COL_X).ToDouble(&x);
+        GetCellValue(e.GetRow(),COL_Y).ToDouble(&y);
+        GetCellValue(e.GetRow(),COL_Z).ToDouble(&z);
+
         Chkpoint(wxT("Spin Coordinates"));
-        GetSS().GetSpin(e.GetRow())->GetPosition()(2)=z;
+        GetSS().GetSpin(e.GetRow()).SetCoordinates(x,y,z);
     } else if(e.GetCol()==COL_ELEMENT) {
         wxString content=GetCellValue(e.GetRow(),e.GetCol());
         long space=content.Find(wxT(" "));

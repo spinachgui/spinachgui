@@ -236,6 +236,10 @@ void RootFrame::InitFrame() {
 	wxObjectEventFunction afterCast = 
 		(wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
 	Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
+
+	//Debug code, print the details of the root frame
+	//cout << GetFrame() << endl;
+	//cout << GetRawSS()->GetRootFrame() << endl;
 }
 
 

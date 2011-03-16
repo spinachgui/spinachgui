@@ -163,6 +163,8 @@ bool SpinachApp::OnInit() {
 	//Set the active frame as the lab frame
 	SetFrame(mSS->GetLabFrame());
 
+	mSS->GetLabFrame()->AddChild(new Frame(Vector3d(1,0,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
+
     RootFrame* frame = new RootFrame(NULL);
     frame->Show();
 

@@ -59,5 +59,12 @@ private:
 	SpinXML::SpinSystem* mSS;
 };
 
+class FrameDrawerNode : public SGNode {
+public:
+	FrameDrawerNode(SpinXML::SpinSystem* ss);
+private:
+	virtual void RawDraw(SpinachDC& dc);
+	virtual void ToPovRay(wxString& src) {}
+};
 
 #endif

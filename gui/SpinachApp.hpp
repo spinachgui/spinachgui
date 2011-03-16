@@ -39,8 +39,13 @@ private:
 //================================================================================//
 // Unit systems
 
+void SetUnit(PhysDimension d,unit u);
+unit GetUnit(PhysDimension d);
+
 const SpinXML::UnitSystem* GetUnitSystem();
+
 extern sigc::signal<void> sigUnitSystemChange;
+extern sigc::signal<void,PhysDimension,unit> sigUnitChange;
 
 //================================================================================//
 // Selection Manager functions

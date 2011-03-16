@@ -51,7 +51,25 @@ template<typename T>
 
 UnitSystem gUnitSystem;
 sigc::signal<void> sigUnitSystemChange;
+sigc::signal<void,PhysDimension,unit> sigUnitChange;
 
+void SetUnit(PhysDimension d,unit u) {
+	switch(d) {
+	case DIM_LENGTH: gUnitSystem.lengthUnit = u; break;
+	case DIM_ENERGY: gUnitSystem.energyUnit = u; break;
+	}
+	sigUnitChange(d,u);
+	sigUnitSystemChange();
+}
+
+unit GetUnit(PhysDimension d) {
+	switch(d) {
+	case DIM_LENGTH:
+		return gUnitSystem.lengthUnit;
+	case DIM_ENERGY:
+		return gUnitSystem.energyUnit;
+	}
+}
 
 const UnitSystem* GetUnitSystem() {
 	return &gUnitSystem;
@@ -121,9 +139,8 @@ bool SpinachApp::OnInit() {
 	sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
 
 	//Setup a sensible system of units
-	gUnitSystem.energyUnit = unit("Joules",1.0);
-	gUnitSystem.energyUnit = unit("Metres",1.0);
-	gUnitSystem.energyUnit = unit("Seconds",1.0);
+	gUnitSystem.energyUnit = MHz;
+	gUnitSystem.lengthUnit = Angstroms;
 
 	sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
   

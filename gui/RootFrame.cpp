@@ -32,6 +32,8 @@ public:
 	StatusBar(wxWindow* parent) : wxStatusBar(parent) {
 		int widths_field[] = {-1,80,80};
 		SetFieldsCount(3,widths_field);
+		SlotUnitChange(DIM_LENGTH,GetUnit(DIM_LENGTH));
+		SlotUnitChange(DIM_ENERGY,GetUnit(DIM_ENERGY));
 	}
 
 	void SlotUnitChange(PhysDimension d,unit u) {
@@ -206,7 +208,7 @@ void RootFrame::InitFrame() {
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
     GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
-	sigChangeUnit.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
+	sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
 
 	//Units menu. To avoid writing an On* function for every unit
 	//(which would make making units configurable impossible) we
@@ -241,7 +243,7 @@ void RootFrame::OnUnitChange(wxCommandEvent& e) {
 	pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
 	PhysDimension d = thePair.first;
 	unit u = thePair.second;
-	sigChangeUnit(d,u);
+	SetUnit(d,u);
 }
 
 void RootFrame::OnUndo(wxCommandEvent& e) {

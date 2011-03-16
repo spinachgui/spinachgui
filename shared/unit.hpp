@@ -81,6 +81,14 @@ const unit micrometre("micrometre",1e-6);
 const unit nanometre("nanometre",1e-9);
 const unit Angstroms("Angstroms",1e-10);
 
+//============================================================//
+// Define an enum of physical dimensions that we care about
+
+enum PhysDimenstion {
+	DIM_LENGTH,
+	DIM_ENERGY
+};
+
 
 #endif
 

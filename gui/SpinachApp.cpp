@@ -24,6 +24,9 @@
 
 using namespace SpinXML;
 
+extern char spinxmlSchema[];
+extern unsigned int spinxmlSchemaSize;
+
 void PANIC(string s) {
 	cout << "Panicking, " << s << endl;
 	int* x = NULL;
@@ -118,21 +121,15 @@ SpinachApp::~SpinachApp() {
     }
 }
 
+
 bool SpinachApp::OnInit() {
+	printf("%p %u\n",spinxmlSchema, spinxmlSchemaSize);
     //Load the I/O Filters
 
     mIOFilters.push_back(new G03Loader);
     mIOFilters.push_back(new SIMPSONLoader);
     mIOFilters.push_back(new CASTEPLoader);
-
-    //Load the xml schema, it's more complicated, of course
-    wxFileName fn(argv[0]);
-    fn.Normalize();
-    fn=fn.GetPath();
-    fn.AppendDir(wxT("data"));
-    fn.SetFullName(wxT("spinxml_schema.xsd"));
-    wxString url(wxString(wxT("file://")) << fn.GetFullPath());
-    mIOFilters.push_back(new XMLLoader(url.char_str()));
+    mIOFilters.push_back(new XMLLoader(spinxmlSchema));
 
 	//Connect up the selection manager so that when a spin is deleted
 	//it also gets unselected

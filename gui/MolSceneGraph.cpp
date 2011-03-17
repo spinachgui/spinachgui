@@ -170,9 +170,9 @@ void SpinDrawerNode::RawDraw(SpinachDC& dc) {
 		Spin* spin=mSS->GetSpin(i);
 		if(spin->GetElement() != 0){
 			glPushMatrix();
-			glTranslatef(spin->GetPosition().x() / Angstroms,
-						 spin->GetPosition().y() / Angstroms,
-						 spin->GetPosition().z() / Angstroms);
+			glTranslatef(spin->GetPosition().x(),
+						 spin->GetPosition().y(),
+						 spin->GetPosition().z());
 		}
 		const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
 		GLfloat material[4]; material[3]=0.0f;
@@ -187,11 +187,11 @@ void SpinDrawerNode::RawDraw(SpinachDC& dc) {
 			//Bug resulting in drawing no content after a g03 load tracked to this line:
 			glTranslatef(40.0f,dc.height-40.0f,0.0f);
 			glMultMatrixf(dc.mRotationMatrix);
-			gluSphere(dc.GetSolidQuadric(),9,14,14);
+			gluSphere(dc.GetSolidQuadric(),9 * OPENGL_SCALE,14,14);
 
 		} else {
             glPushName(i);
-			gluSphere(dc.GetSolidQuadric(),0.1,14,14);
+			gluSphere(dc.GetSolidQuadric(),0.1 * OPENGL_SCALE,14,14);
             glPopName();
 		}
 		if(spin->GetElement() != 0){
@@ -427,17 +427,17 @@ void DrawFrameRecursive(Frame* frame) {
     //Draw some coordiante axese
     glBegin(GL_LINES); {
         glVertex3f(0,0,0);
-        glVertex3f(5,0,0);
+        glVertex3f(5 * OPENGL_SCALE,0,0);
     }glEnd();
 
     glBegin(GL_LINES); {
         glVertex3f(0,0,0);
-        glVertex3f(0,5,0);
+        glVertex3f(0,5 * OPENGL_SCALE,0);
     } glEnd();
 
     glBegin(GL_LINES); {
         glVertex3f(0,0,0);
-        glVertex3f(0,0,5);
+        glVertex3f(0,0,5 * OPENGL_SCALE);
     } glEnd();
 
 	const vector<Frame*>& children = frame->GetChildren();

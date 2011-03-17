@@ -19,7 +19,9 @@
 
 #include <gui/SpinSysManager.hpp>
 
-
+///The characteristic length scale of the objects we are
+///rendering. Affects the positioning of the camera
+#define OPENGL_SCALE (1e-10)
 
 enum LAYER {
 	LAYER_DEFAULT = 0,

@@ -266,13 +266,13 @@ Display3D::Display3D(wxWindow* parent)
 
     mSS=GetRawSS();
 
-    mZoom=0.01;
+    mZoom=0.01 * OPENGL_SCALE;;
     mCamX=0.0;
-    mCamY=0.0;
-    mCamZ=15.0;
+	mCamY=0.0;
+	mCamZ=1.0;
 
-    mXTranslate=0;
-    mYTranslate=0;
+    mXTranslate=0 * OPENGL_SCALE;
+    mYTranslate=0 * OPENGL_SCALE;
     mXRotate=0;
     mYRotate=0;
 
@@ -420,8 +420,8 @@ void Display3D::DoPickingPass() {
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
     if(e.Dragging() && e.RightIsDown()) {
-        mXTranslate=mXTranslate+(e.GetX()-mMouseX);
-        mYTranslate=mYTranslate-(e.GetY()-mMouseY);
+        mXTranslate=mXTranslate+(e.GetX()-mMouseX)*OPENGL_SCALE;
+        mYTranslate=mYTranslate-(e.GetY()-mMouseY)*OPENGL_SCALE;
     }  else if(e.Dragging() && e.LeftIsDown()) {
         mXRotate=mXRotate+(e.GetX()-mMouseX);
         mYRotate=mYRotate+(e.GetY()-mMouseY);
@@ -437,9 +437,9 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
 
 
 void Display3D::OnWheel(wxMouseEvent& e) {
-    mZoom=mZoom-0.001*e.GetWheelRotation()/e.GetWheelDelta();
-    if(mZoom<0.001) {
-        mZoom=0.001;
+    mZoom=mZoom-(0.001 * OPENGL_SCALE)*e.GetWheelRotation()/e.GetWheelDelta();
+    if(mZoom<0.001 * OPENGL_SCALE) {
+        mZoom=0.001 * OPENGL_SCALE;
     }
     ChangeViewport();
     Refresh();
@@ -527,7 +527,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     glMultMatrixf(mRotationMatrix);
     glGetFloatv(GL_MODELVIEW_MATRIX,mRotationMatrix);
     glLoadIdentity();
-    gluLookAt(mCamX,mCamY,mCamZ,0,0,-1,0,1,0);
+    gluLookAt(mCamX*OPENGL_SCALE,mCamY*OPENGL_SCALE,mCamZ*OPENGL_SCALE,0,0,0,0,1,0);
     glMultMatrixf(mRotationMatrix);
 
     mDC.mRotationMatrix=mRotationMatrix;

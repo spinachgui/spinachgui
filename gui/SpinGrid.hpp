@@ -26,6 +26,7 @@ public:
     void OnNewSpin(SpinXML::Spin* newSpin,long number);
 	void SlotHover(SpinXML::Spin* spin);
 	void SlotSelectChange(std::set<SpinXML::Spin*> spins);
+	void SlotAnySpinDie(SpinXML::Spin* spin);
 
     //Overridden in order to emit a signal
     bool DeleteRows(int pos=0,int numRows=1,bool updateLables=true);

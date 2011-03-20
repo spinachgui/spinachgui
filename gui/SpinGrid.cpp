@@ -63,11 +63,18 @@ SpinGrid::SpinGrid(wxWindow* parent)
 
     GetSS().sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
     GetSS().sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
+	sigAnySpinDying.connect(mem_fun(this,&SpinGrid::SlotAnySpinDie));
 
 	sigHover.connect(mem_fun(this,&SpinGrid::SlotHover));
 	sigSelectChange.connect(mem_fun(this,&SpinGrid::SlotSelectChange));
 	
     RefreshFromSpinSystem();
+}
+
+void SpinGrid::SlotAnySpinDie(Spin* spin) {
+	//Quick hack, we should probably just delete the row
+	RefreshFromSpinSystem();
+	return;
 }
 
 void SpinGrid::ColourRow(long rowNumber,const wxColor& c) {
@@ -255,6 +262,7 @@ void SpinGrid::OnRightClick(wxGridEvent& e) {
 }
 
 void SpinGrid::OnDeleteSpinHover(wxCommandEvent& e) {
+	//Currently there isn't a clear way to do hovering
 }
 
 void SpinGrid::OnMouseMove(wxMouseEvent& e) {

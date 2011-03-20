@@ -23,7 +23,7 @@ void RightClickMenu::Build() {
 	unsigned int count = GetSelectedCount();
 	mHoverAtTimeOfOpening = GetHover();
 	if(mHoverAtTimeOfOpening != NULL) {
-		Append(MENU_SPIN_DELETE, wxT("Delete Spin (Under Mouse)"));    
+		Append(MENU_DELETE_HOVER, wxT("Delete Spin (Under Mouse)"));    
 	}
 	if(count > 0) {
 		wxString str = count == 1 ? wxT("Delete Spin (Selected)"):wxT("Delete Spins (Selected)");

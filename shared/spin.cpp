@@ -78,8 +78,8 @@ Vector3d& Spin::GetPosition() {
 }
 
 void Spin::SetPosition(Vector3d Position) {
-    sigChange();
     mPosition=Position;
+    sigChange();
 }
 
 void Spin::GetCoordinates(length* _x,length* _y, length* _z) const {
@@ -90,15 +90,15 @@ void Spin::GetCoordinates(length* _x,length* _y, length* _z) const {
 
 
 void Spin::SetCoordinates(length _x,length _y, length _z) {
-    sigChange();
 	mPosition[0]=_x;
 	mPosition[1]=_y;
 	mPosition[2]=_z;
+    sigChange();
 }
 
 void Spin::SetLabel(string Label) {
-    sigChange();
     mLabel=Label;
+    sigChange();
 }
 
 const char* Spin::GetLabel() const {
@@ -110,12 +110,13 @@ long Spin::GetElement() const {
 }
 
 void Spin::SetElement(long element) {
-    sigChange();
     mElement=element;
+    sigChange();
 }
 
 void Spin::SetIsotope(long isotope) {
     mIsotope=isotope;
+    sigChange();
 }
 
 long Spin::GetIsotope() const {

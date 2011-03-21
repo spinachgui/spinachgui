@@ -159,19 +159,21 @@ void SpinGrid::UpdateRow(long rowNumber) {
         SpinView spin = GetSS().GetSpin(rowNumber);
 		spin.GetCoordinates(&x,&y,&z);
 
-        //Setup the label and the element columns
+        //Set the label
         SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
 
-        //Setup the x,y,z coordinates
+        //Set the x,y,z coordinates
         SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
         SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y);
         SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z);
 
         //Set the element and isotope
-        long element=spin->GetElement();
+        long element=spin.GetElement();
+        long isotope=spin.GetIsotope();
         wxString str(getElementSymbol(element),wxConvUTF8);
         str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
         SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
+		SetCellValue(rowNumber,SpinGrid::COL_ISOTOPES,wxString() << isotope);
 }
 
 void SpinGrid::SetupRow(long rowNumber) {
@@ -223,8 +225,12 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
             Chkpoint(wxT("Spin Element"));
             GetSS().GetSpin(e.GetRow())->SetElement(element);
         }
-        cout << space << " " << symbol.char_str() << endl;
-    } else if(e.GetCol()==COL_LABEL) {
+    } else if(e.GetCol()==SpinGrid::COL_ISOTOPES) {
+		long iso;
+        GetCellValue(e.GetRow(),COL_ISOTOPES).ToLong(&iso);
+
+		GetSS().GetSpin(e.GetRow()).SetIsotope(iso);
+	} else if(e.GetCol()==COL_LABEL) {
         Chkpoint(wxT("Change Spin Label"));
         std::string label(GetCellValue(e.GetRow(),e.GetCol()).char_str());
         GetSS()->GetSpin(e.GetRow())->SetLabel(label);

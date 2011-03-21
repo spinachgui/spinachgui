@@ -462,9 +462,6 @@ EVT_MENU(ID_BOND_TOGGLE,  RootFrame::OnBondToggle)
 //Resize
 EVT_SIZE(RootFrame::OnResize)
 
-//Debug
-EVT_MENU(ID_GL_RESET,RootFrame::OnGLReset)
-
 END_EVENT_TABLE()
 
 

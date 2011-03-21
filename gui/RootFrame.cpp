@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <wx/log.h>
 #include <wx/statusbr.h>
+#include <wx/treectrl.h>
 
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
@@ -23,6 +24,27 @@ wxString GetExtension(const wxString& filename) {
     wxString ext=(dot != wxNOT_FOUND ? filename.Mid(dot+1) : wxT(""));
     return ext;
 }
+
+//============================================================//
+// Reference frame tree view
+
+class FrameTree : public wxTreeCtrl {
+public:
+	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
+		mRoot = AddRoot(wxT("Lab Frame"));
+		RefreshFromSpinSystem();
+	}
+	
+	void RefreshFromSpinSystem() {
+		Frame* frame = GetSS()->GetLabFrame();
+		vector<Frame*> children = frame->GetChildren();
+
+		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
+			AppendItem(mRoot,wxT("Frame"));
+		}
+	}
+	wxTreeItemId mRoot;
+};
 
 //============================================================//
 // Custom Status Bar
@@ -109,6 +131,7 @@ void RootFrame::InitFrame() {
 	mSpinGrid      = new SpinGrid(this);
 	mSpinInterEdit = new SpinInterEditPanel(this);
 	mDisplay3D     = new Display3D(this);
+	mFrameTree     = new FrameTree(this);
 
 
     //Setup the 3D display
@@ -133,6 +156,7 @@ void RootFrame::InitFrame() {
     display3dinfo.Movable(false);
     mAuiManager->AddPane(mDisplay3D,display3dinfo);
     mAuiManager->AddPane(mSpinGrid,wxBOTTOM,wxT("Grid View"));
+	mAuiManager->AddPane(mFrameTree,wxRIGHT,wxT("Reference Frames"));
 
     wxAuiPaneInfo tensorVisinfo;
 	tensorVisinfo.Float();
@@ -397,6 +421,10 @@ void RootFrame::OnToggleInterEdit(wxCommandEvent& e) {
 	AUIToggle(mSpinInterEdit);
 }
 
+void RootFrame::OnToggleFrames(wxCommandEvent& e) {
+	AUIToggle(mFrameTree);
+}
+
 void RootFrame::AUIToggle(wxWindow* p) {
 	cout << "AUI Toggle" << endl;
     wxAuiPaneInfo& info = mAuiManager->GetPane(p);
@@ -429,6 +457,7 @@ EVT_MENU(ID_VIEW_3D,        RootFrame::OnToggle3D)
 EVT_MENU(ID_VIEW_GRID,      RootFrame::OnToggleGrid)
 EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleTensorVis)
 EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleInterEdit)
+EVT_MENU(ID_VIEW_FRAMES,    RootFrame::OnToggleFrames)
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)

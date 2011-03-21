@@ -9,6 +9,7 @@
 #include <wx/splitter.h>
 
 class InterDisplaySettingsPanel;
+class FrameTree;
 
 class RootFrame : public RootFrameBase {
 public:
@@ -48,6 +49,7 @@ public:
 	void OnToggleGrid(wxCommandEvent& e);
 	void OnToggleTensorVis(wxCommandEvent& e);
 	void OnToggleInterEdit(wxCommandEvent& e);
+	void OnToggleFrames(wxCommandEvent& e);
 
     //Resize Event
     void OnResize(wxSizeEvent& e);
@@ -72,6 +74,7 @@ private:
     InterDisplaySettingsPanel* mInterSizePanel;
     SpinInterEditPanel* mSpinInterEdit;
     Display3D* mDisplay3D;
+	FrameTree* mFrameTree;
 
 	SpinXML::ISpinSystemLoader* mSaver;
 

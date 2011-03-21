@@ -133,7 +133,12 @@ void RootFrame::InitFrame() {
     display3dinfo.Movable(false);
     mAuiManager->AddPane(mDisplay3D,display3dinfo);
     mAuiManager->AddPane(mSpinGrid,wxBOTTOM,wxT("Grid View"));
-    mAuiManager->AddPane(mInterSizePanel,wxLEFT,wxT("Tensor Visualisation"));
+
+    wxAuiPaneInfo tensorVisinfo;
+	tensorVisinfo.Float();
+	tensorVisinfo.Hide();
+	tensorVisinfo.Caption(wxT("Tensor Visualisation"));
+    mAuiManager->AddPane(mInterSizePanel,tensorVisinfo);
     mAuiManager->AddPane(mSpinInterEdit,wxBOTTOM,wxT("Interaction Editor"));
 
     //Grey the undo and redo menu ideams. They can be ungreyed when
@@ -375,6 +380,30 @@ void RootFrame::OnBondToggle(wxCommandEvent& e) {
     mRootToolbar->ToggleTool(ID_BOND_TOGGLE,showBonds);
     sigSetShowBonds(showBonds);
 }
+	     
+void RootFrame::OnToggle3D(wxCommandEvent& e) {
+	AUIToggle(mDisplay3D);
+}
+
+void RootFrame::OnToggleGrid(wxCommandEvent& e) {
+	AUIToggle(mSpinGrid);
+}
+
+void RootFrame::OnToggleTensorVis(wxCommandEvent& e) {
+	AUIToggle(mInterSizePanel);
+}
+
+void RootFrame::OnToggleInterEdit(wxCommandEvent& e) {
+	AUIToggle(mSpinInterEdit);
+}
+
+void RootFrame::AUIToggle(wxWindow* p) {
+	cout << "AUI Toggle" << endl;
+    wxAuiPaneInfo& info = mAuiManager->GetPane(p);
+	info.Show(!info.IsShown());
+	mAuiManager->Update();
+}
+
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
@@ -395,6 +424,11 @@ EVT_MENU(ID_NMR,    RootFrame::OnNmr)
 EVT_MENU(ID_EPR,    RootFrame::OnEpr)
 
 EVT_MENU(ID_BOND_TOGGLE,  RootFrame::OnBondToggle)
+
+EVT_MENU(ID_VIEW_3D,        RootFrame::OnToggle3D)
+EVT_MENU(ID_VIEW_GRID,      RootFrame::OnToggleGrid)
+EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleTensorVis)
+EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleInterEdit)
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)

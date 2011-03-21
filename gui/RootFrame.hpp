@@ -8,6 +8,8 @@
 #include <wx/aui/aui.h>
 #include <wx/splitter.h>
 
+class InterDisplaySettingsPanel;
+
 class RootFrame : public RootFrameBase {
 public:
     RootFrame(wxWindow* parent) : RootFrameBase(parent) {
@@ -42,6 +44,11 @@ public:
     void OnEpr(wxCommandEvent& e);
     void OnBondToggle(wxCommandEvent& e);
 
+	void OnToggle3D(wxCommandEvent& e);
+	void OnToggleGrid(wxCommandEvent& e);
+	void OnToggleTensorVis(wxCommandEvent& e);
+	void OnToggleInterEdit(wxCommandEvent& e);
+
     //Resize Event
     void OnResize(wxSizeEvent& e);
 
@@ -60,10 +67,12 @@ private:
     void UpdateTitle();
 
     wxAuiManager* mAuiManager;
+
     SpinGrid* mSpinGrid;
-    wxPanel* mInterSizePanel;
+    InterDisplaySettingsPanel* mInterSizePanel;
     SpinInterEditPanel* mSpinInterEdit;
     Display3D* mDisplay3D;
+
 	SpinXML::ISpinSystemLoader* mSaver;
 
     ///Full path of the open file
@@ -74,6 +83,8 @@ private:
     wxString mOpenFile;
 
 	std::vector<std::pair<PhysDimension,unit> > mIdToUnit;
+
+	void AUIToggle(wxWindow* p);
 };
 
 

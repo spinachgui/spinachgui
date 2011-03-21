@@ -27,7 +27,7 @@ const SpinGrid::SpinGridColum SpinGrid::columns[]={
     {COL_SELECTED,   "",20},
     {COL_LABEL,      "Label",105},    
     {COL_ELEMENT,    "Element",70},   
-    {COL_ISOTOPES,   "Isotopes",70},  
+    {COL_ISOTOPES,   "Mass Number",70},  
     {COL_X,          "x",70},	    
     {COL_Y,          "y",70},	    
     {COL_Z,          "z",70}

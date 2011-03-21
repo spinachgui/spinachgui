@@ -50,6 +50,51 @@ public:
 };
 
 //============================================================//
+
+class InterDisplaySettingsPanel : public wxPanel,public sigc::trackable {
+public:
+	InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
+		wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
+
+		//HACK: Quick hack to iterate though an enum
+		for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
+			Interaction::Type type = (Interaction::Type)i;
+			InterDisplaySettings* widget = new InterDisplaySettings(this,type);
+			bs->Add(widget,1,wxEXPAND);
+
+			//Connect the scalling sliders to the scalling
+			widget->GetLogSlider()->sigChange.connect(bind(mem_fun(this,&InterDisplaySettingsPanel::SlotScaleChange),type));
+
+			//Connect the colour controls to the tensor colours
+			widget->sigColour.connect(bind(mem_fun(this,&InterDisplaySettingsPanel::SlotColourChange),type));
+
+			//Connect the visibility toggles to the tensor colours
+			widget->sigVisible.connect(bind(mem_fun(this,&InterDisplaySettingsPanel::SlotVisibleChange),type ));
+
+			//Set sensible default scallings
+			widget->GetLogSlider()->SetValue(1);
+
+			//Set default visibility to NMR/EPR
+			widget->SetVisible(true);
+
+			//Setup the default colours
+			widget->SetColour(0,0,1);
+		}
+
+		this->SetSizer(bs);
+	}
+	//You could probably avoid needing these functions somehow, but it
+	//probably wouldn't be worth the templates at this point
+	void SlotScaleChange(double s,Interaction::Type t)                 {sigScaleChange(s,t);}
+	void SlotColourChange(float r,float g,float b,Interaction::Type t) {sigColourChange(r,g,b,t);}
+	void SlotVisibleChange(bool b,Interaction::Type t)                 {sigVisibleChange(b,t);}
+
+	sigc::signal<void,double,Interaction::Type>            sigScaleChange;  
+	sigc::signal<void,float,float,float,Interaction::Type> sigColourChange;
+	sigc::signal<void,bool,Interaction::Type>              sigVisibleChange;
+};
+
+//============================================================//
 // RootFrame
 
 void RootFrame::InitFrame() {
@@ -57,130 +102,22 @@ void RootFrame::InitFrame() {
 	StatusBar* statusBar = new StatusBar(this);
 	SetStatusBar(statusBar);
 
+	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
 
-    mInterSizePanel=new wxPanel(this);
-
-    InterDisplaySettings* hfc_sp = new InterDisplaySettings(mInterSizePanel,Interaction::HFC             );
-    InterDisplaySettings* gt_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::G_TENSER        );
-    InterDisplaySettings* zfs_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ZFS             );
-    InterDisplaySettings* exc_sp = new InterDisplaySettings(mInterSizePanel,Interaction::EXCHANGE        );
-    InterDisplaySettings* shd_sp = new InterDisplaySettings(mInterSizePanel,Interaction::SHIELDING       );
-    InterDisplaySettings* sca_sp = new InterDisplaySettings(mInterSizePanel,Interaction::SCALAR          );
-    InterDisplaySettings* qp_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::QUADRUPOLAR     );
-    InterDisplaySettings* dip_sp = new InterDisplaySettings(mInterSizePanel,Interaction::DIPOLAR         );
-    InterDisplaySettings* cl_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::CUSTOM_LINEAR   );
-    InterDisplaySettings* cb_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::CUSTOM_BILINEAR );
-    InterDisplaySettings* cq_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::CUSTOM_QUADRATIC);
+    mInterSizePanel= new InterDisplaySettingsPanel(this);
+	mSpinGrid      = new SpinGrid(this);
+	mSpinInterEdit = new SpinInterEditPanel(this);
+	mDisplay3D     = new Display3D(this);
 
 
-    wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
-    bs->Add(hfc_sp,1,wxEXPAND);
-    bs->Add(gt_sp ,1,wxEXPAND);
-    bs->Add(zfs_sp,1,wxEXPAND);
-    bs->Add(exc_sp,1,wxEXPAND);
-    bs->Add(shd_sp,1,wxEXPAND);
-    bs->Add(sca_sp,1,wxEXPAND);
-    bs->Add(qp_sp ,1,wxEXPAND);
-    bs->Add(dip_sp,1,wxEXPAND);
-    bs->Add(cl_sp ,1,wxEXPAND);
-    bs->Add(cb_sp ,1,wxEXPAND);
-    bs->Add(cq_sp ,1,wxEXPAND);
-    mInterSizePanel->SetSizer(bs);
+    //Setup the 3D display
+	MoleculeNodeNew* mn = new MoleculeNodeNew(GetRawSS());
+    mDisplay3D->SetRootSGNode(mn);
 
-    mSpinGrid      = new SpinGrid(this);
-    mSpinInterEdit = new SpinInterEditPanel(this);
-    mDisplay3D     = new Display3D(this);
-
-    MoleculeNodeNew* mn = new MoleculeNodeNew(GetRawSS());
-
-    SpinachDC& spinDC=mDisplay3D->GetDC();
-
-    //Connect the scalling sliders to the scalling
-    hfc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::HFC             ));
-    gt_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::G_TENSER        )); 
-    zfs_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ZFS             ));
-    exc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::EXCHANGE        ));
-    shd_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::SHIELDING       ));
-    sca_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::SCALAR          ));
-    qp_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::QUADRUPOLAR     ));
-    dip_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::DIPOLAR         ));
-    cl_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::CUSTOM_LINEAR   ));
-    cb_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::CUSTOM_BILINEAR )); 
-    cq_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::CUSTOM_QUADRATIC)); 
-
-    //Connect the colour controls to the tensor colours
-    hfc_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::HFC             ));
-    gt_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::G_TENSER        )); 
-    zfs_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ZFS             ));
-    exc_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::EXCHANGE        ));
-    shd_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::SHIELDING       ));
-    sca_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::SCALAR          ));
-    qp_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::QUADRUPOLAR     ));
-    dip_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::DIPOLAR         ));
-    cl_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::CUSTOM_LINEAR   ));
-    cb_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::CUSTOM_BILINEAR )); 
-    cq_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::CUSTOM_QUADRATIC)); 
-
-    //Connect the visibility toggles to the tensor colours
-    hfc_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::HFC             ));
-    gt_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::G_TENSER        )); 
-    zfs_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ZFS             ));
-    exc_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::EXCHANGE        ));
-    shd_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::SHIELDING       ));
-    sca_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::SCALAR          ));
-    qp_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::QUADRUPOLAR     ));
-    dip_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::DIPOLAR         ));
-    cl_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::CUSTOM_LINEAR   ));
-    cb_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::CUSTOM_BILINEAR )); 
-    cq_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::CUSTOM_QUADRATIC)); 
-
-
-    //Set sensible default scallings
-    hfc_sp->GetLogSlider()->SetValue(0.1);
-    gt_sp ->GetLogSlider()->SetValue(1);
-    zfs_sp->GetLogSlider()->SetValue(1);
-    exc_sp->GetLogSlider()->SetValue(1);
-    shd_sp->GetLogSlider()->SetValue(0.001);
-    sca_sp->GetLogSlider()->SetValue(1);
-    qp_sp ->GetLogSlider()->SetValue(1);
-    dip_sp->GetLogSlider()->SetValue(1);
-    cl_sp ->GetLogSlider()->SetValue(1);
-    cb_sp ->GetLogSlider()->SetValue(1);
-    cq_sp ->GetLogSlider()->SetValue(1);
-
-    //Set sensible default visibility
-    hfc_sp -> SetVisible(true);
-    gt_sp  -> SetVisible(true);
-    zfs_sp -> SetVisible(true);
-    exc_sp -> SetVisible(false);
-    shd_sp -> SetVisible(true);
-    sca_sp -> SetVisible(false);
-    qp_sp  -> SetVisible(true);
-    dip_sp -> SetVisible(false);
-    cl_sp  -> SetVisible(true);
-    cb_sp  -> SetVisible(true);
-    cq_sp  -> SetVisible(true);
-
-
-    //Setup the default colours
-    hfc_sp -> SetColour(0   ,0   ,1   );
-    gt_sp  -> SetColour(0   ,0.7 ,0   );
-    zfs_sp -> SetColour(0.7 ,0   ,0   );
-    exc_sp -> SetColour(0   ,0.0 ,0.3 );
-    shd_sp -> SetColour(0.4 ,0.4 ,0.4 );
-    sca_sp -> SetColour(0   ,0.7 ,0   );
-    qp_sp  -> SetColour(0   ,0.7 ,0   );
-    dip_sp -> SetColour(0   ,0.7 ,0   );
-    cl_sp  -> SetColour(0   ,0.7 ,0   );
-    cb_sp  -> SetColour(0   ,0.7 ,0   );
-    cq_sp  -> SetColour(0   ,0.7 ,0   );
-
-    //Wire the DC up to the the bond toggle event
+	SpinachDC& spinDC=mDisplay3D->GetDC();
     sigSetShowBonds.connect(mem_fun(spinDC,&SpinachDC::SetShowBonds));
 
-
-    mDisplay3D->SetRootSGNode(mn);
 
     mDisplay3D->SetRootFGNode(new MoleculeFG(GetRawSS()));
     // mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));

@@ -128,8 +128,11 @@ namespace SpinXML {
             DIPOLAR,
             CUSTOM_LINEAR,	 
             CUSTOM_BILINEAR,
-            CUSTOM_QUADRATIC
+            CUSTOM_QUADRATIC,
+			
+			TYPE_END
         };
+		
 
         ///Construct from a scalar
         Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)

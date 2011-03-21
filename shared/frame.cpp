@@ -41,7 +41,9 @@ void Frame::SetOrientation(const Orientation orient) {
 void Frame::updateAfine() {
     Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsQuaternion());
 	Matrix4d mat = T.matrix();
-    mAffine = (mParent==NULL) ? mat : mParent->mAffine*mat;
+	Matrix4d imat = T.inverse().matrix();
+    mAffine =         (mParent==NULL) ? mat : mParent->mAffine*mat;
+    mInvertedAffine = (mParent==NULL) ? mat : mat * mParent->mInvertedAffine;
 }
 
 void Frame::AddChild(Frame* frame) {

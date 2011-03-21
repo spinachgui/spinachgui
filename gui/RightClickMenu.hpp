@@ -14,7 +14,7 @@ public:
 	//Event Handlers
 	void OnDeleteHover(wxCommandEvent& e);
 	void OnShowSpinProperties(wxCommandEvent& e);
-	void OnDeleteSpin(wxCommandEvent& e);
+	void OnDeleteSelection(wxCommandEvent& e);
 
 	///Call to build the menu. inserts the menu items in a sensible
 	///order.

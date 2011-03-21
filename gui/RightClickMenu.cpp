@@ -11,7 +11,7 @@ using namespace std;
 
 enum {
   MENU_SPIN_PROP,
-  MENU_SPIN_DELETE,
+  MENU_DELETE_SELECTION,
   MENU_DELETE_HOVER,
 };
 
@@ -27,7 +27,7 @@ void RightClickMenu::Build() {
 	}
 	if(count > 0) {
 		wxString str = count == 1 ? wxT("Delete Spin (Selected)"):wxT("Delete Spins (Selected)");
-		Append(MENU_SPIN_DELETE, str);    
+		Append(MENU_DELETE_SELECTION, str);    
 	}
 	if (count == 1) {
 		Append(MENU_SPIN_PROP, wxT("Spin Properties..."));
@@ -46,7 +46,7 @@ void RightClickMenu::OnDeleteHover(wxCommandEvent& e) {
 	delete mHoverAtTimeOfOpening;
 }
 
-void RightClickMenu::OnDeleteSpin(wxCommandEvent& e) {
+void RightClickMenu::OnDeleteSelection(wxCommandEvent& e) {
   Chkpoint(wxT("Delete Spin"));
   DeleteSelectedSpins();
 }
@@ -56,7 +56,7 @@ void RightClickMenu::OnDeleteSpin(wxCommandEvent& e) {
 BEGIN_EVENT_TABLE(RightClickMenu,wxMenu)
 
 EVT_MENU  (  MENU_SPIN_PROP,          RightClickMenu::OnShowSpinProperties)
-EVT_MENU  (  MENU_SPIN_DELETE,        RightClickMenu::OnDeleteSpin)
+EVT_MENU  (  MENU_DELETE_SELECTION,   RightClickMenu::OnDeleteSelection)
 EVT_MENU  (  MENU_DELETE_HOVER,       RightClickMenu::OnDeleteHover)
 
 END_EVENT_TABLE()

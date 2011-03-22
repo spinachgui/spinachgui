@@ -7,56 +7,95 @@ using namespace SpinXML;
 using namespace std;
 
 //============================================================//
+// RightClickAction
+
+//-- Lambda
+
+RCActionLambda::RCActionLambda(wxString str,CommandT command)
+	: RightClickAction(str),mCommand(command) {
+}
+
+void RCActionLambda::Exec(wxCommandEvent& e) {
+    mCommand(e);
+}
+
+//-- Delete Selection
+
+void RCActionDeleteSelection::Exec(wxCommandEvent&e) {
+    DeleteSelectedSpins();
+}
+
+bool RCActionDeleteSelection::Visible() const {
+    return GetSelectedCount() >=0;
+}
+
+
+//-- Delete Hover
+
+RCActionDeleteHover::RCActionDeleteHover()
+    : RightClickAction(wxT("Delete Spin (under mouse)")),
+      mHoverAtTimeOfOpening(GetHover()) {
+}
+
+void RCActionDeleteHover::Exec(wxCommandEvent& e) {
+    delete mHoverAtTimeOfOpening;
+}
+
+//-- Spin Properties
+
+RCActionShowSpinProperties::RCActionShowSpinProperties(wxWindow* parent) 
+    : RightClickAction(wxT("Properties")), mParent(parent) {
+}
+
+void RCActionShowSpinProperties::Exec(wxCommandEvent& e) {
+    const set<Spin*>& selection = GetSelection();
+    if(selection.begin() != selection.end()) {
+	SpinDialog* dialog=new SpinDialog(mParent,*(selection.begin()));
+	dialog->ShowModal(); 
+    }
+}
+
+bool RCActionShowSpinProperties::Visible() const {
+    return GetSelectedCount() == 1;
+}
+
+//============================================================//
 // PopupMenu
 
-enum {
-  MENU_SPIN_PROP,
-  MENU_DELETE_SELECTION,
-  MENU_DELETE_HOVER,
-};
 
-RightClickMenu::RightClickMenu(wxWindow* parent) : wxMenu(),
-						   mParent(parent){
+RightClickMenu::RightClickMenu(wxWindow* parent)
+    : wxMenu(),mParent(parent) {
+    Connect(wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(RightClickMenu::OnSelect));
 }
+
+ RightClickMenu::~RightClickMenu() {
+    for(std::vector<RightClickAction*>::iterator i = mActions.begin();i!=mActions.end();++i) {
+	delete *i;
+    }
+ }
+
+void RightClickMenu::Build(std::vector<RightClickAction*> actions) {
+    mActions = actions;
+    int id = 0;
+    for(std::vector<RightClickAction*>::iterator i = actions.begin();i!=actions.end();++i) {
+	if ((*i)->Visible()) {
+	    Append(id, (*i)->mText);
+	}
+	id++;
+    }
+}
+
+void RightClickMenu::OnSelect(wxCommandEvent& e) {
+    mActions[e.GetId()]->Exec(e);
+}
+
 
 void RightClickMenu::Build() {
-	unsigned int count = GetSelectedCount();
-	mHoverAtTimeOfOpening = GetHover();
-	if(mHoverAtTimeOfOpening != NULL) {
-		Append(MENU_DELETE_HOVER, wxT("Delete Spin (Under Mouse)"));    
-	}
-	if(count > 0) {
-		wxString str = count == 1 ? wxT("Delete Spin (Selected)"):wxT("Delete Spins (Selected)");
-		Append(MENU_DELETE_SELECTION, str);    
-	}
-	if (count == 1) {
-		Append(MENU_SPIN_PROP, wxT("Spin Properties..."));
-	}
-}
-
-void RightClickMenu::OnShowSpinProperties(wxCommandEvent& e) {
-	const set<Spin*>& selection = GetSelection();
-	if(selection.begin() != selection.end()) {
-		SpinDialog* dialog=new SpinDialog(mParent,*(selection.begin()));
-		dialog->ShowModal(); 
-	}
-}
-
-void RightClickMenu::OnDeleteHover(wxCommandEvent& e) {
-	delete mHoverAtTimeOfOpening;
-}
-
-void RightClickMenu::OnDeleteSelection(wxCommandEvent& e) {
-  Chkpoint(wxT("Delete Spin"));
-  DeleteSelectedSpins();
+    vector<RightClickAction*> actions;
+    actions.push_back(new RCActionDeleteHover                );
+    actions.push_back(new RCActionDeleteSelection	     );
+    actions.push_back(new RCActionShowSpinProperties(mParent));
+    Build(actions);
 }
 
 
-
-BEGIN_EVENT_TABLE(RightClickMenu,wxMenu)
-
-EVT_MENU  (  MENU_SPIN_PROP,          RightClickMenu::OnShowSpinProperties)
-EVT_MENU  (  MENU_DELETE_SELECTION,   RightClickMenu::OnDeleteSelection)
-EVT_MENU  (  MENU_DELETE_HOVER,       RightClickMenu::OnDeleteHover)
-
-END_EVENT_TABLE()

@@ -36,14 +36,17 @@ public:
 	}
 	
 	void RefreshFromSpinSystem() {
-		Frame* frame = GetSS()->GetLabFrame();
+		RefreshFromSpinSystemRecursive(mRoot,GetSS()->GetLabFrame());
+	}
+private:
+	wxTreeItemId mRoot;
+	void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
 		vector<Frame*> children = frame->GetChildren();
-
 		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
-			AppendItem(mRoot,wxT("Frame"));
+			wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"));
+			RefreshFromSpinSystemRecursive(nextItemId,*i);
 		}
 	}
-	wxTreeItemId mRoot;
 };
 
 //============================================================//

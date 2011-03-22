@@ -41,6 +41,13 @@ private:
     Frame* mFrame;
 };
 
+struct FramePointer : public wxTreeItemData {
+    FramePointer(Frame* frame)
+	: frame(frame) {
+    }
+    Frame* frame;
+};
+
 class FrameTree : public wxTreeCtrl {
 public:
 
@@ -54,15 +61,16 @@ public:
 		vector<Frame*> children = frame->GetChildren();
 
 		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
-			AppendItem(mRoot,wxT("Frame"));
+		    AppendItem(mRoot,wxT("Frame"),-1,-1,new FramePointer(*i));
 		}
 	}
     
     void OnRightClick(wxTreeEvent& e) {
+	FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
 	RightClickMenu* menu = new RightClickMenu(this);
 
 	vector<RightClickAction*> actions;
-	actions.push_back(new RCActionActivateFrame(NULL));
+	actions.push_back(new RCActionActivateFrame(fp->frame));
 
 	menu->Build(actions);
 	PopupMenu(menu);

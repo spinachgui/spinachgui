@@ -9,7 +9,7 @@
 
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
-
+#include <gui/RightClickMenu.hpp>
 #define ID_UNIT_START 12345
 
 using namespace std;
@@ -28,8 +28,22 @@ wxString GetExtension(const wxString& filename) {
 //============================================================//
 // Reference frame tree view
 
+class RCActionActivateFrame : public RightClickAction {
+public:
+    RCActionActivateFrame(Frame* frame) 
+	: RightClickAction(wxT("Activate Frame")), mFrame(frame) {
+    }
+    bool Visible() const {return true;}
+    void Exec(wxCommandEvent& e) {
+	cout << "Activating " << mFrame << endl;
+    }
+private:
+    Frame* mFrame;
+};
+
 class FrameTree : public wxTreeCtrl {
 public:
+
 	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
 		mRoot = AddRoot(wxT("Lab Frame"));
 		RefreshFromSpinSystem();
@@ -43,8 +57,29 @@ public:
 			AppendItem(mRoot,wxT("Frame"));
 		}
 	}
+    
+    void OnRightClick(wxTreeEvent& e) {
+	RightClickMenu* menu = new RightClickMenu(this);
+
+	vector<RightClickAction*> actions;
+	actions.push_back(new RCActionActivateFrame(NULL));
+
+	menu->Build(actions);
+	PopupMenu(menu);
+	delete menu;
+    }
+    DECLARE_EVENT_TABLE();
+private:
 	wxTreeItemId mRoot;
 };
+
+
+BEGIN_EVENT_TABLE(FrameTree,wxTreeCtrl)
+
+EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, FrameTree::OnRightClick)
+
+END_EVENT_TABLE()
+
 
 //============================================================//
 // Custom Status Bar

@@ -11,6 +11,7 @@ public:
     RightClickAction(const wxString& text) 
 	: mText(text) {
     }
+    virtual ~RightClickAction() {}
     virtual void Exec(wxCommandEvent& e) = 0;
     virtual bool Visible() const = 0;
 private:

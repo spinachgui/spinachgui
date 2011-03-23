@@ -9,43 +9,43 @@
 
 class MoleculeFG : public Renderer {
 public:
-    MoleculeFG(SpinXML::SpinSystem* ss);
+    MoleculeFG();
 
     void OnNewElectron(SpinXML::Spin* newSpin,long number);
 
 private:
-    virtual void RawDraw(SpinachDC& dc) {}
+    virtual void Geometary(SpinachDC& dc) {}
 };
 
 //============================================================//
 
 class SpinDrawer : public Renderer {
 public:
-    SpinDrawer(SpinXML::SpinSystem* ss);
+    SpinDrawer();
 private:
-    virtual void RawDraw(SpinachDC& dc);
+    virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
 
 class BondDrawer : public Renderer {
 public:
-    BondDrawer(SpinXML::SpinSystem* ss);
+    BondDrawer();
 private:
-    virtual void RawDraw(SpinachDC& dc);
+    virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
 class LinearInterDrawer : public Renderer {
 public:
-    InteractionDrawer(SpinXML::SpinSystem* ss);
+    LinearInterDrawer();
 private:
-    virtual void RawDraw(SpinachDC& dc);
+    virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
 class FrameDrawer : public Renderer {
 public:
-	FrameDrawer(SpinXML::SpinSystem* ss);
+	FrameDrawer();
 private:
-	virtual void RawDraw(SpinachDC& dc);
+	virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
 #endif

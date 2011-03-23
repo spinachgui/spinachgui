@@ -165,7 +165,7 @@ public:
 
     void Draw(const DisplaySettings& settings, PASS pass);
 protected:
-	virtual void Geometary();
+	virtual void Geometary() = 0;
 private:
 	std::vector<GLMode*> mModes;
 };

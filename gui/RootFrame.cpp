@@ -206,8 +206,8 @@ void RootFrame::InitFrame() {
 	MoleculeNodeNew* mn = new MoleculeNodeNew(GetRawSS());
     mDisplay3D->SetRootSGNode(mn);
 
-	SpinachDC& spinDC=mDisplay3D->GetDC();
-    sigSetShowBonds.connect(mem_fun(spinDC,&SpinachDC::SetShowBonds));
+	//SpinachDC& spinDC=mDisplay3D->GetDC();
+    //sigSetShowBonds.connect(mem_fun(spinDC,&SpinachDC::SetShowBonds));
 
 
     mDisplay3D->SetRootFGNode(new MoleculeFG(GetRawSS()));

@@ -15,132 +15,14 @@ using namespace SpinXML;
 // Device Context
 
 SpinachDC::SpinachDC()
-    : depthOnly(false),
-      mSolidQuadric(gluNewQuadric()),
-      mWireQuadric(gluNewQuadric()) {
-    drawBonds=true;
-    gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
-    gluQuadricNormals  (mSolidQuadric,GLU_SMOOTH);
-
-    gluQuadricDrawStyle(mWireQuadric,GLU_LINE);
-    gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
-    mScallings[Interaction::HFC             ]=1.0;
-    mScallings[Interaction::G_TENSER        ]=1.0;
-    mScallings[Interaction::ZFS             ]=1.0;
-    mScallings[Interaction::EXCHANGE        ]=1.0;
-    mScallings[Interaction::SHIELDING       ]=1.0;
-    mScallings[Interaction::SCALAR          ]=1.0;
-    mScallings[Interaction::QUADRUPOLAR     ]=1.0;
-    mScallings[Interaction::DIPOLAR         ]=1.0;
-    mScallings[Interaction::CUSTOM_LINEAR   ]=1.0;
-    mScallings[Interaction::CUSTOM_BILINEAR ]=1.0;
-    mScallings[Interaction::CUSTOM_QUADRATIC]=1.0;
-
-    mInterColours[Interaction::HFC             ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::G_TENSER        ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::ZFS             ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::EXCHANGE        ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::SHIELDING       ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::SCALAR          ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::QUADRUPOLAR     ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::DIPOLAR         ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::CUSTOM_LINEAR   ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::CUSTOM_BILINEAR ]=Vector3d(1.0,1.0,1.0);
-    mInterColours[Interaction::CUSTOM_QUADRATIC]=Vector3d(1.0,1.0,1.0);
-
-    mVisible[Interaction::HFC             ]=false;
-    mVisible[Interaction::G_TENSER        ]=false;
-    mVisible[Interaction::ZFS             ]=false;
-    mVisible[Interaction::EXCHANGE        ]=false;
-    mVisible[Interaction::SHIELDING       ]=false;
-    mVisible[Interaction::SCALAR          ]=false;
-    mVisible[Interaction::QUADRUPOLAR     ]=false;
-    mVisible[Interaction::DIPOLAR         ]=false;
-    mVisible[Interaction::CUSTOM_LINEAR   ]=false;
-    mVisible[Interaction::CUSTOM_BILINEAR ]=false;
-    mVisible[Interaction::CUSTOM_QUADRATIC]=false;
-
+    : depthOnly(false) {
 }
 SpinachDC::~SpinachDC() {
-        gluDeleteQuadric(mSolidQuadric);
-        gluDeleteQuadric(mWireQuadric);
 }
 
 
 //============================================================//
 // Scene graphs
-
-
-void OpenGLText::RawDraw(SpinachDC& dc) {
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D); {
-        glDisable(GL_LIGHTING);
-        glTranslatef(40,dc.height-40,0);
-        glBindTexture(GL_TEXTURE_2D,texName);
-        glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-        glBegin(GL_QUADS); {
-            glTexCoord2f(0,0); glVertex2f(0,0);
-            glTexCoord2f(1,0); glVertex2f(w,0);
-            glTexCoord2f(1,1); glVertex2f(w,h);
-            glTexCoord2f(0,1); glVertex2f(0,h);
-        } glEnd();
-    } glDisable(GL_TEXTURE_2D);
-}
-
-void OpenGLText::UpdateString(const wxString& str) {
-    wxMemoryDC memDC;
-    wxSize s=memDC.GetTextExtent(str);
-
-    w=s.GetWidth();
-    h=s.GetHeight();
-
-    wxBitmap bit(w,h);
-    memDC.SelectObject(bit);
-    memDC.SetTextForeground(wxColor(255,255,255));
-    memDC.SetTextBackground(wxColor(0,0,0));
-    memDC.DrawText(str,0,0);
-    wxImage img(bit.ConvertToImage());
-    img.AddHandler(new wxPNGHandler);
-    img.SaveFile(wxT("TextImg.png"), wxBITMAP_TYPE_PNG);
-    unsigned char* raw=img.GetData();
-
-    raw[0]=254;
-    raw[1]=0;
-    raw[2]=0;
-    raw[3]=254;
-    raw[4]=0;
-    raw[5]=0;
-    raw[6]=254;
-    raw[7]=0;
-    raw[8]=0;
-    raw[9]=254;
-    raw[10]=0;
-    raw[11]=0;
-
-    //openGL stuff
-    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    glEnable(GL_TEXTURE_2D);
-    glGenTextures(1,&texName);
-    glBindTexture(GL_TEXTURE_2D,texName);
-
-    // when texture area is small, bilinear filter the closest mipmap
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                     GL_LINEAR_MIPMAP_NEAREST );
-    // when texture area is large, bilinear filter the first mipmap
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-    // if wrap is true, the texture wraps over at the edges (repeat)
-    //       ... false, the texture ends at the edges (clamp)
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT);
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT);
-    /*glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);*/
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w,h,0,GL_RGB,GL_UNSIGNED_BYTE,raw);
-    //gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGB, w, h,GL_RGB, GL_UNSIGNED_BYTE, raw);
-}
-
 
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5};
 
@@ -155,42 +37,9 @@ SGNode::SGNode()
 }
 
 SGNode::~SGNode() {
-    while(mChildren.begin() != mChildren.end()) {
-        /*
-          Okay, so this loop looks like it will never end. What's actually
-          happening is that when the destructor of a SGNode is called, it
-          signals to its parent and the parent removes the pointer from
-          mChildren (see SGNode::AddNode)
-
-          While this means it's possible to delete a node without care or
-          worry, it does lead to this confuseing loop.
-
-          This is perhaps not my greatest achivement in the field of
-          writing readable code!
-        */
-        delete *(mChildren.begin());
-    }
     sigDying(this);
 }
 
-void SGNode::AddNode(SGNode* node) {
-    mChildren.push_back(node);
-    node->sigDying.connect(mem_fun(this,&SGNode::RemoveNode));
-    node->sigDirty.connect(mem_fun(this,&SGNode::OnChildDirty));
-}
-
-void SGNode::RemoveNode(SGNode* node) {
-    for(itor i=mChildren.begin();i!=mChildren.end();++i) {
-        if(*(i)==node) {
-            mChildren.erase(i);
-            //If we have actually removed a node, we need to recompile this
-            //display list as well, because it still contains a reference to a
-            //dangleing display list
-            Dirty();
-            break;
-        }
-    }
-}
 
 void SGNode::SetMaterial(const float material[3],bool use) {
     mMaterial=material;
@@ -205,7 +54,7 @@ void SGNode::SetTranslation(const Vector3d& v) {
     mat[3 ]=0;  mat[7 ]=0;  mat[11]=0;  mat[15]=1;
 }
 
-void SGNode::Draw(SpinachDC& dc) {
+void SGNode::Draw(const DisplaySettings& settings,SpinachDC& dc) {
     if(!mIdentity) {
         glPushMatrix();
         glMultMatrixf(mat);
@@ -226,9 +75,6 @@ void SGNode::Draw(SpinachDC& dc) {
     if(dc.pass == SpinachDC::PICKING) {
         glPopName();
     }
-    for(itor i=mChildren.begin();i!=mChildren.end();++i) {
-        (*i)->Draw(dc);
-    }
     if(!mIdentity) {
         glPopMatrix();
     }
@@ -237,9 +83,6 @@ void SGNode::Draw(SpinachDC& dc) {
 void SGNode::GetPovRayString(wxString& str) {
     ToPovRay(str);
     str << wxT("union{ \n");
-    for(itor i=mChildren.begin();i!=mChildren.end();++i) {
-        (*i)->GetPovRayString(str);
-    }
     str << wxT("matrix<")
         << mat[0 ] << wxT(",") << mat[1 ] << wxT(",") << mat[2 ] << wxT(",\n")
         << mat[4 ] << wxT(",") << mat[5 ] << wxT(",") << mat[6 ] << wxT(",\n")
@@ -499,7 +342,8 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
     int width,height;
     GetClientSize(&width,&height);
-    mDC.width=width; mDC.height=height;
+    mDisplaySettings.width=width;
+	mDisplaySettings.height=height;
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -529,7 +373,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     gluLookAt(mCamX*OPENGL_SCALE,mCamY*OPENGL_SCALE,mCamZ*OPENGL_SCALE,0,0,0,0,1,0);
     glMultMatrixf(mRotationMatrix);
 
-    mDC.mRotationMatrix=mRotationMatrix;
+    mDisplaySettings.mRotationMatrix=mRotationMatrix;
 
 
 
@@ -556,13 +400,13 @@ void Display3D::OnPaint(wxPaintEvent& e) {
             //Draw opaque objects first
             glDepthMask(GL_TRUE);
             mDC.pass=SpinachDC::SOLID;
-            mRootNode->Draw(mDC);
+            mRootNode->Draw(mDisplaySettings,mDC);
             //Draw transparent/traslucent objects
             glEnable (GL_BLEND);
             glDepthMask(GL_FALSE);
             glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             mDC.pass=SpinachDC::TRANSLUCENT;
-            mRootNode->Draw(mDC);
+            mRootNode->Draw(mDisplaySettings,mDC);
             glDisable (GL_BLEND);
 
             //Work out a line the world coordinates of the mouse
@@ -596,7 +440,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
             glRenderMode(GL_SELECT);
 
             glInitNames();
-            mRootNode->Draw(mDC);
+            mRootNode->Draw(mDisplaySettings,mDC);
 
             hits=glRenderMode(GL_RENDER);
             GLuint* pbuff=buff;
@@ -641,7 +485,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        mForgroundNode->Draw(mDC);
+        mForgroundNode->Draw(mDisplaySettings,mDC);
     } glDisable(GL_LIGHTING);
 
 

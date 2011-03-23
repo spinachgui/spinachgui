@@ -31,15 +31,15 @@ enum LAYER {
     LAYER_INTERACTIONS,
 };
 
+///A struct storing all 3D settings that are invariant over a single
+///rendering pass, implying that this structure may be passed safely
+///as a const reference. It would likely make sense to link settings
+///here to a menu option of configuration file setting. Information
+///such as the current render pass would not belong in this struct
+struct DisplaySettings {
 
-///A class for storing all drawing options
-class SpinachDC : public sigc::trackable {
-public:
-    SpinachDC();
-    ~SpinachDC();
-
-    GLUquadric* GetSolidQuadric() const {return mSolidQuadric;}
-    GLUquadric* GetWireQuadric() const {return mWireQuadric;}
+    void SetShowBonds(bool showBonds) {drawBonds=showBonds;}
+    bool drawBonds;
 
     void SetScalling(double scalling,SpinXML::Interaction::Type t) {
         mScallings[t]=scalling;
@@ -50,20 +50,6 @@ public:
     void SetVisible(bool v,SpinXML::Interaction::Type t) {
         mVisible[t]=v;
     }
-
-    ///If true draw only to the depth buffer
-    bool depthOnly;
-
-    enum PASS {
-        SOLID,
-        TRANSLUCENT,
-        PICKING
-    };
-    PASS pass;
-
-    void SetShowBonds(bool showBonds) {drawBonds=showBonds;}
-    bool drawBonds;
-
 
     GLUquadric* mSolidQuadric;
     GLUquadric* mWireQuadric;
@@ -79,6 +65,24 @@ public:
     std::map<SpinXML::Interaction::Type,bool> mVisible;
 };
 
+
+///A class for storing all drawing options
+class SpinachDC : public sigc::trackable {
+public:
+    SpinachDC();
+    ~SpinachDC();
+
+    ///If true draw only to the depth buffer
+    bool depthOnly;
+
+    enum PASS {
+        SOLID,
+        TRANSLUCENT,
+        PICKING
+    };
+    PASS pass;
+};
+
 class SGNode : public sigc::trackable {
 public:
     ///Construct a dirty SGNode
@@ -91,17 +95,9 @@ public:
     ///list.
     void Dirty() {mDirty=true;sigDirty();}
 
-    ///Called when a parent becomes dirty. Pass the signal up to the top
-    ///node to trigger a redraw
-    void OnChildDirty() {mDirty=true;sigDirty();}
-
     ///Draw, using RawDraw if needed or by calling the display list if
     ///one exists.
-    void Draw(SpinachDC& dc);
-
-    ///Add a node to the scenegraph. To remove it, just make sure its
-    ///destructor is called.
-    void AddNode(SGNode* node);
+    void Draw(const DisplaySettings& settings,SpinachDC& dc);
 
     ///Set the translucency of the node
     void SetTranslucency(float level,bool use=true) {
@@ -109,12 +105,8 @@ public:
         mTranslucentLevel=level;
         Dirty();
     }
-
     ///
     void SetMaterial(const float material[4],bool use=true);
-
-    ///Removes a child node
-    void RemoveNode(SGNode* node);
 
     void SetTranslation(const Vector3d& v);
     void SetIdentity() {mIdentity=true;}
@@ -145,8 +137,6 @@ protected:
     GLint mPickingName;
 
 private:
-    std::list<SGNode*> mChildren;
-    typedef std::list<SGNode*>::iterator itor;
 };
 
 
@@ -189,6 +179,7 @@ public:
     }
     void OnDirty() {Refresh();}
     SpinachDC& GetDC() {return mDC;}
+	DisplaySettings* GetDisplaySettings() {return &mDisplaySettings;}
 
     void PrintTransformMatricese();
 protected:
@@ -210,6 +201,7 @@ private:
     SGNode* mForgroundNode;
 
     SpinachDC mDC;
+	DisplaySettings mDisplaySettings;
 
     bool mGLEnabled;
     wxGLContext* mGLContext;

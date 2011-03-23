@@ -83,6 +83,28 @@ public:
     PASS pass;
 };
 
+
+///An base class using RAII for setting and unsetting GL modes
+class GLMode {
+public:
+	GLMode();
+	virtual ~GLMode() {}
+};
+
+class GLModeAble {
+public:
+	GLModeAble(GLInt mode) : mMode(mMode) {
+		glEnable(mMode);
+	}
+	~GLModeAble() {
+		glDisable(mMode);
+	}
+private:
+	GLInt mMode;
+}
+
+///An abstract class who's job is to visualise part of a spin system
+///such as spins, linear interactions or bonds.
 class Renderer : public sigc::trackable {
 public:
     ///Construct a dirty Renderer
@@ -129,6 +151,16 @@ protected:
 private:
 };
 
+///Keeps a collection of renderers and manages gl state common to a
+///scene, such as camera position, global rotation and lighting.
+class Scene {
+public:
+};
+
+///Manages interaction with the rest of the GUI including keeping the
+///athorattive copy of DisplaySettings, managing the context, managing
+///windowing events, setting the viewport etc. Only this class should
+///depend on wxWidgets
 class Display3D :  public wxGLCanvas, public sigc::trackable {
 public:
     Display3D(wxWindow* parent);

@@ -10,9 +10,7 @@
 class MoleculeFG : public Renderer {
 public:
     MoleculeFG();
-
     void OnNewElectron(SpinXML::Spin* newSpin,long number);
-
 private:
     virtual void Geometary(SpinachDC& dc) {}
 };
@@ -22,7 +20,7 @@ private:
 class SpinDrawer : public Renderer {
 public:
     SpinDrawer();
-private:
+protected:
     virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
@@ -30,21 +28,21 @@ private:
 class BondDrawer : public Renderer {
 public:
     BondDrawer();
-private:
+protected:
     virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
 class LinearInterDrawer : public Renderer {
 public:
     LinearInterDrawer();
-private:
+protected:
     virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
 class FrameDrawer : public Renderer {
 public:
 	FrameDrawer();
-private:
+protected:
 	virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 

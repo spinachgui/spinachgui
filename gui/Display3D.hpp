@@ -37,7 +37,16 @@ enum LAYER {
 ///here to a menu option of configuration file setting. Information
 ///such as the current render pass would not belong in this struct
 struct DisplaySettings {
-
+    DisplaySettings()
+       : mSolidQuadric(gluNewQuadric()),
+	 mWireQuadric(gluNewQuadric()) {
+	gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
+	gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
+    }
+    ~DisplaySettings() {
+	gluDeleteQuadric(mSolidQuadric);
+        gluDeleteQuadric(mWireQuadric);
+    }
     void SetShowBonds(bool showBonds) {drawBonds=showBonds;}
     bool drawBonds;
 
@@ -165,7 +174,7 @@ public:
 
     void Draw(const DisplaySettings& settings, PASS pass);
 protected:
-	virtual void Geometary() = 0;
+	virtual void Geometary(const DisplaySettings& settings, PASS pass) = 0;
 private:
 	std::vector<GLMode*> mModes;
 };
@@ -213,7 +222,7 @@ public:
 
     void ResetView();
 
-    void SetRootRenderer(Renderer* scene) {
+    void SetScene(Renderer* scene) {
         if(mScene) delete mScene; mScene=scene;
     }
     void OnDirty() {Refresh();}

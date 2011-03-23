@@ -36,7 +36,7 @@ void Renderer::Draw(const DisplaySettings& settings, PASS pass) {
 	for(vector<GLMode*>::iterator i = mModes.begin();i!=mModes.end();++i) {
 		(*i)->On();
 	}
-	Geometary();
+	Geometary(settings,pass);
 	for(vector<GLMode*>::iterator i = mModes.begin();i!=mModes.end();++i) {
 		(*i)->Off();
 	}
@@ -293,7 +293,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 		glMultMatrixd(mvmatrix);
 
 
-		GLuint buff[2000];
+		/*GLuint buff[2000];
 		GLint hits;
 		glSelectBuffer(2000,buff);  //glSelectBuffer goes before glRenderMode
 		glRenderMode(GL_SELECT);
@@ -334,7 +334,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 			}
 		} else {
 			SetHover(NULL);
-		}
+			}*/
 	}
 
     SwapBuffers();

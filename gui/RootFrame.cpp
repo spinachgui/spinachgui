@@ -224,6 +224,10 @@ void RootFrame::InitFrame() {
     mMenuItemUndo->Enable(false);
     mMenuItemRedo->Enable(false);
 
+    //Setup the 3d display
+
+    mDisplay3D->SetScene(new SpinDrawer);
+
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
     GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));

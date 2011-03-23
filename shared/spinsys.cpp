@@ -71,9 +71,9 @@ long SpinSystem::GetSpinCount() const {
 }
 
 Spin* SpinSystem::GetSpin(unsigned long n) const {
-	if(n+1 > mSpins.size()) {
-		throw runtime_error("In SpinSystem::GetSpin Invalid spin number");
-	}
+    if(n+1 > mSpins.size()) {
+	//throw runtime_error("In SpinSystem::GetSpin Invalid spin number");
+    }
     return mSpins[n];
 }
 

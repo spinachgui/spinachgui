@@ -175,6 +175,8 @@ namespace SpinXML {
         ///Automacially calculate the nuclear dipole-dipole couplings
         ///from the positions off the nuclear spins
         void CalcNuclearDipoleDipole() {mData->CalcNuclearDipoleDipole();}
+
+		Frame* GetLabFrame() const {return mData->GetLabFrame();}
 	};
 
 }; //End Namespace

@@ -35,12 +35,13 @@ public:
     }
     bool Visible() const {return true;}
     void Exec(wxCommandEvent& e) {
-	cout << "Activating " << mFrame << endl;
+		SetFrame(mFrame);
     }
 private:
     Frame* mFrame;
 };
 
+//Quick class working with the wxWidgets clientData system
 struct FramePointer : public wxTreeItemData {
     FramePointer(Frame* frame)
 	: frame(frame) {
@@ -48,22 +49,42 @@ struct FramePointer : public wxTreeItemData {
     Frame* frame;
 };
 
-class FrameTree : public wxTreeCtrl {
+//Class for drawing the tree of reference frames.
+class FrameTree : public wxTreeCtrl , public sigc::trackable {
 public:
 
 	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
 		mRoot = AddRoot(wxT("Lab Frame"));
+
+
 		RefreshFromSpinSystem();
+		sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
 	}
 	
 	void RefreshFromSpinSystem() {
+		mapFrameToId.clear();
+		mapFrameToId[GetSS().GetLabFrame()] = mRoot;
+
 		RefreshFromSpinSystemRecursive(mRoot,GetSS()->GetLabFrame());
+
+		mActive = mapFrameToId[GetFrame()];
+		SetItemBold(mActive);
+		Refresh(); //Seems like we need to explicitly ask for a
+				   //repaint
+	}
+
+	void SlotFrameChange(Frame* frame) {
+		SetItemBold(mActive,false);
+		mActive = mapFrameToId[frame];
+		SetItemBold(mActive);
+		Refresh();
 	}
 private:
 	void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
+		mapFrameToId[frame] = itemId;
 		vector<Frame*> children = frame->GetChildren();
 		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
-			wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"));
+			wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
 			RefreshFromSpinSystemRecursive(nextItemId,*i);
 		}
 	}
@@ -81,6 +102,8 @@ private:
     }
     DECLARE_EVENT_TABLE();
 	wxTreeItemId mRoot;
+	wxTreeItemId mActive;
+	map<Frame*,wxTreeItemId> mapFrameToId;
 };
 
 

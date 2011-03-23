@@ -284,12 +284,10 @@ void RemoveSelection(SpinXML::Spin* spin) {
 //================================================================================//
 // Set and get gobal reference frame
 
-Frame labFrame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),&gUnitSystem);
-
-Frame* gFrame = &labFrame;
+Frame* gFrame = NULL;
 
 void SetFrame(SpinXML::Frame* frame) {
-	//gFrame = frame;
+	gFrame = frame;
 	sigFrameChange(frame);
 }
 

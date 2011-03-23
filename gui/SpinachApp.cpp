@@ -16,8 +16,6 @@
 #include <shared/formats/castep.hpp>
 #include <shared/formats/simpson.hpp>
 
-#include <shared/has_invariants.hpp>
-
 #include <wx/filename.h>
 
 #include <shared/unit.hpp>

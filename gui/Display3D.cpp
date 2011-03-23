@@ -447,7 +447,6 @@ void Display3D::OnWheel(wxMouseEvent& e) {
 
 void Display3D::OnRightClick(wxMouseEvent& e) {
 	if(!e.Dragging()) {
-
 		if(GetHover()!=NULL) {
 			RightClickMenu* menu = new RightClickMenu(this);
 			menu->Build();

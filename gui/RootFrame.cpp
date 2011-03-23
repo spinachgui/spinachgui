@@ -9,7 +9,7 @@
 
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
-
+#include <gui/RightClickMenu.hpp>
 #define ID_UNIT_START 12345
 
 using namespace std;
@@ -28,8 +28,29 @@ wxString GetExtension(const wxString& filename) {
 //============================================================//
 // Reference frame tree view
 
+class RCActionActivateFrame : public RightClickAction {
+public:
+    RCActionActivateFrame(Frame* frame) 
+	: RightClickAction(wxT("Activate Frame")), mFrame(frame) {
+    }
+    bool Visible() const {return true;}
+    void Exec(wxCommandEvent& e) {
+	cout << "Activating " << mFrame << endl;
+    }
+private:
+    Frame* mFrame;
+};
+
+struct FramePointer : public wxTreeItemData {
+    FramePointer(Frame* frame)
+	: frame(frame) {
+    }
+    Frame* frame;
+};
+
 class FrameTree : public wxTreeCtrl {
 public:
+
 	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
 		mRoot = AddRoot(wxT("Lab Frame"));
 		RefreshFromSpinSystem();
@@ -39,7 +60,6 @@ public:
 		RefreshFromSpinSystemRecursive(mRoot,GetSS()->GetLabFrame());
 	}
 private:
-	wxTreeItemId mRoot;
 	void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
 		vector<Frame*> children = frame->GetChildren();
 		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
@@ -47,7 +67,29 @@ private:
 			RefreshFromSpinSystemRecursive(nextItemId,*i);
 		}
 	}
+    
+    void OnRightClick(wxTreeEvent& e) {
+		FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
+		RightClickMenu* menu = new RightClickMenu(this);
+
+		vector<RightClickAction*> actions;
+		actions.push_back(new RCActionActivateFrame(fp->frame));
+
+		menu->Build(actions);
+		PopupMenu(menu);
+		delete menu;
+    }
+    DECLARE_EVENT_TABLE();
+	wxTreeItemId mRoot;
 };
+
+
+BEGIN_EVENT_TABLE(FrameTree,wxTreeCtrl)
+
+EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, FrameTree::OnRightClick)
+
+END_EVENT_TABLE()
+
 
 //============================================================//
 // Custom Status Bar

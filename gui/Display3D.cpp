@@ -26,7 +26,7 @@ SpinachDC::~SpinachDC() {
 
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5};
 
-SGNode::SGNode()
+Renderer::Renderer()
     : mTranslucent(false),
       mTranslucentLevel(1.0),
       mDirty(true),
@@ -35,18 +35,18 @@ SGNode::SGNode()
       mPickingName(0) {
 }
 
-SGNode::~SGNode() {
+Renderer::~Renderer() {
     sigDying(this);
 }
 
 
-void SGNode::SetMaterial(const float material[3],bool use) {
+void Renderer::SetMaterial(const float material[3],bool use) {
     mMaterial=material;
     mUseMaterial=use;
 }
 
 
-void SGNode::Draw(const DisplaySettings& settings,SpinachDC& dc) {
+void Renderer::Draw(const DisplaySettings& settings,SpinachDC& dc) {
     if(mUseMaterial) {
         const static GLfloat white[4]={0.5f,0.5f,0.5f,0.5f};
         glMaterialfv(GL_FRONT,GL_SPECULAR, white);

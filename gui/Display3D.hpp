@@ -83,13 +83,13 @@ public:
     PASS pass;
 };
 
-class SGNode : public sigc::trackable {
+class Renderer : public sigc::trackable {
 public:
-    ///Construct a dirty SGNode
-    SGNode();
+    ///Construct a dirty Renderer
+    Renderer();
 
-    ///Destruct the SGNode
-    virtual ~SGNode();
+    ///Destruct the Renderer
+    virtual ~Renderer();
 
     ///Mark this node as dirty, that is, needing to drewdraw its display
     ///list.
@@ -108,7 +108,7 @@ public:
     ///
     void SetMaterial(const float material[4],bool use=true);
 
-    sigc::signal<void,SGNode*> sigDying;
+    sigc::signal<void,Renderer*> sigDying;
     sigc::signal<void> sigDirty; //Signals that a redraw is needed
 private:
     ///Make whatever openGL calls are needed to draw the node.
@@ -144,11 +144,11 @@ public:
 
     void ResetView();
 
-    void SetRootSGNode(SGNode* node) {
+    void SetRootRenderer(Renderer* node) {
         if(mRootNode) delete mRootNode; mRootNode=node;
         mRootNode->sigDirty.connect(mem_fun(this,&Display3D::OnDirty));
     }
-    void SetRootFGNode(SGNode* node) {
+    void SetRootFGNode(Renderer* node) {
         if(mForgroundNode) delete mForgroundNode; mForgroundNode=node;
         mForgroundNode->sigDirty.connect(mem_fun(this,&Display3D::OnDirty));
     }
@@ -171,9 +171,9 @@ protected:
 private:
 
     //These nodes can be rotated and translated  with the mouse
-    SGNode* mRootNode;
+    Renderer* mRootNode;
     //This nodes stay fixed on the screne
-    SGNode* mForgroundNode;
+    Renderer* mForgroundNode;
 
     SpinachDC mDC;
 	DisplaySettings mDisplaySettings;

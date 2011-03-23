@@ -108,18 +108,11 @@ public:
     ///
     void SetMaterial(const float material[4],bool use=true);
 
-    void SetTranslation(const Vector3d& v);
-    void SetIdentity() {mIdentity=true;}
-
-    void GetPovRayString(wxString& str);
-
     sigc::signal<void,SGNode*> sigDying;
     sigc::signal<void> sigDirty; //Signals that a redraw is needed
 private:
     ///Make whatever openGL calls are needed to draw the node.
     virtual void RawDraw(SpinachDC& dc)=0;
-
-    virtual void ToPovRay(wxString& src)=0;
 
     bool mTranslucent;
     float mTranslucentLevel;
@@ -131,28 +124,10 @@ private:
 
     ///If true, skip the transform step
 protected:
-    bool mIdentity;
-    GLfloat mat[16];
-
     GLint mPickingName;
 
 private:
 };
-
-
-class OpenGLText : public SGNode {
-public:
-    OpenGLText(const wxString& str)  {UpdateString(str);}
-    void SetStr(const wxString& str) {UpdateString(str);}
-
-private:
-    virtual void RawDraw(SpinachDC& dc);
-    virtual void ToPovRay(wxString& src) {}
-    void UpdateString(const wxString& str);
-    GLuint texName;
-    int w,h;
-};
-
 
 class Display3D :  public wxGLCanvas, public sigc::trackable {
 public:

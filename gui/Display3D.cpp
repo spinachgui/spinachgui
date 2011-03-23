@@ -32,7 +32,6 @@ SGNode::SGNode()
       mDirty(true),
       mUseMaterial(false),
       mMaterial(defaultMaterial),
-      mIdentity(true),
       mPickingName(0) {
 }
 
@@ -46,19 +45,8 @@ void SGNode::SetMaterial(const float material[3],bool use) {
     mUseMaterial=use;
 }
 
-void SGNode::SetTranslation(const Vector3d& v) {
-    mIdentity=false;
-    mat[0 ]=1;  mat[4 ]=0;  mat[8 ]=0;  mat[12]=v.x()*Angstroms;
-    mat[1 ]=0;  mat[5 ]=1;  mat[9 ]=0;  mat[13]=v.y()*Angstroms;
-    mat[2 ]=0;  mat[6 ]=0;  mat[10]=1;  mat[14]=v.z()*Angstroms;
-    mat[3 ]=0;  mat[7 ]=0;  mat[11]=0;  mat[15]=1;
-}
 
 void SGNode::Draw(const DisplaySettings& settings,SpinachDC& dc) {
-    if(!mIdentity) {
-        glPushMatrix();
-        glMultMatrixf(mat);
-    }
     if(mUseMaterial) {
         const static GLfloat white[4]={0.5f,0.5f,0.5f,0.5f};
         glMaterialfv(GL_FRONT,GL_SPECULAR, white);
@@ -75,22 +63,8 @@ void SGNode::Draw(const DisplaySettings& settings,SpinachDC& dc) {
     if(dc.pass == SpinachDC::PICKING) {
         glPopName();
     }
-    if(!mIdentity) {
-        glPopMatrix();
-    }
 }
 
-void SGNode::GetPovRayString(wxString& str) {
-    ToPovRay(str);
-    str << wxT("union{ \n");
-    str << wxT("matrix<")
-        << mat[0 ] << wxT(",") << mat[1 ] << wxT(",") << mat[2 ] << wxT(",\n")
-        << mat[4 ] << wxT(",") << mat[5 ] << wxT(",") << mat[6 ] << wxT(",\n")
-        << mat[8 ] << wxT(",") << mat[9 ] << wxT(",") << mat[10] << wxT(",\n")
-        << mat[12] << wxT(",") << mat[13] << wxT(",") << mat[14]
-        << wxT(">\n");
-    str << wxT("}\n");
-}
 
 //============================================================//
 // Display3D class

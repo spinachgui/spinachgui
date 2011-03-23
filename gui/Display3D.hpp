@@ -65,6 +65,13 @@ struct DisplaySettings {
     std::map<SpinXML::Interaction::Type,bool> mVisible;
 };
 
+//Maybe this only needs to be an enum. We'll see
+enum PASS {
+	SOLID,
+	TRANSLUCENT,
+	PICKING
+};
+
 
 ///A class for storing all drawing options
 class SpinachDC : public sigc::trackable {
@@ -75,33 +82,77 @@ public:
     ///If true draw only to the depth buffer
     bool depthOnly;
 
-    enum PASS {
-        SOLID,
-        TRANSLUCENT,
-        PICKING
-    };
     PASS pass;
 };
 
 
-///An base class using RAII for setting and unsetting GL modes
+///An abstract base class using RAII for setting and unsetting GL
+///modes
 class GLMode {
 public:
-	GLMode();
-	virtual ~GLMode() {}
+	virtual void On()  = 0;
+	virtual void Off() = 0;
 };
 
-class GLModeAble {
+class GLLighting : public GLMode {
 public:
-	GLModeAble(GLInt mode) : mMode(mMode) {
-		glEnable(mMode);
+	virtual void On() {
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		glEnable(GL_LIGHT1);
+
+		// GL_LIGHT0: the white light emitting light source
+		// Create light components for GL_LIGHT0
+		GLfloat ambientLight0[] =  {0.4, 0.4, 0.4, 1.0};
+		GLfloat diffuseLight0[] =  {0.6, 0.6, 0.6, 1.0};
+		GLfloat specularLight0[] = {0.8, 0.8, 0.8, 1.0};
+		GLfloat position0[] =      {-1.5, 1.0,-4.0, 1.0};
+		// Assign created components to GL_LIGHT0
+		glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
+		glLightfv(GL_LIGHT0, GL_POSITION, position0);
+
+		// GL_LIGHT1: the red light emitting light source
+		// Create light components for GL_LIGHT1
+		GLfloat ambientLight1[] =  {0.4, 0.4, 0.4, 1.0};
+		GLfloat diffuseLight1[] =  {0.6, 0.6, 0.6, 1.0};
+		GLfloat specularLight1[] = {0.8, 0.8, 0.8, 1.0};
+		GLfloat position1[] =      {1.5, 1.0, 4.0, 1.0};
+		// Assign created components to GL_LIGHT1
+		glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
+		glLightfv(GL_LIGHT1, GL_POSITION, position1);
 	}
-	~GLModeAble() {
-		glDisable(mMode);
+	virtual void Off() {
+		glDisable(GL_LIGHTING);
+	}
+};
+
+class GLDepthLessEqual : public GLMode {
+public:
+	virtual void On() {
+		glDepthFunc(GL_LEQUAL);
+	}
+	virtual void Off() {
+		glDepthFunc(GL_LESS);
+	}
+};
+
+template<typename T>
+class GLModeGuard {
+public:
+	GLModeGuard(T mode)
+		: mMode(mode) {
+		mMode.On();
+	}
+	~GLModeGuard() {
+		mMode.Off();
 	}
 private:
-	GLInt mMode;
-}
+	T mMode;
+};
 
 ///An abstract class who's job is to visualise part of a spin system
 ///such as spins, linear interactions or bonds.
@@ -109,52 +160,32 @@ class Renderer : public sigc::trackable {
 public:
     ///Construct a dirty Renderer
     Renderer();
-
     ///Destruct the Renderer
     virtual ~Renderer();
 
-    ///Mark this node as dirty, that is, needing to drewdraw its display
-    ///list.
-    void Dirty() {mDirty=true;sigDirty();}
-
-    ///Draw, using RawDraw if needed or by calling the display list if
-    ///one exists.
-    void Draw(const DisplaySettings& settings,SpinachDC& dc);
-
-    ///Set the translucency of the node
-    void SetTranslucency(float level,bool use=true) {
-        mTranslucent=use;
-        mTranslucentLevel=level;
-        Dirty();
-    }
-    ///
-    void SetMaterial(const float material[4],bool use=true);
-
-    sigc::signal<void,Renderer*> sigDying;
-    sigc::signal<void> sigDirty; //Signals that a redraw is needed
-private:
-    ///Make whatever openGL calls are needed to draw the node.
-    virtual void RawDraw(SpinachDC& dc)=0;
-
-    bool mTranslucent;
-    float mTranslucentLevel;
-
-    bool mDirty;
-
-    bool mUseMaterial;
-    const float* mMaterial;
-
-    ///If true, skip the transform step
-protected:
-    GLint mPickingName;
-
-private:
+    virtual void Draw(const DisplaySettings& settings, PASS pass) = 0;
 };
 
 ///Keeps a collection of renderers and manages gl state common to a
 ///scene, such as camera position, global rotation and lighting.
-class Scene {
+class Scene : public Renderer {
 public:
+	Scene(const std::vector<Renderer*>& renderers) 
+		: mRenderers(renderers) {
+	}
+	~Scene() {
+		for(std::vector<Renderer*>::iterator i = mRenderers.begin();i != mRenderers.end();++i) {
+			delete (*i);
+		}
+	}
+	void Draw(const DisplaySettings& displaySettings,PASS pass) {
+		//loop and render
+		for(std::vector<Renderer*>::iterator i = mRenderers.begin();i != mRenderers.end();++i) {
+			(*i)->Draw(displaySettings,pass);
+		}
+	}
+private:
+	std::vector<Renderer*> mRenderers;
 };
 
 ///Manages interaction with the rest of the GUI including keeping the
@@ -176,16 +207,10 @@ public:
 
     void ResetView();
 
-    void SetRootRenderer(Renderer* node) {
-        if(mRootNode) delete mRootNode; mRootNode=node;
-        mRootNode->sigDirty.connect(mem_fun(this,&Display3D::OnDirty));
-    }
-    void SetRootFGNode(Renderer* node) {
-        if(mForgroundNode) delete mForgroundNode; mForgroundNode=node;
-        mForgroundNode->sigDirty.connect(mem_fun(this,&Display3D::OnDirty));
+    void SetRootRenderer(Renderer* scene) {
+        if(mScene) delete mScene; mScene=scene;
     }
     void OnDirty() {Refresh();}
-    SpinachDC& GetDC() {return mDC;}
 	DisplaySettings* GetDisplaySettings() {return &mDisplaySettings;}
 
     void PrintTransformMatricese();
@@ -194,32 +219,17 @@ protected:
 
     ///Call whenever the size of the viewport changes
 
-
     void EnableGL();
     void ChangeViewport();
-
-	// Do an openGL picking render and record the objects found under the mouse.
-	void DoPickingPass();
 private:
 
     //These nodes can be rotated and translated  with the mouse
-    Renderer* mRootNode;
-    //This nodes stay fixed on the screne
-    Renderer* mForgroundNode;
+    Renderer* mScene;
 
-    SpinachDC mDC;
 	DisplaySettings mDisplaySettings;
 
     bool mGLEnabled;
     wxGLContext* mGLContext;
-
-    SpinXML::SpinSystem* mSS;
-
-    //Textures
-    GLuint mTexDepth;
-
-    //Frame buffer objects
-    GLuint mFB;
 
     //GUI State Variables
     double mHoverDist;

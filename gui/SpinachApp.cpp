@@ -87,6 +87,31 @@ void CheesyUnitSystemChangerHandler() {
 	GetRawSS()->sigReloaded();
 }
 
+//================================================================================//
+// Set and get gobal reference frame
+
+Frame* gFrame = NULL;
+
+void SetFrame(SpinXML::Frame* frame) {
+	gFrame = frame;
+	sigFrameChange(frame);
+}
+
+SpinXML::Frame* GetFrame() {
+	return gFrame;
+}
+
+void CheesyFrameChangerHandler(Frame* frame) {
+	//Quick hack for making sure everything gets updated, emit a
+	//sigReloaded signal
+	GetRawSS()->sigReloaded();
+}
+
+
+sigc::signal<void,SpinXML::Frame*> sigFrameChange;
+
+
+
 //--------------------------------------------------------------------------------//
 // The Application Object
 
@@ -138,7 +163,7 @@ bool SpinachApp::OnInit() {
 	gUnitSystem.lengthUnit = Angstroms;
 
 	sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
-  
+	sigFrameChange.connect(sigc::ptr_fun(&CheesyFrameChangerHandler));
 
     //Load the isotopes
 
@@ -280,20 +305,4 @@ void RemoveSelection(SpinXML::Spin* spin) {
 	}
 	AssertSelectionExists();
 }
-
-//================================================================================//
-// Set and get gobal reference frame
-
-Frame* gFrame = NULL;
-
-void SetFrame(SpinXML::Frame* frame) {
-	gFrame = frame;
-	sigFrameChange(frame);
-}
-
-SpinXML::Frame* GetFrame() {
-	return gFrame;
-}
-
-sigc::signal<void,SpinXML::Frame*> sigFrameChange;
 

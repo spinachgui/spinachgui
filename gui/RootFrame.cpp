@@ -201,21 +201,6 @@ void RootFrame::InitFrame() {
 	mDisplay3D     = new Display3D(this);
 	mFrameTree     = new FrameTree(this);
 
-
-    //Setup the 3D display
-	MoleculeNodeNew* mn = new MoleculeNodeNew(GetRawSS());
-    mDisplay3D->SetRootSGNode(mn);
-
-	//SpinachDC& spinDC=mDisplay3D->GetDC();
-    //sigSetShowBonds.connect(mem_fun(spinDC,&SpinachDC::SetShowBonds));
-
-
-    mDisplay3D->SetRootFGNode(new MoleculeFG(GetRawSS()));
-    // mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));
-
-    mDisplay3D->GetDC().depthOnly=false;
-
-
     // add the panes to the manager
     wxAuiPaneInfo display3dinfo;
     display3dinfo.Center();
@@ -459,11 +444,6 @@ void RootFrame::OnEpr(wxCommandEvent& e) {
 
 void RootFrame::OnResize(wxSizeEvent&e) {
     mAuiManager->Update();
-}
-
-
-void RootFrame::OnGLReset(wxCommandEvent& e) {
-    mDisplay3D->SetRootSGNode(new MoleculeNodeNew(GetRawSS()));  
 }
 
 void RootFrame::OnBondToggle(wxCommandEvent& e) {

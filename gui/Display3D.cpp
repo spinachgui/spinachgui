@@ -30,12 +30,23 @@ Renderer::Renderer() {
 }
 
 Renderer::~Renderer() {
-    sigDying(this);
 }
 
-//============================================================// A
-// scene is a very special case of a renderer that can manage other
+void Renderer::Draw(const DisplaySettings& settings, PASS pass) {
+	for(vector<GLMode*>::iterator i = mModes.begin();i!=mModes.end();++i) {
+		(*i)->On();
+	}
+	Geometary();
+	for(vector<GLMode*>::iterator i = mModes.begin();i!=mModes.end();++i) {
+		(*i)->Off();
+	}
+}
+
+//============================================================// 
+// A scene is a very special case of a renderer that can manage other
 // renderers
+
+
 
 //============================================================//
 // Display3D class
@@ -45,14 +56,9 @@ Display3D::Display3D(wxWindow* parent)
     : wxGLCanvas(parent,(wxGLContext*)NULL,wxID_ANY,
                  wxDefaultPosition,wxDefaultSize,
                  0,wxT("Display3D"),
-                 gl_attribs),
-      mRootNode(NULL),
-	  mForgroundNode(NULL),
-      mDC() {
+                 gl_attribs) {
     mGLContext=NULL;
     mGLEnabled=false;
-
-    mSS=GetRawSS();
 
     mZoom=0.01 * OPENGL_SCALE;;
     mCamX=0.0;
@@ -86,8 +92,8 @@ Display3D::Display3D(wxWindow* parent)
 }
 
 Display3D::~Display3D() {
-    if(mRootNode) {
-        delete mRootNode;
+    if(mScene) {
+        delete mScene;
     }
 }
 
@@ -131,7 +137,7 @@ void Display3D::EnableGL() {
     glMatrixMode(GL_MODELVIEW);
 
     //Generate a texture for saving the depth buffer to
-    glGenTextures(1,&mTexDepth);
+    //glGenTextures(1,&mTexDepth);
     //Generate a texture for saving the depth buffer to
     //glGenFramebuffers(1,&mFB);
 }
@@ -250,17 +256,16 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT);
-	if(mRootNode) {
+	if(mScene) {
 		//Draw opaque objects first
 		glDepthMask(GL_TRUE);
-		mDC.pass=SpinachDC::SOLID;
-		mRootNode->Draw(mDisplaySettings,mDC);
+		mScene->Draw(mDisplaySettings,SOLID);
 		//Draw transparent/traslucent objects
 		glEnable (GL_BLEND);
 		glDepthMask(GL_FALSE);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		mDC.pass=SpinachDC::TRANSLUCENT;
-		mRootNode->Draw(mDisplaySettings,mDC);
+
+		mScene->Draw(mDisplaySettings,TRANSLUCENT);
 		glDisable (GL_BLEND);
 
 		//Work out a line the world coordinates of the mouse
@@ -287,14 +292,14 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 		glLoadIdentity();
 		glMultMatrixd(mvmatrix);
 
-		mDC.pass=SpinachDC::PICKING;
+
 		GLuint buff[2000];
 		GLint hits;
 		glSelectBuffer(2000,buff);  //glSelectBuffer goes before glRenderMode
 		glRenderMode(GL_SELECT);
 
 		glInitNames();
-		mRootNode->Draw(mDisplaySettings,mDC);
+		mScene->Draw(mDisplaySettings,PICKING);
 
 		hits=glRenderMode(GL_RENDER);
 		GLuint* pbuff=buff;

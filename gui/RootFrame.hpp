@@ -57,9 +57,6 @@ public:
 	//Unit Menu
 	void OnUnitChange(wxCommandEvent& e);
 
-    //Debug Menu
-    void OnGLReset(wxCommandEvent& e);
-
     //Signals
     sigc::signal<void,bool> sigSetShowBonds;
 

@@ -156,15 +156,20 @@ private:
 
 ///An abstract class who's job is to visualise part of a spin system
 ///such as spins, linear interactions or bonds.
-class Renderer : public sigc::trackable {
+class Renderer {
 public:
-    ///Construct a dirty Renderer
     Renderer();
-    ///Destruct the Renderer
     virtual ~Renderer();
 
-    virtual void Draw(const DisplaySettings& settings, PASS pass) = 0;
+	void SetModes(std::vector<GLMode*> modes) {mModes = modes;}
+
+    void Draw(const DisplaySettings& settings, PASS pass);
+protected:
+	virtual void Geometary();
+private:
+	std::vector<GLMode*> mModes;
 };
+
 
 ///Keeps a collection of renderers and manages gl state common to a
 ///scene, such as camera position, global rotation and lighting.
@@ -178,7 +183,8 @@ public:
 			delete (*i);
 		}
 	}
-	void Draw(const DisplaySettings& displaySettings,PASS pass) {
+protected:
+	void Geometary(const DisplaySettings& displaySettings,PASS pass) {
 		//loop and render
 		for(std::vector<Renderer*>::iterator i = mRenderers.begin();i != mRenderers.end();++i) {
 			(*i)->Draw(displaySettings,pass);

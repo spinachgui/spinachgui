@@ -117,12 +117,12 @@ void Display3D::PrintTransformMatricese() {
 
 
 void Display3D::EnableGL() {
-    //cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
-
     if(mGLContext == NULL) {
         mGLContext = new wxGLContext(this);
     }
     this->SetCurrent(*mGLContext);
+
+    cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
 
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClearDepth(1.0);
@@ -151,6 +151,7 @@ void Display3D::ResetView() {
 }
 
 void Display3D::ChangeViewport() {
+    cout << "Changing viewport" << endl;
     GetClientSize(&mWidth,&mHeight);
     glViewport(0,0,mWidth,mHeight);
 }
@@ -168,8 +169,6 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
     }
     mMouseX=e.GetX();
     mMouseY=e.GetY();
-
-
     Refresh();
 }
 
@@ -203,6 +202,9 @@ void Display3D::OnLeftClick(wxMouseEvent& e) {
 }
 
 void Display3D::OnResize(wxSizeEvent& e) {
+    int w,h;
+    GetClientSize(&w,&h);
+    cout << "Resize event, width=" << w << " height = " << h << endl;
     if(mGLEnabled) {
         ChangeViewport();
     }
@@ -213,12 +215,15 @@ void Display3D::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
 void Display3D::OnPaint(wxPaintEvent& e) {
+    cout << "onPaint" << endl;
+
+    wxPaintDC dc(this);
+
     if(!mGLEnabled) {
         mGLEnabled=true;
         EnableGL();
+	ChangeViewport();
     }
-
-    wxPaintDC dc(this);
 
     int width,height;
     GetClientSize(&width,&height);

@@ -8,29 +8,23 @@
 #include <shared/frame.hpp>
 #include <assert.h>
 
-#include <gui/SpinSysManager.hpp>
-
 #include <set>
 #include <algorithm>
 
 void PANIC(std::string s);
 
 
-class SelectionManager;
-
 class SpinachApp : public wxApp {
 public:
     ~SpinachApp();
     virtual bool OnInit();
     SpinXML::SpinSystem* GetSpinSystem() const {return mSS;}
-    SelectionManager* GetSelectionManager() const {return mSelectionManager;}
     const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
 
     sigc::signal<void> sigDying;
 private:
     SpinXML::SpinSystem* mSS;
     std::vector<SpinXML::ISpinSystemLoader*> mIOFilters;
-    SelectionManager* mSelectionManager;
 };
 
 #include <map>

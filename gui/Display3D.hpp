@@ -5,7 +5,6 @@
 #include <shared/spinsys.hpp>
 
 #include <wx/glcanvas.h>
-#include <boost/shared_ptr.hpp>
 
 #ifdef __linux__
 #include <GL/glx.h>
@@ -14,10 +13,7 @@
 #include <GL/glu.h>
 #include <sigc++/sigc++.h>
 
-#include <list>
 #include <map>
-
-#include <gui/SpinSysManager.hpp>
 
 ///The characteristic length scale of the objects we are
 ///rendering. Affects the positioning of the camera

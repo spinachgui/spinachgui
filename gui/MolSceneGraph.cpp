@@ -51,6 +51,7 @@ SpinDrawer::SpinDrawer() {
 }
 
 void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) {
+    cout << "SpinDrawer::Geometary" << endl;
     long count=GetSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 	Spin* spin=GetSS()->GetSpin(i);

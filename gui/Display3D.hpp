@@ -17,7 +17,7 @@
 
 ///The characteristic length scale of the objects we are
 ///rendering. Affects the positioning of the camera
-#define OPENGL_SCALE (1e-10)
+#define OPENGL_SCALE 1.0 //(1e-10)
 
 enum LAYER {
 	LAYER_DEFAULT = 0,
@@ -101,38 +101,39 @@ public:
 
 class GLLighting : public GLMode {
 public:
-	virtual void On() {
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		glEnable(GL_LIGHT1);
+    virtual void On() {
+	std::cout << "Lighting On" << std::endl;
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 
-		// GL_LIGHT0: the white light emitting light source
-		// Create light components for GL_LIGHT0
-		GLfloat ambientLight0[] =  {0.4, 0.4, 0.4, 1.0};
-		GLfloat diffuseLight0[] =  {0.6, 0.6, 0.6, 1.0};
-		GLfloat specularLight0[] = {0.8, 0.8, 0.8, 1.0};
-		GLfloat position0[] =      {-1.5, 1.0,-4.0, 1.0};
-		// Assign created components to GL_LIGHT0
-		glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
-		glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
-		glLightfv(GL_LIGHT0, GL_POSITION, position0);
+	// GL_LIGHT0: the white light emitting light source
+	// Create light components for GL_LIGHT0
+	GLfloat ambientLight0[] =  {0.4, 0.4, 0.4, 1.0};
+	GLfloat diffuseLight0[] =  {0.6, 0.6, 0.6, 1.0};
+	GLfloat specularLight0[] = {0.8, 0.8, 0.8, 1.0};
+	GLfloat position0[] =      {-1.5, 1.0,-4.0, 1.0};
+	// Assign created components to GL_LIGHT0
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
+	glLightfv(GL_LIGHT0, GL_POSITION, position0);
 
-		// GL_LIGHT1: the red light emitting light source
-		// Create light components for GL_LIGHT1
-		GLfloat ambientLight1[] =  {0.4, 0.4, 0.4, 1.0};
-		GLfloat diffuseLight1[] =  {0.6, 0.6, 0.6, 1.0};
-		GLfloat specularLight1[] = {0.8, 0.8, 0.8, 1.0};
-		GLfloat position1[] =      {1.5, 1.0, 4.0, 1.0};
-		// Assign created components to GL_LIGHT1
-		glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
-		glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
-		glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
-		glLightfv(GL_LIGHT1, GL_POSITION, position1);
-	}
-	virtual void Off() {
-		glDisable(GL_LIGHTING);
-	}
+	// GL_LIGHT1: the red light emitting light source
+	// Create light components for GL_LIGHT1
+	GLfloat ambientLight1[] =  {0.4, 0.4, 0.4, 1.0};
+	GLfloat diffuseLight1[] =  {0.6, 0.6, 0.6, 1.0};
+	GLfloat specularLight1[] = {0.8, 0.8, 0.8, 1.0};
+	GLfloat position1[] =      {1.5, 1.0, 4.0, 1.0};
+	// Assign created components to GL_LIGHT1
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
+	glLightfv(GL_LIGHT1, GL_POSITION, position1);
+    }
+    virtual void Off() {
+	glDisable(GL_LIGHTING);
+    }
 };
 
 class GLDepthLessEqual : public GLMode {
@@ -180,24 +181,34 @@ private:
 ///scene, such as camera position, global rotation and lighting.
 class Scene : public Renderer {
 public:
-	Scene(const std::vector<Renderer*>& renderers) 
-		: mRenderers(renderers) {
+    typedef std::vector<Renderer*> TRenderVec;
+    typedef std::vector<Renderer*>::iterator TRenderIt;
+    typedef std::vector<GLMode*> TModeVec;
+    typedef std::vector<GLMode*>::iterator TModeIt;
+    
+    Scene(const TRenderVec& renderers,const TModeVec& modes) 
+	: mRenderers(renderers), mModes(modes) {
+    }
+    ~Scene() {
+	for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
+	    delete (*i);
 	}
-	~Scene() {
-		for(std::vector<Renderer*>::iterator i = mRenderers.begin();i != mRenderers.end();++i) {
-			delete (*i);
-		}
-	}
+    }
 protected:
-	void Geometary(const DisplaySettings& displaySettings,PASS pass) {
-		//loop and render
-		for(std::vector<Renderer*>::iterator i = mRenderers.begin();i != mRenderers.end();++i) {
-			(*i)->Draw(displaySettings,pass);
-		}
+    void Geometary(const DisplaySettings& displaySettings,PASS pass) {
+	for(TModeIt i = mModes.begin();i != mModes.end();++i) {
+	    (*i)->On();
 	}
+	//loop and render
+	for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
+	    (*i)->Draw(displaySettings,pass);
+	}
+    }
 private:
-	std::vector<Renderer*> mRenderers;
+    TModeVec mModes;
+    TRenderVec mRenderers;
 };
+
 
 ///Manages interaction with the rest of the GUI including keeping the
 ///athorattive copy of DisplaySettings, managing the context, managing

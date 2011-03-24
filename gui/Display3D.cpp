@@ -197,7 +197,10 @@ void Display3D::OnDeleteSpinHover(wxCommandEvent& e) {
 
 void Display3D::OnPaint(wxPaintEvent& e) {
     cout << "onPaint" << endl;
-
+    if(!mScene) {
+	cout << "mScene is null" << endl;
+	return;
+    }
     wxPaintDC dc(this);
 
     if(!mGLEnabled) {
@@ -209,7 +212,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     int width,height;
     GetClientSize(&width,&height);
     mDisplaySettings.width=width;
-	mDisplaySettings.height=height;
+    mDisplaySettings.height=height;
 
     glMatrixMode(GL_PROJECTION);
     glOrtho(-width*mZoom, width*mZoom,
@@ -235,95 +238,102 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     glMultMatrixf(mRotationMatrix);
     glGetFloatv(GL_MODELVIEW_MATRIX,mRotationMatrix);
     glLoadIdentity();
-    gluLookAt(mCamX*OPENGL_SCALE,mCamY*OPENGL_SCALE,mCamZ*OPENGL_SCALE,0,0,0,0,1,0);
-    glMultMatrixf(mRotationMatrix);
+    gluLookAt(5,5,5,0,0,0,0,1,0);
+    //glMultMatrixf(mRotationMatrix);
 
     mDisplaySettings.mRotationMatrix=mRotationMatrix;
 
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glClear(GL_COLOR_BUFFER_BIT);
-	if(mScene) {
-		//Draw opaque objects first
-		glDepthMask(GL_TRUE);
-		mScene->Draw(mDisplaySettings,SOLID);
-		//Draw transparent/traslucent objects
-		glEnable (GL_BLEND);
-		glDepthMask(GL_FALSE);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
+    //Draw opaque objects first
+    //glDepthMask(GL_TRUE);
+    
+    gluSphere(mDisplaySettings.mSolidQuadric,1.0,20,20);
 
-		mScene->Draw(mDisplaySettings,TRANSLUCENT);
-		glDisable (GL_BLEND);
+    //mScene->Draw(mDisplaySettings,SOLID);
+    //Draw transparent/traslucent objects
+    /*glEnable (GL_BLEND);
+    glDepthMask(GL_FALSE);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		//Work out a line the world coordinates of the mouse
-		GLint viewport[4];
-		GLdouble mvmatrix[16],projmatrix[16];
-		glGetIntegerv(GL_VIEWPORT,viewport);
-		glGetDoublev(GL_MODELVIEW_MATRIX,mvmatrix);
-		glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
-		GLdouble worldFarX,  worldFarY ,worldFarZ;
-		GLdouble worldNearX, worldNearY,worldNearZ;
-		gluUnProject(mMouseX,height-mMouseY-1,1.0,mvmatrix,projmatrix,viewport,&worldFarX, &worldFarY ,&worldFarZ);
-		gluUnProject(mMouseX,height-mMouseY-1,0.0,mvmatrix,projmatrix,viewport,&worldNearX,&worldNearY,&worldNearZ);
+    mScene->Draw(mDisplaySettings,TRANSLUCENT);
+    glDisable (GL_BLEND);
 
-
-		//Draw in opengl picking mode
-		glDepthMask(GL_TRUE);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glClear(GL_DEPTH_BUFFER_BIT);
-		gluPickMatrix(mMouseX,viewport[3]-mMouseY,3.0, 3.0, viewport);
-		glMultMatrixd(projmatrix);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glMultMatrixd(mvmatrix);
+    //Work out a line the world coordinates of the mouse
+    GLint viewport[4];
+    GLdouble mvmatrix[16],projmatrix[16];
+    glGetIntegerv(GL_VIEWPORT,viewport);
+    glGetDoublev(GL_MODELVIEW_MATRIX,mvmatrix);
+    glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
+    GLdouble worldFarX,  worldFarY ,worldFarZ;
+    GLdouble worldNearX, worldNearY,worldNearZ;
+    gluUnProject(mMouseX,height-mMouseY-1,1.0,mvmatrix,projmatrix,viewport,&worldFarX, &worldFarY ,&worldFarZ);
+    gluUnProject(mMouseX,height-mMouseY-1,0.0,mvmatrix,projmatrix,viewport,&worldNearX,&worldNearY,&worldNearZ);
 
 
-		/*GLuint buff[2000];
-		GLint hits;
-		glSelectBuffer(2000,buff);  //glSelectBuffer goes before glRenderMode
-		glRenderMode(GL_SELECT);
+    //Draw in opengl picking mode
+    glDepthMask(GL_TRUE);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    gluPickMatrix(mMouseX,viewport[3]-mMouseY,3.0, 3.0, viewport);
+    glMultMatrixd(projmatrix);
 
-		glInitNames();
-		mScene->Draw(mDisplaySettings,PICKING);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMultMatrixd(mvmatrix);
 
-		hits=glRenderMode(GL_RENDER);
-		GLuint* pbuff=buff;
-		float closestDistance=HUGE_VAL;
-		GLuint* closestNames=NULL;
-		GLuint closestNameCount=0;
-		if(hits >0) {
-			for(long i=0;i<hits;i++) {
-				GLuint name_count = *(pbuff++);
-				float d1=float(*(pbuff++))/0x7fffffff;
-				float d2=float(*(pbuff++))/0x7fffffff;
-				float thisDistance=d1<d2 ? d1 : d2;
-				if(closestDistance > thisDistance) {
-					closestDistance=thisDistance;
-					closestNames=pbuff;
-					closestNameCount=name_count;
-				}
-				pbuff+=name_count;
-			}
-			switch(closestNames[0]){
-			case LAYER_SPINS:
-				SetHover(GetSS()->GetSpin(closestNames[1]));
-				break;
-			case LAYER_INTERACTIONS:
-				SetHover(NULL);
-				//NO_OP
-				break;
-			case LAYER_BONDS:
-				SetHover(NULL);
-				//NO_OP
-				break;
-			}
-		} else {
-			SetHover(NULL);
-			}*/
-	}
 
+    GLuint buff[2000];
+      GLint hits;
+      glSelectBuffer(2000,buff);  //glSelectBuffer goes before glRenderMode
+      glRenderMode(GL_SELECT);
+
+      glInitNames();
+      mScene->Draw(mDisplaySettings,PICKING);
+
+      hits=glRenderMode(GL_RENDER);
+      GLuint* pbuff=buff;
+      float closestDistance=HUGE_VAL;
+      GLuint* closestNames=NULL;
+      GLuint closestNameCount=0;
+      if(hits >0) {
+      for(long i=0;i<hits;i++) {
+      GLuint name_count = *(pbuff++);
+      float d1=float(*(pbuff++))/0x7fffffff;
+      float d2=float(*(pbuff++))/0x7fffffff;
+      float thisDistance=d1<d2 ? d1 : d2;
+      if(closestDistance > thisDistance) {
+      closestDistance=thisDistance;
+      closestNames=pbuff;
+      closestNameCount=name_count;
+      }
+      pbuff+=name_count;
+      }
+      switch(closestNames[0]){
+      case LAYER_SPINS:
+      SetHover(GetSS()->GetSpin(closestNames[1]));
+      break;
+      case LAYER_INTERACTIONS:
+      SetHover(NULL);
+      //NO_OP
+      break;
+      case LAYER_BONDS:
+      SetHover(NULL);
+      //NO_OP
+      break;
+      }
+      } else {
+      SetHover(NULL);
+      }*/
     SwapBuffers();
+    while (true) {
+      GLenum x = glGetError() ;
+
+      if ( x == GL_NO_ERROR )
+	  break;
+      cout << "OpenGL error:" << gluErrorString(x) << endl;
+    }
 }
 
 BEGIN_EVENT_TABLE(Display3D,wxGLCanvas)

@@ -46,4 +46,23 @@ protected:
 	virtual void Geometary(const DisplaySettings& settings, PASS pass);
 };
 
+class SpinSysScene : public Scene {
+public:
+    SpinSysScene()
+	: Scene(GetRenderers(),GetModes()) {
+    }
+
+private:
+    std::vector<GLMode*> GetModes() {
+	std::vector<GLMode*> out;
+	out.push_back(new GLLighting);
+	return out;
+    }
+    std::vector<Renderer*> GetRenderers() {
+	std::vector<Renderer*> out;
+	out.push_back(new SpinDrawer);
+	return out;
+    }
+};
+
 #endif

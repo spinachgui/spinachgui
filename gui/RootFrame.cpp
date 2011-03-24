@@ -226,7 +226,7 @@ void RootFrame::InitFrame() {
 
     //Setup the 3d display
 
-    mDisplay3D->SetScene(new SpinDrawer);
+    mDisplay3D->SetScene(new SpinSysScene);
 
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));

@@ -69,26 +69,7 @@ Display3D::Display3D(wxWindow* parent)
     mYTranslate=0 * OPENGL_SCALE;
     mXRotate=0;
     mYRotate=0;
-
-    mRotationMatrix[0 ]=1.0;
-    mRotationMatrix[1 ]=0.0;
-    mRotationMatrix[2 ]=0.0;
-    mRotationMatrix[3 ]=0.0;
-
-    mRotationMatrix[4 ]=0.0;
-    mRotationMatrix[5 ]=1.0;
-    mRotationMatrix[6 ]=0.0;
-    mRotationMatrix[7 ]=0.0;
-
-    mRotationMatrix[8 ]=0.0;
-    mRotationMatrix[9 ]=0.0;
-    mRotationMatrix[10]=1.0;
-    mRotationMatrix[11]=0.0;
-
-    mRotationMatrix[12]=0.0;
-    mRotationMatrix[13]=0.0;
-    mRotationMatrix[14]=0.0;
-    mRotationMatrix[15]=1.0;
+    ResetView();
 }
 
 Display3D::~Display3D() {

@@ -206,7 +206,6 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     if(!mGLEnabled) {
         mGLEnabled=true;
         EnableGL();
-	ChangeViewport();
     }
 
     int width,height;
@@ -215,28 +214,17 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     mDisplaySettings.height=height;
 
     glMatrixMode(GL_PROJECTION);
-    glOrtho(-width*mZoom, width*mZoom,
-            -height*mZoom, height*mZoom,
-            -40.0, 40.0);
+    //NB: glOrtho multiplies the current matrix so glLoadIdentity is
+    //vital
+    glLoadIdentity();
+    glOrtho(-5*width*mZoom ,5*width*mZoom,
+            -5*height*mZoom,5*height*mZoom,
+            1.0, 40.0);
 
     glMatrixMode(GL_MODELVIEW);
     //Take the opertunity to calculate the rotation matrix for the scene
     //TODO: This would be better handled on the CPU, it's only one
     //matrix. Change when matrix classes have been written
-    float dotProduct=(mXRotate*mXRotate+mYRotate*mYRotate);
-    float norm=sqrt(dotProduct);
-    glLoadIdentity();
-
-    if(norm != 0){ //Prevent division by zero errors
-        glRotatef(dotProduct,mYRotate/norm,mXRotate/norm,0);
-    }
-    glTranslatef(mXTranslate*mZoom,mYTranslate*mZoom,0);
-    mXRotate=0;
-    mYRotate=0;
-    mXTranslate=0;
-    mYTranslate=0;
-    glMultMatrixf(mRotationMatrix);
-    glGetFloatv(GL_MODELVIEW_MATRIX,mRotationMatrix);
     glLoadIdentity();
     gluLookAt(5,5,5,0,0,0,0,1,0);
     //glMultMatrixf(mRotationMatrix);
@@ -246,9 +234,9 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     glClear(GL_DEPTH_BUFFER_BIT);
     glClear(GL_COLOR_BUFFER_BIT);
     //Draw opaque objects first
-    //glDepthMask(GL_TRUE);
+    glDepthMask(GL_TRUE);
     
-    gluSphere(mDisplaySettings.mSolidQuadric,1.0,20,20);
+    gluSphere(mDisplaySettings.mSolidQuadric,0.1,20,20);
 
     //mScene->Draw(mDisplaySettings,SOLID);
     //Draw transparent/traslucent objects

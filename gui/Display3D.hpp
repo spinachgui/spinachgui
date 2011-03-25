@@ -2,6 +2,10 @@
 #ifndef _3DDISPLAY_H
 #define _3DDISPLAY_H
 
+#include <boost/foreach.hpp>
+#define foreach         BOOST_FOREACH
+#define foreach_reverse BOOST_REVERSE_FOREACH
+
 #include <shared/spinsys.hpp>
 
 #include <wx/glcanvas.h>
@@ -122,6 +126,38 @@ public:
     }
 };
 
+class ModeCollection : public GLMode {
+public:
+	ModeCollection(const std::vector<GLMode*>& modes) 
+		: mModes(modes) {
+	}
+	ModeCollection(GLMode* mode1) {
+		mModes.push_back(mode1);
+	}
+	ModeCollection(GLMode* mode1,GLMode* mode2) {
+		mModes.push_back(mode1);
+		mModes.push_back(mode2);
+	}
+	ModeCollection(GLMode* mode1,GLMode* mode2,GLMode* mode3) {
+		mModes.push_back(mode1);
+		mModes.push_back(mode2);
+		mModes.push_back(mode3);
+	}
+
+	virtual void On() const {
+		foreach(GLMode* mode, mModes) {
+			mode->On();
+		}
+	}
+	virtual void Off() const {
+		foreach_reverse(GLMode* mode, mModes) {
+			mode->Off();
+		}
+	}
+private:
+	std::vector<GLMode*> mModes;
+};
+
 ///An abstract class who's job is to visualise part of a spin system
 ///such as spins, linear interactions or bonds.
 class Renderer {
@@ -161,6 +197,39 @@ private:
     TRenderVec mRenderers;
 };
 
+class Camera {
+public:
+	Camera() 
+		: mEyeLocation(5,5,5), mEyeTarget(0,0,0),mZoom(0.001) {
+	}
+	void SetZoom(double zoom);
+	void Rotate(float deltaX,float deltaY) {
+		float dotProduct=(deltaX*deltaX+deltaY*deltaY);
+		float norm=sqrt(dotProduct);
+	}
+	void Set(int width,int height) const {
+		glMatrixMode(GL_PROJECTION);
+		//NB: glOrtho multiplies the current matrix so glLoadIdentity is
+		//vital
+		glLoadIdentity();
+		glOrtho(-width*mZoom ,width*mZoom,
+				-height*mZoom,height*mZoom,
+				1.0, 40.0);
+
+		glMatrixMode(GL_MODELVIEW);
+
+		glLoadIdentity();
+		gluLookAt(mEyeLocation.x(),mEyeLocation.y(),mEyeLocation.z(),
+				  mEyeTarget.x(),mEyeTarget.y(),mEyeTarget.z(),
+				  0,1,0);
+	}
+private:
+	//The camera starts at the origin
+	Vector3f mEyeLocation;
+	Vector3f mEyeTarget;
+
+	float mZoom;
+};
 
 ///Manages interaction with the rest of the GUI including keeping the
 ///athorattive copy of DisplaySettings, managing the context, managing
@@ -212,7 +281,7 @@ private:
     int mWidth,mHeight;
 
     //3D Variables
-    double mCamX,mCamY,mCamZ;
+	Camera* mCamera;
     float mRotationMatrix[16];
     float mXTranslate,mYTranslate;
     float mXRotate,mYRotate;

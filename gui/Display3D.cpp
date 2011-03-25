@@ -48,13 +48,12 @@ Display3D::Display3D(wxWindow* parent)
                  wxDefaultPosition,wxDefaultSize,
                  0,wxT("Display3D"),
                  gl_attribs) {
+	mCamera = new Camera;
+
     mGLContext=NULL;
     mGLEnabled=false;
 
     mZoom=0.01 * OPENGL_SCALE;;
-    mCamX=0.0;
-	mCamY=0.0;
-	mCamZ=1.0;
 
     mXTranslate=0 * OPENGL_SCALE;
     mYTranslate=0 * OPENGL_SCALE;
@@ -75,6 +74,9 @@ Display3D::~Display3D() {
     if(mScene) {
         delete mScene;
     }
+	if(mCamera) {
+		delete mCamera;
+	}
 }
 
 void Display3D::PrintTransformMatricese() {
@@ -202,20 +204,11 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     mDisplaySettings.width=width;
     mDisplaySettings.height=height;
 
-    glMatrixMode(GL_PROJECTION);
-    //NB: glOrtho multiplies the current matrix so glLoadIdentity is
-    //vital
-    glLoadIdentity();
-    glOrtho(-width*mZoom ,width*mZoom,
-            -height*mZoom,height*mZoom,
-            1.0, 40.0);
+	mCamera->Set(width,height);
 
-    glMatrixMode(GL_MODELVIEW);
     //Take the opertunity to calculate the rotation matrix for the scene
     //TODO: This would be better handled on the CPU, it's only one
     //matrix. Change when matrix classes have been written
-    glLoadIdentity();
-    gluLookAt(5,5,5,0,0,0,0,1,0);
     //glMultMatrixf(mRotationMatrix);
 
     mDisplaySettings.mRotationMatrix=mRotationMatrix;

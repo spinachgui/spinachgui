@@ -22,9 +22,16 @@ Renderer::Renderer() {
 Renderer::~Renderer() {
 }
 
+void Renderer::DrawWith(const GLMode& mode,const DisplaySettings& settings, PASS pass) const {
+    mode.On();
+    Geometary(settings,pass);
+    mode.Off();
+}
+
 void Renderer::Draw(const DisplaySettings& settings, PASS pass) const {
     Geometary(settings,pass);
 }
+
 
 //============================================================// 
 // A scene is a very special case of a renderer that can manage other
@@ -218,7 +225,9 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     //Draw opaque objects first
     glDepthMask(GL_TRUE);
     
-    mScene->Draw(mDisplaySettings,SOLID);
+    const static GLLighting lighting;
+
+    mScene->DrawWith(lighting,mDisplaySettings,SOLID);
     //Draw transparent/traslucent objects
     /*glEnable (GL_BLEND);
     glDepthMask(GL_FALSE);

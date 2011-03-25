@@ -56,6 +56,8 @@ private:
     std::vector<Renderer*> GetRenderers() {
 	std::vector<Renderer*> out;
 	out.push_back(new SpinDrawer);
+	out.push_back(new BondDrawer);
+	out.push_back(new LinearInterDrawer);
 	return out;
     }
 };

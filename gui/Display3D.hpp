@@ -87,7 +87,7 @@ public:
 
 class GLLighting : public GLMode {
 public:
-    virtual void On() {
+    virtual void On() const {
 	std::cout << "Lighting On" << std::endl;
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -117,33 +117,9 @@ public:
 	glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
 	glLightfv(GL_LIGHT1, GL_POSITION, position1);
     }
-    virtual void Off() {
+    virtual void Off() const {
 	glDisable(GL_LIGHTING);
     }
-};
-
-class GLDepthLessEqual : public GLMode {
-public:
-	virtual void On() {
-		glDepthFunc(GL_LEQUAL);
-	}
-	virtual void Off() {
-		glDepthFunc(GL_LESS);
-	}
-};
-
-template<typename T>
-class GLModeGuard {
-public:
-	GLModeGuard(T mode)
-		: mMode(mode) {
-		mMode.On();
-	}
-	~GLModeGuard() {
-		mMode.Off();
-	}
-private:
-	T mMode;
 };
 
 ///An abstract class who's job is to visualise part of a spin system
@@ -152,6 +128,7 @@ class Renderer {
 public:
     Renderer();
     virtual ~Renderer();
+    void DrawWith(const GLMode& mode,const DisplaySettings& settings, PASS pass) const;
     void Draw(const DisplaySettings& settings, PASS pass) const;
 protected:
     virtual void Geometary(const DisplaySettings& settings, PASS pass) const = 0;
@@ -172,11 +149,6 @@ public:
 	for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
 	    delete (*i);
 	}
-    }
-    void DrawWith(const GLMode* mode,const DisplaySettings& settings, PASS pass) const {
-	if(mode) mode->On();
-	Draw(settings,pass);
-	if(mode) mode->Off();
     }
 protected:
     void Geometary(const DisplaySettings& displaySettings,PASS pass) const {

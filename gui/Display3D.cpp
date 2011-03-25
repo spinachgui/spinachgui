@@ -12,16 +12,6 @@ using namespace std;
 using namespace SpinXML;
 
 //============================================================//
-// Device Context
-
-SpinachDC::SpinachDC()
-    : depthOnly(false) {
-}
-SpinachDC::~SpinachDC() {
-}
-
-
-//============================================================//
 // Abstract Renderer
 
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5};

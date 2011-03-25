@@ -77,20 +77,6 @@ enum PASS {
 	PICKING
 };
 
-
-///A class for storing all drawing options
-class SpinachDC : public sigc::trackable {
-public:
-    SpinachDC();
-    ~SpinachDC();
-
-    ///If true draw only to the depth buffer
-    bool depthOnly;
-
-    PASS pass;
-};
-
-
 ///An abstract base class using RAII for setting and unsetting GL
 ///modes
 class GLMode {

@@ -32,21 +32,10 @@ Display3D::Display3D(wxWindow* parent)
 
     mGLContext=NULL;
     mGLEnabled=false;
-
-    mZoom=0.01;
-
-    mXTranslate=0;
-    mYTranslate=0;
-    mXRotate=0;
-    mYRotate=0;
-    ResetView();
 }
 
 void Display3D::ResetView() {
-    mRotationMatrix[0 ]=1;  mRotationMatrix[1 ]=0;  mRotationMatrix[2 ]=0;  mRotationMatrix[3 ]=0;
-    mRotationMatrix[4 ]=0;  mRotationMatrix[5 ]=1;  mRotationMatrix[6 ]=0;  mRotationMatrix[7 ]=0;
-    mRotationMatrix[8 ]=0;  mRotationMatrix[9 ]=0;  mRotationMatrix[10]=1;  mRotationMatrix[11]=0;
-    mRotationMatrix[12]=0;  mRotationMatrix[13]=0;  mRotationMatrix[14]=0;  mRotationMatrix[15]=1;
+	cout << "Not implimented" << endl;
     Refresh();
 }
 
@@ -62,23 +51,6 @@ Display3D::~Display3D() {
 	}
 }
 
-void Display3D::PrintTransformMatricese() {
-    // get the current modelview matrix
-    GLfloat mv[16];
-    GLfloat p[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX , mv);
-    glGetFloatv(GL_PROJECTION_MATRIX , p);
-
-    cout << "(" << mv[0]  << "," << mv[1]  << "," << mv[2]  << "," << mv[3]  << endl
-         << " " << mv[4]  << "," << mv[5]  << "," << mv[6]  << "," << mv[7]  << "," << endl
-         << " " << mv[8]  << "," << mv[9]  << "," << mv[10] << "," << mv[11] << "," << endl
-         << " " << mv[12] << "," << mv[13] << "," << mv[14] << "," << mv[15] << "," << ")" << endl;
-
-    cout << "(" << p[0]  << "," << p[1]  << "," << p[2]  << "," << p[3]  << "," << endl
-         << " " << p[4]  << "," << p[5]  << "," << p[6]  << "," << p[7]  << "," << endl
-         << " " << p[8]  << "," << p[9]  << "," << p[10] << "," << p[11] << "," << endl
-         << " " << p[12] << "," << p[13] << "," << p[14] << "," << p[15] << ")" << endl;
-}
 
 
 void Display3D::EnableGL() {
@@ -117,7 +89,7 @@ void Display3D::ChangeViewport() {
 
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
-    if(e.Dragging() && e.RightIsDown()) {
+	/*  if(e.Dragging() && e.RightIsDown()) {
         mXTranslate=mXTranslate+(e.GetX()-mMouseX);
         mYTranslate=mYTranslate-(e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
@@ -126,16 +98,12 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
     } 
     mMouseX=e.GetX();
     mMouseY=e.GetY();
-    Refresh();
+    Refresh();*/
 }
 
 
 void Display3D::OnWheel(wxMouseEvent& e) {
-    mZoom=mZoom-(0.001)*e.GetWheelRotation()/e.GetWheelDelta();
-    if(mZoom<0.001) {
-        mZoom=0.001;
-    }
-    ChangeViewport();
+	mCamera->DeltaZoom(-(0.001)*e.GetWheelRotation()/e.GetWheelDelta());
     Refresh();
 }
 
@@ -189,8 +157,6 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     mDisplaySettings.height=height;
 
 	mCamera->Set(width,height);
-
-    mDisplaySettings.mRotationMatrix=mRotationMatrix;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Draw opaque objects first

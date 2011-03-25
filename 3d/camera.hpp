@@ -8,7 +8,8 @@
 class Camera {
 public:
 	Camera();
-	void SetZoom(double zoom);
+	void SetZoom(float zoom);
+	void DeltaZoom(float delta);
 	void Rotate(float deltaX,float deltaY);
 	void Set(int width,int height) const;
 private:

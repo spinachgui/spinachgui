@@ -39,7 +39,6 @@ struct DisplaySettings {
     GLUquadric* mSolidQuadric;
     GLUquadric* mWireQuadric;
     int width,height;
-    const float* mRotationMatrix;
 
     ///The size of the displayed interaction in units of energy/length,
     ///e.g. MHz/Nm

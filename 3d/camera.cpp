@@ -5,8 +5,15 @@
 Camera::Camera()
 	: mEyeLocation(5,5,5), mEyeTarget(0,0,0),mZoom(0.001) {
 }
-void Camera::SetZoom(double zoom) {
+void Camera::SetZoom(float zoom) {
+	mZoom = zoom;
+}
 
+void Camera::DeltaZoom(float deltaZoom) {
+    mZoom+=deltaZoom;
+    if(mZoom<0.001) {
+        mZoom=0.001;
+    }
 }
 
 void Camera::Rotate(float deltaX,float deltaY) {

@@ -51,7 +51,6 @@ public:
     void OnDirty() {Refresh();}
 	DisplaySettings* GetDisplaySettings() {return &mDisplaySettings;}
 
-    void PrintTransformMatricese();
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -73,15 +72,10 @@ private:
 
     //GUI State Variables
     double mHoverDist;
-    long mMouseX,mMouseY;
-    double mZoom;
     int mWidth,mHeight;
 
     //3D Variables
 	Camera* mCamera;
-    float mRotationMatrix[16];
-    float mXTranslate,mYTranslate;
-    float mXRotate,mYRotate;
 };
 
 #endif

@@ -21,6 +21,7 @@
 #include <shared/unit.hpp>
 
 using namespace SpinXML;
+using namespace Eigen;
 
 extern char spinxmlSchema[];
 extern unsigned int spinxmlSchemaSize;

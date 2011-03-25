@@ -55,31 +55,31 @@ namespace SpinXML {
 
     //Interaction converstions
     energy ConvertToScalar(const energy& inter);
-    energy ConvertToScalar(const Matrix3d& inter);
+    energy ConvertToScalar(const Eigen::Matrix3d& inter);
     energy ConvertToScalar(const Eigenvalues& inter);
     energy ConvertToScalar(const AxRhom& inter);
     energy ConvertToScalar(const SpanSkew& inter);
 
-    Matrix3d ConvertToMatrix(const energy& inter);
-    Matrix3d ConvertToMatrix(const Matrix3d& inter);
-    Matrix3d ConvertToMatrix(const Eigenvalues& inter);
-    Matrix3d ConvertToMatrix(const AxRhom& inter);
-    Matrix3d ConvertToMatrix(const SpanSkew& inter);
+    Eigen::Matrix3d ConvertToMatrix(const energy& inter);
+	Eigen::Matrix3d ConvertToMatrix(const Eigen::Matrix3d& inter);
+    Eigen::Matrix3d ConvertToMatrix(const Eigenvalues& inter);
+    Eigen::Matrix3d ConvertToMatrix(const AxRhom& inter);
+    Eigen::Matrix3d ConvertToMatrix(const SpanSkew& inter);
 
     Eigenvalues ConvertToEigenvalues(const energy& inter);
-    Eigenvalues ConvertToEigenvalues(const Matrix3d& inter);
+    Eigenvalues ConvertToEigenvalues(const Eigen::Matrix3d& inter);
     Eigenvalues ConvertToEigenvalues(const Eigenvalues& inter);
     Eigenvalues ConvertToEigenvalues(const AxRhom& inter);
     Eigenvalues ConvertToEigenvalues(const SpanSkew& inter);
 
     AxRhom ConvertToAxRhom(const energy& inter);
-    AxRhom ConvertToAxRhom(const Matrix3d& inter);
+    AxRhom ConvertToAxRhom(const Eigen::Matrix3d& inter);
     AxRhom ConvertToAxRhom(const Eigenvalues& inter);
     AxRhom ConvertToAxRhom(const AxRhom& inter);
     AxRhom ConvertToAxRhom(const SpanSkew& inter);
 
     SpanSkew ConvertToSpanSkew(const energy& inter);
-    SpanSkew ConvertToSpanSkew(const Matrix3d& inter);
+    SpanSkew ConvertToSpanSkew(const Eigen::Matrix3d& inter);
     SpanSkew ConvertToSpanSkew(const Eigenvalues& inter);
     SpanSkew ConvertToSpanSkew(const AxRhom& inter);
     SpanSkew ConvertToSpanSkew(const SpanSkew& inter);
@@ -140,7 +140,7 @@ namespace SpinXML {
             valid_or_throw();
         }
         ///Construct from a matrix
-        Interaction(const Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
+        Interaction(const Eigen::Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
             valid_or_throw();
         }
@@ -207,7 +207,7 @@ namespace SpinXML {
         ///If the Matrix sorage convention being used then this function will set
         ///the value of its argument to the appropreate value. Otherwise the
         ///result is undefined.
-        void GetMatrix(Matrix3d* OutMatrix) const;
+        void GetMatrix(Eigen::Matrix3d* OutMatrix) const;
         ///If the Eigenvalues sorage convention being used then this function will set
         ///the value of its arguments to the appropreate value. Otherwise the
         ///result is undefined.
@@ -224,7 +224,7 @@ namespace SpinXML {
         ///Set the value of the interaction using the scalar covention.
         void SetScalar(energy Scalar);
         ///Set the value of the interaction using the matrix covention.
-        void SetMatrix(const Matrix3d& InMatrix);
+        void SetMatrix(const Eigen::Matrix3d& InMatrix);
         ///Set the value of the interaction using the eigenvalue covention.
         void SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient);
         ///Set the value of the interaction using the axiality-rhombicity covention.
@@ -248,7 +248,7 @@ namespace SpinXML {
         void ToSpanSkew();
 
         energy      AsScalar() const;
-        Matrix3d    AsMatrix() const;
+        Eigen::Matrix3d    AsMatrix() const;
         Eigenvalues AsEigenvalues() const;
         AxRhom      AsAxRhom() const;
         SpanSkew    AsSpanSkew() const;
@@ -267,7 +267,7 @@ namespace SpinXML {
 
         void valid_or_throw() const;
 
-		typedef boost::variant<energy,Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
+		typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
 		var_t mData;
         Type mType;
 
@@ -312,7 +312,7 @@ namespace SpinXML {
         ///Set the value of the interaction using the scalar covention.
         void SetScalar(double Scalar);
         ///Set the value of the interaction using the matrix covention.
-        void SetMatrix(const Matrix3d& InMatrix);
+        void SetMatrix(const Eigen::Matrix3d& InMatrix);
         ///Set the value of the interaction using the eigenvalue covention.
         void SetEigenvalues(double XX,double YY,   double ZZ,  const Orientation& Orient);
         ///Set the value of the interaction using the axiality-rhombicity covention.
@@ -331,7 +331,7 @@ namespace SpinXML {
         void ToSpanSkew()    {mData->ToSpanSkew();}
 
         double       AsScalar() const;
-        Matrix3d     AsMatrix() const;
+        Eigen::Matrix3d     AsMatrix() const;
         UEigenvalues AsEigenvalues() const;
         UAxRhom      AsAxRhom() const;
         USpanSkew    AsSpanSkew() const;

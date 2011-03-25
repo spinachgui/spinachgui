@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace SpinXML;
+using namespace Eigen;
 
 void XYZLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
   ofstream fout(filename);

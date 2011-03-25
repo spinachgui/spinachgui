@@ -12,8 +12,6 @@
 #include <Eigen/Dense>
 #include <shared/interaction.hpp>
 
-using namespace Eigen;
-
 namespace SpinXML {
 	class SpinSystemView;
 
@@ -98,7 +96,7 @@ namespace SpinXML {
 
         ///Return all spins withing distance of point pos. Do not return
         ///skip all spins below Ignore
-        std::vector<Spin*> GetNearbySpins(Vector3d pos,length distance,Spin* Ignore=NULL);
+        std::vector<Spin*> GetNearbySpins(Eigen::Vector3d pos,length distance,Spin* Ignore=NULL);
 
         sigc::signal<void,Spin*,long> sigNewSpin;
         sigc::signal<void,Interaction*> sigNewInter;
@@ -166,7 +164,7 @@ namespace SpinXML {
 
         ///Return all spins withing distance of point pos. Do not return
         ///skip all spins below Ignore
-        std::vector<SpinView> GetNearbySpins(Vector3d pos,double distance,SpinView Ignore=SpinView(NULL,NULL,NULL));
+        std::vector<SpinView> GetNearbySpins(Eigen::Vector3d pos,double distance,SpinView Ignore=SpinView(NULL,NULL,NULL));
 
         sigc::signal<void,Spin*,long> sigNewSpin;
         sigc::signal<void,Interaction*> sigNewInter;

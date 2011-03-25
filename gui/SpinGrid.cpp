@@ -7,7 +7,7 @@
 #include <wx/debug.h>
 
 using namespace std;
-
+using namespace Eigen;
 using namespace SpinXML;
 
 const long ColumCount=7; 

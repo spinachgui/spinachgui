@@ -7,7 +7,6 @@
 #include <shared/orientation.hpp>
 #include <vector>
 
-using namespace Eigen;
 
 namespace SpinXML {
 
@@ -30,11 +29,11 @@ namespace SpinXML {
     ///possible.
     class Frame : public sigc::trackable {
     public:
-        Frame(Vector3d translation, Orientation rotation, const UnitSystem* unitSystem);
+        Frame(Eigen::Vector3d translation, Orientation rotation, const UnitSystem* unitSystem);
 		~Frame();
 
-        void SetTranslation(const Vector3d& vec);
-        const Vector3d& GetTranslation() const {return mTranslate;}
+        void SetTranslation(const Eigen::Vector3d& vec);
+        const Eigen::Vector3d& GetTranslation() const {return mTranslate;}
 
         void SetOrientation(const Orientation orient);
         const Orientation& GetOrientation() const {return mOrient;}
@@ -43,12 +42,12 @@ namespace SpinXML {
         ///transformation into this frame. In other words if v is a
         ///vector in the lab frame then f.getTransformFromLab() * v is a
         ///vector in the f frame. Units are SI
-        Matrix4d getTransformFromLab() const;
+        Eigen::Matrix4d getTransformFromLab() const;
         ///Return a 4x4 isometary matrix expression a transformation
         ///into this frame. In other words if v is a vector in the f
         ///frame then: f.getTransformToLab() * v is a vector in the
         ///lab frame. Units are SI
-        Matrix4d getTransformToLab() const;
+        Eigen::Matrix4d getTransformToLab() const;
 
         ///Returns the parent frame of this frame
         Frame* upOne() const {return mParent;}
@@ -68,10 +67,10 @@ namespace SpinXML {
         Frame* mParent;
 		std::vector<Frame*> mChildren;
 
-        Vector3d mTranslate;
+        Eigen::Vector3d mTranslate;
         Orientation mOrient;
-        Matrix4d mAffine;
-        Matrix4d mInvertedAffine;
+        Eigen::Matrix4d mAffine;
+        Eigen::Matrix4d mInvertedAffine;
 		const UnitSystem* mUnitSystem;
     };
 

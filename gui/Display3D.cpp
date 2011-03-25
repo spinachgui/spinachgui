@@ -8,35 +8,14 @@
 #include <iostream>
 #include <wx/file.h>
 
+#include <3d/glgeometry.hpp>
+#include <3d/glmode.hpp>
+#include <3d/camera.hpp>
+
 using namespace std;
 using namespace SpinXML;
 
-//============================================================//
-// Abstract Renderer
-
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5};
-
-Renderer::Renderer() {
-}
-
-Renderer::~Renderer() {
-}
-
-void Renderer::DrawWith(GLMode& mode,const DisplaySettings& settings, PASS pass) const {
-    mode.On();
-    Geometary(settings,pass);
-    mode.Off();
-}
-
-void Renderer::Draw(const DisplaySettings& settings, PASS pass) const {
-    Geometary(settings,pass);
-}
-
-
-//============================================================// 
-// A scene is a very special case of a renderer that can manage other
-// renderers
-
 
 
 //============================================================//
@@ -54,10 +33,10 @@ Display3D::Display3D(wxWindow* parent)
     mGLContext=NULL;
     mGLEnabled=false;
 
-    mZoom=0.01 * OPENGL_SCALE;;
+    mZoom=0.01;
 
-    mXTranslate=0 * OPENGL_SCALE;
-    mYTranslate=0 * OPENGL_SCALE;
+    mXTranslate=0;
+    mYTranslate=0;
     mXRotate=0;
     mYRotate=0;
     ResetView();

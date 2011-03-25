@@ -12,6 +12,8 @@
 #include <gui/RightClickMenu.hpp>
 #define ID_UNIT_START 12345
 
+#include <3d/glgeometry.hpp>
+
 using namespace std;
 using namespace SpinXML;
 using sigc::bind;

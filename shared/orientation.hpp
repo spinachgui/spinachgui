@@ -9,8 +9,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-using namespace Eigen;
-
 #define PI 3.141592653589793238462643
 using std::complex;
 
@@ -57,45 +55,45 @@ namespace SpinXML {
     //Rotation Converions
 
     EulerAngles ConvertToEuler(const EulerAngles& rot);
-    EulerAngles ConvertToEuler(const Matrix3d&    rot);
-    EulerAngles ConvertToEuler(const Quaterniond& rot);
-    EulerAngles ConvertToEuler(const AngleAxisd&   rot);
+    EulerAngles ConvertToEuler(const Eigen::Matrix3d&    rot);
+    EulerAngles ConvertToEuler(const Eigen::Quaterniond& rot);
+    EulerAngles ConvertToEuler(const Eigen::AngleAxisd&   rot);
 
-    Matrix3d    ConvertToDCM(const EulerAngles& rot);
-    Matrix3d    ConvertToDCM(const Matrix3d&    rot);
-    Matrix3d    ConvertToDCM(const Quaterniond& rot);
-    Matrix3d    ConvertToDCM(const AngleAxisd&   rot);
+    Eigen::Matrix3d    ConvertToDCM(const EulerAngles& rot);
+    Eigen::Matrix3d    ConvertToDCM(const Eigen::Matrix3d&    rot);
+    Eigen::Matrix3d    ConvertToDCM(const Eigen::Quaterniond& rot);
+    Eigen::Matrix3d    ConvertToDCM(const Eigen::AngleAxisd&   rot);
 
-    Quaterniond ConvertToQuaternion(const EulerAngles& rot);
-    Quaterniond ConvertToQuaternion(const Matrix3d&    rot);
-    Quaterniond ConvertToQuaternion(const Quaterniond& rot);
-    Quaterniond ConvertToQuaternion(const AngleAxisd&   rot);
+    Eigen::Quaterniond ConvertToQuaternion(const EulerAngles& rot);
+    Eigen::Quaterniond ConvertToQuaternion(const Eigen::Matrix3d&    rot);
+    Eigen::Quaterniond ConvertToQuaternion(const Eigen::Quaterniond& rot);
+    Eigen::Quaterniond ConvertToQuaternion(const Eigen::AngleAxisd&   rot);
 
-    AngleAxisd  ConvertToAngleAxis(const EulerAngles& rot);
-    AngleAxisd  ConvertToAngleAxis(const Matrix3d&    rot);
-    AngleAxisd  ConvertToAngleAxis(const Quaterniond& rot);
-    AngleAxisd  ConvertToAngleAxis(const AngleAxisd&   rot);
+    Eigen::AngleAxisd  ConvertToAngleAxis(const EulerAngles& rot);
+    Eigen::AngleAxisd  ConvertToAngleAxis(const Eigen::Matrix3d&    rot);
+    Eigen::AngleAxisd  ConvertToAngleAxis(const Eigen::Quaterniond& rot);
+    Eigen::AngleAxisd  ConvertToAngleAxis(const Eigen::AngleAxisd&   rot);
 
     //Uniform Rotation Normalisation
     EulerAngles NormalizeRotation(const EulerAngles& rot);
-    Matrix3d    NormalizeRotation(const Matrix3d& rot);
-    Quaterniond NormalizeRotation(const Quaterniond& rot);
-    AngleAxisd  NormalizeRotation(const AngleAxisd& rot);
+    Eigen::Matrix3d    NormalizeRotation(const Eigen::Matrix3d& rot);
+    Eigen::Quaterniond NormalizeRotation(const Eigen::Quaterniond& rot);
+    Eigen::AngleAxisd  NormalizeRotation(const Eigen::AngleAxisd& rot);
 
     ///Class for storing a 3 dimentional rotation
     class Orientation {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Constructs the identity rotation
-        Orientation() : mData(Quaterniond(1,0,0,0)) {}
+        Orientation() : mData(Eigen::Quaterniond(1,0,0,0)) {}
         ///Constructs an orientation from euler angles
         Orientation(const EulerAngles& ea) : mData(ea) {}
         ///Constructs an orientation from a matrix
-        Orientation(const Matrix3d& m) : mData(m) {}
+        Orientation(const Eigen::Matrix3d& m) : mData(m) {}
         ///Constructs an orientation from a quaternion
-        Orientation(const Quaterniond& q) : mData(q) {}
+        Orientation(const Eigen::Quaterniond& q) : mData(q) {}
         ///Constructs an orientation from an AngleAxis
-        Orientation(const AngleAxisd& aa) : mData(aa) {}
+        Orientation(const Eigen::AngleAxisd& aa) : mData(aa) {}
         ///Destructor
         ~Orientation() {};
 
@@ -122,7 +120,7 @@ namespace SpinXML {
         ///If the angle axis convention being used then this function will
         ///set its arugments to those values otherwise the result is
         ///undefined.
-        void GetAngleAxis(double* angle,Vector3d* axis) const;
+        void GetAngleAxis(double* angle,Eigen::Vector3d* axis) const;
         ///If the quaternion convention being used then this function will
         ///set its arguments to those values otherwise the result is
         ///undefined.
@@ -130,31 +128,31 @@ namespace SpinXML {
         ///If the eigensystem convention is being used then this function
         ///will set its arguments to the appropriate values otherwise the
         ///result is undefined.
-        void GetDCM(Matrix3d* matrix) const;
+        void GetDCM(Eigen::Matrix3d* matrix) const;
 
-        Vector3d Apply(Vector3d v) const;
+        Eigen::Vector3d Apply(Eigen::Vector3d v) const;
 
         const Orientation& operator=(const EulerAngles& ea) {mData = ea; return *this;}
-        const Orientation& operator=(const AngleAxisd& aa)  {mData = aa; return *this;}
-        const Orientation& operator=(const Matrix3d& m)     {mData = m;  return *this;}
-        const Orientation& operator=(const Quaterniond& q)  {mData = q;  return *this;}
+        const Orientation& operator=(const Eigen::AngleAxisd& aa)  {mData = aa; return *this;}
+        const Orientation& operator=(const Eigen::Matrix3d& m)     {mData = m;  return *this;}
+        const Orientation& operator=(const Eigen::Quaterniond& q)  {mData = q;  return *this;}
 
         bool operator==(const Orientation& o) const {
 			using boost::get;
             if(o.mData.type()==typeid(EulerAngles))	return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
-            if(o.mData.type()==typeid(AngleAxisd))
-                return get<AngleAxisd>(o.mData).angle()==get<AngleAxisd>(mData).angle()
-                    && get<AngleAxisd>(o.mData).axis()==get<AngleAxisd>(mData).axis();
-            if(o.mData.type()==typeid(Quaterniond))
-                return get<Quaterniond>(o.mData).w()==get<Quaterniond>(mData).w()
-                    && get<Quaterniond>(o.mData).x()==get<Quaterniond>(mData).x()
-                    && get<Quaterniond>(o.mData).y()==get<Quaterniond>(mData).y()
-                    && get<Quaterniond>(o.mData).z()==get<Quaterniond>(mData).z();
-            if(o.mData.type()==typeid(Matrix3d))    return get<Matrix3d>   (o.mData)==get<Matrix3d>   (mData);
+            if(o.mData.type()==typeid(Eigen::AngleAxisd))
+                return get<Eigen::AngleAxisd>(o.mData).angle()==get<Eigen::AngleAxisd>(mData).angle()
+                    && get<Eigen::AngleAxisd>(o.mData).axis()==get<Eigen::AngleAxisd>(mData).axis();
+            if(o.mData.type()==typeid(Eigen::Quaterniond))
+                return get<Eigen::Quaterniond>(o.mData).w()==get<Eigen::Quaterniond>(mData).w()
+                    && get<Eigen::Quaterniond>(o.mData).x()==get<Eigen::Quaterniond>(mData).x()
+                    && get<Eigen::Quaterniond>(o.mData).y()==get<Eigen::Quaterniond>(mData).y()
+                    && get<Eigen::Quaterniond>(o.mData).z()==get<Eigen::Quaterniond>(mData).z();
+            if(o.mData.type()==typeid(Eigen::Matrix3d))    return get<Eigen::Matrix3d>   (o.mData)==get<Eigen::Matrix3d>   (mData);
         }
 
         ///Converts to a rotation matrix
-        Matrix3d GetAsMatrix() const;
+        Eigen::Matrix3d GetAsMatrix() const;
 
         ///returns a representation of the orientation as a string that is
         ///both machiene parsable and human readable.
@@ -164,12 +162,12 @@ namespace SpinXML {
         void FromString(std::string string);
 
         EulerAngles GetAsEuler() const;
-        Matrix3d    GetAsDCM() const;
-        AngleAxisd  GetAsAngleAxis() const;
-        Quaterniond GetAsQuaternion() const;
+        Eigen::Matrix3d    GetAsDCM() const;
+        Eigen::AngleAxisd  GetAsAngleAxis() const;
+        Eigen::Quaterniond GetAsQuaternion() const;
 
     private:
-        typedef boost::variant<EulerAngles,AngleAxisd,Quaterniond,Matrix3d> var_t;
+        typedef boost::variant<EulerAngles,Eigen::AngleAxisd,Eigen::Quaterniond,Eigen::Matrix3d> var_t;
         var_t mData;
     };
 };

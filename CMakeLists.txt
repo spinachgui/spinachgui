@@ -54,7 +54,9 @@ set(Boost_LIBRARIES  -lboost_program_options -lboost_unit_test_framework -lboost
 file(GLOB sharedSources shared/*.cpp)
 file(GLOB formatSources shared/formats/*.cpp)
 file(GLOB guiSources gui/*.cpp)
-set(guiSources ${guiSources} gui/schema_import.s)
+file(GLOB threeDeeSources 3d/*.cpp)
+
+set(guiSources ${guiSources} ${threeDeeSources} gui/schema_import.s)
 set(wxformbuilderSources ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp)
 set(xmlSources           ${CMAKE_CURRENT_BINARY_DIR}/auto/spinxml_schema.cpp)
 

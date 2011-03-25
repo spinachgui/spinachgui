@@ -5,6 +5,7 @@
 using namespace std;
 using namespace SpinXML;
 using namespace sigc;
+using namespace Eigen;
 
 //============================================================//
 // Gobal Singals

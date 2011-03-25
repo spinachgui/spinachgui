@@ -22,7 +22,7 @@ Renderer::Renderer() {
 Renderer::~Renderer() {
 }
 
-void Renderer::DrawWith(const GLMode& mode,const DisplaySettings& settings, PASS pass) const {
+void Renderer::DrawWith(GLMode& mode,const DisplaySettings& settings, PASS pass) const {
     mode.On();
     Geometary(settings,pass);
     mode.Off();
@@ -49,6 +49,7 @@ Display3D::Display3D(wxWindow* parent)
                  0,wxT("Display3D"),
                  gl_attribs) {
 	mCamera = new Camera;
+	mPicking = new GLPicking(2000);
 
     mGLContext=NULL;
     mGLEnabled=false;
@@ -76,6 +77,9 @@ Display3D::~Display3D() {
     }
 	if(mCamera) {
 		delete mCamera;
+	}
+	if(mPicking) {
+		delete mPicking;
 	}
 }
 
@@ -106,8 +110,10 @@ void Display3D::EnableGL() {
 
     cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
 
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(1.0, 1.0, 1.0, 0.0);
     glClearDepth(1.0);
+	glEnable (GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
 
     glShadeModel(GL_SMOOTH);
     //Adpated from a detailed tutorail on opengl lighting located at
@@ -187,10 +193,9 @@ void Display3D::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
 void Display3D::OnPaint(wxPaintEvent& e) {
-    cout << "onPaint" << endl;
     if(!mScene) {
-	cout << "mScene is null" << endl;
-	return;
+		cout << "mScene is null" << endl;
+		return;
     }
     wxPaintDC dc(this);
 
@@ -206,104 +211,73 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
 	mCamera->Set(width,height);
 
-    //Take the opertunity to calculate the rotation matrix for the scene
-    //TODO: This would be better handled on the CPU, it's only one
-    //matrix. Change when matrix classes have been written
-    //glMultMatrixf(mRotationMatrix);
-
     mDisplaySettings.mRotationMatrix=mRotationMatrix;
 
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Draw opaque objects first
-    glDepthMask(GL_TRUE);
     
-    const static GLLighting lighting;
-
+    static GLLighting lighting;
     mScene->DrawWith(lighting,mDisplaySettings,SOLID);
+
+	mScene->DrawWith(*mPicking,mDisplaySettings,SOLID);
+	ProcessHits();
     //Draw transparent/traslucent objects
     /*glEnable (GL_BLEND);
-    glDepthMask(GL_FALSE);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	  glDepthMask(GL_FALSE);
+	  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    mScene->Draw(mDisplaySettings,TRANSLUCENT);
-    glDisable (GL_BLEND);
+	  mScene->Draw(mDisplaySettings,TRANSLUCENT);
+	  glDisable (GL_BLEND);
+	*/
 
-    //Work out a line the world coordinates of the mouse
-    GLint viewport[4];
-    GLdouble mvmatrix[16],projmatrix[16];
-    glGetIntegerv(GL_VIEWPORT,viewport);
-    glGetDoublev(GL_MODELVIEW_MATRIX,mvmatrix);
-    glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
-    GLdouble worldFarX,  worldFarY ,worldFarZ;
-    GLdouble worldNearX, worldNearY,worldNearZ;
-    gluUnProject(mMouseX,height-mMouseY-1,1.0,mvmatrix,projmatrix,viewport,&worldFarX, &worldFarY ,&worldFarZ);
-    gluUnProject(mMouseX,height-mMouseY-1,0.0,mvmatrix,projmatrix,viewport,&worldNearX,&worldNearY,&worldNearZ);
-
-
-    //Draw in opengl picking mode
-    glDepthMask(GL_TRUE);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glClear(GL_DEPTH_BUFFER_BIT);
-    gluPickMatrix(mMouseX,viewport[3]-mMouseY,3.0, 3.0, viewport);
-    glMultMatrixd(projmatrix);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glMultMatrixd(mvmatrix);
-
-
-    GLuint buff[2000];
-      GLint hits;
-      glSelectBuffer(2000,buff);  //glSelectBuffer goes before glRenderMode
-      glRenderMode(GL_SELECT);
-
-      glInitNames();
-      mScene->Draw(mDisplaySettings,PICKING);
-
-      hits=glRenderMode(GL_RENDER);
-      GLuint* pbuff=buff;
-      float closestDistance=HUGE_VAL;
-      GLuint* closestNames=NULL;
-      GLuint closestNameCount=0;
-      if(hits >0) {
-      for(long i=0;i<hits;i++) {
-      GLuint name_count = *(pbuff++);
-      float d1=float(*(pbuff++))/0x7fffffff;
-      float d2=float(*(pbuff++))/0x7fffffff;
-      float thisDistance=d1<d2 ? d1 : d2;
-      if(closestDistance > thisDistance) {
-      closestDistance=thisDistance;
-      closestNames=pbuff;
-      closestNameCount=name_count;
-      }
-      pbuff+=name_count;
-      }
-      switch(closestNames[0]){
-      case LAYER_SPINS:
-      SetHover(GetSS()->GetSpin(closestNames[1]));
-      break;
-      case LAYER_INTERACTIONS:
-      SetHover(NULL);
-      //NO_OP
-      break;
-      case LAYER_BONDS:
-      SetHover(NULL);
-      //NO_OP
-      break;
-      }
-      } else {
-      SetHover(NULL);
-      }*/
     SwapBuffers();
     while (true) {
-      GLenum x = glGetError() ;
+		GLenum x = glGetError() ;
 
-      if ( x == GL_NO_ERROR )
-	  break;
-      cout << "OpenGL error:" << gluErrorString(x) << endl;
+		if ( x == GL_NO_ERROR )
+			break;
+		cout << "OpenGL error:" << gluErrorString(x) << endl;
     }
+}
+
+void Display3D::ProcessHits() {
+	pair<long,GLuint*> tupple = mPicking->GetBuffer();
+	long hits = tupple.first;
+	GLuint* buff = tupple.second;
+
+	float closestDistance=HUGE_VAL;
+	GLuint* closestNames=NULL;
+	GLuint closestNameCount=0;
+	if(hits >0) {
+		for(long i=0;i<hits;i++) {
+			GLuint name_count = *(buff++);
+			float d1=float(*(buff++))/0x7fffffff;
+			float d2=float(*(buff++))/0x7fffffff;
+			float thisDistance=d1<d2 ? d1 : d2;
+			if(closestDistance > thisDistance) {
+				closestDistance=thisDistance;
+				closestNames=buff;
+				closestNameCount=name_count;
+			}
+			buff+=name_count;
+		}
+		switch(closestNames[0]){
+		case LAYER_SPINS:
+			SetHover(GetSS()->GetSpin(closestNames[1]));
+			break;
+		case LAYER_INTERACTIONS:
+			SetHover(NULL);
+			//NO_OP
+			break;
+		case LAYER_BONDS:
+			SetHover(NULL);
+			//NO_OP
+			break;
+		}
+	} else {
+		SetHover(NULL);
+	}
+	
 }
 
 BEGIN_EVENT_TABLE(Display3D,wxGLCanvas)

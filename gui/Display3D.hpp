@@ -85,13 +85,13 @@ enum PASS {
 ///modes
 class GLMode {
 public:
-	virtual void On()  const = 0;
-	virtual void Off() const = 0;
+	virtual void On()  = 0;
+	virtual void Off() = 0;
 };
 
 class GLLighting : public GLMode {
 public:
-    virtual void On() const {
+    virtual void On()  {
 	std::cout << "Lighting On" << std::endl;
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -121,9 +121,69 @@ public:
 	glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight1);
 	glLightfv(GL_LIGHT1, GL_POSITION, position1);
     }
-    virtual void Off() const {
+    virtual void Off() {
 	glDisable(GL_LIGHTING);
     }
+};
+
+class GLTranslucent : public GLMode {
+public:
+	virtual void On()  {
+		glEnable (GL_BLEND);
+		glDepthMask(GL_FALSE);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	virtual void Off() {
+		glDepthMask(GL_TRUE);
+		glDisable (GL_BLEND);
+	}
+};
+
+class GLPicking : public GLMode {
+public:
+	GLPicking(long len) 
+		: mLen(len),mHits(0),mBuff(new GLuint[len]),mMouseX(0),mMouseY(0) {
+
+	}
+	~GLPicking() {
+		if(mBuff) {
+			delete [] mBuff;
+		}
+	}
+	void SetMouseXY(long mouseX,long mouseY) {
+		mMouseX = mouseX;
+		mMouseY = mouseY;
+	}
+	std::pair<long,GLuint*> GetBuffer() const {
+		return std::pair<long,GLuint*>(mHits,mBuff);
+	}
+	virtual void On() {
+		glSelectBuffer(mLen,mBuff);  //glSelectBuffer goes before glRenderMode
+		glRenderMode(GL_SELECT);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		
+		GLint    viewport[4];
+		GLdouble projmatrix[16];
+		glGetIntegerv(GL_VIEWPORT,viewport);
+		glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
+		
+		gluPickMatrix(mMouseX,viewport[3]-mMouseY,3.0, 3.0, viewport);
+		glMultMatrixd(projmatrix);
+
+		glInitNames();
+		glMatrixMode(GL_MODELVIEW);
+	}
+	virtual void Off() {
+		mHits=glRenderMode(GL_RENDER);
+	}
+private:
+	long mLen;
+	long mHits;
+	GLuint* mBuff;
+    long mMouseX,mMouseY;
 };
 
 class ModeCollection : public GLMode {
@@ -144,12 +204,12 @@ public:
 		mModes.push_back(mode3);
 	}
 
-	virtual void On() const {
+	virtual void On() {
 		foreach(GLMode* mode, mModes) {
 			mode->On();
 		}
 	}
-	virtual void Off() const {
+	virtual void Off() {
 		foreach_reverse(GLMode* mode, mModes) {
 			mode->Off();
 		}
@@ -164,7 +224,7 @@ class Renderer {
 public:
     Renderer();
     virtual ~Renderer();
-    void DrawWith(const GLMode& mode,const DisplaySettings& settings, PASS pass) const;
+    void DrawWith(GLMode& mode,const DisplaySettings& settings, PASS pass) const;
     void Draw(const DisplaySettings& settings, PASS pass) const;
 protected:
     virtual void Geometary(const DisplaySettings& settings, PASS pass) const = 0;
@@ -264,10 +324,12 @@ protected:
 
     void EnableGL();
     void ChangeViewport();
+	void ProcessHits();
 private:
 
     //These nodes can be rotated and translated  with the mouse
     Renderer* mScene;
+	GLPicking* mPicking;
 
 	DisplaySettings mDisplaySettings;
 

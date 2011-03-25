@@ -95,8 +95,8 @@ public:
 ///modes
 class GLMode {
 public:
-	virtual void On()  = 0;
-	virtual void Off() = 0;
+	virtual void On()  const = 0;
+	virtual void Off() const = 0;
 };
 
 class GLLighting : public GLMode {
@@ -166,14 +166,10 @@ class Renderer {
 public:
     Renderer();
     virtual ~Renderer();
-
-	void SetModes(std::vector<GLMode*> modes) {mModes = modes;}
-
-    void Draw(const DisplaySettings& settings, PASS pass);
+    void Draw(const DisplaySettings& settings, PASS pass) const;
 protected:
-	virtual void Geometary(const DisplaySettings& settings, PASS pass) = 0;
+    virtual void Geometary(const DisplaySettings& settings, PASS pass) const = 0;
 private:
-	std::vector<GLMode*> mModes;
 };
 
 
@@ -182,30 +178,28 @@ private:
 class Scene : public Renderer {
 public:
     typedef std::vector<Renderer*> TRenderVec;
-    typedef std::vector<Renderer*>::iterator TRenderIt;
-    typedef std::vector<GLMode*> TModeVec;
-    typedef std::vector<GLMode*>::iterator TModeIt;
-    
-    Scene(const TRenderVec& renderers,const TModeVec& modes) 
-	: mRenderers(renderers), mModes(modes) {
+    typedef std::vector<Renderer*>::const_iterator TRenderIt;
+    Scene(const TRenderVec& renderers) 
+	: mRenderers(renderers) {
     }
     ~Scene() {
 	for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
 	    delete (*i);
 	}
     }
+    void DrawWith(const GLMode* mode,const DisplaySettings& settings, PASS pass) const {
+	if(mode) mode->On();
+	Draw(settings,pass);
+	if(mode) mode->Off();
+    }
 protected:
-    void Geometary(const DisplaySettings& displaySettings,PASS pass) {
-	for(TModeIt i = mModes.begin();i != mModes.end();++i) {
-	    (*i)->On();
-	}
+    void Geometary(const DisplaySettings& displaySettings,PASS pass) const {
 	//loop and render
 	for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
 	    (*i)->Draw(displaySettings,pass);
 	}
     }
 private:
-    TModeVec mModes;
     TRenderVec mRenderers;
 };
 

@@ -50,16 +50,16 @@ void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u,const DisplaySetti
 SpinDrawer::SpinDrawer() {
 }
 
-void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) {
+void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
     cout << "SpinDrawer::Geometary" << endl;
     long count=GetSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 	Spin* spin=GetSS()->GetSpin(i);
 	if(spin->GetElement() != 0){
 	    glPushMatrix();
-	    glTranslatef(spin->GetPosition().x(),
-			 spin->GetPosition().y(),
-			 spin->GetPosition().z());
+	    glTranslatef(spin->GetPosition().x() / Angstroms,
+			 spin->GetPosition().y() / Angstroms,
+			 spin->GetPosition().z() / Angstroms);
 	}
 	const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
 	GLfloat material[4]; material[3]=0.0f;
@@ -96,7 +96,7 @@ BondDrawer::BondDrawer() {
     //SetMaterial(blueMaterial);	
 }
 
-void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) {
+void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
     long count=GetSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 	Spin* spin=GetSS()->GetSpin(i);
@@ -113,8 +113,8 @@ void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) {
 	    Vector3d mR1=spin->GetPosition();
 	    Vector3d mR2=nearby[j]->GetPosition();
 
-	    double x1=mR1.x() * Angstroms,y1=mR1.y() * Angstroms,z1=mR1.z() * Angstroms;
-	    double x2=mR2.x() * Angstroms,y2=mR2.y() * Angstroms,z2=mR2.z() * Angstroms;
+	    double x1=mR1.x() / Angstroms,y1=mR1.y() / Angstroms,z1=mR1.z() / Angstroms;
+	    double x2=mR2.x() / Angstroms,y2=mR2.y() / Angstroms,z2=mR2.z() / Angstroms;
 
 	    double len=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
@@ -133,7 +133,7 @@ void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) {
 LinearInterDrawer::LinearInterDrawer() {
 }
 
-void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) {
+void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
 
 }
 
@@ -170,7 +170,7 @@ void DrawFrameRecursive(Frame* frame) {
 	glPopMatrix();
 }
 
-void FrameDrawer::Geometary(const DisplaySettings&, PASS) {
+void FrameDrawer::Geometary(const DisplaySettings&, PASS) const {
     static const GLfloat white[] = {0.5, 0.5, 0.5};
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
 	Frame* frame = GetRawSS()->GetLabFrame();

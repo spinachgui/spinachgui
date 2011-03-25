@@ -32,14 +32,8 @@ Renderer::Renderer() {
 Renderer::~Renderer() {
 }
 
-void Renderer::Draw(const DisplaySettings& settings, PASS pass) {
-	for(vector<GLMode*>::iterator i = mModes.begin();i!=mModes.end();++i) {
-		(*i)->On();
-	}
-	Geometary(settings,pass);
-	for(vector<GLMode*>::iterator i = mModes.begin();i!=mModes.end();++i) {
-		(*i)->Off();
-	}
+void Renderer::Draw(const DisplaySettings& settings, PASS pass) const {
+    Geometary(settings,pass);
 }
 
 //============================================================// 
@@ -70,6 +64,14 @@ Display3D::Display3D(wxWindow* parent)
     mXRotate=0;
     mYRotate=0;
     ResetView();
+}
+
+void Display3D::ResetView() {
+    mRotationMatrix[0 ]=1;  mRotationMatrix[1 ]=0;  mRotationMatrix[2 ]=0;  mRotationMatrix[3 ]=0;
+    mRotationMatrix[4 ]=0;  mRotationMatrix[5 ]=1;  mRotationMatrix[6 ]=0;  mRotationMatrix[7 ]=0;
+    mRotationMatrix[8 ]=0;  mRotationMatrix[9 ]=0;  mRotationMatrix[10]=1;  mRotationMatrix[11]=0;
+    mRotationMatrix[12]=0;  mRotationMatrix[13]=0;  mRotationMatrix[14]=0;  mRotationMatrix[15]=1;
+    Refresh();
 }
 
 Display3D::~Display3D() {
@@ -123,14 +125,6 @@ void Display3D::EnableGL() {
     //glGenFramebuffers(1,&mFB);
 }
 
-void Display3D::ResetView() {
-    mRotationMatrix[0 ]=1;  mRotationMatrix[1 ]=0;  mRotationMatrix[2 ]=0;  mRotationMatrix[3 ]=0;
-    mRotationMatrix[4 ]=0;  mRotationMatrix[5 ]=1;  mRotationMatrix[6 ]=0;  mRotationMatrix[7 ]=0;
-    mRotationMatrix[8 ]=0;  mRotationMatrix[9 ]=0;  mRotationMatrix[10]=1;  mRotationMatrix[11]=0;
-    mRotationMatrix[12]=0;  mRotationMatrix[13]=0;  mRotationMatrix[14]=0;  mRotationMatrix[15]=1;
-    Refresh();
-}
-
 void Display3D::ChangeViewport() {
     cout << "Changing viewport" << endl;
     GetClientSize(&mWidth,&mHeight);
@@ -140,14 +134,12 @@ void Display3D::ChangeViewport() {
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
     if(e.Dragging() && e.RightIsDown()) {
-        mXTranslate=mXTranslate+(e.GetX()-mMouseX)*OPENGL_SCALE;
-        mYTranslate=mYTranslate-(e.GetY()-mMouseY)*OPENGL_SCALE;
+        mXTranslate=mXTranslate+(e.GetX()-mMouseX);
+        mYTranslate=mYTranslate-(e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
         mXRotate=mXRotate+(e.GetX()-mMouseX);
         mYRotate=mYRotate+(e.GetY()-mMouseY);
-    } else {
-
-    }
+    } 
     mMouseX=e.GetX();
     mMouseY=e.GetY();
     Refresh();
@@ -155,31 +147,31 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
 
 
 void Display3D::OnWheel(wxMouseEvent& e) {
-    mZoom=mZoom-(0.001 * OPENGL_SCALE)*e.GetWheelRotation()/e.GetWheelDelta();
-    if(mZoom<0.001 * OPENGL_SCALE) {
-        mZoom=0.001 * OPENGL_SCALE;
+    mZoom=mZoom-(0.001)*e.GetWheelRotation()/e.GetWheelDelta();
+    if(mZoom<0.001) {
+        mZoom=0.001;
     }
     ChangeViewport();
     Refresh();
 }
 
 void Display3D::OnRightClick(wxMouseEvent& e) {
-	if(!e.Dragging()) {
-		if(GetHover()!=NULL) {
-			RightClickMenu* menu = new RightClickMenu(this);
-			menu->Build();
-			PopupMenu(menu);
-			delete menu;
-		}
+    if(!e.Dragging()) {
+	if(GetHover()!=NULL) {
+	    RightClickMenu* menu = new RightClickMenu(this);
+	    menu->Build();
+	    PopupMenu(menu);
+	    delete menu;
 	}
+    }
 }
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(!e.ShiftDown()) {
-		AddSelection(GetHover());
+	AddSelection(GetHover());
     } else {
-		AddSelection(GetHover());
-	}
+	AddSelection(GetHover());
+    }
 }
 
 void Display3D::OnResize(wxSizeEvent& e) {
@@ -217,8 +209,8 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     //NB: glOrtho multiplies the current matrix so glLoadIdentity is
     //vital
     glLoadIdentity();
-    glOrtho(-5*width*mZoom ,5*width*mZoom,
-            -5*height*mZoom,5*height*mZoom,
+    glOrtho(-width*mZoom ,width*mZoom,
+            -height*mZoom,height*mZoom,
             1.0, 40.0);
 
     glMatrixMode(GL_MODELVIEW);
@@ -236,9 +228,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     //Draw opaque objects first
     glDepthMask(GL_TRUE);
     
-    gluSphere(mDisplaySettings.mSolidQuadric,0.1,20,20);
-
-    //mScene->Draw(mDisplaySettings,SOLID);
+    mScene->Draw(mDisplaySettings,SOLID);
     //Draw transparent/traslucent objects
     /*glEnable (GL_BLEND);
     glDepthMask(GL_FALSE);

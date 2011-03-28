@@ -15,9 +15,7 @@ public:
 	void Set(int width,int height) const;
 private:
 	//The camera starts at the origin
-	Eigen::Vector3f mEyeLocation;
-	Eigen::Vector3f mEyeTarget;
-	Eigen::Vector3f mUp;
+	Eigen::Matrix4f mTransform;
 
 	float mZoom;
 };

@@ -23,6 +23,9 @@ void Camera::DeltaZoom(float deltaZoom) {
 }
 
 void Camera::Translate(float deltaX,float deltaY) {
+	Affine3f t(Affine3f::Identity());
+	t.translate(Vector3f(3*deltaX*mZoom,-3*deltaY*mZoom,0));
+	mTransform = t.matrix() * mTransform;
 }
 
 void Camera::Rotate(float deltaX,float deltaY) {

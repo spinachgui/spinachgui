@@ -76,6 +76,8 @@ private:
 
     //3D Variables
 	Camera* mCamera;
+    long mMouseX;
+    long mMouseY;
 };
 
 #endif

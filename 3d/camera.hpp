@@ -10,12 +10,14 @@ public:
 	Camera();
 	void SetZoom(float zoom);
 	void DeltaZoom(float delta);
+	void Translate(float deltaX,float deltaY);
 	void Rotate(float deltaX,float deltaY);
 	void Set(int width,int height) const;
 private:
 	//The camera starts at the origin
 	Eigen::Vector3f mEyeLocation;
 	Eigen::Vector3f mEyeTarget;
+	Eigen::Vector3f mUp;
 
 	float mZoom;
 };

@@ -30,6 +30,9 @@ Display3D::Display3D(wxWindow* parent)
 	mCamera = new Camera;
 	mPicking = new GLPicking(2000);
 
+    mMouseX = 0;
+    mMouseY = 0;
+
     mGLContext=NULL;
     mGLEnabled=false;
 }
@@ -89,16 +92,14 @@ void Display3D::ChangeViewport() {
 
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
-	/*  if(e.Dragging() && e.RightIsDown()) {
-        mXTranslate=mXTranslate+(e.GetX()-mMouseX);
-        mYTranslate=mYTranslate-(e.GetY()-mMouseY);
+	if(e.Dragging() && e.RightIsDown()) {
+		mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
-        mXRotate=mXRotate+(e.GetX()-mMouseX);
-        mYRotate=mYRotate+(e.GetY()-mMouseY);
+		mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
     } 
     mMouseX=e.GetX();
     mMouseY=e.GetY();
-    Refresh();*/
+    Refresh();
 }
 
 
@@ -109,20 +110,20 @@ void Display3D::OnWheel(wxMouseEvent& e) {
 
 void Display3D::OnRightClick(wxMouseEvent& e) {
     if(!e.Dragging()) {
-	if(GetHover()!=NULL) {
-	    RightClickMenu* menu = new RightClickMenu(this);
-	    menu->Build();
-	    PopupMenu(menu);
-	    delete menu;
-	}
+		if(GetHover()!=NULL) {
+			RightClickMenu* menu = new RightClickMenu(this);
+			menu->Build();
+			PopupMenu(menu);
+			delete menu;
+		}
     }
 }
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(!e.ShiftDown()) {
-	AddSelection(GetHover());
+		AddSelection(GetHover());
     } else {
-	AddSelection(GetHover());
+		AddSelection(GetHover());
     }
 }
 

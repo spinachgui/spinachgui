@@ -182,11 +182,21 @@ void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
     }
 }
 
+//============================================================//
 
 LinearInterDrawer::LinearInterDrawer() {
 }
 
 void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
+
+}
+
+//============================================================//
+
+BilinearInterDrawer::BilinearInterDrawer() {
+}
+
+void BilinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
 
 }
 
@@ -198,7 +208,31 @@ FrameDrawer::FrameDrawer() {
 
 void DrawFrameRecursive(Frame* frame) {
 	glPushMatrix();
-	glMultMatrixd(frame->getTransformFromLab().data());
+	double A = Angstroms.get_from_si();
+	const double* d = frame->getTransformFromLab().data();
+	double buffer[16];
+	buffer[ 0] = d[ 0];
+	buffer[ 1] = d[ 1];
+	buffer[ 2] = d[ 2];
+	buffer[ 3] = d[ 3];
+		     	     
+	buffer[ 4] = d[ 4];
+	buffer[ 5] = d[ 5];
+	buffer[ 6] = d[ 6];
+	buffer[ 7] = d[ 7];
+		     	     
+	buffer[ 8] = d[ 8];
+	buffer[ 9] = d[ 9];
+	buffer[10] = d[10];
+	buffer[11] = d[11];
+		     	     
+	buffer[12] = d[12]*A;
+	buffer[13] = d[13]*A;
+	buffer[14] = d[14]*A;
+	buffer[15] = d[15];
+
+	glMultMatrixd(buffer);
+	
     //Draw some coordiante axese
     glBegin(GL_LINES); {
         glVertex3f(0,0,0);

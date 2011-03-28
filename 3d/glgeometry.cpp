@@ -111,36 +111,30 @@ void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
     cout << "SpinDrawer::Geometary" << endl;
     long count=GetSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
-	Spin* spin=GetSS()->GetSpin(i);
-	if(spin->GetElement() != 0){
-	    glPushMatrix();
-	    glTranslatef(spin->GetPosition().x() / Angstroms,
-			 spin->GetPosition().y() / Angstroms,
-			 spin->GetPosition().z() / Angstroms);
-	}
-	const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
-	GLfloat material[4]; material[3]=0.0f;
+		Spin* spin=GetSS()->GetSpin(i);
+		if(spin->GetElement() == 0){
+			continue;
+		}
+		glPushMatrix();
+		glTranslatef(spin->GetPosition().x() / Angstroms,
+					 spin->GetPosition().y() / Angstroms,
+					 spin->GetPosition().z() / Angstroms);
 
-	material[0] = getElementR(spin->GetElement());
-	material[1] = getElementG(spin->GetElement());
-	material[2] = getElementB(spin->GetElement());
+		const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
+		GLfloat material[4]; material[3]=0.0f;
 
-	glMaterialfv(GL_FRONT, GL_SPECULAR, white);
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
-	if(spin->GetElement()==0) {
-	    //Bug resulting in drawing no content after a g03 load tracked to this line:
-	    glTranslatef(40.0f,settings.height-40.0f,0.0f);
+		material[0] = getElementR(spin->GetElement());
+		material[1] = getElementG(spin->GetElement());
+		material[2] = getElementB(spin->GetElement());
 
-	    gluSphere(settings.mSolidQuadric,9,14,14);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
 
-	} else {
-            glPushName(i);
-	    gluSphere(settings.mSolidQuadric,0.1,14,14);
-            glPopName();
-	}
-	if(spin->GetElement() != 0){
-	    glPopMatrix();
-	}
+		glPushName(i);
+		gluSphere(settings.mSolidQuadric,0.1,14,14);
+		glPopName();
+
+		glPopMatrix();
 
     }
 }

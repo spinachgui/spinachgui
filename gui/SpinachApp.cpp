@@ -184,14 +184,25 @@ bool SpinachApp::OnInit() {
 	//Set the active frame as the lab frame
 	SetFrame(mSS->GetLabFrame());
 
-	mSS->InsertSpin(new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16));
-	mSS->InsertSpin(new Spin(Vector3d(0,1e-10,0),"Test Spin B",1,1));
-	mSS->InsertSpin(new Spin(Vector3d(0,0,0)    ,"Test Spin O",1,1));
+	Spin* spin1 = new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16);
+	mSS->InsertSpin(spin1);
+
+	Spin* spin2 = new Spin(Vector3d(0,1e-10,0),"Test Spin B",1,1);
+	mSS->InsertSpin(spin2);
+
+	Spin* spin3 = new Spin(Vector3d(0,0,0)    ,"Test Spin O",1,1);
+	mSS->InsertSpin(spin3);
 
 	mSS->CalcNuclearDipoleDipole();
 
+	mSS->InsertInteraction(new Interaction(10*MHz,Interaction::SHIELDING,spin1));
+
+	mSS->InsertInteraction(new Interaction(Eigenvalues(10*MHz,20*MHz,50*MHz,Orientation()),Interaction::SHIELDING,spin2));
+
+
 	mSS->GetLabFrame()->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
 	Frame* f1 = new Frame(Vector3d(3,-2,0),Orientation(EulerAngles(1,2,0)),GetUnitSystem());
+
 	mSS->GetLabFrame()->AddChild(f1);
 
 	f1->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));

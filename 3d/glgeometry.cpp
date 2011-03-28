@@ -212,9 +212,9 @@ void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) co
 
 			Matrix3d Scale;
 			Scale <<
-				xx, 0,  0,
-				0,  yy, 0,
-				0,  0,  zz;
+				xx / MHz, 0,  0,
+				0,  yy / MHz, 0,
+				0,  0,  zz / MHz;
 
 			mat3=Rot.real()*Scale;
 			GLfloat mat[16];
@@ -226,17 +226,22 @@ void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) co
             mat[14]=0;
             mat[15]=1;
 
-            mat[0 ]=abs(mat3(0,0) / MHz);
-            mat[1 ]=abs(mat3(0,1) / MHz);
-            mat[2 ]=abs(mat3(0,2) / MHz);
+            mat[0 ]=mat3(0,0);
+            mat[1 ]=mat3(0,1);
+            mat[2 ]=mat3(0,2);
 
-            mat[4 ]=abs(mat3(1,0) / MHz);
-            mat[5 ]=abs(mat3(1,1) / MHz);
-            mat[6 ]=abs(mat3(1,2) / MHz);
+            mat[4 ]=mat3(1,0);
+            mat[5 ]=mat3(1,1);
+            mat[6 ]=mat3(1,2);
 
-            mat[8 ]=abs(mat3(2,0) / MHz);
-            mat[9 ]=abs(mat3(2,1) / MHz);
-            mat[10]=abs(mat3(2,2) / MHz);
+            mat[8 ]=mat3(2,0);
+            mat[9 ]=mat3(2,1);
+            mat[10]=mat3(2,2);
+
+			cout << mat3 << endl;
+
+			glMultMatrixf(mat);
+			gluSphere(settings.mWireQuadric,0.01,29,37);
 
 		} glPopMatrix();
 	}

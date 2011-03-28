@@ -51,9 +51,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				int dummy1,atomicNumber,dummy3;
 				length x,y,z;
 				stream >> dummy1 >> atomicNumber >> dummy3 >> x >> y >> z;
-				x=x/Angstroms;
-				y=y/Angstroms;
-				z=z/Angstroms;
+				x=x*Angstroms;
+				y=y*Angstroms;
+				z=z*Angstroms;
 				stream.clear();
 				fin.getline(buff,500); line=buff; stream.str(line); //Read a line
 				if(standardOrientFound) {

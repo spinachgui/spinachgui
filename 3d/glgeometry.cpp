@@ -9,6 +9,10 @@
 
 #include <gui/SpinachApp.hpp>
 
+#include <shared/foreach.hpp>
+
+#include <Eigen/Eigenvalues> 
+
 using namespace std;
 using namespace SpinXML;
 using namespace Eigen;
@@ -188,7 +192,60 @@ LinearInterDrawer::LinearInterDrawer() {
 }
 
 void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
+	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
+	
+	foreach(Interaction* inter,inters) {
+		if(inter->GetIsBilinear()) {
+			continue;
+		}
+		Spin* spin = inter->GetSpin1();
+		glPushMatrix(); {
+			glTranslatef(spin->GetPosition().x() / Angstroms,
+						 spin->GetPosition().y() / Angstroms,
+						 spin->GetPosition().z() / Angstroms);
 
+			Interaction::Type t = inter->GetType();
+			Matrix3d mat3 =       inter->AsMatrix();
+
+			EigenSolver<Matrix3d> es(mat3);
+			EigenSolver<Matrix3d>::EigenvectorsType Rot = es.eigenvectors();
+			EigenSolver<Matrix3d>::EigenvalueType   vec = es.eigenvalues();
+
+			//Assume real eigenvalues
+			double xx = real(vec.x());
+			double yy = real(vec.y());
+			double zz = real(vec.z());
+
+			Matrix3d Scale;
+			Scale <<
+				xx, 0,  0,
+				0,  yy, 0,
+				0,  0,  zz;
+
+			mat3=Rot.real()*Scale;
+			GLfloat mat[16];
+            mat[3 ]=0;
+            mat[7 ]=0;
+            mat[11]=0;
+            mat[12]=0;
+            mat[13]=0;
+            mat[14]=0;
+            mat[15]=1;
+
+            mat[0 ]=abs(mat3(0,0) / MHz);
+            mat[1 ]=abs(mat3(0,1) / MHz);
+            mat[2 ]=abs(mat3(0,2) / MHz);
+
+            mat[4 ]=abs(mat3(1,0) / MHz);
+            mat[5 ]=abs(mat3(1,1) / MHz);
+            mat[6 ]=abs(mat3(1,2) / MHz);
+
+            mat[8 ]=abs(mat3(2,0) / MHz);
+            mat[9 ]=abs(mat3(2,1) / MHz);
+            mat[10]=abs(mat3(2,2) / MHz);
+
+		} glPopMatrix();
+	}
 }
 
 //============================================================//

@@ -188,6 +188,8 @@ bool SpinachApp::OnInit() {
 	mSS->InsertSpin(new Spin(Vector3d(0,1e-10,0),"Test Spin B",1,1));
 	mSS->InsertSpin(new Spin(Vector3d(0,0,0)    ,"Test Spin O",1,1));
 
+	mSS->CalcNuclearDipoleDipole();
+
 	mSS->GetLabFrame()->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
 	Frame* f1 = new Frame(Vector3d(3,-2,0),Orientation(EulerAngles(1,2,0)),GetUnitSystem());
 	mSS->GetLabFrame()->AddChild(f1);

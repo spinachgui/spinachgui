@@ -75,9 +75,9 @@ protected:
     virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
 };
 
-class LinearInterDrawer : public Renderer {
+class MonoInterDrawer : public Renderer {
 public:
-    LinearInterDrawer();
+    MonoInterDrawer();
 protected:
     virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
 };
@@ -107,7 +107,7 @@ private:
 		std::vector<Renderer*> out;
 		out.push_back(new SpinDrawer);
 		out.push_back(new BondDrawer);
-		out.push_back(new LinearInterDrawer);
+		out.push_back(new MonoInterDrawer);
 		out.push_back(new BilinearInterDrawer);
 		out.push_back(new FrameDrawer);
 

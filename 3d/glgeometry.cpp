@@ -181,10 +181,10 @@ void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
 
 //============================================================//
 
-LinearInterDrawer::LinearInterDrawer() {
+MonoInterDrawer::MonoInterDrawer() {
 }
 
-void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
+void MonoInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
 	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
 	
 	foreach(Interaction* inter,inters) {

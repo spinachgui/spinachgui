@@ -10,6 +10,8 @@
 #include <map>
 
 #include <3d/displaySettings.hpp>
+#include <3d/glgeometry.hpp>
+
 
 class Renderer;
 class Camera;
@@ -45,9 +47,6 @@ public:
 
     void ResetView();
 
-    void SetScene(Renderer* scene) {
-        if(mScene) delete mScene; mScene=scene;
-    }
 	DisplaySettings* GetDisplaySettings() {return &mDisplaySettings;}
 
 protected:
@@ -65,7 +64,9 @@ protected:
 private:
 
     //These nodes can be rotated and translated  with the mouse
-    Renderer* mScene;
+    SpinSysScene     mMolScene;
+    InteractionScene mInteractionScene;
+
 	GLPicking* mPicking;
 
 	DisplaySettings mDisplaySettings;

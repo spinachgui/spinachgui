@@ -249,7 +249,7 @@ void MonoInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) cons
 			
 			double size = GetInterSize(t);
 			glScaled(size,size,size);
-			gluSphere(settings.mWireQuadric,0.01,29,37);
+			gluSphere(settings.mWireQuadric,0.01,11,13);
 
 		} glPopMatrix();
 	}
@@ -326,4 +326,25 @@ void FrameDrawer::Geometary(const DisplaySettings&, PASS) const {
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
 	Frame* frame = GetRawSS()->GetLabFrame();
 	DrawFrameRecursive(frame);
+}
+
+//================================================================================//
+// Collections of Geometary
+
+SpinSysScene::SpinSysScene() {
+}
+
+void SpinSysScene::Geometary(const DisplaySettings& displaySettings,PASS pass) const {
+	mSpinDrawer.Draw(displaySettings,pass);
+	mBondDrawer.Draw(displaySettings,pass);
+	mFrameDrawer.Draw(displaySettings,pass);
+}
+
+
+InteractionScene::InteractionScene() {
+}
+
+void InteractionScene::Geometary(const DisplaySettings& settings, PASS pass) const {
+	mMonoDrawer.Draw(settings,pass);
+	mBinaryDrawer.Draw(settings,pass);
 }

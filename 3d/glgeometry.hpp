@@ -96,23 +96,28 @@ protected:
 	virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
 };
 
-class SpinSysScene : public Scene {
+//================================================================================//
+
+class SpinSysScene : public Renderer {
 public:
-    SpinSysScene()
-		: Scene(GetRenderers()) {
-    }
-
+    SpinSysScene();
+protected:
+	virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
 private:
-    std::vector<Renderer*> GetRenderers() {
-		std::vector<Renderer*> out;
-		out.push_back(new SpinDrawer);
-		out.push_back(new BondDrawer);
-		out.push_back(new MonoInterDrawer);
-		out.push_back(new BilinearInterDrawer);
-		out.push_back(new FrameDrawer);
+	SpinDrawer          mSpinDrawer;
+	BondDrawer          mBondDrawer;
+	FrameDrawer         mFrameDrawer;
+};
 
-		return out;
-    }
+class InteractionScene : public Renderer {
+public:
+	InteractionScene();
+protected:
+	virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+private:
+	MonoInterDrawer     mMonoDrawer;
+	BilinearInterDrawer mBinaryDrawer;
+
 };
 
 #endif

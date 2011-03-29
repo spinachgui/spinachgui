@@ -8,7 +8,6 @@ using namespace std;
 //============================================================//
 
 void GLLighting::On()  {
-	cout << "Lighting On" << endl;
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);

@@ -45,9 +45,6 @@ void Display3D::ResetView() {
 }
 
 Display3D::~Display3D() {
-    if(mScene) {
-        delete mScene;
-    }
 	if(mCamera) {
 		delete mCamera;
 	}
@@ -143,10 +140,6 @@ void Display3D::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
 void Display3D::OnPaint(wxPaintEvent& e) {
-    if(!mScene) {
-		cout << "mScene is null" << endl;
-		return;
-    }
     wxPaintDC dc(this);
 
     if(!mGLEnabled) {
@@ -165,18 +158,17 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     //Draw opaque objects first
     
     static GLLighting lighting;
-    mScene->DrawWith(lighting,mDisplaySettings,SOLID);
+	lighting.On();
+    mMolScene.Draw(mDisplaySettings,SOLID);
 
-	mScene->DrawWith(*mPicking,mDisplaySettings,SOLID);
+	static GLTranslucent translucent;
+	translucent.On();
+	mInteractionScene.Draw(mDisplaySettings,SOLID);
+	translucent.Off();
+
+	lighting.Off();
+
 	ProcessHits();
-    //Draw transparent/traslucent objects
-    /*glEnable (GL_BLEND);
-	  glDepthMask(GL_FALSE);
-	  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	  mScene->Draw(mDisplaySettings,TRANSLUCENT);
-	  glDisable (GL_BLEND);
-	*/
 
     SwapBuffers();
     while (true) {

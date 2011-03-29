@@ -26,16 +26,19 @@ map<SpinXML::Interaction::Type,double>    sizeMap;
 void SetInterVisible(bool b,SpinXML::Interaction::Type t) {
 	visableMap[t] = b;
 	sigInterVisible(t,b);
+	sig3DChange();
 }
 
 void SetInterColour (ColourRGB c,SpinXML::Interaction::Type t) {
 	colourMap[t] = c;
 	sigInterColour(t,c);
+	sig3DChange();
 }
 
 void SetInterSize   (double s,SpinXML::Interaction::Type t) {
 	sizeMap[t] = s;
 	sigInterSize(t,s);
+	sig3DChange();
 }
 
 bool      GetInterVisible(SpinXML::Interaction::Type t) {

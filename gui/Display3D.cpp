@@ -14,6 +14,7 @@
 
 using namespace std;
 using namespace SpinXML;
+using namespace sigc;
 
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5};
 
@@ -35,6 +36,7 @@ Display3D::Display3D(wxWindow* parent)
 
     mGLContext=NULL;
     mGLEnabled=false;
+	sig3DChange.connect(sigc::mem_fun(this,&Display3D::Redraw));
 }
 
 void Display3D::ResetView() {

@@ -48,7 +48,6 @@ public:
     void SetScene(Renderer* scene) {
         if(mScene) delete mScene; mScene=scene;
     }
-    void OnDirty() {Refresh();}
 	DisplaySettings* GetDisplaySettings() {return &mDisplaySettings;}
 
 protected:
@@ -59,6 +58,10 @@ protected:
     void EnableGL();
     void ChangeViewport();
 	void ProcessHits();
+	
+	//We only need this because binding Refresh directly in a signal
+	//is difficult due to the default arguments
+	void Redraw(){Refresh();}
 private:
 
     //These nodes can be rotated and translated  with the mouse

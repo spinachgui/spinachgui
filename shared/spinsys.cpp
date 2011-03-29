@@ -45,17 +45,18 @@ SpinSystem::SpinSystem(const SpinSystem& system)
 
 SpinSystem::~SpinSystem() {
     Clear();
+	delete mRootFrame;
 }
 
 void SpinSystem::Clear() {
-    //Currently we need to delete the interactions Before the spins as
-    //the spins have interactions as their children. 
-
     for(unsigned long i=0;i<mSpins.size();i++) {
         mIgnoreSpinKill=mSpins[i];
         delete mSpins[i];
     }
     mSpins.resize(0);
+
+	delete mRootFrame;
+	mRootFrame = new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem);
 
     sigReloaded();
 }

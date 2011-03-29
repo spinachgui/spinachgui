@@ -188,7 +188,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				//Read the coupling strength (in megaherz)
 				stream >> dummy1 >> dummy2 >> dummy3 >> isoCoupling;
         
-				Interaction* inter=new Interaction(isoCoupling/MHz,Interaction::HFC,ss->GetSpin(i+1),ss->GetSpin(0));
+				Interaction* inter=new Interaction(isoCoupling*MHz,Interaction::HFC,ss->GetSpin(i+1),ss->GetSpin(0));
 				ss->InsertInteraction(inter);
 			}          
 		}
@@ -220,7 +220,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 										   x2,y2,z2,
 										   x3,y3,z3));
 
-				Interaction* inter=new Interaction(Eigenvalues(eigenvalue1/MHz,eigenvalue2/MHz,eigenvalue3/MHz,o),
+				Interaction* inter=new Interaction(Eigenvalues(eigenvalue1*MHz,eigenvalue2*MHz,eigenvalue3*MHz,o),
 												   Interaction::HFC,
 												   ss->GetSpin(i+1),ss->GetSpin(0)); 
 				ss->InsertInteraction(inter);

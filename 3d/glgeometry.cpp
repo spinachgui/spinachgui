@@ -185,17 +185,26 @@ MonoInterDrawer::MonoInterDrawer() {
 }
 
 void MonoInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
+	cout << "MonoInterDrawer::Geometary" << endl;
+
 	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
 	
 	foreach(Interaction* inter,inters) {
+		Spin* spin = inter->GetSpin1();
+
 		if(inter->GetIsBilinear()) {
-			continue;
+			if(inter->GetType() == Interaction::HFC) {
+				if(spin->GetElement() == 0) {
+					spin = inter->GetSpin2();
+				}
+			} else {
+				continue;
+			}
 		}
 		Interaction::Type t = inter->GetType();
 		GetInterColour(t).SetMaterial(0.5);
 
 		glPushMatrix(); {
-			Spin* spin = inter->GetSpin1();
 			glTranslatef(spin->GetPosition().x() / Angstroms,
 						 spin->GetPosition().y() / Angstroms,
 						 spin->GetPosition().z() / Angstroms);
@@ -212,12 +221,9 @@ void MonoInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) cons
 			double zz = real(vec.z());
 
 			Matrix3d Scale;
-			Scale <<
-				xx / MHz, 0,  0,
-				0,  yy / MHz, 0,
-				0,  0,  zz / MHz;
+			glScaled(xx / MHz,yy / MHz, zz / MHz);
 
-			mat3=Rot.real()*Scale;
+			mat3=Rot.real();
 			GLfloat mat[16];
             mat[3 ]=0;
             mat[7 ]=0;

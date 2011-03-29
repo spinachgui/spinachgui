@@ -106,6 +106,13 @@ namespace SpinXML {
         ///from the positions off the nuclear spins
         void CalcNuclearDipoleDipole();
 
+		///If two interactions act on the same spin or spin pair,
+		///crush them into one, large, equivilent interaction. This
+		///treatment is needed, for example, after loading from a
+		///gaussian file (gaussian gives the isotropic and anisotropic
+		///parts seperatly)
+		void CompressDuplicateInteractions();
+
 		///Get the lab frame, which is always an unrotated frame centred at the origin
 		Frame* GetLabFrame() const {return mRootFrame;}
     private:

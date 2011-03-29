@@ -5,7 +5,6 @@
 #include <shared/interaction.hpp>
 #include <3d/opengl.hpp>
 
-#include <map>
 #include <shared/initonce.hpp>
 
 //================================================================================//
@@ -30,30 +29,10 @@ struct DisplaySettings {
 		gluDeleteQuadric(mSolidQuadric);
         gluDeleteQuadric(mWireQuadric);
     }
-    void SetShowBonds(bool showBonds) {drawBonds=showBonds;}
-    bool drawBonds;
-
-    void SetScalling(double scalling,SpinXML::Interaction::Type t) {
-        mScallings[t]=scalling;
-    }
-    void SetColour(float r,float g,float b,SpinXML::Interaction::Type t) {
-        mInterColours[t]=Eigen::Vector3d(r,g,b);
-    }
-    void SetVisible(bool v,SpinXML::Interaction::Type t) {
-        mVisible[t]=v;
-    }
 
     GLUquadric* mSolidQuadric;
     GLUquadric* mWireQuadric;
     int width,height;
-
-    ///The size of the displayed interaction in units of energy/length,
-    ///e.g. MHz/Nm
-    std::map<SpinXML::Interaction::Type,double> mScallings;
-    ///The colour of the displayed interactions
-    std::map<SpinXML::Interaction::Type,Eigen::Vector3d> mInterColours;
-    ///The visibility of the displayed interactions
-    std::map<SpinXML::Interaction::Type,bool> mVisible;
 };
 
 //================================================================================//
@@ -78,6 +57,13 @@ struct ColourRGB {
 	float g;
 	float b;
 };
+
+//================================================================================//
+// Should bonds be drawn?
+
+void SetShowBonds(bool b);
+bool GetShowBonds();
+extern sigc::signal<void,bool> sigShowBonds;
 
 //================================================================================//
 //Interaction Display Settings

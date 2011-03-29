@@ -106,7 +106,6 @@ SpinDrawer::SpinDrawer() {
 }
 
 void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
-    cout << "SpinDrawer::Geometary" << endl;
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 		Spin* spin=GetRawSS()->GetSpin(i);
@@ -146,6 +145,9 @@ BondDrawer::BondDrawer() {
 }
 
 void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
+	if(!GetShowBonds()) {
+		return;
+	}
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 		Spin* spin=GetRawSS()->GetSpin(i);
@@ -237,8 +239,6 @@ void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) co
             mat[8 ]=mat3(2,0);
             mat[9 ]=mat3(2,1);
             mat[10]=mat3(2,2);
-
-			cout << mat3 << endl;
 
 			glMultMatrixf(mat);
 			

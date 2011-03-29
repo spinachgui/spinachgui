@@ -8,7 +8,7 @@
 
 #include <shared/spin.hpp>
 #include <shared/orientation.hpp>
-
+#include <shared/initonce.hpp>
 
 namespace SpinXML {
 	class InteractionView;
@@ -347,9 +347,17 @@ namespace SpinXML {
         sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
     };
 
+	extern std::vector<Interaction::Type> Types;
+	extern std::vector<Interaction::Type> MonoTypes;
+	extern std::vector<Interaction::Type> BinaryTypes;
+
 };
 
+//Private
 
-
+struct __InterInit : public InitOnce<__InterInit> {
+	__InterInit();
+};
+static __InterInit __initInit;
 
 #endif

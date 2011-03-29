@@ -51,6 +51,20 @@ double    GetInterSize   (SpinXML::Interaction::Type t) {
 	return sizeMap[t];
 }
 
+//================================================================================//
+// Should bonds be drawn?
+
+bool gShowBonds = true;
+
+void SetShowBonds(bool b) {
+	gShowBonds = b;
+	sigShowBonds(b);
+	sig3DChange();
+}
+bool GetShowBonds() {
+	return gShowBonds;
+}
+sigc::signal<void,bool> sigShowBonds;
 
 
 //================================================================================//

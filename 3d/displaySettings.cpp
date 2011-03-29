@@ -66,6 +66,10 @@ bool GetShowBonds() {
 }
 sigc::signal<void,bool> sigShowBonds;
 
+//================================================================================//
+// What colour should bonds be drawn
+
+ColourRGB gBondColour(0,0,0.9);
 
 //================================================================================//
 // Interaction Display Settings

@@ -140,11 +140,10 @@ void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
 
 
 BondDrawer::BondDrawer() {
-    //const static GLfloat blueMaterial[]  = {0.06,0.06,0.4,0.0f}; 
-    //SetMaterial(blueMaterial);	
 }
 
 void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
+	gBondColour.SetMaterial(1.0);
 	if(!GetShowBonds()) {
 		return;
 	}

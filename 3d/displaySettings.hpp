@@ -65,6 +65,9 @@ void SetShowBonds(bool b);
 bool GetShowBonds();
 extern sigc::signal<void,bool> sigShowBonds;
 
+extern ColourRGB gBondColour;
+
+
 //================================================================================//
 //Interaction Display Settings
 

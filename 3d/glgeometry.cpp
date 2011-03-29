@@ -72,9 +72,9 @@ void Scene::Geometary(const DisplaySettings& displaySettings,PASS pass) const {
 
 
 MoleculeFG::MoleculeFG()  {
-    long count=GetSS()->GetSpinCount();
+    long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
-        Spin* spin=GetSS()->GetSpin(i);
+        Spin* spin=GetRawSS()->GetSpin(i);
         if(spin->GetElement() == 0) {
             //Now we are only drawing electrons
             cout << "No longer adding an electron to the forground" << endl;
@@ -107,9 +107,9 @@ SpinDrawer::SpinDrawer() {
 
 void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
     cout << "SpinDrawer::Geometary" << endl;
-    long count=GetSS()->GetSpinCount();
+    long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
-		Spin* spin=GetSS()->GetSpin(i);
+		Spin* spin=GetRawSS()->GetSpin(i);
 		if(spin->GetElement() == 0){
 			continue;
 		}
@@ -146,15 +146,15 @@ BondDrawer::BondDrawer() {
 }
 
 void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
-    long count=GetSS()->GetSpinCount();
+    long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
-	Spin* spin=GetSS()->GetSpin(i);
+	Spin* spin=GetRawSS()->GetSpin(i);
 	if(spin->GetElement() == 0) {
 	    continue;
 	}
 	//If the spin is an electron, it should be drawn outside of the
 	//molecule
-	vector<Spin*> nearby=GetSS()->GetNearbySpins(spin->GetPosition(),1.8*Angstroms,spin);
+	vector<Spin*> nearby=GetRawSS()->GetNearbySpins(spin->GetPosition(),1.8*Angstroms,spin);
 	for(unsigned long j=0;j<nearby.size();j++) {
 	    if(nearby[j]->GetElement()==0) {
 		continue;

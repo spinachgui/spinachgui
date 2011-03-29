@@ -155,7 +155,7 @@ void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
 		}
 		//If the spin is an electron, it should be drawn outside of the
 		//molecule
-		vector<Spin*> nearby=GetRawSS()->GetNearbySpins(spin->GetPosition(),1.4*Angstroms,spin);
+		vector<Spin*> nearby=GetRawSS()->GetNearbySpins(spin->GetPosition(),1.6*Angstroms,spin);
 		for(unsigned long j=0;j<nearby.size();j++) {
 			if(nearby[j]->GetElement()==0) {
 				continue;

@@ -90,9 +90,9 @@ long SpinSystem::GetSpinNumber(Spin* spin) const {
 vector<Spin*> SpinSystem::GetNearbySpins(Vector3d pos,length distance,Spin* Ignore) {
     std::vector<Spin*> result;
     length2 dist2=distance*distance;
-    length x1=pos.x() * metres;
-    length y1=pos.x() * metres;
-    length z1=pos.x() * metres;
+    length x1=pos.x();
+    length y1=pos.y();
+    length z1=pos.z();
 
     long spinCount=mSpins.size();
 
@@ -106,7 +106,7 @@ vector<Spin*> SpinSystem::GetNearbySpins(Vector3d pos,length distance,Spin* Igno
         length deltaX=(x1-x2);
         length deltaY=(y1-y2);
         length deltaZ=(z1-z2);
-	length2 deltaR=deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ;
+		length2 deltaR=deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ;
         if(deltaR < dist2) {
             result.push_back(mSpins[i]);
         }

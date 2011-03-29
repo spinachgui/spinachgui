@@ -148,33 +148,33 @@ BondDrawer::BondDrawer() {
 void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
-	Spin* spin=GetRawSS()->GetSpin(i);
-	if(spin->GetElement() == 0) {
-	    continue;
-	}
-	//If the spin is an electron, it should be drawn outside of the
-	//molecule
-	vector<Spin*> nearby=GetRawSS()->GetNearbySpins(spin->GetPosition(),1.8*Angstroms,spin);
-	for(unsigned long j=0;j<nearby.size();j++) {
-	    if(nearby[j]->GetElement()==0) {
-		continue;
-	    }
-	    Vector3d mR1=spin->GetPosition();
-	    Vector3d mR2=nearby[j]->GetPosition();
+		Spin* spin=GetRawSS()->GetSpin(i);
+		if(spin->GetElement() == 0) {
+			continue;
+		}
+		//If the spin is an electron, it should be drawn outside of the
+		//molecule
+		vector<Spin*> nearby=GetRawSS()->GetNearbySpins(spin->GetPosition(),1.4*Angstroms,spin);
+		for(unsigned long j=0;j<nearby.size();j++) {
+			if(nearby[j]->GetElement()==0) {
+				continue;
+			}
+			Vector3d mR1=spin->GetPosition();
+			Vector3d mR2=nearby[j]->GetPosition();
 
-	    double x1=mR1.x() / Angstroms,y1=mR1.y() / Angstroms,z1=mR1.z() / Angstroms;
-	    double x2=mR2.x() / Angstroms,y2=mR2.y() / Angstroms,z2=mR2.z() / Angstroms;
+			double x1=mR1.x() / Angstroms,y1=mR1.y() / Angstroms,z1=mR1.z() / Angstroms;
+			double x2=mR2.x() / Angstroms,y2=mR2.y() / Angstroms,z2=mR2.z() / Angstroms;
 
-	    double len=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+			double len=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
-	    //Now we need to find the rotation between the z axis
-	    double angle=acos((z2-z1)/len);
-	    glPushMatrix(); {
-		glTranslatef(x1,y1,z1);
-		glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-		gluCylinder(settings.mSolidQuadric,0.04,0.04,len,7,7);
-	    } glPopMatrix();
-	}
+			//Now we need to find the rotation between the z axis
+			double angle=acos((z2-z1)/len);
+			glPushMatrix(); {
+				glTranslatef(x1,y1,z1);
+				glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
+				gluCylinder(settings.mSolidQuadric,0.04,0.04,len,7,7);
+			} glPopMatrix();
+		}
     }
 }
 

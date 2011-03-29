@@ -7,6 +7,8 @@
 #include <wx/statusbr.h>
 #include <wx/treectrl.h>
 
+#include <3d/displaySettings.hpp>
+
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
 #include <gui/RightClickMenu.hpp>
@@ -155,13 +157,14 @@ public:
 			bs->Add(widget,1,wxEXPAND);
 
 			//Connect the scalling sliders to the scalling
-			widget->GetLogSlider()->sigChange.connect(bind(mem_fun(this,&InterDisplaySettingsPanel::SlotScaleChange),type));
+			widget->GetLogSlider()->sigChange.connect(bind(&SetInterSize,type));
 
 			//Connect the colour controls to the tensor colours
-			widget->sigColour.connect(bind(mem_fun(this,&InterDisplaySettingsPanel::SlotColourChange),type));
+			bind(&SetInterColour,type);
+			//widget->sigColour.connect();
 
 			//Connect the visibility toggles to the tensor colours
-			widget->sigVisible.connect(bind(mem_fun(this,&InterDisplaySettingsPanel::SlotVisibleChange),type ));
+			widget->sigVisible.connect(bind(&SetInterVisible,type));
 
 			//Set sensible default scallings
 			widget->GetLogSlider()->SetValue(1);
@@ -177,13 +180,9 @@ public:
 	}
 	//You could probably avoid needing these functions somehow, but it
 	//probably wouldn't be worth the templates at this point
-	void SlotScaleChange(double s,Interaction::Type t)                 {sigScaleChange(s,t);}
-	void SlotColourChange(float r,float g,float b,Interaction::Type t) {sigColourChange(r,g,b,t);}
-	void SlotVisibleChange(bool b,Interaction::Type t)                 {sigVisibleChange(b,t);}
-
-	sigc::signal<void,double,Interaction::Type>            sigScaleChange;  
-	sigc::signal<void,float,float,float,Interaction::Type> sigColourChange;
-	sigc::signal<void,bool,Interaction::Type>              sigVisibleChange;
+	void SlotScaleChange(double s,Interaction::Type t)                 {}
+	void SlotColourChange(float r,float g,float b,Interaction::Type t) {}
+	void SlotVisibleChange(bool b,Interaction::Type t)                 {}
 };
 
 //============================================================//

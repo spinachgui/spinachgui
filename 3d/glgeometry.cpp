@@ -13,6 +13,8 @@
 
 #include <Eigen/Eigenvalues> 
 
+#include <3d/displaySettings.hpp>
+
 using namespace std;
 using namespace SpinXML;
 using namespace Eigen;
@@ -80,10 +82,6 @@ MoleculeFG::MoleculeFG()  {
     }
 }
 
-
-//============================================================
-// The New 3D Code
-//============================================================
 
 void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u,const DisplaySettings& settings) {
     //If the spin is an electron, it should be drawn outside of the
@@ -192,13 +190,15 @@ void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) co
 		if(inter->GetIsBilinear()) {
 			continue;
 		}
-		Spin* spin = inter->GetSpin1();
+		Interaction::Type t = inter->GetType();
+		GetInterColour(t).SetMaterial(0.5);
+
 		glPushMatrix(); {
+			Spin* spin = inter->GetSpin1();
 			glTranslatef(spin->GetPosition().x() / Angstroms,
 						 spin->GetPosition().y() / Angstroms,
 						 spin->GetPosition().z() / Angstroms);
 
-			Interaction::Type t = inter->GetType();
 			Matrix3d mat3 =       inter->AsMatrix();
 
 			EigenSolver<Matrix3d> es(mat3);
@@ -241,6 +241,9 @@ void LinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) co
 			cout << mat3 << endl;
 
 			glMultMatrixf(mat);
+			
+			double size = GetInterSize(t);
+			glScaled(size,size,size);
 			gluSphere(settings.mWireQuadric,0.01,29,37);
 
 		} glPopMatrix();

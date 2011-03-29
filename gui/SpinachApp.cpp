@@ -213,8 +213,6 @@ bool SpinachApp::OnInit() {
     return true;
 }
 
-
-
 //============================================================//
 // Selection Manager
 
@@ -319,4 +317,6 @@ void RemoveSelection(SpinXML::Spin* spin) {
 	}
 	AssertSelectionExists();
 }
+
+
 

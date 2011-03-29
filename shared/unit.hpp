@@ -24,31 +24,31 @@ unit type being assigned to the ddouble)
 
 struct unit {
     unit(const std::string& name,double toSIf) : mName(name) {
-	mToSI=toSIf;
-	mFromSI=1/mToSI;
+		mToSI=toSIf;
+		mFromSI=1/mToSI;
     }
     const char* get_name_c() const {
-	return mName.c_str();
+		return mName.c_str();
     }
     const std::string& get_name() const {
-	return mName;
+		return mName;
     }
     operator const char* () {
-	return mName.c_str();
+		return mName.c_str();
     }
     inline double toSI(double nonSI) const {
-	return mToSI*nonSI;
+		return mToSI*nonSI;
     }
     inline double fromSI(double SI) const {
-	return mFromSI*SI;
+		return mFromSI*SI;
     }
     inline double get_to_si() const {
-	return mToSI;
+		return mToSI;
     }
     inline double get_from_si() const {
-	return mFromSI;
+		return mFromSI;
     }
-    private:
+private:
     std::string mName;
     double mToSI;
     double mFromSI;

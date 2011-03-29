@@ -49,6 +49,7 @@ SpinXML::Frame* GetFrame();
 
 extern sigc::signal<void,SpinXML::Frame*> sigFrameChange;
 
+
 //================================================================================//
 // Selection Manager functions
 

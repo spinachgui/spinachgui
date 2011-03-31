@@ -136,27 +136,32 @@ namespace SpinXML {
 
         ///Construct from a scalar
         Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
+			SetType(t,spin1,spin2);
             valid_or_throw();
         }
         ///Construct from a matrix
         Interaction(const Eigen::Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
+			SetType(t,spin1,spin2);
             valid_or_throw();
         }
         ///Construct from a matrix
         Interaction(const Eigenvalues& inter ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
+			SetType(t,spin1,spin2);
             valid_or_throw();
         }
         ///Construct from a matrix
         Interaction(const AxRhom& inter      ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
+			SetType(t,spin1,spin2);
             valid_or_throw();
         }
         ///Construct from a matrix
         Interaction(const SpanSkew& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter),mType(t),mSpin1(spin1),mSpin2(spin2){
+            : mData(inter), mSpin1(NULL), mSpin2(NULL)  {
+			SetType(t,spin1,spin2);
             valid_or_throw();
         }
         ///Copy constructor

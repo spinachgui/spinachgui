@@ -511,6 +511,8 @@ EVT_MENU(ID_VIEW_FRAMES,    RootFrame::OnToggleFrames)
 //Resize
 EVT_SIZE(RootFrame::OnResize)
 
+EVT_ERASE_BACKGROUND(RootFrame::OnEraseBackground)
+
 END_EVENT_TABLE()
 
 

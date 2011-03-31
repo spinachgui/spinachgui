@@ -46,6 +46,9 @@ public:
     void OnDeleteSpinHover(wxCommandEvent& e);
 
     void ResetView();
+    
+    //To prevent flicker, overide this function to do nothing
+    void OnEraseBackground(wxEraseEvent& e) {e.Skip(false);}
 
 protected:
     DECLARE_EVENT_TABLE();

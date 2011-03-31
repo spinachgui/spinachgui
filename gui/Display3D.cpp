@@ -77,6 +77,8 @@ void Display3D::EnableGL() {
     //Create a dictionary of colours
     glMatrixMode(GL_MODELVIEW);
 
+	SetQuadric(QUAD_SOLID);
+
     //Generate a texture for saving the depth buffer to
     //glGenTextures(1,&mTexDepth);
     //Generate a texture for saving the depth buffer to
@@ -165,7 +167,10 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 	translucent.Off();
 
 	//Also draw the interactions as wireframes
+	static GLWire wire;
+	wire.On();
 	mInteractionScene.Draw();
+	wire.Off();
 
 	lighting.Off();
 

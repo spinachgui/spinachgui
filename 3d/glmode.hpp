@@ -21,6 +21,12 @@ public:
     virtual void Off();
 };
 
+class GLWire : public GLMode {
+public:
+    virtual void On();
+    virtual void Off();
+};
+
 class GLTranslucent : public GLMode {
 public:
 	virtual void On();

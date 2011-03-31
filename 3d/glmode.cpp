@@ -1,7 +1,12 @@
 
+#include <3d/displaySettings.hpp>
+
 #include <3d/glmode.hpp>
+
+
 #include <iostream>
 #include <shared/foreach.hpp>
+
 
 using namespace std;
 
@@ -52,6 +57,16 @@ void GLTranslucent::On()  {
 void GLTranslucent::Off() {
 	glDepthMask(GL_TRUE);
 	glDisable (GL_BLEND);
+}
+
+//============================================================//
+
+void GLWire::On()  {
+	SetQuadric(QUAD_WIREFRAME);
+}
+
+void GLWire::Off() {
+	SetQuadric(QUAD_SOLID);
 }
 
 //============================================================//

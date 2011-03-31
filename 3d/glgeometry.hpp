@@ -26,10 +26,10 @@ class Renderer {
 public:
     Renderer();
     virtual ~Renderer();
-    void DrawWith(GLMode& mode,const DisplaySettings& settings, PASS pass) const;
-    void Draw(const DisplaySettings& settings, PASS pass) const;
+    void DrawWith(GLMode& mode) const;
+    void Draw() const;
 protected:
-    virtual void Geometary(const DisplaySettings& settings, PASS pass) const = 0;
+    virtual void Geometary() const = 0;
 private:
 };
 
@@ -43,7 +43,7 @@ public:
     Scene(const TRenderVec& renderers);
     ~Scene();
 protected:
-    void Geometary(const DisplaySettings& displaySettings,PASS pass) const;
+    void Geometary() const;
 private:
     TRenderVec mRenderers;
 };
@@ -55,7 +55,7 @@ public:
     MoleculeFG();
     void OnNewElectron(SpinXML::Spin* newSpin,long number);
 protected:
-    virtual void Geometary(const DisplaySettings& settings, PASS pass) const {}
+    virtual void Geometary() const {}
 };
 
 //============================================================//
@@ -64,7 +64,7 @@ class SpinDrawer : public Renderer {
 public:
     SpinDrawer();
 protected:
-    virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+    virtual void Geometary() const;
 };
 
 
@@ -72,28 +72,28 @@ class BondDrawer : public Renderer {
 public:
     BondDrawer();
 protected:
-    virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+    virtual void Geometary() const;
 };
 
 class MonoInterDrawer : public Renderer {
 public:
     MonoInterDrawer();
 protected:
-    virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+    virtual void Geometary() const;
 };
 
 class BilinearInterDrawer : public Renderer {
 public:
     BilinearInterDrawer();
 protected:
-    virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+    virtual void Geometary() const;
 };
 
 class FrameDrawer : public Renderer {
 public:
 	FrameDrawer();
 protected:
-	virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+	virtual void Geometary() const;
 };
 
 //================================================================================//
@@ -102,7 +102,7 @@ class SpinSysScene : public Renderer {
 public:
     SpinSysScene();
 protected:
-	virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+	virtual void Geometary() const;
 private:
 	SpinDrawer          mSpinDrawer;
 	BondDrawer          mBondDrawer;
@@ -113,7 +113,7 @@ class InteractionScene : public Renderer {
 public:
 	InteractionScene();
 protected:
-	virtual void Geometary(const DisplaySettings& settings, PASS pass) const;
+	virtual void Geometary() const;
 private:
 	MonoInterDrawer     mMonoDrawer;
 	BilinearInterDrawer mBinaryDrawer;

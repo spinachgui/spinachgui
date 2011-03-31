@@ -47,8 +47,6 @@ public:
 
     void ResetView();
 
-	DisplaySettings* GetDisplaySettings() {return &mDisplaySettings;}
-
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -68,8 +66,6 @@ private:
     InteractionScene mInteractionScene;
 
 	GLPicking* mPicking;
-
-	DisplaySettings mDisplaySettings;
 
     bool mGLEnabled;
     wxGLContext* mGLContext;

@@ -35,14 +35,14 @@ Renderer::Renderer() {
 Renderer::~Renderer() {
 }
 
-void Renderer::DrawWith(GLMode& mode,const DisplaySettings& settings, PASS pass) const {
+void Renderer::DrawWith(GLMode& mode) const {
     mode.On();
-    Geometary(settings,pass);
+    Geometary();
     mode.Off();
 }
 
-void Renderer::Draw(const DisplaySettings& settings, PASS pass) const {
-    Geometary(settings,pass);
+void Renderer::Draw() const {
+    Geometary();
 }
 
 
@@ -61,10 +61,10 @@ Scene::~Scene() {
 	}
 }
 
-void Scene::Geometary(const DisplaySettings& displaySettings,PASS pass) const {
+void Scene::Geometary() const {
 	//loop and render
 	for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
-	    (*i)->Draw(displaySettings,pass);
+	    (*i)->Draw();
 	}
 }
 
@@ -83,7 +83,7 @@ MoleculeFG::MoleculeFG()  {
 }
 
 
-void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u,const DisplaySettings& settings) {
+void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u) {
     //If the spin is an electron, it should be drawn outside of the
     //molecule
     double x1=R1.x() * u,y1=R1.y() * u,z1=R1.z() * u;
@@ -96,7 +96,7 @@ void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u,const DisplaySetti
     glPushMatrix(); {
 		glTranslatef(x1,y1,z1);
 		glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-		gluCylinder(settings.mSolidQuadric,width * u,width * u,len,7,7);
+		gluCylinder(GetQuadric(),width * u,width * u,len,7,7);
     } glPopMatrix();
 }
 
@@ -105,7 +105,7 @@ void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u,const DisplaySetti
 SpinDrawer::SpinDrawer() {
 }
 
-void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
+void SpinDrawer::Geometary() const {
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 		Spin* spin=GetRawSS()->GetSpin(i);
@@ -128,7 +128,7 @@ void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
 		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
 
 		glPushName(i);
-		gluSphere(settings.mSolidQuadric,0.1,14,14);
+		gluSphere(GetQuadric(),0.1,14,14);
 		glPopName();
 
 		glPopMatrix();
@@ -142,7 +142,7 @@ void SpinDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
 BondDrawer::BondDrawer() {
 }
 
-void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
+void BondDrawer::Geometary() const {
 	gBondColour.SetMaterial(1.0);
 	if(!GetShowBonds()) {
 		return;
@@ -173,7 +173,7 @@ void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
 			glPushMatrix(); {
 				glTranslatef(x1,y1,z1);
 				glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-				gluCylinder(settings.mSolidQuadric,0.04,0.04,len,7,7);
+				gluCylinder(GetQuadric(),0.04,0.04,len,7,7);
 			} glPopMatrix();
 		}
     }
@@ -184,7 +184,7 @@ void BondDrawer::Geometary(const DisplaySettings& settings, PASS passm) const {
 MonoInterDrawer::MonoInterDrawer() {
 }
 
-void MonoInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
+void MonoInterDrawer::Geometary() const {
 	cout << "MonoInterDrawer::Geometary" << endl;
 
 	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
@@ -249,7 +249,7 @@ void MonoInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) cons
 			
 			double size = GetInterSize(t);
 			glScaled(size,size,size);
-			gluSphere(settings.mWireQuadric,0.01,11,13);
+			gluSphere(GetQuadric(),0.01,11,13);
 
 		} glPopMatrix();
 	}
@@ -260,7 +260,7 @@ void MonoInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) cons
 BilinearInterDrawer::BilinearInterDrawer() {
 }
 
-void BilinearInterDrawer::Geometary(const DisplaySettings& settings, PASS pass) const {
+void BilinearInterDrawer::Geometary() const {
 
 }
 
@@ -321,7 +321,7 @@ void DrawFrameRecursive(Frame* frame) {
 	glPopMatrix();
 }
 
-void FrameDrawer::Geometary(const DisplaySettings&, PASS) const {
+void FrameDrawer::Geometary() const {
     static const GLfloat white[] = {0.5, 0.5, 0.5};
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
 	Frame* frame = GetRawSS()->GetLabFrame();
@@ -334,17 +334,17 @@ void FrameDrawer::Geometary(const DisplaySettings&, PASS) const {
 SpinSysScene::SpinSysScene() {
 }
 
-void SpinSysScene::Geometary(const DisplaySettings& displaySettings,PASS pass) const {
-	mSpinDrawer.Draw(displaySettings,pass);
-	mBondDrawer.Draw(displaySettings,pass);
-	mFrameDrawer.Draw(displaySettings,pass);
+void SpinSysScene::Geometary() const {
+	mSpinDrawer.Draw();
+	mBondDrawer.Draw();
+	mFrameDrawer.Draw();
 }
 
 
 InteractionScene::InteractionScene() {
 }
 
-void InteractionScene::Geometary(const DisplaySettings& settings, PASS pass) const {
-	mMonoDrawer.Draw(settings,pass);
-	mBinaryDrawer.Draw(settings,pass);
+void InteractionScene::Geometary() const {
+	mMonoDrawer.Draw();
+	mBinaryDrawer.Draw();
 }

@@ -149,8 +149,6 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
     int width,height;
     GetClientSize(&width,&height);
-    mDisplaySettings.width=width;
-    mDisplaySettings.height=height;
 
 	mCamera->Set(width,height);
 
@@ -159,12 +157,15 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     
     static GLLighting lighting;
 	lighting.On();
-    mMolScene.Draw(mDisplaySettings,SOLID);
+    mMolScene.Draw();
 
 	static GLTranslucent translucent;
 	translucent.On();
-	mInteractionScene.Draw(mDisplaySettings,SOLID);
+	mInteractionScene.Draw();
 	translucent.Off();
+
+	//Also draw the interactions as wireframes
+	mInteractionScene.Draw();
 
 	lighting.Off();
 

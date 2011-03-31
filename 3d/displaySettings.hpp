@@ -13,27 +13,16 @@
 
 extern sigc::signal<void> sig3DChange;
 
-///A struct storing all 3D settings that are invariant over a single
-///rendering pass, implying that this structure may be passed safely
-///as a const reference. It would likely make sense to link settings
-///here to a menu option of configuration file setting. Information
-///such as the current render pass would not belong in this struct
-struct DisplaySettings {
-    DisplaySettings()
-		: mSolidQuadric(gluNewQuadric()),
-		  mWireQuadric(gluNewQuadric()) {
-		gluQuadricDrawStyle(mSolidQuadric,GLU_FILL);
-		gluQuadricNormals  (mWireQuadric,GLU_SMOOTH);
-    }
-    ~DisplaySettings() {
-		gluDeleteQuadric(mSolidQuadric);
-        gluDeleteQuadric(mWireQuadric);
-    }
+//================================================================================//
+// Wireframe settings
 
-    GLUquadric* mSolidQuadric;
-    GLUquadric* mWireQuadric;
-    int width,height;
+enum QUADRIC_TYPE {
+	QUAD_WIREFRAME,
+	QUAD_SOLID
 };
+
+GLUquadric* GetQuadric();
+void SetQuadric(QUADRIC_TYPE type);
 
 //================================================================================//
 // RGB colour struct
@@ -91,6 +80,7 @@ extern sigc::signal<void,SpinXML::Interaction::Type,double>    sigInterSize;
 class __ModInit : public InitOnce<__ModInit> {
 public:
 	__ModInit();
+	~__ModInit();
 };
 
 #endif

@@ -52,6 +52,27 @@ double    GetInterSize   (SpinXML::Interaction::Type t) {
 }
 
 //================================================================================//
+// Wireframe settings
+
+GLUquadric* gActiveQuadric = NULL;
+GLUquadric* gSolidQuadric  = NULL;
+GLUquadric* gWireQuadric   = NULL;
+
+GLUquadric* GetQuadric() {
+	return gActiveQuadric;
+}
+void SetQuadric(QUADRIC_TYPE type) {
+	if(type == QUAD_WIREFRAME) {
+		gActiveQuadric = gWireQuadric;
+	} else if(type == QUAD_SOLID) {
+		gActiveQuadric = gSolidQuadric;
+	} else {
+		cerr << "Bad quadric type passes to SetQuadric()" << endl;
+	}
+}
+
+
+//================================================================================//
 // Should bonds be drawn?
 
 bool gShowBonds = true;
@@ -75,6 +96,16 @@ ColourRGB gBondColour(0,0,0.9);
 // Interaction Display Settings
 
 __ModInit::__ModInit() {
+	gSolidQuadric = gluNewQuadric();
+	gWireQuadric  = gluNewQuadric();
+	gActiveQuadric = gWireQuadric;
+
+	gluQuadricDrawStyle(gSolidQuadric,GLU_FILL);
+	gluQuadricNormals  (gSolidQuadric,GLU_SMOOTH);
+
+	gluQuadricDrawStyle(gWireQuadric,GLU_LINE);
+	gluQuadricNormals  (gWireQuadric,GLU_SMOOTH);
+
 	//Set sensible default scallings
 	sizeMap[Interaction::G_TENSER        ] = 1;
 	sizeMap[Interaction::ZFS             ] = 1;
@@ -110,5 +141,9 @@ __ModInit::__ModInit() {
 	colourMap[Interaction::CUSTOM_QUADRATIC] = ColourRGB(0.0,0.0,0.0);
 }
 
+__ModInit::~__ModInit() {
+	gluDeleteQuadric(gSolidQuadric);
+	gluDeleteQuadric(gWireQuadric);
+}
 
 static __ModInit __init;

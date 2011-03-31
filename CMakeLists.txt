@@ -12,7 +12,7 @@ enable_testing()
 
 ############################################################
 #Tell me what commands are being executed.
-#set(CMAKE_VERBOSE_MAKEFILE TRUE)
+# set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported

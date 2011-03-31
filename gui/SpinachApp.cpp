@@ -25,11 +25,23 @@ SpinachApp& wxGetApp() {
   return *gApp;
 }
 
+#ifdef __LINUX__
 int main(int argc,char** argv) {
+#else
+int WINAPI WinMain(HINSTANCE hInstance,
+                   HINSTANCE hPrevInstance,
+                   LPWSTR lpCmdLine,
+                   int nShowCmd)
+
+#endif
   try {
     gApp = new SpinachApp;
     wxApp::SetInstance(gApp);
-    wxEntry(argc,argv);
+#ifdef __LINUX__
+   wxEntry(argc,argv);
+#else
+   wxEntry(hInstance,hPrevInstance,lpCmdLine,nShowCmd);
+#endif
   } catch (logic_error& e) {
     cerr << "Uncaught logic_error what()=" << e.what() << endl;
   } catch (runtime_error& e) {
@@ -49,7 +61,7 @@ SpinachApp::~SpinachApp() {
 }
 
 bool SpinachApp::OnInit() {
-    
+
 
     //Create the global selection manager
     mSelectionManager = new SelectionManager;
@@ -68,7 +80,7 @@ bool SpinachApp::OnInit() {
     fn.SetFullName(wxT("spinxml_schema.xsd"));
     wxString url(wxString(wxT("file://")) << fn.GetFullPath());
     mIOFilters.push_back(new XMLLoader(url.char_str()));
-  
+
     //Load the isotopes
 
     try {
@@ -76,8 +88,8 @@ bool SpinachApp::OnInit() {
     } catch(runtime_error e) {
         cout << "Isotopes not loaded" << endl;
         wxLogError(wxString() <<
-                   wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") << 
-                   wxT("Message was:") << 
+                   wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") <<
+                   wxT("Message was:") <<
                    wxString(e.what(),wxConvUTF8));
         return false;
     }

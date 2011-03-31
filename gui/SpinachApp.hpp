@@ -5,60 +5,83 @@
 
 #include <wx/app.h>
 #include <shared/spinsys.hpp>
+#include <shared/frame.hpp>
 #include <assert.h>
 
-#include <gui/SpinSysManager.hpp>
+#include <set>
+#include <algorithm>
 
-class SelectionManager;
+void PANIC(std::string s);
+
 
 class SpinachApp : public wxApp {
 public:
     ~SpinachApp();
     virtual bool OnInit();
-    SpinXML::SpinSystem* GetSS() const {return mSS;}
-    SelectionManager* GetSelectionManager() const {return mSelectionManager;}
+    SpinXML::SpinSystem* GetSpinSystem() const {return mSS;}
     const std::vector<SpinXML::ISpinSystemLoader*>& GetIOFilters() {return mIOFilters;}
 
     sigc::signal<void> sigDying;
 private:
     SpinXML::SpinSystem* mSS;
     std::vector<SpinXML::ISpinSystemLoader*> mIOFilters;
-    SelectionManager* mSelectionManager;
 };
 
 #include <map>
 #include <sigc++/sigc++.h>
 
-///A singleton class which keeps track of which objects are currently
-///selected or are being hovered over. (At the moment only spins can
-///be selected)
-class SelectionManager : public sigc::trackable {
-public:
-    SelectionManager();
-    ~SelectionManager();
+//================================================================================//
+// Unit systems
 
-    void SetHover(SpinXML::Spin* spin);
-    void SetSelection(const std::vector<SpinXML::Spin*>& selection);
+void SetUnit(PhysDimension d,unit u);
+unit GetUnit(PhysDimension d);
 
-    SpinXML::Spin* GetHover() const {return mHover;}
-    const std::vector<SpinXML::Spin*>& GetSelection() const {return mSelection;}
+const SpinXML::UnitSystem* GetUnitSystem();
 
-    static SelectionManager* Instance();
+extern sigc::signal<void> sigUnitSystemChange;
+extern sigc::signal<void,PhysDimension,unit> sigUnitChange;
 
-    sigc::signal<void,SpinXML::Spin*>          sigHover;
-    sigc::signal<void,std::vector<SpinXML::Spin*> > sigSelect;
-private:
-    SpinXML::Spin* mHover;
-    std::vector<SpinXML::Spin*> mSelection;
-    static SelectionManager* static_this;
-};
+//================================================================================//
+// Reference frames, there is exactly on active reference frame at a time
+
+void SetFrame(SpinXML::Frame* frame);
+SpinXML::Frame* GetFrame();
+
+extern sigc::signal<void,SpinXML::Frame*> sigFrameChange;
+
+
+//================================================================================//
+// Selection Manager functions
+
+//readers
+bool IsSelected(SpinXML::Spin* spin);
+unsigned int GetSelectedCount();
+
+extern sigc::signal<void,SpinXML::Spin*>            sigHover;
+extern sigc::signal<void,std::set<SpinXML::Spin*> > sigSelectChange;
+
+//Selection writers
+void ClearSelection();
+void SetHover(SpinXML::Spin* spin);
+void SetSelection(SpinXML::Spin* spin);
+void SetSelection(std::set<SpinXML::Spin*>& selection);
+
+void AddSelection(SpinXML::Spin* spinToAdd);
+void RemoveSelection(SpinXML::Spin* spin);
+SpinXML::Spin* GetHover();
+std::set<SpinXML::Spin*> GetSelection();
+
+//Selection Actions
+void DeleteSelectedSpins();
+
+
 
 ///Fakes the get app macro
 SpinachApp& wxGetApp();
 
 //Define macros for accessing the most up to date spin system
-#define GetSelMgr() (wxGetApp().GetSelectionManager())
-#define GetSS() (wxGetApp().GetSS())
+#define GetSS() (wxGetApp().GetSpinSystem()->GetView(GetFrame(),GetUnitSystem()))
+#define GetRawSS() (wxGetApp().GetSpinSystem())
 #define Chkpoint(x) 
 
 #endif

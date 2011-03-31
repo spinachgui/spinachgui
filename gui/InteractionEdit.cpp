@@ -148,98 +148,97 @@ void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
 
 void InterEditPanel::LoadFromInter() {
     cout << "Load from Inter()" << endl;
-  mLoading=true;
+	mLoading=true;
 
-  if(mInter->GetIsLinear()) {
-	mSpin2Combo->Enable(false);
-  } else if(mInter->GetIsBilinear()) {
-	mSpin2Combo->Enable(true);
-  } else {
-	//Interaction is quadratic
-	mSpin2Combo->Enable(false);
-  }
-  UpdateSubTypeCombo();
+	if(mInter->GetIsLinear()) {
+		mSpin2Combo->Enable(false);
+	} else if(mInter->GetIsBilinear()) {
+		mSpin2Combo->Enable(true);
+	} else {
+		//Interaction is quadratic
+		mSpin2Combo->Enable(false);
+	}
+	UpdateSubTypeCombo();
 
-  //Populate the spin 2 combobox with every other spin
-  mSpin2Combo->Clear();
+	//Populate the spin 2 combobox with every other spin
+	mSpin2Combo->Clear();
   
-  SpinSystem* ss=GetSS();
-  long spinCount=ss->GetSpinCount();
+	long spinCount=GetSS().GetSpinCount();
 
-  for(long i=0;i<spinCount;i++) {
-    Spin* spin=ss->GetSpin(i);
-    mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(spin->GetLabel(),wxConvUTF8),(void*)spin);
-  }
-  if(mInter->GetIsBilinear()) {
-    long Spin2Number=GetSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
-    mSpin2Combo->SetSelection(Spin2Number);
-  }
-  cout << "About the start testing types" << endl;
+	for(long i=0;i<spinCount;i++) {
+		SpinView spin=GetSS().GetSpin(i);
+		mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(spin.GetLabel(),wxConvUTF8),(void*)spin.Get());
+	}
+	if(mInter->GetIsBilinear()) {
+		long Spin2Number=GetSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
+		mSpin2Combo->SetSelection(Spin2Number);
+	}
+	cout << "About the start testing types" << endl;
 
-  if(mInter->GetStorage()==Interaction::STORAGE_SCALAR) {
-    energy scalar;
-    mInter->GetScalar(&scalar);
-    mScalarCtrl->SetValue(wxString() << scalar * MHz);
-    mTypeChoiceBook->SetSelection(0);
-  } else if(mInter->GetStorage()==Interaction::MATRIX) {
-    Matrix3d mat;
-    mInter->GetMatrix(&mat);
+	if(mInter->GetStorage()==Interaction::STORAGE_SCALAR) {
+		energy scalar;
+		mInter->GetScalar(&scalar);
+		mScalarCtrl->SetValue(wxString() << scalar * MHz);
+		mTypeChoiceBook->SetSelection(0);
+	} else if(mInter->GetStorage()==Interaction::MATRIX) {
+		Matrix3d mat;
+		mInter->GetMatrix(&mat);
     
-    mMatXXCtrl->SetValue(wxString() << mat(0,0) * MHz);
-    mMatXYCtrl->SetValue(wxString() << mat(0,1) * MHz);
-    mMatXZCtrl->SetValue(wxString() << mat(0,2) * MHz);
+		mMatXXCtrl->SetValue(wxString() << mat(0,0) * MHz);
+		mMatXYCtrl->SetValue(wxString() << mat(0,1) * MHz);
+		mMatXZCtrl->SetValue(wxString() << mat(0,2) * MHz);
                             
-    mMatYXCtrl->SetValue(wxString() << mat(1,0) * MHz);
-    mMatYYCtrl->SetValue(wxString() << mat(1,1) * MHz);
-    mMatYZCtrl->SetValue(wxString() << mat(1,2) * MHz);
+		mMatYXCtrl->SetValue(wxString() << mat(1,0) * MHz);
+		mMatYYCtrl->SetValue(wxString() << mat(1,1) * MHz);
+		mMatYZCtrl->SetValue(wxString() << mat(1,2) * MHz);
                                 
-    mMatZXCtrl->SetValue(wxString() << mat(2,0) * MHz);
-    mMatZYCtrl->SetValue(wxString() << mat(2,1) * MHz);
-    mMatZZCtrl->SetValue(wxString() << mat(2,2) * MHz);
+		mMatZXCtrl->SetValue(wxString() << mat(2,0) * MHz);
+		mMatZYCtrl->SetValue(wxString() << mat(2,1) * MHz);
+		mMatZZCtrl->SetValue(wxString() << mat(2,2) * MHz);
 
-    mTypeChoiceBook->SetSelection(1);
-  } else if(mInter->GetStorage()==Interaction::EIGENVALUES) {
-    energy xx,yy,zz;
-    Orientation o(Quaterniond(1,0,0,0));
-    mInter->GetEigenvalues(&xx,&yy,&zz,&o);
+		mTypeChoiceBook->SetSelection(1);
+	} else if(mInter->GetStorage()==Interaction::EIGENVALUES) {
+		energy xx,yy,zz;
+		Orientation o(Quaterniond(1,0,0,0));
+		mInter->GetEigenvalues(&xx,&yy,&zz,&o);
 
-    mEigenXXCtrl->SetValue(wxString() << xx * MHz);
-    mEigenYYCtrl->SetValue(wxString() << yy * MHz);
-    mEigenZZCtrl->SetValue(wxString() << zz * MHz);
+		mEigenXXCtrl->SetValue(wxString() << xx * MHz);
+		mEigenYYCtrl->SetValue(wxString() << yy * MHz);
+		mEigenZZCtrl->SetValue(wxString() << zz * MHz);
     
-    mOrientEigenvalueCtrl->SetOrient(o);
+		mOrientEigenvalueCtrl->SetOrient(o);
 
-    mTypeChoiceBook->SetSelection(2);
+		mTypeChoiceBook->SetSelection(2);
 
-  } else if(mInter->GetStorage()==Interaction::AXRHOM) {
-      cout << "type==axrhom" << endl;
-    energy ax,rhom,iso;
-    Orientation o(Quaterniond(1,0,0,0));
-    mInter->GetAxRhom(&iso,&ax,&rhom,&o);
-    mAxCtrl->       SetValue(wxString() << ax   * MHz);
-    mRhomCtrl->     SetValue(wxString() << rhom * MHz);
-    mAxRhomIsoCtrl->SetValue(wxString() << iso  * MHz);
-    cout << "Set everything but the orientation" << endl;
-    mOrientAxRhomCtrl->SetOrient(o);
+	} else if(mInter->GetStorage()==Interaction::AXRHOM) {
+		cout << "type==axrhom" << endl;
+		energy ax,rhom,iso;
+		Orientation o(Quaterniond(1,0,0,0));
+		mInter->GetAxRhom(&iso,&ax,&rhom,&o);
+		mAxCtrl->       SetValue(wxString() << ax   * MHz);
+		mRhomCtrl->     SetValue(wxString() << rhom * MHz);
+		mAxRhomIsoCtrl->SetValue(wxString() << iso  * MHz);
+		cout << "Set everything but the orientation" << endl;
+		mOrientAxRhomCtrl->SetOrient(o);
 
-    mTypeChoiceBook->SetSelection(3);
-  } else if(mInter->GetStorage()==Interaction::SPANSKEW) {
-    energy span,iso;
-    double skew;
-    Orientation o(Quaterniond(1,0,0,0));
-    mInter->GetSpanSkew(&iso,&span,&skew,&o);
-    mSpanCtrl->       SetValue(wxString() << span * MHz);
-    mSkewCtrl->       SetValue(wxString() << skew);
-    mSpanSkewIsoCtrl->SetValue(wxString() << iso  * MHz);
+		mTypeChoiceBook->SetSelection(3);
+	} else if(mInter->GetStorage()==Interaction::SPANSKEW) {
+		energy span,iso;
+		double skew;
+		Orientation o(Quaterniond(1,0,0,0));
+		mInter->GetSpanSkew(&iso,&span,&skew,&o);
+		mSpanCtrl->       SetValue(wxString() << span * MHz);
+		mSkewCtrl->       SetValue(wxString() << skew);
+		mSpanSkewIsoCtrl->SetValue(wxString() << iso  * MHz);
 
-    mOrientSpanSkewCtrl->SetOrient(o);
+		mOrientSpanSkewCtrl->SetOrient(o);
 
-    mTypeChoiceBook->SetSelection(4);
-  } else {
-      cerr << "Interaction.type was undefined" << endl;
-  }
+		mTypeChoiceBook->SetSelection(4);
+	} else {
+		cerr << "Interaction.type was undefined" << endl;
+	}
 
-  mLoading=false;
+	mLoading=false;
 }
 
 void InterEditPanel::SaveToInter() {

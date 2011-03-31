@@ -9,6 +9,7 @@
 
 using namespace SpinXML;
 using namespace std;
+using namespace boost;
 
 energy SpinXML::ConvertToScalar(const energy&   I)    {return I;}
 energy SpinXML::ConvertToScalar(const Matrix3d& I)    {return energy(I.trace()/3.0);}
@@ -612,3 +613,37 @@ void Interaction::valid_or_throw() const {
         throw runtime_error("Unknown, invalid type in Interaction");
     }
 }
+
+
+std::vector<Interaction::Type> SpinXML::Types;
+std::vector<Interaction::Type> SpinXML::MonoTypes;
+std::vector<Interaction::Type> SpinXML::BinaryTypes;
+
+__InterInit::__InterInit() {
+	cout << "Init interaction" << endl;
+    Types.push_back(Interaction::HFC);
+	Types.push_back(Interaction::G_TENSER);
+	Types.push_back(Interaction::ZFS);
+	Types.push_back(Interaction::EXCHANGE);
+	Types.push_back(Interaction::SHIELDING);
+	Types.push_back(Interaction::SCALAR);
+	Types.push_back(Interaction::QUADRUPOLAR);
+	Types.push_back(Interaction::DIPOLAR);
+	Types.push_back(Interaction::CUSTOM_LINEAR);
+	Types.push_back(Interaction::CUSTOM_BILINEAR);
+	Types.push_back(Interaction::CUSTOM_QUADRATIC);
+
+	MonoTypes.push_back(Interaction::G_TENSER);
+	MonoTypes.push_back(Interaction::ZFS);
+	MonoTypes.push_back(Interaction::SHIELDING);
+	MonoTypes.push_back(Interaction::QUADRUPOLAR);
+	MonoTypes.push_back(Interaction::CUSTOM_LINEAR);
+	MonoTypes.push_back(Interaction::CUSTOM_QUADRATIC);
+
+    BinaryTypes.push_back(Interaction::HFC);
+	BinaryTypes.push_back(Interaction::EXCHANGE);
+	BinaryTypes.push_back(Interaction::SCALAR);
+	BinaryTypes.push_back(Interaction::DIPOLAR);
+	BinaryTypes.push_back(Interaction::CUSTOM_BILINEAR);
+}
+

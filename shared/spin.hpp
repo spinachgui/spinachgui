@@ -2,17 +2,14 @@
 #ifndef SPIN_H
 #define SPIN_H
 
-#include <sigc++/sigc++.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry> 
+#include <sigc++/sigc++.h>
 #include <vector>
 
 #include <shared/unit.hpp>
 #include <shared/frame.hpp>
 #include <shared/base.hpp>
-
-using namespace Eigen;
-
 
 namespace SpinXML {
 	class SpinView;
@@ -21,12 +18,12 @@ namespace SpinXML {
     class Spin : public SpinXMLBase<Spin,SpinView> {
     public:  
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-        Spin(Vector3d mPosition,std::string mLabel,long atomicNumber=1,long isotope=1);
+        Spin(Eigen::Vector3d mPosition,std::string mLabel,long atomicNumber=1,long isotope=1);
         Spin(const Spin& s);
         ~Spin();
   
-        Vector3d& GetPosition();
-        void SetPosition(Vector3d Position);
+		Eigen::Vector3d& GetPosition();
+        void SetPosition(Eigen::Vector3d Position);
         void GetCoordinates(length* _x,length* _y, length* _z) const;
         void SetCoordinates(length _x,length _y, length _z);
 
@@ -38,11 +35,13 @@ namespace SpinXML {
         long GetIsotope() const;
         void SetIsotope(long isotope);
     private:
-        Vector3d mPosition;
+        Eigen::Vector3d mPosition;
         std::string mLabel;
         long mElement;
         long mIsotope;
     };
+
+	extern sigc::signal<void,Spin*> sigAnySpinDying;
 
     class SpinView : public ViewBase<SpinView,Spin> {
     public:
@@ -55,9 +54,9 @@ namespace SpinXML {
         ///When the SpinView detects the spin it is watching has been
         ///deleted it deletes itself and passes the signal upwards.
 
-
-        Vector3d GetPosition() const;
-        void SetPosition(Vector3d Position);
+		
+        Eigen::Vector3d GetPosition() const;
+        void SetPosition(Eigen::Vector3d Position);
         void GetCoordinates(double* _x,double* _y, double* _z) const;
         void SetCoordinates(double  _x,double  _y, double  _z);
 

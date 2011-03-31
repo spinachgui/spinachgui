@@ -14,6 +14,11 @@
 using namespace std;
 using namespace SpinXML;
 
+using namespace boost;
+namespace qi = boost::spirit::qi;
+using namespace boost::phoenix;
+using namespace boost::fusion;
+
 
 template<typename Iterator>
 struct pdb : qi::grammar<Iterator> {

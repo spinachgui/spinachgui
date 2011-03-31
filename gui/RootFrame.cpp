@@ -4,12 +4,22 @@
 #include <gui/MolSceneGraph.hpp>
 #include <stdexcept>
 #include <wx/log.h>
+#include <wx/statusbr.h>
+#include <wx/treectrl.h>
+
+#include <3d/displaySettings.hpp>
 
 //Input and output filters
 #include <gui/InterDisplaySettings.hpp>
+#include <gui/RightClickMenu.hpp>
+#define ID_UNIT_START 12345
+
+#include <3d/glgeometry.hpp>
 
 using namespace std;
-using namespace sigc;
+using namespace SpinXML;
+using sigc::bind;
+using sigc::mem_fun;
 //============================================================//
 // Utility Functions
 
@@ -20,139 +30,177 @@ wxString GetExtension(const wxString& filename) {
 }
 
 //============================================================//
+// Reference frame tree view
+
+class RCActionActivateFrame : public RightClickAction {
+public:
+    RCActionActivateFrame(Frame* frame) 
+	: RightClickAction(wxT("Activate Frame")), mFrame(frame) {
+    }
+    bool Visible() const {return true;}
+    void Exec(wxCommandEvent& e) {
+		SetFrame(mFrame);
+    }
+private:
+    Frame* mFrame;
+};
+
+//Quick class working with the wxWidgets clientData system
+struct FramePointer : public wxTreeItemData {
+    FramePointer(Frame* frame)
+	: frame(frame) {
+    }
+    Frame* frame;
+};
+
+//Class for drawing the tree of reference frames.
+class FrameTree : public wxTreeCtrl , public sigc::trackable {
+public:
+
+	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
+		mRoot = AddRoot(wxT("Lab Frame"),-1,-1,new FramePointer(GetSS()->GetLabFrame()));
+
+
+		RefreshFromSpinSystem();
+		sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
+	}
+	
+	void RefreshFromSpinSystem() {
+		mapFrameToId.clear();
+		mapFrameToId[GetSS().GetLabFrame()] = mRoot;
+
+		RefreshFromSpinSystemRecursive(mRoot,GetSS()->GetLabFrame());
+
+		mActive = mapFrameToId[GetFrame()];
+		SetItemBold(mActive);
+		Refresh(); //Seems like we need to explicitly ask for a
+				   //repaint
+	}
+
+	void SlotFrameChange(Frame* frame) {
+		SetItemBold(mActive,false);
+		mActive = mapFrameToId[frame];
+		SetItemBold(mActive);
+		Refresh();
+	}
+private:
+	void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
+		mapFrameToId[frame] = itemId;
+		vector<Frame*> children = frame->GetChildren();
+		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
+			wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
+			RefreshFromSpinSystemRecursive(nextItemId,*i);
+		}
+	}
+    
+    void OnRightClick(wxTreeEvent& e) {
+		FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
+		RightClickMenu* menu = new RightClickMenu(this);
+
+		vector<RightClickAction*> actions;
+		actions.push_back(new RCActionActivateFrame(fp->frame));
+
+		menu->Build(actions);
+		PopupMenu(menu);
+		delete menu;
+    }
+    DECLARE_EVENT_TABLE();
+	wxTreeItemId mRoot;
+	wxTreeItemId mActive;
+	map<Frame*,wxTreeItemId> mapFrameToId;
+};
+
+
+BEGIN_EVENT_TABLE(FrameTree,wxTreeCtrl)
+
+EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, FrameTree::OnRightClick)
+
+END_EVENT_TABLE()
+
+
+//============================================================//
+// Custom Status Bar
+
+class StatusBar : public wxStatusBar {
+public:
+	StatusBar(wxWindow* parent) : wxStatusBar(parent) {
+		int widths_field[] = {-1,80,80};
+		SetFieldsCount(3,widths_field);
+		SlotUnitChange(DIM_LENGTH,GetUnit(DIM_LENGTH));
+		SlotUnitChange(DIM_ENERGY,GetUnit(DIM_ENERGY));
+	}
+
+	void SlotUnitChange(PhysDimension d,unit u) {
+		wxString str = wxString(u.get_name().c_str(),wxConvUTF8);
+		switch(d) {
+		case DIM_LENGTH:
+			SetStatusText(str,1);
+			break;
+		case DIM_ENERGY:
+			SetStatusText(str,2);
+			break;
+		}
+	}
+};
+
+//============================================================//
+
+class InterDisplaySettingsPanel : public wxPanel,public sigc::trackable {
+public:
+	InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
+		wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
+
+		//HACK: Quick hack to iterate though an enum
+		for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
+			Interaction::Type type = (Interaction::Type)i;
+			InterDisplaySettings* widget = new InterDisplaySettings(this,type);
+			bs->Add(widget,1,wxEXPAND);
+
+			//Connect the scalling sliders to the scalling
+			widget->GetLogSlider()->sigChange.connect(bind(&SetInterSize,type));
+
+			//Connect the colour controls to the tensor colours
+			bind(&SetInterColour,type);
+			//widget->sigColour.connect();
+
+			//Connect the visibility toggles to the tensor colours
+			widget->sigVisible.connect(bind(&SetInterVisible,type));
+
+			//Set sensible default scallings
+			widget->GetLogSlider()->SetValue(1);
+
+			//Set default visibility to NMR/EPR
+			widget->SetVisible(true);
+
+			//Setup the default colours
+			widget->SetColour(0,0,1);
+		}
+
+		this->SetSizer(bs);
+	}
+	//You could probably avoid needing these functions somehow, but it
+	//probably wouldn't be worth the templates at this point
+	void SlotScaleChange(double s,Interaction::Type t)                 {}
+	void SlotColourChange(float r,float g,float b,Interaction::Type t) {}
+	void SlotVisibleChange(bool b,Interaction::Type t)                 {}
+};
+
+//============================================================//
 // RootFrame
 
 void RootFrame::InitFrame() {
+	//Setup the status bar
+	StatusBar* statusBar = new StatusBar(this);
+	SetStatusBar(statusBar);
+
+	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
 
-    mInterSizePanel=new wxPanel(this);
-
-    InterDisplaySettings* hfc_sp = new InterDisplaySettings(mInterSizePanel,Interaction::HFC             );
-    InterDisplaySettings* gt_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::G_TENSER        );
-    InterDisplaySettings* zfs_sp = new InterDisplaySettings(mInterSizePanel,Interaction::ZFS             );
-    InterDisplaySettings* exc_sp = new InterDisplaySettings(mInterSizePanel,Interaction::EXCHANGE        );
-    InterDisplaySettings* shd_sp = new InterDisplaySettings(mInterSizePanel,Interaction::SHIELDING       );
-    InterDisplaySettings* sca_sp = new InterDisplaySettings(mInterSizePanel,Interaction::SCALAR          );
-    InterDisplaySettings* qp_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::QUADRUPOLAR     );
-    InterDisplaySettings* dip_sp = new InterDisplaySettings(mInterSizePanel,Interaction::DIPOLAR         );
-    InterDisplaySettings* cl_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::CUSTOM_LINEAR   );
-    InterDisplaySettings* cb_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::CUSTOM_BILINEAR );
-    InterDisplaySettings* cq_sp  = new InterDisplaySettings(mInterSizePanel,Interaction::CUSTOM_QUADRATIC);
-
-
-    wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
-    bs->Add(hfc_sp,1,wxEXPAND);
-    bs->Add(gt_sp ,1,wxEXPAND);
-    bs->Add(zfs_sp,1,wxEXPAND);
-    bs->Add(exc_sp,1,wxEXPAND);
-    bs->Add(shd_sp,1,wxEXPAND);
-    bs->Add(sca_sp,1,wxEXPAND);
-    bs->Add(qp_sp ,1,wxEXPAND);
-    bs->Add(dip_sp,1,wxEXPAND);
-    bs->Add(cl_sp ,1,wxEXPAND);
-    bs->Add(cb_sp ,1,wxEXPAND);
-    bs->Add(cq_sp ,1,wxEXPAND);
-    mInterSizePanel->SetSizer(bs);
-
-    mSpinGrid      = new SpinGrid(this);
-    mSpinInterEdit = new SpinInterEditPanel(this);
-    mDisplay3D     = new Display3D(this);
-
-    MoleculeNodeNew* mn = new MoleculeNodeNew(GetSS());
-
-    SpinachDC& spinDC=mDisplay3D->GetDC();
-
-    //Connect the scalling sliders to the scalling
-    hfc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::HFC             ));
-    gt_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::G_TENSER        )); 
-    zfs_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::ZFS             ));
-    exc_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::EXCHANGE        ));
-    shd_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::SHIELDING       ));
-    sca_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::SCALAR          ));
-    qp_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::QUADRUPOLAR     ));
-    dip_sp->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::DIPOLAR         ));
-    cl_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::CUSTOM_LINEAR   ));
-    cb_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::CUSTOM_BILINEAR )); 
-    cq_sp ->GetLogSlider()->sigChange.connect(bind(mem_fun(spinDC,&SpinachDC::SetScalling),Interaction::CUSTOM_QUADRATIC)); 
-
-    //Connect the colour controls to the tensor colours
-    hfc_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::HFC             ));
-    gt_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::G_TENSER        )); 
-    zfs_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::ZFS             ));
-    exc_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::EXCHANGE        ));
-    shd_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::SHIELDING       ));
-    sca_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::SCALAR          ));
-    qp_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::QUADRUPOLAR     ));
-    dip_sp->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::DIPOLAR         ));
-    cl_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::CUSTOM_LINEAR   ));
-    cb_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::CUSTOM_BILINEAR )); 
-    cq_sp ->sigColour.connect(bind(mem_fun(spinDC,&SpinachDC::SetColour),Interaction::CUSTOM_QUADRATIC)); 
-
-    //Connect the visibility toggles to the tensor colours
-    hfc_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::HFC             ));
-    gt_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::G_TENSER        )); 
-    zfs_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::ZFS             ));
-    exc_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::EXCHANGE        ));
-    shd_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::SHIELDING       ));
-    sca_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::SCALAR          ));
-    qp_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::QUADRUPOLAR     ));
-    dip_sp->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::DIPOLAR         ));
-    cl_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::CUSTOM_LINEAR   ));
-    cb_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::CUSTOM_BILINEAR )); 
-    cq_sp ->sigVisible.connect(bind(mem_fun(spinDC,&SpinachDC::SetVisible),Interaction::CUSTOM_QUADRATIC)); 
-
-
-    //Set sensible default scallings
-    hfc_sp->GetLogSlider()->SetValue(0.1);
-    gt_sp ->GetLogSlider()->SetValue(1);
-    zfs_sp->GetLogSlider()->SetValue(1);
-    exc_sp->GetLogSlider()->SetValue(1);
-    shd_sp->GetLogSlider()->SetValue(0.001);
-    sca_sp->GetLogSlider()->SetValue(1);
-    qp_sp ->GetLogSlider()->SetValue(1);
-    dip_sp->GetLogSlider()->SetValue(1);
-    cl_sp ->GetLogSlider()->SetValue(1);
-    cb_sp ->GetLogSlider()->SetValue(1);
-    cq_sp ->GetLogSlider()->SetValue(1);
-
-    //Set sensible default visibility
-    hfc_sp -> SetVisible(true);
-    gt_sp  -> SetVisible(true);
-    zfs_sp -> SetVisible(true);
-    exc_sp -> SetVisible(false);
-    shd_sp -> SetVisible(true);
-    sca_sp -> SetVisible(false);
-    qp_sp  -> SetVisible(true);
-    dip_sp -> SetVisible(false);
-    cl_sp  -> SetVisible(true);
-    cb_sp  -> SetVisible(true);
-    cq_sp  -> SetVisible(true);
-
-
-    //Setup the default colours
-    hfc_sp -> SetColour(0   ,0   ,1   );
-    gt_sp  -> SetColour(0   ,0.7 ,0   );
-    zfs_sp -> SetColour(0.7 ,0   ,0   );
-    exc_sp -> SetColour(0   ,0.0 ,0.3 );
-    shd_sp -> SetColour(0.4 ,0.4 ,0.4 );
-    sca_sp -> SetColour(0   ,0.7 ,0   );
-    qp_sp  -> SetColour(0   ,0.7 ,0   );
-    dip_sp -> SetColour(0   ,0.7 ,0   );
-    cl_sp  -> SetColour(0   ,0.7 ,0   );
-    cb_sp  -> SetColour(0   ,0.7 ,0   );
-    cq_sp  -> SetColour(0   ,0.7 ,0   );
-
-    //Wire the DC up to the the bond toggle event
-    sigSetShowBonds.connect(mem_fun(spinDC,&SpinachDC::SetShowBonds));
-
-
-    mDisplay3D->SetRootSGNode(mn);
-
-    mDisplay3D->SetRootFGNode(new MoleculeFG(GetSS()));
-    // mDisplay3D->SetRootFGNode(new OpenGLText(wxT("Hello World")));
-
-    mDisplay3D->GetDC().depthOnly=false;
-
+    mInterSizePanel= new InterDisplaySettingsPanel(this);
+	mSpinGrid      = new SpinGrid(this);
+	mSpinInterEdit = new SpinInterEditPanel(this);
+	mDisplay3D     = new Display3D(this);
+	mFrameTree     = new FrameTree(this);
 
     // add the panes to the manager
     wxAuiPaneInfo display3dinfo;
@@ -162,7 +210,13 @@ void RootFrame::InitFrame() {
     display3dinfo.Movable(false);
     mAuiManager->AddPane(mDisplay3D,display3dinfo);
     mAuiManager->AddPane(mSpinGrid,wxBOTTOM,wxT("Grid View"));
-    mAuiManager->AddPane(mInterSizePanel,wxLEFT,wxT("Tensor Visualisation"));
+	mAuiManager->AddPane(mFrameTree,wxRIGHT,wxT("Reference Frames"));
+
+    wxAuiPaneInfo tensorVisinfo;
+	tensorVisinfo.Float();
+	tensorVisinfo.Hide();
+	tensorVisinfo.Caption(wxT("Tensor Visualisation"));
+    mAuiManager->AddPane(mInterSizePanel,tensorVisinfo);
     mAuiManager->AddPane(mSpinInterEdit,wxBOTTOM,wxT("Interaction Editor"));
 
     //Grey the undo and redo menu ideams. They can be ungreyed when
@@ -173,9 +227,48 @@ void RootFrame::InitFrame() {
 
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
-    GetSS()->sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
+    GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
+	sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
+
+	//Units menu. To avoid writing an On* function for every unit
+	//(which would make making units configurable impossible) we
+	//connect them all to the same handler and setup a lookup for
+	//translating the id into a unit and physical dimension.
+	typedef pair<PhysDimension,unit> p;
+
+	mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
+	mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
+	mIdToUnit.push_back(p(DIM_LENGTH,metres));
+
+	mIdToUnit.push_back(p(DIM_ENERGY,Hz));  //Default
+	mIdToUnit.push_back(p(DIM_ENERGY,KHz));
+	mIdToUnit.push_back(p(DIM_ENERGY,MHz));
+	mIdToUnit.push_back(p(DIM_ENERGY,eV));
+	mIdToUnit.push_back(p(DIM_ENERGY,Joules));
+
+	for(unsigned long i = 0;i<mIdToUnit.size();i++) {
+		PhysDimension d = mIdToUnit[i].first;
+		unit u = mIdToUnit[i].second;
+
+		wxMenu *menu = d == DIM_LENGTH ? mMenuLength : mMenuEnergy;
+		menu->AppendRadioItem(ID_UNIT_START+i,wxString(u.get_name().c_str(),wxConvUTF8));
+	}
+	wxObjectEventFunction afterCast = 
+		(wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
+	Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
+
+	//Debug code, print the details of the root frame
+	//cout << GetFrame() << endl;
+	//cout << GetRawSS()->GetRootFrame() << endl;
 }
 
+
+void RootFrame::OnUnitChange(wxCommandEvent& e) {
+	pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
+	PhysDimension d = thePair.first;
+	unit u = thePair.second;
+	SetUnit(d,u);
+}
 
 void RootFrame::OnUndo(wxCommandEvent& e) {
 
@@ -354,17 +447,40 @@ void RootFrame::OnResize(wxSizeEvent&e) {
     mAuiManager->Update();
 }
 
-
-void RootFrame::OnGLReset(wxCommandEvent& e) {
-    mDisplay3D->SetRootSGNode(new MoleculeNodeNew(GetSS()));  
-}
-
 void RootFrame::OnBondToggle(wxCommandEvent& e) {
     bool showBonds=e.IsChecked();
     mMenuItemBondToggle->Check(showBonds);
     mRootToolbar->ToggleTool(ID_BOND_TOGGLE,showBonds);
     sigSetShowBonds(showBonds);
 }
+	     
+void RootFrame::OnToggle3D(wxCommandEvent& e) {
+	AUIToggle(mDisplay3D);
+}
+
+void RootFrame::OnToggleGrid(wxCommandEvent& e) {
+	AUIToggle(mSpinGrid);
+}
+
+void RootFrame::OnToggleTensorVis(wxCommandEvent& e) {
+	AUIToggle(mInterSizePanel);
+}
+
+void RootFrame::OnToggleInterEdit(wxCommandEvent& e) {
+	AUIToggle(mSpinInterEdit);
+}
+
+void RootFrame::OnToggleFrames(wxCommandEvent& e) {
+	AUIToggle(mFrameTree);
+}
+
+void RootFrame::AUIToggle(wxWindow* p) {
+	cout << "AUI Toggle" << endl;
+    wxAuiPaneInfo& info = mAuiManager->GetPane(p);
+	info.Show(!info.IsShown());
+	mAuiManager->Update();
+}
+
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
@@ -386,11 +502,14 @@ EVT_MENU(ID_EPR,    RootFrame::OnEpr)
 
 EVT_MENU(ID_BOND_TOGGLE,  RootFrame::OnBondToggle)
 
+EVT_MENU(ID_VIEW_3D,        RootFrame::OnToggle3D)
+EVT_MENU(ID_VIEW_GRID,      RootFrame::OnToggleGrid)
+EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleTensorVis)
+EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleInterEdit)
+EVT_MENU(ID_VIEW_FRAMES,    RootFrame::OnToggleFrames)
+
 //Resize
 EVT_SIZE(RootFrame::OnResize)
-
-//Debug
-EVT_MENU(ID_GL_RESET,RootFrame::OnGLReset)
 
 END_EVENT_TABLE()
 

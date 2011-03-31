@@ -2,7 +2,6 @@
 #include <gui/SpinDialog.hpp>
 #include <gui/SpinachApp.hpp>
 #include <shared/nuclear_data.hpp>
-#include <gui/SpinSysManager.hpp>
 
 #include <string>
 #include <wx/log.h>
@@ -13,7 +12,8 @@ enum {
   ID_ELEMENT
 };
 
-SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) : SpinDialogBase(parent,id),mSpin(spin) {
+SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) 
+	: SpinDialogBase(parent,id),mSpin(spin) {
   mInterEdit=new SpinInterEditPanel(mSpinDialogPanel);
   mInterEdit->SetSpin(spin);
 

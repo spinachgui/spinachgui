@@ -44,8 +44,8 @@ SpinInterEditPanel::~SpinInterEditPanel() {
 }
 
 void SpinInterEditPanel::SetSpin(Spin* spin) {
-  mSpin=spin;
-  LoadFromSpin();
+	mSpin=spin;
+	LoadFromSpin();
 }
 
 void SpinInterEditPanel::Clear() {
@@ -55,7 +55,7 @@ void SpinInterEditPanel::Clear() {
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 	Interaction* inter=new Interaction(0.0*Hz,Interaction::SHIELDING,mSpin);
-	mSpinSystem->InsertInteraction(inter);
+	GetSS()->InsertInteraction(inter);
 
 	ListBoxInteraction lbi;
 	lbi.inter=inter;
@@ -71,7 +71,7 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 
 void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
   long n=GetSelectedInterIndex();
-  mSpinSystem->DiscardInteraction(mTempInteractions[n].inter);
+  GetSS()->DiscardInteraction(mTempInteractions[n].inter);
   mTempInteractions.erase(mTempInteractions.begin() + n);
   UpdateListBox();
   mInterEdit->SetInter(NULL,NULL);
@@ -86,7 +86,7 @@ void SpinInterEditPanel::LoadFromSpin() {
     Enable(true);
   }
 
-  std::vector<Interaction*> oldInteractions=mSpinSystem->GetInteractionsBySpin(mSpin);
+  std::vector<Interaction*> oldInteractions=GetSS()->GetInteractionsBySpin(mSpin);
   //Make sure all the interactions here are copies
   for(unsigned long i=0;i<oldInteractions.size();i++) {
     ListBoxInteraction lbi;

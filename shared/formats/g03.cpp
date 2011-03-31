@@ -51,9 +51,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				int dummy1,atomicNumber,dummy3;
 				length x,y,z;
 				stream >> dummy1 >> atomicNumber >> dummy3 >> x >> y >> z;
-				x=x/Angstroms;
-				y=y/Angstroms;
-				z=z/Angstroms;
+				x=x*Angstroms;
+				y=y*Angstroms;
+				z=z*Angstroms;
 				stream.clear();
 				fin.getline(buff,500); line=buff; stream.str(line); //Read a line
 				if(standardOrientFound) {
@@ -188,7 +188,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				//Read the coupling strength (in megaherz)
 				stream >> dummy1 >> dummy2 >> dummy3 >> isoCoupling;
         
-				Interaction* inter=new Interaction(isoCoupling/MHz,Interaction::HFC,ss->GetSpin(i+1),ss->GetSpin(0));
+				Interaction* inter=new Interaction(isoCoupling*MHz,Interaction::HFC,ss->GetSpin(i+1),ss->GetSpin(0));
 				ss->InsertInteraction(inter);
 			}          
 		}
@@ -220,13 +220,14 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 										   x2,y2,z2,
 										   x3,y3,z3));
 
-				Interaction* inter=new Interaction(Eigenvalues(eigenvalue1/MHz,eigenvalue2/MHz,eigenvalue3/MHz,o),
+				Interaction* inter=new Interaction(Eigenvalues(eigenvalue1*MHz,eigenvalue2*MHz,eigenvalue3*MHz,o),
 												   Interaction::HFC,
 												   ss->GetSpin(i+1),ss->GetSpin(0)); 
 				ss->InsertInteraction(inter);
 			}
 		}
 	}
+	ss->CompressDuplicateInteractions();
 	cout << "Finished loading the g03 file, saving ss->GetSpinCount()=" << ss->GetSpinCount() << endl;
 }
 

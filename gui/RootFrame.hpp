@@ -8,6 +8,9 @@
 #include <wx/aui/aui.h>
 #include <wx/splitter.h>
 
+class InterDisplaySettingsPanel;
+class FrameTree;
+
 class RootFrame : public RootFrameBase {
 public:
     RootFrame(wxWindow* parent) : RootFrameBase(parent) {
@@ -20,7 +23,7 @@ public:
     void InitFrame();
 
     void LoadFromFile(const wxString& path, const wxString& dir, const wxString& filename);
-    void SaveToFile(const wxString& filename,ISpinSystemLoader* saver=NULL);
+    void SaveToFile(const wxString& filename,SpinXML::ISpinSystemLoader* saver=NULL);
 
     //Utility Functions
     void SaveAs();
@@ -42,11 +45,17 @@ public:
     void OnEpr(wxCommandEvent& e);
     void OnBondToggle(wxCommandEvent& e);
 
+	void OnToggle3D(wxCommandEvent& e);
+	void OnToggleGrid(wxCommandEvent& e);
+	void OnToggleTensorVis(wxCommandEvent& e);
+	void OnToggleInterEdit(wxCommandEvent& e);
+	void OnToggleFrames(wxCommandEvent& e);
+
     //Resize Event
     void OnResize(wxSizeEvent& e);
 
-    //Debug Menu
-    void OnGLReset(wxCommandEvent& e);
+	//Unit Menu
+	void OnUnitChange(wxCommandEvent& e);
 
     //Signals
     sigc::signal<void,bool> sigSetShowBonds;
@@ -57,11 +66,14 @@ private:
     void UpdateTitle();
 
     wxAuiManager* mAuiManager;
+
     SpinGrid* mSpinGrid;
-    wxPanel* mInterSizePanel;
+    InterDisplaySettingsPanel* mInterSizePanel;
     SpinInterEditPanel* mSpinInterEdit;
     Display3D* mDisplay3D;
-    ISpinSystemLoader* mSaver;
+	FrameTree* mFrameTree;
+
+	SpinXML::ISpinSystemLoader* mSaver;
 
     ///Full path of the open file
     wxString mOpenPath;
@@ -69,6 +81,10 @@ private:
     wxString mOpenDir;
     ///Just the name of the open file
     wxString mOpenFile;
+
+	std::vector<std::pair<PhysDimension,unit> > mIdToUnit;
+
+	void AUIToggle(wxWindow* p);
 };
 
 

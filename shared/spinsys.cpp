@@ -7,6 +7,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <shared/basic_math.hpp>
+#include <shared/foreach.hpp>
 
 using namespace std;
 using namespace SpinXML;
@@ -27,12 +28,12 @@ std::vector<SpinView> SpinSystemView::GetNearbySpins(Vector3d pos,double distanc
 // SpinSystem
 
 SpinSystem::SpinSystem()
-	: mRootFrame(new Frame(Vector3d(1,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
 }
 
 
 SpinSystem::SpinSystem(const SpinSystem& system)
-	: mRootFrame(new Frame(Vector3d(1,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
     long spinCount=system.mSpins.size();
 
     mSpins.resize(spinCount);
@@ -45,17 +46,18 @@ SpinSystem::SpinSystem(const SpinSystem& system)
 
 SpinSystem::~SpinSystem() {
     Clear();
+	delete mRootFrame;
 }
 
 void SpinSystem::Clear() {
-    //Currently we need to delete the interactions Before the spins as
-    //the spins have interactions as their children. 
-
     for(unsigned long i=0;i<mSpins.size();i++) {
         mIgnoreSpinKill=mSpins[i];
         delete mSpins[i];
     }
     mSpins.resize(0);
+
+	delete mRootFrame;
+	mRootFrame = new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem);
 
     sigReloaded();
 }
@@ -71,9 +73,9 @@ long SpinSystem::GetSpinCount() const {
 }
 
 Spin* SpinSystem::GetSpin(unsigned long n) const {
-	if(n+1 > mSpins.size()) {
-		throw runtime_error("In SpinSystem::GetSpin Invalid spin number");
-	}
+    if(n+1 > mSpins.size()) {
+	//throw runtime_error("In SpinSystem::GetSpin Invalid spin number");
+    }
     return mSpins[n];
 }
 
@@ -89,9 +91,9 @@ long SpinSystem::GetSpinNumber(Spin* spin) const {
 vector<Spin*> SpinSystem::GetNearbySpins(Vector3d pos,length distance,Spin* Ignore) {
     std::vector<Spin*> result;
     length2 dist2=distance*distance;
-    length x1=pos.x() * metres;
-    length y1=pos.x() * metres;
-    length z1=pos.x() * metres;
+    length x1=pos.x();
+    length y1=pos.y();
+    length z1=pos.z();
 
     long spinCount=mSpins.size();
 
@@ -105,7 +107,7 @@ vector<Spin*> SpinSystem::GetNearbySpins(Vector3d pos,length distance,Spin* Igno
         length deltaX=(x1-x2);
         length deltaY=(y1-y2);
         length deltaZ=(z1-z2);
-	length2 deltaR=deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ;
+		length2 deltaR=deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ;
         if(deltaR < dist2) {
             result.push_back(mSpins[i]);
         }
@@ -264,4 +266,45 @@ void SpinSystem::InsertInteraction(Interaction* inter) {
 
 void SpinSystem::OnSpinDeleted(Spin* spin) {
 	RemoveSpin(spin);
+}
+
+void SpinSystem::CompressDuplicateInteractions() {
+	//Do the monospin interactions
+	foreach(Spin* spin,mSpins) {
+		foreach(Interaction::Type t,MonoTypes) {
+			vector<Interaction*> toCrush = GetInteractionsBySpin(spin,t);
+			if(toCrush.size() > 1) {
+				Matrix3d total;
+				total << 
+					0, 0, 0,
+					0, 0, 0,
+					0, 0, 0;
+				foreach(Interaction* inter,toCrush) {
+					total += inter->AsMatrix();
+					delete RemoveInteraction(inter);
+				}
+				this->InsertInteraction(new Interaction(total,t,spin));
+			}
+		}
+	}
+	//Now do the binary spin interactions
+	for(vector<Spin*>::iterator i = mSpins.begin();i != mSpins.end(); ++i) {
+		for(vector<Spin*>::iterator j = i + 1; j != mSpins.end(); ++j) {
+			foreach(Interaction::Type t,BinaryTypes) {
+				vector<Interaction*> toCrush = GetInteractionsBySpin(*i,*j,t);
+				if(toCrush.size() > 1) {
+					Matrix3d total;
+					total << 
+						0, 0, 0,
+						0, 0, 0,
+						0, 0, 0;
+					foreach(Interaction* inter,toCrush) {
+						total += inter->AsMatrix();
+						delete RemoveInteraction(inter);
+					}
+					this->InsertInteraction(new Interaction(total,t,*i,*j));
+				}
+			}
+		}
+	}
 }

@@ -12,7 +12,9 @@ UnitSystem::UnitSystem()
 //============================================================//
 
 Frame::Frame(Vector3d translation, Orientation rotation, const UnitSystem* unitSystem) 
-    : mParent(NULL),mTranslate(translation * unitSystem->lengthUnit.get_to_si()),mOrient(rotation),mUnitSystem(unitSystem) {
+    : mParent(NULL),
+	  mTranslate(translation * (unitSystem->lengthUnit.get_to_si())),
+	  mOrient(rotation),mUnitSystem(unitSystem) {
     updateAfine();
 }
 
@@ -38,8 +40,10 @@ void Frame::SetOrientation(const Orientation orient) {
 
 void Frame::updateAfine() {
     Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsQuaternion());
-    Matrix4d mat=T.matrix();
-    mAffine = (mParent==NULL) ? mat : mParent->mAffine*mat;
+	Matrix4d mat = T.matrix();
+	Matrix4d imat = T.inverse().matrix();
+    mAffine =         (mParent==NULL) ? mat : mParent->mAffine*mat;
+    mInvertedAffine = (mParent==NULL) ? mat : mat * mParent->mInvertedAffine;
 }
 
 void Frame::AddChild(Frame* frame) {
@@ -49,5 +53,16 @@ void Frame::AddChild(Frame* frame) {
 	frame->sigChange(frame);
 }
 
+
+Matrix4d Frame::getTransformFromLab() const {
+	return mAffine;
+}
+
+Matrix4d Frame::getTransformToLab() const {
+	return mInvertedAffine;
+}
+
+
 //Initalise the static default UnitSystem
 UnitSystem UnitSystem::singleton;
+

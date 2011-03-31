@@ -1,10 +1,12 @@
     .section .rodata
-    .global spinxmlSchema
+    .global _spinxmlSchema
+//    .type   spinxmlSchema, @object
     .align  4
-spinxmlSchema:
+_spinxmlSchema:
     .incbin "data/spinxml_schema.xsd"
-	.int    0
-    .global spinxmlSchemaSize
+    .int    0
+    .global _spinxmlSchemaSize
+//    .type   spinxmlSchemaSize, @object
     .align  4
-spinxmlSchemaSize:
-	.int    spinxmlSchemaSize - spinxmlSchema
+_spinxmlSchemaSize:
+    .int    _spinxmlSchemaSize - _spinxmlSchema

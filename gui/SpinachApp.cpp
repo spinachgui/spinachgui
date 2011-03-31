@@ -20,6 +20,10 @@
 
 #include <shared/unit.hpp>
 
+#ifndef __LINUX__
+#include <windows.h>
+#endif
+
 using namespace SpinXML;
 using namespace Eigen;
 
@@ -126,9 +130,9 @@ SpinachApp& wxGetApp() {
 int main(int argc,char** argv) {
 #else
 int WINAPI WinMain(HINSTANCE hInstance,
-                   HINSTANCE hPrevInstance,
-                   LPWSTR lpCmdLine,
-                   int nShowCmd) {
+		   HINSTANCE hPrevInstance,
+		   LPSTR lpCmdLine,
+		   int nShowCmd) {
 
 #endif
   try {

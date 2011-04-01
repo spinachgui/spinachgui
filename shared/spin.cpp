@@ -70,7 +70,6 @@ Spin::Spin(const Spin& s) :
 }
 
 Spin::~Spin() {
-    sigDying(this);
 	sigAnySpinDying(this);
 }
 

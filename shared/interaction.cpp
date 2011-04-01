@@ -195,7 +195,6 @@ USpanSkew    InteractionView::AsSpanSkew() const {
 
 Interaction::~Interaction() {
 	cout << "Calling the destructor" << endl;
-    sigDying(this);
 }
 
 class thisVisitor : public static_visitor<> {

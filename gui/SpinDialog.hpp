@@ -3,18 +3,15 @@
 #define SPINDIALOG_H
 
 #include <auto/SpinachGUI.h>
+#include <shared/spin.hpp>
 
 class SpinInterEditPanel;
-namespace SpinXML {
-	class Spin;
-	class SpinSystem;
-};
 
 using namespace std;
 
 class SpinDialog : public SpinDialogBase {
 public:
-	SpinDialog(wxWindow* parent,SpinXML::Spin* spin,wxWindowID id= -1); 
+	SpinDialog(wxWindow* parent,SpinXML::SpinView spin,wxWindowID id= -1); 
 
 	void OnApply(wxCommandEvent& e);
 
@@ -32,8 +29,7 @@ protected:
 	DECLARE_EVENT_TABLE();
 
 private:
-	SpinXML::Spin* mSpin;
-	SpinXML::SpinSystem* mSpinSystem;
+	SpinXML::SpinView mSpin;
 	SpinInterEditPanel* mInterEdit;
 };
 

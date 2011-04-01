@@ -15,10 +15,10 @@ enum {
 	ID_ELEMENT
 };
 
-SpinDialog::SpinDialog(wxWindow* parent,Spin* spin,wxWindowID id) 
+SpinDialog::SpinDialog(wxWindow* parent,SpinView spin,wxWindowID id) 
 	: SpinDialogBase(parent,id),mSpin(spin) {
 	mInterEdit=new SpinInterEditPanel(mSpinDialogPanel);
-	mInterEdit->SetSpin(spin);
+	mInterEdit->SetSpin(spin.Get());
 
 	wxSizer* interSizer=mSpinDialogPanel->GetSizer()->GetItem(2)->GetSizer();
 	interSizer->Add(mInterEdit,1,wxEXPAND | wxALL);
@@ -79,33 +79,33 @@ void SpinDialog::SaveToSpin() {
 		return;
 	}
     
-	mSpin->SetCoordinates(x*Angstroms,y*Angstroms,z*Angstroms);
+	mSpin.SetCoordinates(x,y,z);
 
 	wxString label=mSpinTitle->GetValue();
-	mSpin->SetLabel(string(label.mb_str()));
+	mSpin.SetLabel(string(label.mb_str()));
 
 
-	mSpin->SetElement(mElementCombo->GetSelection());
+	mSpin.SetElement(mElementCombo->GetSelection());
 }
 
 
 void SpinDialog::LoadFromSpin() {
 	length x,y,z;
-	mSpin->GetCoordinates(&x,&y,&z);
-	wxString label=wxString(mSpin->GetLabel(),wxConvUTF8);
+	mSpin.GetCoordinates(&x,&y,&z);
+	wxString label=wxString(mSpin.GetLabel(),wxConvUTF8);
 
 	mSpinTitle->SetValue(label);
 
 	wxString strX,strY,strZ;
-	strX << x * Angstroms;
-	strY << y * Angstroms;
-	strZ << z * Angstroms;
+	strX << x;
+	strY << y;
+	strZ << z;
 
 	mXPosCtrl->SetValue(strX);
 	mYPosCtrl->SetValue(strY);
 	mZPosCtrl->SetValue(strZ);
 
-	mElementCombo->SetSelection(mSpin->GetElement());
+	mElementCombo->SetSelection(mSpin.GetElement());
 
 	UpdateIsotopeDropDown();
 	mIsotopeCombo->SetSelection(0);

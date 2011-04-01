@@ -30,7 +30,7 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id) 
 	: SpinInterEditPanelBase(parent,id),
 	  mEditMode(EDIT_ALL),
-	  mSpin(NULL),
+	  mSpin(SpinView(NULL,GetFrame(),GetUnitSystem())),
 	  mUpdatingListBox(false),
 	  mDialogMode(true) {
 	mInterEdit=new InterEditPanel(this);
@@ -44,7 +44,7 @@ SpinInterEditPanel::~SpinInterEditPanel() {
 }
 
 void SpinInterEditPanel::SetSpin(Spin* spin) {
-	mSpin=spin;
+	mSpin=SpinView(spin,GetFrame(),GetUnitSystem());
 	LoadFromSpin();
 }
 
@@ -54,7 +54,7 @@ void SpinInterEditPanel::Clear() {
 }
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
-	Interaction* inter=new Interaction(0.0*Hz,Interaction::SHIELDING,mSpin);
+	Interaction* inter=new Interaction(0.0*Hz,Interaction::SHIELDING,mSpin.Get());
 	GetRawSS()->InsertInteraction(inter);
 
 	ListBoxInteraction lbi;
@@ -65,7 +65,7 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 
 	UpdateListBox();
 	mInterListBox->SetSelection(mInterListBox->GetCount()-1);
-	mInterEdit->SetInter(inter,mSpin);
+	mInterEdit->SetInter(inter,mSpin.Get());
 	InteractionChange();
 }
 
@@ -80,13 +80,13 @@ void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
 
 void SpinInterEditPanel::LoadFromSpin() {
 	Clear();
-	if(mSpin==NULL) {
+	if(mSpin.Get()==NULL) {
 		return;
 	} else {
 		Enable(true);
 	}
 
-	std::vector<Interaction*> oldInteractions=GetRawSS()->GetInteractionsBySpin(mSpin);
+	std::vector<Interaction*> oldInteractions=GetRawSS()->GetInteractionsBySpin(mSpin.Get());
 	//Make sure all the interactions here are copies
 	for(unsigned long i=0;i<oldInteractions.size();i++) {
 		ListBoxInteraction lbi;
@@ -157,14 +157,14 @@ void SpinInterEditPanel::InteractionChange() {
 	long selected=GetSelectedInterIndex();
 	if(selected >-1) {
 		Interaction* inter=mTempInteractions[selected].inter;
-		mInterEdit->SetInter(inter,mSpin);
+		mInterEdit->SetInter(inter,mSpin.Get());
 	} else {
 		mInterEdit->SetInter(NULL,NULL);
 	}
 }
 
 void SpinInterEditPanel::OnSSChange(wxCommandEvent& e) {
-	if(mSpin==NULL) {
+	if(mSpin.Get()==NULL) {
 		return;
 	}
 	//If one of the interactions we're interested in just changed, it must

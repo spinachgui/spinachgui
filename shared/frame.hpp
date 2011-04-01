@@ -82,6 +82,9 @@ namespace SpinXML {
 
         ViewBase(T* data,const Frame* frame, const UnitSystem* unitSystem)
             : mData(data),mFrame(frame),mUnitSystem(unitSystem) {
+			if(mData == NULL) {
+				return;
+			}
 			mData->sigChange.connect(sigChange);
             mData->sigDying.connect(sigDying);
             mData->sigDying.connect(mem_fun(this,&ViewBase::OnObjectDie));

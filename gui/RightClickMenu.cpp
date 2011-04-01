@@ -50,8 +50,10 @@ RCActionShowSpinProperties::RCActionShowSpinProperties(wxWindow* parent)
 void RCActionShowSpinProperties::Exec(wxCommandEvent& e) {
     const set<Spin*>& selection = GetSelection();
     if(selection.begin() != selection.end()) {
-	SpinDialog* dialog=new SpinDialog(mParent,*(selection.begin()));
-	dialog->ShowModal(); 
+		Spin* spin = *(selection.begin());
+		SpinView spinV = spin->GetView(GetFrame(),GetUnitSystem());
+		SpinDialog* dialog=new SpinDialog(mParent,spinV);
+		dialog->ShowModal(); 
     }
 }
 

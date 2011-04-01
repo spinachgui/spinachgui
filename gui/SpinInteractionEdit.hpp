@@ -64,7 +64,7 @@ private:
 	long GetSelectedInterIndex() const;
 
 	//Data
-	SpinXML::Spin* mSpin;
+	SpinXML::SpinView mSpin;
   
 	///True when the GUI list box is being updated.  Events generated
 	///when mUpdatingListBox is true should usually be ignored

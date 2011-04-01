@@ -10,17 +10,17 @@ using namespace SpinXML;
 // InterPopup
 
 InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
-  : wxFrame(Parent,
-	    id,
-	    wxT("Popup panel"),
-	    wxDefaultPosition,
-	    wxDefaultSize,
-	    wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR),
-    mPanel(new SpinInterEditPanel(this)) {
-  mPanel->SetSpin(spin);
-  wxBoxSizer* sizer=new wxBoxSizer(wxVERTICAL);
-  sizer->Add(mPanel,1.0,wxALL | wxEXPAND);
-  SetSizer(sizer);  
+	: wxFrame(Parent,
+			  id,
+			  wxT("Popup panel"),
+			  wxDefaultPosition,
+			  wxDefaultSize,
+			  wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR),
+	  mPanel(new SpinInterEditPanel(this)) {
+	mPanel->SetSpin(spin);
+	wxBoxSizer* sizer=new wxBoxSizer(wxVERTICAL);
+	sizer->Add(mPanel,1.0,wxALL | wxEXPAND);
+	SetSizer(sizer);  
 }
 
 //============================================================//
@@ -28,19 +28,19 @@ InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
 
 
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id) 
-  : SpinInterEditPanelBase(parent,id),
-    mEditMode(EDIT_ALL),
-    mSpin(NULL),
-    mUpdatingListBox(false),
-    mDialogMode(true) {
-  mInterEdit=new InterEditPanel(this);
-  mInterEdit->sigChange.connect(mem_fun(*this,&SpinInterEditPanel::DirtySelected));
-  GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
-  Enable(false);
+	: SpinInterEditPanelBase(parent,id),
+	  mEditMode(EDIT_ALL),
+	  mSpin(NULL),
+	  mUpdatingListBox(false),
+	  mDialogMode(true) {
+	mInterEdit=new InterEditPanel(this);
+	mInterEdit->sigChange.connect(mem_fun(*this,&SpinInterEditPanel::DirtySelected));
+	GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
+	Enable(false);
 };
 
 SpinInterEditPanel::~SpinInterEditPanel() {
-  Clear();
+	Clear();
 }
 
 void SpinInterEditPanel::SetSpin(Spin* spin) {
@@ -49,8 +49,8 @@ void SpinInterEditPanel::SetSpin(Spin* spin) {
 }
 
 void SpinInterEditPanel::Clear() {
-  mTempInteractions.resize(0);
-  Enable(false);
+	mTempInteractions.resize(0);
+	Enable(false);
 }
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
@@ -70,119 +70,119 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 }
 
 void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
-  long n=GetSelectedInterIndex();
-  GetRawSS()->DiscardInteraction(mTempInteractions[n].inter);
-  mTempInteractions.erase(mTempInteractions.begin() + n);
-  UpdateListBox();
-  mInterEdit->SetInter(NULL,NULL);
-  InteractionChange();
+	long n=GetSelectedInterIndex();
+	GetRawSS()->DiscardInteraction(mTempInteractions[n].inter);
+	mTempInteractions.erase(mTempInteractions.begin() + n);
+	UpdateListBox();
+	mInterEdit->SetInter(NULL,NULL);
+	InteractionChange();
 }
 
 void SpinInterEditPanel::LoadFromSpin() {
-  Clear();
-  if(mSpin==NULL) {
-    return;
-  } else {
-    Enable(true);
-  }
+	Clear();
+	if(mSpin==NULL) {
+		return;
+	} else {
+		Enable(true);
+	}
 
-  std::vector<Interaction*> oldInteractions=GetRawSS()->GetInteractionsBySpin(mSpin);
-  //Make sure all the interactions here are copies
-  for(unsigned long i=0;i<oldInteractions.size();i++) {
-    ListBoxInteraction lbi;
-    lbi.inter=oldInteractions[i];
-    lbi.modified=false;
-    mTempInteractions.push_back(lbi);
-  }
+	std::vector<Interaction*> oldInteractions=GetRawSS()->GetInteractionsBySpin(mSpin);
+	//Make sure all the interactions here are copies
+	for(unsigned long i=0;i<oldInteractions.size();i++) {
+		ListBoxInteraction lbi;
+		lbi.inter=oldInteractions[i];
+		lbi.modified=false;
+		mTempInteractions.push_back(lbi);
+	}
 
-  UpdateListBox();
-  InteractionChange();
+	UpdateListBox();
+	InteractionChange();
 }
 
 void SpinInterEditPanel::DirtySelected() {
-  mTempInteractions[GetSelectedInterIndex()].modified=true;
-  UpdateListBox();
+	mTempInteractions[GetSelectedInterIndex()].modified=true;
+	UpdateListBox();
 }
 
 void SpinInterEditPanel::UpdateListBox() {
-  mUpdatingListBox=true;
-  mInterListBox->Clear();
-  long len=mTempInteractions.size();
+	mUpdatingListBox=true;
+	mInterListBox->Clear();
+	long len=mTempInteractions.size();
 
-  mLBIndex2SpinIndex.resize(0);
+	mLBIndex2SpinIndex.resize(0);
 
-  for (long i=0;i<len;i++) {
-    Interaction* inter=mTempInteractions[i].inter;
-    if(inter->GetIsQuadratic()) {
-      if(mEditMode!=EDIT_QUAD && mEditMode!=EDIT_ALL) {
-	continue;
-      }
-    } else if (inter->GetIsBilinear()) {
-      if(mEditMode!=EDIT_BILINEAR && mEditMode!=EDIT_ALL) {
-	continue;
-      }
-    } else {
-      if(mEditMode!=EDIT_LINEAR && mEditMode!=EDIT_ALL) {
-	continue;
-      }
-    }
-    wxString interTitle=NameInteraction(inter);
-    if(mTempInteractions[i].modified && mDialogMode) {
-      interTitle << wxT("*");
-    } 
-    mLBIndex2SpinIndex.push_back(i);
-    mInterListBox->Append(interTitle);
-  }
-  mUpdatingListBox=false;
+	for (long i=0;i<len;i++) {
+		Interaction* inter=mTempInteractions[i].inter;
+		if(inter->GetIsQuadratic()) {
+			if(mEditMode!=EDIT_QUAD && mEditMode!=EDIT_ALL) {
+				continue;
+			}
+		} else if (inter->GetIsBilinear()) {
+			if(mEditMode!=EDIT_BILINEAR && mEditMode!=EDIT_ALL) {
+				continue;
+			}
+		} else {
+			if(mEditMode!=EDIT_LINEAR && mEditMode!=EDIT_ALL) {
+				continue;
+			}
+		}
+		wxString interTitle=NameInteraction(inter);
+		if(mTempInteractions[i].modified && mDialogMode) {
+			interTitle << wxT("*");
+		} 
+		mLBIndex2SpinIndex.push_back(i);
+		mInterListBox->Append(interTitle);
+	}
+	mUpdatingListBox=false;
 }
 
 wxString SpinInterEditPanel::NameInteraction(Interaction* inter) {
-  wxString interTitle;
-  interTitle << wxString(Interaction::GetTypeName(inter->GetType()),wxConvUTF8);
-  interTitle << wxT("(");
-  interTitle << wxString(Interaction::GetStorageName(inter->GetStorage()),wxConvUTF8);
-  interTitle << wxT(")");
+	wxString interTitle;
+	interTitle << wxString(Interaction::GetTypeName(inter->GetType()),wxConvUTF8);
+	interTitle << wxT("(");
+	interTitle << wxString(Interaction::GetStorageName(inter->GetStorage()),wxConvUTF8);
+	interTitle << wxT(")");
 
-  return interTitle;
+	return interTitle;
 }
        
 void SpinInterEditPanel::OnInteractionChange(wxCommandEvent& e) {
-  if(mUpdatingListBox) {
-    return;
-  }
-  InteractionChange();
+	if(mUpdatingListBox) {
+		return;
+	}
+	InteractionChange();
 }
 
 void SpinInterEditPanel::InteractionChange() {
-  long selected=GetSelectedInterIndex();
-  if(selected >-1) {
-    Interaction* inter=mTempInteractions[selected].inter;
-    mInterEdit->SetInter(inter,mSpin);
-  } else {
-    mInterEdit->SetInter(NULL,NULL);
-  }
+	long selected=GetSelectedInterIndex();
+	if(selected >-1) {
+		Interaction* inter=mTempInteractions[selected].inter;
+		mInterEdit->SetInter(inter,mSpin);
+	} else {
+		mInterEdit->SetInter(NULL,NULL);
+	}
 }
 
 void SpinInterEditPanel::OnSSChange(wxCommandEvent& e) {
-  if(mSpin==NULL) {
-    return;
-  }
-  //If one of the interactions we're interested in just changed, it must
-  //be the one currently being displayed, thus that is the one we mark as modifed
-  long selected=GetSelectedInterIndex();
-  if(selected >-1) {
-    mTempInteractions[selected].modified=true;
-  } 
-  UpdateListBox();
-  e.Skip();
+	if(mSpin==NULL) {
+		return;
+	}
+	//If one of the interactions we're interested in just changed, it must
+	//be the one currently being displayed, thus that is the one we mark as modifed
+	long selected=GetSelectedInterIndex();
+	if(selected >-1) {
+		mTempInteractions[selected].modified=true;
+	} 
+	UpdateListBox();
+	e.Skip();
 }
 
 long SpinInterEditPanel::GetSelectedInterIndex() const {
-  long selected = mInterListBox->GetSelection();
-  if(selected < 0) {
-    return -1;
-  } 
-  return mLBIndex2SpinIndex[selected];
+	long selected = mInterListBox->GetSelection();
+	if(selected < 0) {
+		return -1;
+	} 
+	return mLBIndex2SpinIndex[selected];
 }
 
 

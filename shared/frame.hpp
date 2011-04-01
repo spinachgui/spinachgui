@@ -90,7 +90,7 @@ namespace SpinXML {
         void SetFrame(Frame* frame) {mFrame=frame;}
         void SetUnitSystem(UnitSystem* unitSystem) {mUnitSystem=unitSystem;}
 
-        T* operator ->() {return mData;}
+        //T* operator ->() {return mData;}
 		T* Get() {return mData;}
 		const T* Get() const {return mData;}
 

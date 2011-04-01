@@ -170,7 +170,7 @@ void InterEditPanel::LoadFromInter() {
 		mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(spin.GetLabel(),wxConvUTF8),(void*)spin.Get());
 	}
 	if(mInter->GetIsBilinear()) {
-		long Spin2Number=GetSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
+		long Spin2Number=GetRawSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
 		mSpin2Combo->SetSelection(Spin2Number);
 	}
 	cout << "About the start testing types" << endl;

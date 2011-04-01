@@ -92,7 +92,7 @@ void SpinGrid::SlotHover(Spin* spin) {
 	if(spin == NULL) {
 		return;
 	}
-	long spinN = GetSS()->GetSpinNumber(spin);
+	long spinN = GetRawSS()->GetSpinNumber(spin);
 	ColourRow(spinN,wxColor(hoverC));
 	mLastHover = spinN;
 }
@@ -102,18 +102,18 @@ void SpinGrid::SlotSelectChange(set<Spin*> spins) {
 		ColourRow(i,defaultC);
 	}
 	for(set<Spin*>::iterator i = spins.begin();i!=spins.end();++i) {
-		long row = GetSS()->GetSpinNumber(*i);
+		long row = GetRawSS()->GetSpinNumber(*i);
 		ColourRow(row,selectedC);
 	}
 }
 
 
 void SpinGrid::OnEdit(wxGridEvent& e) {
-    long sc=GetSS()->GetSpinCount();
+    long sc=GetRawSS()->GetSpinCount();
     if(e.GetRow()==sc) {
         //User is trying to edit the blank line at the bottom of the grid,
         //so create a new spin for them
-        GetSS()->InsertSpin(new Spin(Vector3d(0,0,0),"New Spin",1));
+        GetRawSS()->InsertSpin(new Spin(Vector3d(0,0,0),"New Spin",1));
     }
 }
 
@@ -143,7 +143,7 @@ void SpinGrid::RefreshFromSpinSystem() {
         //remain and are black. wxGrid::DeleteRows solves this
         DeleteRows(0,GetNumberRows());
     }
-    long count=GetSS()->GetSpinCount();
+    long count=GetRawSS()->GetSpinCount();
     AppendRows(count+1);
     for (long i=0; i < count; i++) {
         SetupRow(i);
@@ -160,7 +160,7 @@ void SpinGrid::UpdateRow(long rowNumber) {
 		spin.GetCoordinates(&x,&y,&z);
 
         //Set the label
-        SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
+        SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin.GetLabel(),wxConvUTF8));
 
         //Set the x,y,z coordinates
         SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
@@ -223,7 +223,7 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         } else {
             UpdateRowIsotopes(e.GetRow());
             Chkpoint(wxT("Spin Element"));
-            GetSS().GetSpin(e.GetRow())->SetElement(element);
+            GetRawSS()->GetSpin(e.GetRow())->SetElement(element);
         }
     } else if(e.GetCol()==SpinGrid::COL_ISOTOPES) {
 		long iso;
@@ -233,13 +233,13 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
 	} else if(e.GetCol()==COL_LABEL) {
         Chkpoint(wxT("Change Spin Label"));
         std::string label(GetCellValue(e.GetRow(),e.GetCol()).char_str());
-        GetSS()->GetSpin(e.GetRow())->SetLabel(label);
+        GetRawSS()->GetSpin(e.GetRow())->SetLabel(label);
     } else if(e.GetCol()==COL_SELECTED){
         wxString value=GetCellValue(e.GetRow(),e.GetCol());
         if(value == wxT("1")) {
-            AddSelection(GetSS()->GetSpin(e.GetRow()));
+            AddSelection(GetRawSS()->GetSpin(e.GetRow()));
         } else {
-            RemoveSelection(GetSS()->GetSpin(e.GetRow()));
+            RemoveSelection(GetRawSS()->GetSpin(e.GetRow()));
         }
     }
 }
@@ -249,14 +249,14 @@ void SpinGrid::UpdateRowIsotopes(long row) {
 }
 
 void SpinGrid::OnCellSelect(wxGridEvent& e) {
-    if(e.GetRow()==GetSS()->GetSpinCount()) {
+    if(e.GetRow()==GetRawSS()->GetSpinCount()) {
         //The user clicked the last line, which means there is no spin to
         //edit
         e.Skip();
         sigSelect((Spin*)NULL);
         return;
     }
-    sigSelect(GetSS()->GetSpin(e.GetRow()));
+    sigSelect(GetRawSS()->GetSpin(e.GetRow()));
     e.Skip();
 }
 

@@ -123,7 +123,7 @@ class FrameTree : public wxTreeCtrl , public sigc::trackable {
 public:
 
 	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
-		mRoot = AddRoot(wxT("Lab Frame"),-1,-1,new FramePointer(GetSS()->GetLabFrame()));
+		mRoot = AddRoot(wxT("Lab Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
 
 
 		RefreshFromSpinSystem();
@@ -134,7 +134,7 @@ public:
 		mapFrameToId.clear();
 		mapFrameToId[GetSS().GetLabFrame()] = mRoot;
 
-		RefreshFromSpinSystemRecursive(mRoot,GetSS()->GetLabFrame());
+		RefreshFromSpinSystemRecursive(mRoot,GetRawSS()->GetLabFrame());
 
 		mActive = mapFrameToId[GetFrame()];
 		SetItemBold(mActive);
@@ -343,7 +343,7 @@ void RootFrame::OnRedo(wxCommandEvent& e) {
 }
 
 void RootFrame::OnNew(wxCommandEvent& e) {
-    GetSS()->Clear();
+    GetRawSS()->Clear();
     mOpenPath=wxT("Untitled");
     mOpenFile=wxT("Untitled");
     mOpenDir=wxT("");
@@ -407,7 +407,7 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
         wxLogError(wxString() << wxT("Unknown extension ") << ext);
     } else {
         try {
-            GetSS()->LoadFromFile(mOpenPath.char_str(),loader);
+            GetRawSS()->LoadFromFile(mOpenPath.char_str(),loader);
         } catch(const runtime_error& e) {
             wxString msg(e.what(),wxConvUTF8);
             wxLogError(wxString() << wxT("File is corrupt:\n") << msg);
@@ -473,7 +473,7 @@ void RootFrame::SaveAs() {
         if(saver==NULL) {
             wxLogError(wxString() << wxT("Unknown extension ") << ext);
         } else {
-            GetSS()->SaveToFile(mOpenPath.char_str(),saver);
+            GetRawSS()->SaveToFile(mOpenPath.char_str(),saver);
         }
         UpdateTitle();
     }
@@ -487,7 +487,7 @@ void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {
     if(saver==NULL) {
         saver=mSaver;
     }
-    GetSS()->SaveToFile(filename.char_str(),saver);
+    GetRawSS()->SaveToFile(filename.char_str(),saver);
     mSaver=saver;
 }
 

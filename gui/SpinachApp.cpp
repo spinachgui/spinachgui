@@ -245,7 +245,7 @@ typedef set<Spin*>::iterator itor;
 
 void AssertSelectionExists() {
 	cout << "   CurrentSelection:" << endl;
-	std::vector<Spin*> spins = GetSS()->GetSpins();
+	std::vector<Spin*> spins = GetRawSS()->GetSpins();
 	for(itor i = gSelection.begin();i!=gSelection.end();++i) {
 		cout << "     spin = " << *i << endl;
 		if(find(spins.begin(),spins.end(),*i) == spins.end()) {

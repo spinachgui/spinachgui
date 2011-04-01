@@ -260,6 +260,7 @@ Interaction* SpinSystem::RemoveInteraction(Interaction* inter) {
 
 void SpinSystem::InsertInteraction(Interaction* inter) {
 	mInteractions.push_back(inter);
+	inter->sigDying.connect(mem_fun(this,&SpinSystem::SlotInterDying));
 	sigNewInter.emit(inter);
 }
 

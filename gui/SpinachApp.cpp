@@ -244,8 +244,10 @@ typedef set<Spin*>::iterator itor;
 //Selection Manager Invariants
 
 void AssertSelectionExists() {
+	cout << "   CurrentSelection:" << endl;
 	std::vector<Spin*> spins = GetSS()->GetSpins();
 	for(itor i = gSelection.begin();i!=gSelection.end();++i) {
+		cout << "     spin = " << *i << endl;
 		if(find(spins.begin(),spins.end(),*i) == spins.end()) {
 			PANIC("A spin in the selection manager was not present in the spin system");
 		}
@@ -277,6 +279,8 @@ Spin* GetHover() {
 
 void ClearSelection() {
 	AssertSelectionExists();
+	cout << "Clear selection" << endl;
+
 	gSelection.clear();
 }
 
@@ -294,14 +298,17 @@ void DeleteSelectedSpins(){
 };
 
 void SetHover(SpinXML::Spin* spin) {
+	cout << "Set Hover" << spin << endl;
     gHover=spin;
     sigHover(spin);
 }
 
 
 void SetSelection(Spin* spin) {
+	cout << "Set selection (single)" << spin << endl;
 	AssertSelectionExists();
 	ClearSelection();
+
 	gSelection.insert(spin);
     sigSelectChange(gSelection);
 	AssertSelectionExists();
@@ -309,6 +316,8 @@ void SetSelection(Spin* spin) {
 
 
 void SetSelection(set<SpinXML::Spin*>& selection) {
+	cout << "Set selection (set)" << endl;
+
 	AssertSelectionExists();
 	ClearSelection();
 	gSelection = selection;
@@ -317,6 +326,8 @@ void SetSelection(set<SpinXML::Spin*>& selection) {
 }
 
 void AddSelection(SpinXML::Spin* spinToAdd) {
+	cout << "Add selection" << spinToAdd << endl;
+
 	if(spinToAdd == NULL) return;
 	AssertSelectionExists();
 	gSelection.insert(spinToAdd);

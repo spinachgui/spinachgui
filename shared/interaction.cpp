@@ -194,6 +194,7 @@ USpanSkew    InteractionView::AsSpanSkew() const {
 // Interaction
 
 Interaction::~Interaction() {
+	cout << "Calling the destructor" << endl;
     sigDying(this);
 }
 
@@ -380,6 +381,16 @@ Interaction::Form Interaction::GetForm() const {
     if(GetIsQuadratic())
         return QUADRATIC;
     throw runtime_error("GetForm failed");
+}
+
+void Interaction::InitalSetType(Type t,Spin* spin1,Spin* spin2) {
+    mType=t;
+	mSpin1 = spin1;
+	mSpin2 = spin2;
+	if(mSpin1)
+		mDyingConnect1=mSpin1->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
+	if(mSpin2)
+		mDyingConnect2=mSpin2->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
 }
 
 void Interaction::SetType(Type t,Spin* spin1,Spin* spin2) {

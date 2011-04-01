@@ -134,13 +134,13 @@ void SpinDrawer::Geometary() const {
 		GLfloat material[4]; material[3]=0.0f;
 
 		if(spin == hover) {
-			material[0] = 200/255;
+			material[0] = 200/255.0;
 			material[1] = 1.0;
-			material[2] = 1.0;
+			material[2] = 200/255.0;
 		} else if(selection.find(spin) != selection.end()) {
-			material[0] = 200/255;
+			material[0] = 1.0;
 			material[1] = 1.0;
-			material[2] = 200/255;
+			material[2] = 200/255.0;
 		} else {
 			material[0] = getElementR(spin->GetElement());
 			material[1] = getElementG(spin->GetElement());

@@ -123,10 +123,19 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 }
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
+	if(GetHover() == NULL) {
+		ClearSelection();
+		return;
+	}
+
     if(!e.ShiftDown()) {
-		AddSelection(GetHover());
+		SetSelection(GetHover());
     } else {
-		AddSelection(GetHover());
+		if(GetSelection().find(GetHover()) != GetSelection().end()) {
+			AddSelection(GetHover());
+		} else {
+			RemoveSelection(GetHover());
+		}
     }
 }
 
@@ -200,7 +209,6 @@ void Display3D::StopPicking() {
 			closestNameCount=name_count;
 		}
 		buff+=name_count;
-		cout << "Name count = " << name_count << endl;
 	}
 	OnMouseOver3D(closestNameCount,closestNames);
 }

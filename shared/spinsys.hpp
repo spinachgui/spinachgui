@@ -81,6 +81,7 @@ namespace SpinXML {
 
         void InsertInteraction(Interaction* inter);
         Interaction* RemoveInteraction(Interaction* inter);
+		void SlotInterDying(Interaction* inter) {RemoveInteraction(inter);}
 
 		void DiscardInteraction(Interaction* inter) {delete RemoveInteraction(inter);}
 

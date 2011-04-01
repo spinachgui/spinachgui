@@ -1,6 +1,7 @@
 
 #include <shared/formats/easyspin.hpp>
 #include <shared/nuclear_data.hpp>
+#include <shared/unit.hpp>
 #include <shared/foreach.hpp>
 #include <fstream>
 #include <sstream>
@@ -52,7 +53,7 @@ struct Appender {
 	string& str;
 };
 
-Matrix3d Crush(const vector<Interaction*>& inters) {
+Matrix3d Crush(const vector<Interaction*>& inters,unit u) {
 	Matrix3d total;
 	total <<
 		0,0,0,
@@ -60,17 +61,17 @@ Matrix3d Crush(const vector<Interaction*>& inters) {
 		0,0,0;
 	for(unsigned long j = 0;j<inters.size();j++) {
 		Interaction* inter = inters[j];
-		total += inter->AsMatrix();
+		total += inter->AsMatrix()*(1/u);
 	}
 	return total;
 }
 
-void monoTensor(const SpinSystem* ss,ostream& out,string varname,vector<Spin*> spins,Interaction::Type t) {
+void monoTensor(const SpinSystem* ss,ostream& out,string varname,vector<Spin*> spins,Interaction::Type t,unit u) {
 	string line;
 	Appender appender(line);
 	foreach(Spin* spin,spins) {
 		vector<Interaction*> tensors = ss->GetInteractionsBySpin(spin,t);
-		appender(MatlabMatrix(Crush(tensors)));
+		appender(MatlabMatrix(Crush(tensors,u)));
 	}
 	out << "sys." << varname << " = " << line << ";" << endl;
 }
@@ -116,11 +117,11 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 
 	
 	//G tensors
-	monoTensor(ss,fout,"g",electronSpins,Interaction::G_TENSER);
+	monoTensor(ss,fout,"g",electronSpins,Interaction::G_TENSER,Joules);
 	//Nuclear Quadrupole
-	monoTensor(ss,fout,"Q",nucSpins,Interaction::QUADRUPOLAR);
+	monoTensor(ss,fout,"Q",nucSpins,Interaction::QUADRUPOLAR,MHz);
 	//ZFS
-	monoTensor(ss,fout,"D",electronSpins,Interaction::ZFS);
+	monoTensor(ss,fout,"D",electronSpins,Interaction::ZFS,MHz);
 
 	/*
 	  From the easyspin documentation:
@@ -144,7 +145,7 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 			//If, for some reason, more than one g_tensor is specified,
 			//crush them all together
 
-			nucAppender(MatlabMatrix(Crush(a_tensor)));
+			nucAppender(MatlabMatrix(Crush(a_tensor,MHz)));
 		}
 		ATensorAppender(NuclearALine);
 	}
@@ -170,7 +171,7 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 			vector<Interaction*> tensors = ss->GetInteractionsBySpin(*i,*j,Interaction::DIPOLAR);
 			//If, for some reason, more than one g_tensor is specified,
 			//crush them all together
-			eeTensorAppender(MatlabMatrix(Crush(tensors)));
+			eeTensorAppender(MatlabMatrix(Crush(tensors,MHz)));
 		}
 
 	}

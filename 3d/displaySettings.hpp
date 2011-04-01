@@ -5,8 +5,6 @@
 #include <shared/interaction.hpp>
 #include <3d/opengl.hpp>
 
-#include <shared/initonce.hpp>
-
 //================================================================================//
 // Whenever any of the display settings we generally have to redraw
 // everything. This signal provides a signel trigger for doing that.
@@ -77,7 +75,7 @@ extern sigc::signal<void,SpinXML::Interaction::Type,double>    sigInterSize;
 // Static module initalisation (private)
 
 
-class __ModInit : public InitOnce<__ModInit> {
+class __ModInit  {
 public:
 	__ModInit();
 	~__ModInit();

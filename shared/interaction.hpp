@@ -8,7 +8,6 @@
 
 #include <shared/spin.hpp>
 #include <shared/orientation.hpp>
-#include <shared/initonce.hpp>
 
 namespace SpinXML {
 	class InteractionView;
@@ -363,9 +362,8 @@ namespace SpinXML {
 
 //Private
 
-struct __InterInit : public InitOnce<__InterInit> {
+struct __InterInit {
 	__InterInit();
 };
-static __InterInit __initInit;
 
 #endif

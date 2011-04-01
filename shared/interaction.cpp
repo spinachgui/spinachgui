@@ -658,3 +658,4 @@ __InterInit::__InterInit() {
 	BinaryTypes.push_back(Interaction::CUSTOM_BILINEAR);
 }
 
+static __InterInit __initInit;

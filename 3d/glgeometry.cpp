@@ -115,6 +115,9 @@ SpinDrawer::SpinDrawer()
 }
 
 void SpinDrawer::Geometary() const {
+	Spin* hover = GetHover();
+	set<Spin*> selection = GetSelection();
+
 	glPushName(0);
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
@@ -130,9 +133,19 @@ void SpinDrawer::Geometary() const {
 		const static GLfloat white[4]={0.8f,0.8f,0.8f,0.0f};
 		GLfloat material[4]; material[3]=0.0f;
 
-		material[0] = getElementR(spin->GetElement());
-		material[1] = getElementG(spin->GetElement());
-		material[2] = getElementB(spin->GetElement());
+		if(spin == hover) {
+			material[0] = 200/255;
+			material[1] = 1.0;
+			material[2] = 1.0;
+		} else if(selection.find(spin) != selection.end()) {
+			material[0] = 200/255;
+			material[1] = 1.0;
+			material[2] = 200/255;
+		} else {
+			material[0] = getElementR(spin->GetElement());
+			material[1] = getElementG(spin->GetElement());
+			material[2] = getElementB(spin->GetElement());
+		}
 
 		glMaterialfv(GL_FRONT, GL_SPECULAR, white);
 		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);

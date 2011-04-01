@@ -46,6 +46,7 @@ public:
 protected:
 	virtual void DrawScene() {
 		lighting.On();
+
 		mMolScene.Draw();
 
 		translucent.On();
@@ -59,8 +60,26 @@ protected:
 
 		lighting.Off();
 
+		StartPicking();
+		mMolScene.Draw();
+		StopPicking();
 	}
-
+	virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) {
+		if(stackLength == 0) {
+			SetHover(NULL);
+			return;
+		}
+		if(ClosestName[0] == NAME_SPINS) {
+			Spin* hover = GetHover();
+			Spin* newHover = GetRawSS()->GetSpin(ClosestName[stackLength-1]);
+			if(hover != newHover) {
+				SetHover(newHover);
+			}
+		} else {
+			SetHover(NULL);
+		}
+	}
+	
 private:
 	//These nodes can be rotated and translated  with the mouse
 	static GLLighting lighting;

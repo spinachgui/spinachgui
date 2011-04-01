@@ -31,7 +31,8 @@ const double pi=3.141592654;
 ///such as spins, linear interactions or bonds.
 
 
-Renderer::Renderer() {
+Renderer::Renderer(GLuint glName) 
+	: mName(glName) {
 }
 
 Renderer::~Renderer() {
@@ -44,7 +45,11 @@ void Renderer::DrawWith(GLMode& mode) const {
 }
 
 void Renderer::Draw() const {
+	if(mName != NAME_NONE)
+		glPushName(mName);
     Geometary();
+	if(mName != NAME_NONE)
+		glPopName();
 }
 
 
@@ -54,7 +59,7 @@ void Renderer::Draw() const {
 ///scene, such as camera position, global rotation and lighting.
 
 Scene::Scene(const TRenderVec& renderers) 
-	: mRenderers(renderers) {
+	: Renderer(NAME_NONE), mRenderers(renderers) {
 }
 
 Scene::~Scene() {
@@ -73,7 +78,8 @@ void Scene::Geometary() const {
 //============================================================//
 
 
-MoleculeFG::MoleculeFG()  {
+MoleculeFG::MoleculeFG() 
+	: Renderer(NAME_FG) {
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
         Spin* spin=GetRawSS()->GetSpin(i);
@@ -104,10 +110,12 @@ void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u) {
 
 //============================================================//
 
-SpinDrawer::SpinDrawer() {
+SpinDrawer::SpinDrawer() 
+ : Renderer(NAME_SPINS) {
 }
 
 void SpinDrawer::Geometary() const {
+	glPushName(0);
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 		Spin* spin=GetRawSS()->GetSpin(i);
@@ -136,12 +144,14 @@ void SpinDrawer::Geometary() const {
 		glPopMatrix();
 
     }
+	glPopName();
 }
 
 //============================================================//
 
 
-BondDrawer::BondDrawer() {
+BondDrawer::BondDrawer() 
+	: Renderer(NAME_BONDS) {
 }
 
 void BondDrawer::Geometary() const {
@@ -183,12 +193,11 @@ void BondDrawer::Geometary() const {
 
 //============================================================//
 
-MonoInterDrawer::MonoInterDrawer() {
+MonoInterDrawer::MonoInterDrawer() 
+  :  Renderer(NAME_MONO_INTERACTIONS) {
 }
 
 void MonoInterDrawer::Geometary() const {
-	cout << "MonoInterDrawer::Geometary" << endl;
-
 	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
 	
 	foreach(Interaction* inter,inters) {
@@ -259,7 +268,8 @@ void MonoInterDrawer::Geometary() const {
 
 //============================================================//
 
-BilinearInterDrawer::BilinearInterDrawer() {
+BilinearInterDrawer::BilinearInterDrawer() 
+	: Renderer(NAME_BINARY_INTERACTIONS) {
 }
 
 void BilinearInterDrawer::Geometary() const {
@@ -268,8 +278,8 @@ void BilinearInterDrawer::Geometary() const {
 
 //============================================================//
 
-FrameDrawer::FrameDrawer() {
-
+FrameDrawer::FrameDrawer() 
+	: Renderer(NAME_FRAME) {
 }
 
 void DrawFrameRecursive(Frame* frame) {
@@ -333,7 +343,8 @@ void FrameDrawer::Geometary() const {
 //================================================================================//
 // Collections of Geometary
 
-SpinSysScene::SpinSysScene() {
+SpinSysScene::SpinSysScene() 
+	: Renderer(NAME_NONE) {
 }
 
 void SpinSysScene::Geometary() const {
@@ -343,7 +354,8 @@ void SpinSysScene::Geometary() const {
 }
 
 
-InteractionScene::InteractionScene() {
+InteractionScene::InteractionScene() 
+  : Renderer(NAME_NONE) {
 }
 
 void InteractionScene::Geometary() const {

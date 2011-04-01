@@ -7,30 +7,29 @@
 #include <3d/glmode.hpp>
 #include <3d/opengl.hpp>
 
-
-
-//Maybe this only needs to be an enum. We'll see
-enum PASS {
-	SOLID,
-	TRANSLUCENT,
-	PICKING
+enum GLName {
+	NAME_NONE = 0,
+    NAME_AXIS,
+    NAME_SPINS,
+    NAME_BONDS,
+    NAME_MONO_INTERACTIONS,
+    NAME_BINARY_INTERACTIONS,
+	NAME_FG,
+	NAME_FRAME
 };
-
-
-
-
 
 ///An abstract class who's job is to visualise part of a spin system
 ///such as spins, linear interactions or bonds.
 class Renderer {
 public:
-    Renderer();
+    Renderer(GLuint glName);
     virtual ~Renderer();
     void DrawWith(GLMode& mode) const;
     void Draw() const;
 protected:
     virtual void Geometary() const = 0;
 private:
+	int mName;
 };
 
 

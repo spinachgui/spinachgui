@@ -159,8 +159,6 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     
 	DrawScene();
 
-	ProcessHits();
-
     SwapBuffers();
     while (true) {
 		GLenum x = glGetError() ;
@@ -171,44 +169,40 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     }
 }
 
-void Display3D::ProcessHits() {
+void Display3D::StartPicking() {
+	mPicking->SetMouseXY(mMouseX,mMouseY);
+	mPicking->On();
+}
+
+void Display3D::StopPicking() {
+	mPicking->Off();
+
 	pair<long,GLuint*> tupple = mPicking->GetBuffer();
+
 	long hits = tupple.first;
 	GLuint* buff = tupple.second;
 
 	float closestDistance=HUGE_VAL;
 	GLuint* closestNames=NULL;
 	GLuint closestNameCount=0;
-	if(hits >0) {
-		for(long i=0;i<hits;i++) {
-			GLuint name_count = *(buff++);
-			float d1=float(*(buff++))/0x7fffffff;
-			float d2=float(*(buff++))/0x7fffffff;
-			float thisDistance=d1<d2 ? d1 : d2;
-			if(closestDistance > thisDistance) {
-				closestDistance=thisDistance;
-				closestNames=buff;
-				closestNameCount=name_count;
-			}
-			buff+=name_count;
-		}
-		switch(closestNames[0]){
-		case LAYER_SPINS:
-			SetHover(GetSS()->GetSpin(closestNames[1]));
-			break;
-		case LAYER_INTERACTIONS:
-			SetHover(NULL);
-			//NO_OP
-			break;
-		case LAYER_BONDS:
-			SetHover(NULL);
-			//NO_OP
-			break;
-		}
-	} else {
-		SetHover(NULL);
+	if(hits <= 0) {
+		OnMouseOver3D(0,NULL);
+		return;
 	}
-	
+	for(long i=0;i<hits;i++) {
+		GLuint name_count = *(buff++);
+		float d1=float(*(buff++))/0x7fffffff;
+		float d2=float(*(buff++))/0x7fffffff;
+		float thisDistance=d1<d2 ? d1 : d2;
+		if(closestDistance > thisDistance) {
+			closestDistance=thisDistance;
+			closestNames=buff;
+			closestNameCount=name_count;
+		}
+		buff+=name_count;
+		cout << "Name count = " << name_count << endl;
+	}
+	OnMouseOver3D(closestNameCount,closestNames);
 }
 
 BEGIN_EVENT_TABLE(Display3D,wxGLCanvas)

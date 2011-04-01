@@ -12,16 +12,6 @@ class Camera;
 class GLMode;
 class GLPicking;
 
-enum LAYER {
-	LAYER_DEFAULT = 0,
-    LAYER_AXIS,
-    LAYER_SPINS,
-    LAYER_BONDS,
-    LAYER_INTERACTIONS,
-};
-
-
-
 ///Manages interaction with the rest of the GUI including keeping the
 ///athorattive copy of DisplaySettings, managing the context, managing
 ///windowing events, setting the viewport etc. Only this class should
@@ -44,6 +34,8 @@ public:
     //To prevent flicker, overide this function to do nothing
     void OnEraseBackground(wxEraseEvent& e) {e.Skip(false);}
 
+	void StartPicking();
+	void StopPicking();
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -51,7 +43,9 @@ protected:
 
     void EnableGL();
     void ChangeViewport();
-	void ProcessHits();
+
+	//Returns the name stack of the closest object moused over
+	virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) =0;
 	
 	virtual void DrawScene() = 0;
 

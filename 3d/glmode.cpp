@@ -91,26 +91,32 @@ std::pair<long,GLuint*> GLPicking::GetBuffer() const {
 }
 
 void GLPicking::On() {
+    glDepthMask(GL_TRUE); 
+	glClear(GL_DEPTH_BUFFER_BIT);
+
 	glSelectBuffer(mLen,mBuff);  //glSelectBuffer goes before glRenderMode
 	glRenderMode(GL_SELECT);
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glClear(GL_DEPTH_BUFFER_BIT);
-		
 	GLint    viewport[4];
-	GLdouble projmatrix[16];
 	glGetIntegerv(GL_VIEWPORT,viewport);
-	glGetDoublev(GL_PROJECTION_MATRIX,projmatrix);
-		
+	glGetDoublev(GL_PROJECTION_MATRIX,mProjmatrix);
+	
+	glLoadIdentity();	
 	gluPickMatrix(mMouseX,viewport[3]-mMouseY,3.0, 3.0, viewport);
-	glMultMatrixd(projmatrix);
+	glMultMatrixd(mProjmatrix);
 
 	glInitNames();
 	glMatrixMode(GL_MODELVIEW);
 }
 void GLPicking::Off() {
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();	
+	glMultMatrixd(mProjmatrix);
+
+
 	mHits=glRenderMode(GL_RENDER);
+	glMatrixMode(GL_MODELVIEW);
 }
 
 //============================================================//

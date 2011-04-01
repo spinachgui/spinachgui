@@ -45,6 +45,7 @@ private:
 	long mLen;
 	long mHits;
 	GLuint* mBuff;
+	GLdouble mProjmatrix[16];
     long mMouseX,mMouseY;
 };
 

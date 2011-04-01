@@ -236,15 +236,15 @@ void MonoInterDrawer::Geometary() const {
             mat[15]=1;
 
             mat[0 ]=mat3(0,0);
-            mat[1 ]=mat3(0,1);
-            mat[2 ]=mat3(0,2);
-
-            mat[4 ]=mat3(1,0);
+            mat[1 ]=mat3(1,0);
+            mat[2 ]=mat3(2,0);
+						    
+            mat[4 ]=mat3(0,1);
             mat[5 ]=mat3(1,1);
-            mat[6 ]=mat3(1,2);
-
-            mat[8 ]=mat3(2,0);
-            mat[9 ]=mat3(2,1);
+            mat[6 ]=mat3(2,1);
+						    
+            mat[8 ]=mat3(0,2);
+            mat[9 ]=mat3(1,2);
             mat[10]=mat3(2,2);
 
 			glMultMatrixf(mat);

@@ -15,6 +15,7 @@
 #include <shared/formats/xml.hpp>
 #include <shared/formats/castep.hpp>
 #include <shared/formats/simpson.hpp>
+#include <shared/formats/easyspin.hpp>
 
 #include <wx/filename.h>
 
@@ -167,6 +168,7 @@ bool SpinachApp::OnInit() {
     mIOFilters.push_back(new G03Loader);
     mIOFilters.push_back(new SIMPSONLoader);
     mIOFilters.push_back(new CASTEPLoader);
+    mIOFilters.push_back(new EasySpinLoader);
     mIOFilters.push_back(new XMLLoader(spinxmlSchema));
 
 	//Connect up the selection manager so that when a spin is deleted

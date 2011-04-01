@@ -15,6 +15,8 @@
 
 #include <3d/displaySettings.hpp>
 
+#include <shared/spinsys.hpp>
+
 using namespace std;
 using namespace SpinXML;
 using namespace Eigen;

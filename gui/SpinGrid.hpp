@@ -3,8 +3,9 @@
 #define SPINGRID_H
 
 #include <gui/SpinInteractionEdit.hpp>
-#include <shared/spinsys.hpp>
 #include <sigc++/sigc++.h>
+#include <shared/spinsys.hpp>
+
 #include <wx/grid.h>
 #include <set>
 

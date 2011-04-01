@@ -2,16 +2,10 @@
 #ifndef _3DDISPLAY_H
 #define _3DDISPLAY_H
 
-#include <shared/spinsys.hpp>
-
 #include <wx/glcanvas.h>
 #include <sigc++/sigc++.h>
 
 #include <map>
-
-#include <3d/displaySettings.hpp>
-#include <3d/glgeometry.hpp>
-
 
 class Renderer;
 class Camera;
@@ -59,14 +53,13 @@ protected:
     void ChangeViewport();
 	void ProcessHits();
 	
+	virtual void DrawScene() = 0;
+
 	//We only need this because binding Refresh directly in a signal
 	//is difficult due to the default arguments
 	void Redraw(){Refresh();}
 private:
 
-    //These nodes can be rotated and translated  with the mouse
-    SpinSysScene     mMolScene;
-    InteractionScene mInteractionScene;
 
 	GLPicking* mPicking;
 

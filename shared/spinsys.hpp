@@ -2,15 +2,19 @@
 #ifndef SPINSYS_H
 #define SPINSYS_H
 
+#include <shared/interaction.hpp>
+
+#include <shared/unit.hpp>
+
+#include <Eigen/Dense>
+#include <sigc++/sigc++.h>
+#include <boost/variant.hpp>
+
 #include <vector>
 #include <string>
 #include <string.h>
 #include <stdexcept>
-#include <sigc++/sigc++.h>
-#include <shared/unit.hpp>
-#include <boost/variant.hpp>
-#include <Eigen/Dense>
-#include <shared/interaction.hpp>
+
 
 namespace SpinXML {
 	class SpinSystemView;

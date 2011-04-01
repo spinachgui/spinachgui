@@ -3,13 +3,22 @@
 #define ROOT_FRAME_H
 
 #include <auto/SpinachGUI.h>
-#include <gui/Display3D.hpp>
-#include <gui/SpinGrid.hpp>
-#include <wx/aui/aui.h>
-#include <wx/splitter.h>
+
+#include <shared/unit.hpp>
+
+#include <utility>
+#include <vector>
 
 class InterDisplaySettingsPanel;
 class FrameTree;
+class wxAuiManager;
+class SpinGrid;
+class Display3D;
+class SpinInterEditPanel;
+
+namespace SpinXML {
+	class ISpinSystemLoader;
+};
 
 class RootFrame : public RootFrameBase {
 public:

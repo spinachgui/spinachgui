@@ -1,20 +1,25 @@
-
 #include <gui/RootFrame.hpp>
+
+#include <gui/InterDisplaySettings.hpp>
+#include <gui/RightClickMenu.hpp>
+#include <3d/glgeometry.hpp>
+#include <3d/displaySettings.hpp>
+#include <gui/Display3D.hpp>
 #include <gui/SpinachApp.hpp>
 #include <gui/MolSceneGraph.hpp>
+#include <gui/SpinGrid.hpp>
+
+#include <shared/spinsys.hpp>
+
 #include <stdexcept>
 #include <wx/log.h>
 #include <wx/statusbr.h>
 #include <wx/treectrl.h>
-
-#include <3d/displaySettings.hpp>
+#include <wx/aui/aui.h>
 
 //Input and output filters
-#include <gui/InterDisplaySettings.hpp>
-#include <gui/RightClickMenu.hpp>
 #define ID_UNIT_START 12345
 
-#include <3d/glgeometry.hpp>
 
 using namespace std;
 using namespace SpinXML;
@@ -30,19 +35,60 @@ wxString GetExtension(const wxString& filename) {
 }
 
 //============================================================//
+// Our spin system display
+
+class SpinSysDisplay3D : public Display3D {
+public:
+	SpinSysDisplay3D(wxWindow* parent) 
+		: Display3D(parent) {
+		GetSS().sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
+	}
+protected:
+	virtual void DrawScene() {
+		lighting.On();
+		mMolScene.Draw();
+
+		translucent.On();
+		mInteractionScene.Draw();
+		translucent.Off();
+
+		//Also draw the interactions as wireframes
+		wire.On();
+		mInteractionScene.Draw();
+		wire.Off();
+
+		lighting.Off();
+
+	}
+
+private:
+	//These nodes can be rotated and translated  with the mouse
+	static GLLighting lighting;
+	static GLTranslucent translucent;
+	static GLWire wire;
+
+    SpinSysScene     mMolScene;
+    InteractionScene mInteractionScene;
+};
+GLLighting    SpinSysDisplay3D::lighting;
+GLTranslucent SpinSysDisplay3D::translucent;
+GLWire        SpinSysDisplay3D::wire;
+
+
+//============================================================//
 // Reference frame tree view
 
 class RCActionActivateFrame : public RightClickAction {
 public:
-    RCActionActivateFrame(Frame* frame) 
-	: RightClickAction(wxT("Activate Frame")), mFrame(frame) {
-    }
-    bool Visible() const {return true;}
-    void Exec(wxCommandEvent& e) {
+	RCActionActivateFrame(Frame* frame) 
+		: RightClickAction(wxT("Activate Frame")), mFrame(frame) {
+	}
+	bool Visible() const {return true;}
+	void Exec(wxCommandEvent& e) {
 		SetFrame(mFrame);
-    }
+	}
 private:
-    Frame* mFrame;
+	Frame* mFrame;
 };
 
 //Quick class working with the wxWidgets clientData system
@@ -199,7 +245,7 @@ void RootFrame::InitFrame() {
     mInterSizePanel= new InterDisplaySettingsPanel(this);
 	mSpinGrid      = new SpinGrid(this);
 	mSpinInterEdit = new SpinInterEditPanel(this);
-	mDisplay3D     = new Display3D(this);
+	mDisplay3D     = new SpinSysDisplay3D(this);
 	mFrameTree     = new FrameTree(this);
 
     // add the panes to the manager
@@ -227,7 +273,6 @@ void RootFrame::InitFrame() {
 
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
-    GetSS().sigReloaded.connect(mem_fun(mDisplay3D,&Display3D::ResetView));
 	sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
 
 	//Units menu. To avoid writing an On* function for every unit

@@ -2,7 +2,6 @@
 #ifndef SPIN_H
 #define SPIN_H
 
-#include <Eigen/Dense>
 #include <Eigen/Geometry> 
 #include <sigc++/sigc++.h>
 #include <vector>

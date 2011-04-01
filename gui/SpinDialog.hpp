@@ -2,10 +2,13 @@
 #ifndef SPINDIALOG_H
 #define SPINDIALOG_H
 
-#include <shared/spinsys.hpp>
 #include <auto/SpinachGUI.h>
-#include <gui/SpinInteractionEdit.hpp>
 
+class SpinInterEditPanel;
+namespace SpinXML {
+	class Spin;
+	class SpinSystem;
+};
 
 using namespace std;
 

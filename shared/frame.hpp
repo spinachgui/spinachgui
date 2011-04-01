@@ -3,6 +3,7 @@
 #ifndef FRAME_H
 #define FRAME_H
 
+#include <Eigen/Geometry>
 #include <sigc++/sigc++.h>
 #include <shared/orientation.hpp>
 #include <vector>

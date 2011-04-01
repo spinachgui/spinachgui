@@ -2,6 +2,9 @@
 #include <gui/SpinDialog.hpp>
 #include <gui/SpinachApp.hpp>
 #include <shared/nuclear_data.hpp>
+#include <gui/SpinInteractionEdit.hpp>
+
+
 
 #include <string>
 #include <wx/log.h>

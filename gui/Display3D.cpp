@@ -1,12 +1,14 @@
 
-#include <gui/Display3D.hpp>
 #include <gui/SpinachApp.hpp>
+#include <gui/Display3D.hpp>
 #include <gui/RightClickMenu.hpp>
 #include <wx/dcclient.h>
 #include <wx/image.h>
 #include <wx/dcmemory.h>
 #include <iostream>
 #include <wx/file.h>
+
+#include <shared/spinsys.hpp>
 
 #include <3d/glgeometry.hpp>
 #include <3d/glmode.hpp>
@@ -151,28 +153,11 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
     int width,height;
     GetClientSize(&width,&height);
-
 	mCamera->Set(width,height);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Draw opaque objects first
     
-    static GLLighting lighting;
-	lighting.On();
-    mMolScene.Draw();
-
-	static GLTranslucent translucent;
-	translucent.On();
-	mInteractionScene.Draw();
-	translucent.Off();
-
-	//Also draw the interactions as wireframes
-	static GLWire wire;
-	wire.On();
-	mInteractionScene.Draw();
-	wire.Off();
-
-	lighting.Off();
+	DrawScene();
 
 	ProcessHits();
 

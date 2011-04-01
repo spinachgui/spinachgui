@@ -4,13 +4,23 @@
 #define SPINACHAPP_H
 
 #include <wx/app.h>
-#include <shared/spinsys.hpp>
-#include <shared/frame.hpp>
 #include <assert.h>
 
+#include <sigc++/sigc++.h>
+
+#include <shared/unit.hpp>
+#include <shared/frame.hpp>
+
 #include <set>
+#include <vector>
 #include <algorithm>
 
+
+namespace SpinXML {
+	class Spin;
+	class SpinSystem;
+	class ISpinSystemLoader;
+};
 void PANIC(std::string s);
 
 

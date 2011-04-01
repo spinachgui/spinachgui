@@ -515,7 +515,7 @@ void RootFrame::OnBondToggle(wxCommandEvent& e) {
     bool showBonds=e.IsChecked();
     mMenuItemBondToggle->Check(showBonds);
     mRootToolbar->ToggleTool(ID_BOND_TOGGLE,showBonds);
-    sigSetShowBonds(showBonds);
+    SetShowBonds(showBonds);
 }
 	     
 void RootFrame::OnToggle3D(wxCommandEvent& e) {

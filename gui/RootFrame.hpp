@@ -69,9 +69,6 @@ public:
 	//Unit Menu
 	void OnUnitChange(wxCommandEvent& e);
 
-    //Signals
-    sigc::signal<void,bool> sigSetShowBonds;
-
     DECLARE_EVENT_TABLE();
 
 private:

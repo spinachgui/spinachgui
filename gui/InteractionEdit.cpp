@@ -240,7 +240,7 @@ void InterEditPanel::SaveToInter() {
 	if(storage==Interaction::STORAGE_SCALAR) {
 		double scalar;
 		mScalarCtrl->GetValue().ToDouble(&scalar);
-		mInter.SetScalar(scalar*MHz);
+		mInter.SetScalar(scalar);
 	} else if(storage==Interaction::MATRIX) {
 		double xx,xy,xz;
 		double yx,yy,yz;

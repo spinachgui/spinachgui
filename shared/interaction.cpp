@@ -118,9 +118,7 @@ void InteractionView::SetMatrix(const Matrix3d& InMatrix) {
 
 
 void InteractionView::SetEigenvalues(double XX,double YY,   double ZZ,  const Orientation& Orient) {
-	Matrix3d InMatrix = ConvertToMatrix(Eigenvalues(XX * mUnitSystem->energyUnit,
-													YY * mUnitSystem->energyUnit,
-													ZZ * mUnitSystem->energyUnit,Orient));
+	Matrix3d InMatrix = ConvertToMatrix(Eigenvalues(XX,YY,ZZ,Orient));
 	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
 	Matrix3d rotation=Affine3d(mFrame->getTransformToLab()).rotation();
 	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
@@ -128,9 +126,7 @@ void InteractionView::SetEigenvalues(double XX,double YY,   double ZZ,  const Or
 }
 
 void InteractionView::SetAxRhom(double iso,    double ax,   double rh,  const Orientation& Orient) {
-	Matrix3d InMatrix = ConvertToMatrix(AxRhom(iso * mUnitSystem->energyUnit,
-											   ax * mUnitSystem->energyUnit,
-											   rh * mUnitSystem->energyUnit,Orient));
+	Matrix3d InMatrix = ConvertToMatrix(AxRhom(iso,ax,rh,Orient));
 	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
 	Matrix3d rotation=Affine3d(mFrame->getTransformToLab()).rotation();
 	mData->SetMatrix(rotation * MatInSI * rotation.inverse());
@@ -138,9 +134,7 @@ void InteractionView::SetAxRhom(double iso,    double ax,   double rh,  const Or
 }
 
 void InteractionView::SetSpanSkew(double iso,  double Span, double Skew,const Orientation& Orient) {
-	Matrix3d InMatrix = ConvertToMatrix(SpanSkew(iso  * mUnitSystem->energyUnit,
-												 Span * mUnitSystem->energyUnit,
-												 Skew,Orient));
+	Matrix3d InMatrix = ConvertToMatrix(SpanSkew(iso,Span,Skew,Orient));
 	Matrix3d MatInSI = InMatrix * mUnitSystem->energyUnit.get_to_si();
 	Matrix3d rotation=Affine3d(mFrame->getTransformToLab()).rotation();
 	mData->SetMatrix(rotation * MatInSI * rotation.inverse());

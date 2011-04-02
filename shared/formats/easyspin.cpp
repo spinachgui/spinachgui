@@ -8,6 +8,7 @@
 
 #include <vector>
 
+#define BOOST_FILESYSTEM_VERSION 2
 #include <boost/filesystem.hpp>
 
 using namespace std;
@@ -16,7 +17,7 @@ using namespace Eigen;
 using namespace boost::filesystem;
 
 string MatlabMatrix(Matrix3d mat) {
-	ostringstream out;	
+	ostringstream out;
 
 	out << "[";
 
@@ -42,7 +43,7 @@ struct Appender {
 		: first(true),delim(delim_),str(str_) {
 	}
 	void operator()(string toAppend) {
-		if(!first) 
+		if(!first)
 			str += delim;
 		first = false;
 		str += toAppend;
@@ -115,7 +116,7 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 	fout << "sys.S = [" << electronLine << "];" << endl;
 	fout << "sys.Nucs = [" << NucsStream.str() << "];" << endl;
 
-	
+
 	//G tensors
 	monoTensor(ss,fout,"g",electronSpins,Interaction::G_TENSER,Joules);
 	//Nuclear Quadrupole
@@ -132,7 +133,7 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 	  3x3 matrices side by side, for different nuclei, on top of each
 	  other. If full matrices are given in A, Apa is ignored.
 
-	  
+
 	*/
 	string ATensorLine;
 	Appender ATensorAppender(ATensorLine);
@@ -150,10 +151,10 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 		ATensorAppender(NuclearALine);
 	}
 	fout << "sys.A = [" << ATensorLine << "];" << endl;
-	
+
 	/*
 	  From the easyspin documentation:
-	  
+
 	  Principal value of the electron-electron interaction
 	  matrices. Each row corresponds to the diagonal of an interaction
 	  matrix (in its eigenframe). They are lexicographically ordered
@@ -176,7 +177,7 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 
 	}
 	fout << "sys.ee = [" << eeTensorLine << "];" << endl;
-	
+
 
 	fout << "end" << endl;
 }

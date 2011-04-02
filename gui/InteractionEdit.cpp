@@ -28,122 +28,122 @@ enum {
 };
 
 const Interaction::Type NuclearT[] =
-  {Interaction::EXCHANGE,   
-   Interaction::SHIELDING,  
-   Interaction::HFC,        
-   Interaction::DIPOLAR,    
-   Interaction::QUADRUPOLAR,
-   Interaction::CUSTOM_LINEAR,     
-   Interaction::CUSTOM_BILINEAR,     
-   Interaction::CUSTOM_QUADRATIC};
+	{Interaction::EXCHANGE,   
+	 Interaction::SHIELDING,  
+	 Interaction::HFC,        
+	 Interaction::DIPOLAR,    
+	 Interaction::QUADRUPOLAR,
+	 Interaction::CUSTOM_LINEAR,     
+	 Interaction::CUSTOM_BILINEAR,     
+	 Interaction::CUSTOM_QUADRATIC};
 const long NuclearSTLen = 8;
 
 const Interaction::Type ElectronT[] = 
-  {Interaction::EXCHANGE,   
-   Interaction::G_TENSER,   
-   Interaction::DIPOLAR,    
-   Interaction::QUADRUPOLAR,
-   Interaction::ZFS,        
-   Interaction::CUSTOM_LINEAR,     
-   Interaction::CUSTOM_BILINEAR,     
-   Interaction::CUSTOM_QUADRATIC};
+	{Interaction::EXCHANGE,   
+	 Interaction::G_TENSER,   
+	 Interaction::DIPOLAR,    
+	 Interaction::QUADRUPOLAR,
+	 Interaction::ZFS,        
+	 Interaction::CUSTOM_LINEAR,     
+	 Interaction::CUSTOM_BILINEAR,     
+	 Interaction::CUSTOM_QUADRATIC};
 const long ElectronSTLen = 8;
 
 
 Interaction::Storage StorageOrders[]={
-  Interaction::STORAGE_SCALAR,
-  Interaction::MATRIX,
-  Interaction::EIGENVALUES,
-  Interaction::AXRHOM,
-  Interaction::SPANSKEW
+	Interaction::STORAGE_SCALAR,
+	Interaction::MATRIX,
+	Interaction::EIGENVALUES,
+	Interaction::AXRHOM,
+	Interaction::SPANSKEW
 };
 
 class STClientData : public wxClientData {
 public:
-  STClientData(Interaction::Type t) 
-    : mT(t){
-  }
-  Interaction::Type GetData() {return mT;}
-  private:
-  Interaction::Type mT;
+	STClientData(Interaction::Type t) 
+		: mT(t){
+	}
+	Interaction::Type GetData() {return mT;}
+private:
+	Interaction::Type mT;
 };
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
-  : InterEditPanelBase(parent,id),
-    mInter(NULL),
-    mLoading(false),
-    mDialogMode(true) {
+	: InterEditPanelBase(parent,id),
+	  mInter(NULL),
+	  mLoading(false),
+	  mDialogMode(true) {
 
-  Enable(false);
+	Enable(false);
 
-  mOrientEigenvalueCtrl = new OrientDialogCombo(mEigenEditPanel);
-  mOrientAxRhomCtrl     = new OrientDialogCombo(mAxRhomEditPanel);
-  mOrientSpanSkewCtrl   = new OrientDialogCombo(mSpanSkewEditPanel);
+	mOrientEigenvalueCtrl = new OrientDialogCombo(mEigenEditPanel);
+	mOrientAxRhomCtrl     = new OrientDialogCombo(mAxRhomEditPanel);
+	mOrientSpanSkewCtrl   = new OrientDialogCombo(mSpanSkewEditPanel);
 
-  mEigenEditPanel->   GetSizer()->Add(mOrientEigenvalueCtrl,1.0,wxALL);
-  mAxRhomEditPanel->  GetSizer()->Add(mOrientAxRhomCtrl,1.0,wxALL);
-  mSpanSkewEditPanel->GetSizer()->Add(mOrientSpanSkewCtrl,1.0,wxALL);
+	mEigenEditPanel->   GetSizer()->Add(mOrientEigenvalueCtrl,1.0,wxALL);
+	mAxRhomEditPanel->  GetSizer()->Add(mOrientAxRhomCtrl,1.0,wxALL);
+	mSpanSkewEditPanel->GetSizer()->Add(mOrientSpanSkewCtrl,1.0,wxALL);
 
-  mSubTypeCombo->SetId(TYPE_COMBO);
-  mSpin2Combo->SetId(SPIN2_COMBO);
+	mSubTypeCombo->SetId(TYPE_COMBO);
+	mSpin2Combo->SetId(SPIN2_COMBO);
 
-  UpdateSubTypeCombo();
+	UpdateSubTypeCombo();
 }							     
 							     
 void InterEditPanel::SetInter(Interaction* inter,Spin* withRespectTo) {
-  interChangeConnect.disconnect();
-  mWithRespectTo=withRespectTo;
-  mInter=inter;
-  Enable(inter != NULL);
-  if(inter != NULL) {
-    interChangeConnect=mInter->sigChange.connect(mem_fun(this,&InterEditPanel::OnInterChange));
-    LoadFromInter();
-  }
+	interChangeConnect.disconnect();
+	mWithRespectTo=withRespectTo;
+	mInter=inter;
+	Enable(inter != NULL);
+	if(inter != NULL) {
+		interChangeConnect=mInter->sigChange.connect(mem_fun(this,&InterEditPanel::OnInterChange));
+		LoadFromInter();
+	}
 }
 
 
  
 void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
-  if (mLoading) {
-    return;
-  }
-  Interaction::Storage storage=StorageOrders[e.GetSelection()];
-  if(storage==Interaction::STORAGE_SCALAR) {
-      mInter->ToScalar();
-  } else if(storage==Interaction::MATRIX) {
-      mInter->ToMatrix();
-  } else if(storage==Interaction::EIGENVALUES) {
-      mInter->ToEigenvalues();
-  } else if(storage==Interaction::AXRHOM) {
-      mInter->ToAxRhom();
-      cout << "Conversion done" << endl;
-  } else if(storage==Interaction::SPANSKEW) {
-      mInter->ToSpanSkew();
-  }
-  LoadFromInter();
+	if (mLoading) {
+		return;
+	}
+	Interaction::Storage storage=StorageOrders[e.GetSelection()];
+	if(storage==Interaction::STORAGE_SCALAR) {
+		mInter->ToScalar();
+	} else if(storage==Interaction::MATRIX) {
+		mInter->ToMatrix();
+	} else if(storage==Interaction::EIGENVALUES) {
+		mInter->ToEigenvalues();
+	} else if(storage==Interaction::AXRHOM) {
+		mInter->ToAxRhom();
+		cout << "Conversion done" << endl;
+	} else if(storage==Interaction::SPANSKEW) {
+		mInter->ToSpanSkew();
+	}
+	LoadFromInter();
 }
 
 void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
-  //TODO: We need to test if the spin is an election, because then
-  //slightly different options should become avaliable
-  mSubTypeCombo->Clear();
-  if(mInter==NULL) {
-    return;
-  }
-  Interaction::Type t = mInter->GetType();
-  if(true) {//If nucleus
-    for(long i=0;i<NuclearSTLen;i++) {
-      mSubTypeCombo->Append(wxString(Interaction::GetTypeName(NuclearT[i]),wxConvUTF8),new STClientData(NuclearT[i]));
-    }
-  } else { //Else electron
-    for(long i=0;i<ElectronSTLen;i++) {
-      mSubTypeCombo->Append(wxString(Interaction::GetTypeName(ElectronT[i]),wxConvUTF8),new STClientData(ElectronT[i]));
-    }
-  }
-  SetTypeSelection(t);
-  STClientData* data=dynamic_cast<STClientData*>(mSubTypeCombo->GetClientObject(0));
-  cout << Interaction::GetTypeName(data->GetData()) << endl;
-  cout << "Done update sub type combo" << endl;
+	//TODO: We need to test if the spin is an election, because then
+	//slightly different options should become avaliable
+	mSubTypeCombo->Clear();
+	if(mInter==NULL) {
+		return;
+	}
+	Interaction::Type t = mInter->GetType();
+	if(true) {//If nucleus
+		for(long i=0;i<NuclearSTLen;i++) {
+			mSubTypeCombo->Append(wxString(Interaction::GetTypeName(NuclearT[i]),wxConvUTF8),new STClientData(NuclearT[i]));
+		}
+	} else { //Else electron
+		for(long i=0;i<ElectronSTLen;i++) {
+			mSubTypeCombo->Append(wxString(Interaction::GetTypeName(ElectronT[i]),wxConvUTF8),new STClientData(ElectronT[i]));
+		}
+	}
+	SetTypeSelection(t);
+	STClientData* data=dynamic_cast<STClientData*>(mSubTypeCombo->GetClientObject(0));
+	cout << Interaction::GetTypeName(data->GetData()) << endl;
+	cout << "Done update sub type combo" << endl;
 }
 
 void InterEditPanel::LoadFromInter() {
@@ -313,38 +313,38 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
 
 
 void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
-  STClientData* data=dynamic_cast<STClientData*>(mSubTypeCombo->GetClientObject(mSubTypeCombo->GetSelection()));
-  if(data==NULL) {
-    cerr << "data==NULL" << endl;
-    return;
-  }
-  Interaction::Type t=data->GetData();
-  cout << "OnSubTypeChange, st=" << Interaction::GetTypeName(t) << endl;
-  Interaction::Form f=Interaction::GetFormFromType(t);
+	STClientData* data=dynamic_cast<STClientData*>(mSubTypeCombo->GetClientObject(mSubTypeCombo->GetSelection()));
+	if(data==NULL) {
+		cerr << "data==NULL" << endl;
+		return;
+	}
+	Interaction::Type t=data->GetData();
+	cout << "OnSubTypeChange, st=" << Interaction::GetTypeName(t) << endl;
+	Interaction::Form f=Interaction::GetFormFromType(t);
 
-  if(f==Interaction::LINEAR || f==Interaction::QUADRATIC) {
-    mInter->SetType(t,mWithRespectTo,NULL);
-    cout << "setting subtype to a linear or quadratic form" << endl;
-  } else {
-    Spin* spin=(Spin*)mSpin2Combo->GetClientData(mSpin2Combo->GetSelection());
-    cout << "setting spin 2 to " << spin << endl;
-    mInter->SetType(t,mWithRespectTo,spin);
-  }
+	if(f==Interaction::LINEAR || f==Interaction::QUADRATIC) {
+		mInter->SetType(t,mWithRespectTo,NULL);
+		cout << "setting subtype to a linear or quadratic form" << endl;
+	} else {
+		Spin* spin=(Spin*)mSpin2Combo->GetClientData(mSpin2Combo->GetSelection());
+		cout << "setting spin 2 to " << spin << endl;
+		mInter->SetType(t,mWithRespectTo,spin);
+	}
 
-  sigChange();
+	sigChange();
 }
 
 
 void InterEditPanel::SetTypeSelection(SpinXML::Interaction::Type t) {
-  for(long i=0;i<NuclearSTLen;i++) {
-    if(t==NuclearT[i]) {
-      mSubTypeCombo->SetSelection(i);
-    }
-  }
+	for(long i=0;i<NuclearSTLen;i++) {
+		if(t==NuclearT[i]) {
+			mSubTypeCombo->SetSelection(i);
+		}
+	}
 }
 
 void InterEditPanel::OnOrientChange(wxCommandEvent& e){
-  SaveToInter();
+	SaveToInter();
 }
 
 

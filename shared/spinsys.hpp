@@ -124,7 +124,6 @@ namespace SpinXML {
         std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;
 		Frame* mRootFrame;
-        Spin* mIgnoreSpinKill;
     };
 
 	class SpinSystemView  : public ViewBase<SpinSystemView,SpinSystem> {

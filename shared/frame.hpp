@@ -85,8 +85,6 @@ namespace SpinXML {
 			if(mData == NULL) {
 				return;
 			}
-			mData->sigChange.connect(sigChange);
-            mData->sigDying.connect(sigDying);
             mData->sigDying.connect(mem_fun(this,&ViewBase::OnObjectDie));
         }
         void OnObjectDie(T*) {mData=NULL;}
@@ -97,8 +95,6 @@ namespace SpinXML {
 		T* Get() {return mData;}
 		const T* Get() const {return mData;}
 
-        sigc::signal<void> sigChange;
-        sigc::signal<void,T*> sigDying;
     protected:
 		template <typename ViewType>
 		std::vector<ViewType> MapVectorToViewVector(const std::vector<typename ViewType::ViewedType*>& v) const {

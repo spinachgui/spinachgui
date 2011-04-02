@@ -28,12 +28,12 @@ std::vector<SpinView> SpinSystemView::GetNearbySpins(Vector3d pos,double distanc
 // SpinSystem
 
 SpinSystem::SpinSystem()
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)) {
 }
 
 
 SpinSystem::SpinSystem(const SpinSystem& system)
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)),mIgnoreSpinKill(NULL) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)) {
     long spinCount=system.mSpins.size();
 
     mSpins.resize(spinCount);
@@ -50,11 +50,10 @@ SpinSystem::~SpinSystem() {
 }
 
 void SpinSystem::Clear() {
-    for(unsigned long i=0;i<mSpins.size();i++) {
-        mIgnoreSpinKill=mSpins[i];
-        delete mSpins[i];
+    while(mSpins.size() > 0) {
+		//Caling the destructor of Spin triggers removal
+        delete mSpins[0];
     }
-    mSpins.resize(0);
 
 	delete mRootFrame;
 	mRootFrame = new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem);
@@ -139,10 +138,6 @@ Spin* SpinSystem::RemoveSpin(long Position) {
 }
 
 Spin* SpinSystem::RemoveSpin(Spin* _Spin) {
-    if(_Spin==mIgnoreSpinKill) {
-        mIgnoreSpinKill=NULL;
-        return NULL;
-    }
     for(unsigned long i=0;i<mSpins.size();i++) {
         if(mSpins[i]==_Spin) {
             mSpins.erase(mSpins.begin()+i);

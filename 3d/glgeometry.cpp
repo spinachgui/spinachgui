@@ -91,11 +91,13 @@ MoleculeFG::MoleculeFG()
 }
 
 
-void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u) {
+void DrawCylinder(Vector3d R1,Vector3d R2,length width) {
     //If the spin is an electron, it should be drawn outside of the
     //molecule
-    double x1=R1.x() * u,y1=R1.y() * u,z1=R1.z() * u;
-    double x2=R2.x() * u,y2=R2.y() * u,z2=R2.z() * u;
+    double x1=R1.x(),y1=R1.y(),z1=R1.z();
+    double x2=R2.x(),y2=R2.y(),z2=R2.z();
+
+	cout << "Draw cyllinder from " << R1 << " to " << " R2" << R2 << endl;
 
     double len=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
@@ -104,7 +106,7 @@ void DrawCylinder(Vector3d R1,Vector3d R2,length width,unit u) {
     glPushMatrix(); {
 		glTranslatef(x1,y1,z1);
 		glRotatef(angle/2/pi*360,y1-y2,x2-x1,0);
-		gluCylinder(GetQuadric(),width * u,width * u,len,7,7);
+		gluCylinder(GetQuadric(),width,width,len,7,7);
     } glPopMatrix();
 }
 
@@ -286,7 +288,48 @@ BilinearInterDrawer::BilinearInterDrawer()
 }
 
 void BilinearInterDrawer::Geometary() const {
+	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
+	
+	foreach(Interaction* inter,inters) {
+		Interaction::Type t = inter->GetType();
+		if(!GetInterVisible(t)) {
+			continue;
+		}
 
+		if(!inter->GetIsBilinear()) {
+			continue;
+		}
+		if(inter->GetType() == Interaction::HFC) {
+			continue;
+		}
+
+		Spin* spin1 = inter->GetSpin1();
+		Spin* spin2 = inter->GetSpin2();
+
+		//We don't currently visualise bilinear interactions involving
+		//electrons
+		if(spin1->GetElement() == 0) {
+			continue;
+		}
+		if(spin2->GetElement() == 0) {
+			continue;
+		}
+
+		GetInterColour(t).SetMaterial(0.5);
+
+		double minCuttoff=GetInterSize(t);
+		double maxCuttoff=minCuttoff*2;
+
+		energy norm = inter->AsMatrix().norm();
+
+		if(minCuttoff < norm) {
+			double width=(norm > maxCuttoff) ? 1.0 : (norm-minCuttoff)/(maxCuttoff-minCuttoff);
+			double realWidth = width * 0.04;
+			cout << "We should be drawing, width = " << realWidth << endl;
+			DrawCylinder(spin1->GetPosition() * Angstroms.get_from_si(), spin2->GetPosition() * Angstroms.get_from_si(), realWidth);
+		}
+
+	}
 }
 
 //============================================================//

@@ -233,21 +233,15 @@ void MonoInterDrawer::Geometary() const {
 						 spin->GetPosition().y() / Angstroms,
 						 spin->GetPosition().z() / Angstroms);
 
-			Matrix3d mat3 =       inter->AsMatrix();
+			Eigenvalues ev = inter->AsEigenvalues();
 
-			EigenSolver<Matrix3d> es(mat3);
-			EigenSolver<Matrix3d>::EigenvectorsType Rot = es.eigenvectors();
-			EigenSolver<Matrix3d>::EigenvalueType   vec = es.eigenvalues();
+			
+			double xx = ev.xx;
+			double yy = ev.yy;
+			double zz = ev.zz;
 
-			//Assume real eigenvalues
-			double xx = real(vec.x());
-			double yy = real(vec.y());
-			double zz = real(vec.z());
+			Matrix3d mat3 = ev.mOrient.GetAsDCM();
 
-			Matrix3d Scale;
-			glScaled(xx / MHz,yy / MHz, zz / MHz);
-
-			mat3=Rot.real();
 			GLfloat mat[16];
             mat[3 ]=0;
             mat[7 ]=0;
@@ -258,18 +252,20 @@ void MonoInterDrawer::Geometary() const {
             mat[15]=1;
 
             mat[0 ]=mat3(0,0);
-            mat[1 ]=mat3(1,0);
-            mat[2 ]=mat3(2,0);
+            mat[1 ]=mat3(0,1);
+            mat[2 ]=mat3(0,2);
 						    
-            mat[4 ]=mat3(0,1);
+            mat[4 ]=mat3(1,0);
             mat[5 ]=mat3(1,1);
-            mat[6 ]=mat3(2,1);
+            mat[6 ]=mat3(1,2);
 						    
-            mat[8 ]=mat3(0,2);
-            mat[9 ]=mat3(1,2);
+            mat[8 ]=mat3(2,0);
+            mat[9 ]=mat3(2,1);
             mat[10]=mat3(2,2);
 
 			glMultMatrixf(mat);
+
+			glScaled(xx / MHz,yy / MHz, zz / MHz);
 			
 			double size = GetInterSize(t);
 			glScaled(size,size,size);

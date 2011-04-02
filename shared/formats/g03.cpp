@@ -17,6 +17,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	  streams properly. This is due to it being adapted from matlab code (which uses
 	  c style I/O
 	*/
+	vector<double>      isoHFC;
+	vector<Eigenvalues> anisoHFC;
+
 	ss->Clear();
 	Spin* s=new Spin(Vector3d(0,0,0),string("Unpaired Electron"),0);
 	ss->InsertSpin(s);
@@ -188,8 +191,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				//Read the coupling strength (in megaherz)
 				stream >> dummy1 >> dummy2 >> dummy3 >> isoCoupling;
         
-				Interaction* inter=new Interaction(isoCoupling*MHz,Interaction::HFC,ss->GetSpin(i+1),ss->GetSpin(0));
-				ss->InsertInteraction(inter);
+				isoHFC.push_back(isoCoupling*MHz);
 			}          
 		}
 		if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
@@ -220,14 +222,22 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 										   x2,y2,z2,
 										   x3,y3,z3));
 
-				Interaction* inter=new Interaction(Eigenvalues(eigenvalue1*MHz,eigenvalue2*MHz,eigenvalue3*MHz,o),
-												   Interaction::HFC,
-												   ss->GetSpin(i+1),ss->GetSpin(0)); 
-				ss->InsertInteraction(inter);
+				anisoHFC.push_back(Eigenvalues(eigenvalue1*MHz,eigenvalue2*MHz,eigenvalue3*MHz,o));
 			}
 		}
 	}
-	ss->CompressDuplicateInteractions();
+
+	for(unsigned long i = 0;i<isoHFC.size();i++) {
+		double      iso       = isoHFC[i];
+		Eigenvalues toCompose = anisoHFC[i];
+		toCompose.xx += iso;
+		toCompose.yy += iso;
+		toCompose.zz += iso;
+		Interaction* inter=new Interaction(toCompose, Interaction::HFC, ss->GetSpin(i+1),ss->GetSpin(0)); 
+		ss->InsertInteraction(inter);
+
+	}
+
 	cout << "Finished loading the g03 file, saving ss->GetSpinCount()=" << ss->GetSpinCount() << endl;
 }
 

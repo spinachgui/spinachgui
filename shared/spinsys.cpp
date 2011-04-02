@@ -179,9 +179,9 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             //A unit vector pointing from spin1 tp spin2
             length rx,ry,rz;
             Vector3d r_1_2=spin2->GetPosition()-spin1->GetPosition();
-            rx=r_1_2.x() * metres;
-            ry=r_1_2.y() * metres;
-            rz=r_1_2.z() * metres;
+            rx=r_1_2.x();
+            ry=r_1_2.y();
+            rz=r_1_2.z();
 
             long element2=spin2->GetElement();
             long isotope2=spin2->GetIsotope();

@@ -148,7 +148,7 @@ void InteractionView::SetSpanSkew(double iso,  double Span, double Skew,const Or
 }
 
 double InteractionView::AsScalar() const {
-	return mData->AsScalar()*mUnitSystem->energyUnit;
+	return mData->AsScalar() / mUnitSystem->energyUnit;
 }
 
 Matrix3d InteractionView::AsMatrix() const {
@@ -162,9 +162,10 @@ UEigenvalues InteractionView::AsEigenvalues() const {
 	Matrix3d rotation = Affine3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d AsMatrix = (rotation * MatInSI * rotation.inverse());
 	Eigenvalues eig = ConvertToEigenvalues(AsMatrix);
-	return UEigenvalues(eig.xx * mUnitSystem->energyUnit,
-						eig.yy * mUnitSystem->energyUnit,
-						eig.zz * mUnitSystem->energyUnit,eig.mOrient);
+	cout << eig.xx << endl;
+	return UEigenvalues(eig.xx / mUnitSystem->energyUnit,
+						eig.yy / mUnitSystem->energyUnit,
+						eig.zz / mUnitSystem->energyUnit,eig.mOrient);
 }
 
 UAxRhom      InteractionView::AsAxRhom() const {
@@ -172,9 +173,9 @@ UAxRhom      InteractionView::AsAxRhom() const {
 	Matrix3d rotation = Affine3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
 	AxRhom ax_rhom=ConvertToAxRhom(Matrix);
-	return UAxRhom(ax_rhom.iso * mUnitSystem->energyUnit,
-				   ax_rhom.ax  * mUnitSystem->energyUnit,
-				   ax_rhom.rh  * mUnitSystem->energyUnit,ax_rhom.mOrient);
+	return UAxRhom(ax_rhom.iso / mUnitSystem->energyUnit,
+				   ax_rhom.ax  / mUnitSystem->energyUnit,
+				   ax_rhom.rh  / mUnitSystem->energyUnit,ax_rhom.mOrient);
 }
 
 USpanSkew    InteractionView::AsSpanSkew() const {
@@ -182,8 +183,8 @@ USpanSkew    InteractionView::AsSpanSkew() const {
 	Matrix3d rotation = Affine3d(mFrame->getTransformFromLab()).rotation();
 	Matrix3d Matrix = (rotation * MatInSI * rotation.inverse());
 	SpanSkew span_skew = ConvertToSpanSkew(Matrix);
-	return USpanSkew(span_skew.iso*mUnitSystem->energyUnit,
-				   span_skew.span*mUnitSystem->energyUnit,
+	return USpanSkew(span_skew.iso / mUnitSystem->energyUnit,
+				   span_skew.span / mUnitSystem->energyUnit,
 				   span_skew.skew,span_skew.mOrient);
 }
 

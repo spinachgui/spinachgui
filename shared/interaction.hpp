@@ -295,7 +295,6 @@ namespace SpinXML {
         ///Construct from a scalar
         InteractionView(Interaction* inter   ,const Frame* frame, const UnitSystem* unitSystem)
 			: Base(inter,frame,unitSystem) {
-			mData->sigRemoveSpin.connect(sigRemoveSpin);
         }
 
         ///Get the storage convention being used
@@ -350,8 +349,6 @@ namespace SpinXML {
         ///given a pointer to one of those spins, return a pointer to
         ///the other spin. In all other cases return NULL
         SpinView GetOtherSpin(const SpinView spin) const {return mData->GetOtherSpin(spin.Get())->GetView(mFrame,mUnitSystem);}
-
-        sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
     };
 
 	extern std::vector<Interaction::Type> Types;

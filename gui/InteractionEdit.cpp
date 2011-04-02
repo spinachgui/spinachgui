@@ -242,73 +242,73 @@ void InterEditPanel::LoadFromInter() {
 }
 
 void InterEditPanel::SaveToInter() {
-  interChangeConnect.block();
-  Interaction::Storage storage = StorageOrders[mTypeChoiceBook->GetSelection()];
-  if(storage==Interaction::STORAGE_SCALAR) {
-    double scalar;
-    mScalarCtrl->GetValue().ToDouble(&scalar);
-    mInter->SetScalar(scalar*MHz);
-  } else if(storage==Interaction::MATRIX) {
-    double xx,xy,xz;
-    double yx,yy,yz;
-    double zx,zy,zz;
-    mMatXXCtrl->GetValue().ToDouble(&xx);
-    mMatXYCtrl->GetValue().ToDouble(&xy);
-    mMatXZCtrl->GetValue().ToDouble(&xz);
+	interChangeConnect.block();
+	Interaction::Storage storage = StorageOrders[mTypeChoiceBook->GetSelection()];
+	if(storage==Interaction::STORAGE_SCALAR) {
+		double scalar;
+		mScalarCtrl->GetValue().ToDouble(&scalar);
+		mInter->SetScalar(scalar*MHz);
+	} else if(storage==Interaction::MATRIX) {
+		double xx,xy,xz;
+		double yx,yy,yz;
+		double zx,zy,zz;
+		mMatXXCtrl->GetValue().ToDouble(&xx);
+		mMatXYCtrl->GetValue().ToDouble(&xy);
+		mMatXZCtrl->GetValue().ToDouble(&xz);
                          
-    mMatYXCtrl->GetValue().ToDouble(&yx);
-    mMatYYCtrl->GetValue().ToDouble(&yy);
-    mMatYZCtrl->GetValue().ToDouble(&yz);
+		mMatYXCtrl->GetValue().ToDouble(&yx);
+		mMatYYCtrl->GetValue().ToDouble(&yy);
+		mMatYZCtrl->GetValue().ToDouble(&yz);
                          
-    mMatZXCtrl->GetValue().ToDouble(&zx);
-    mMatZYCtrl->GetValue().ToDouble(&zy);
-    mMatZZCtrl->GetValue().ToDouble(&zz);
+		mMatZXCtrl->GetValue().ToDouble(&zx);
+		mMatZYCtrl->GetValue().ToDouble(&zy);
+		mMatZZCtrl->GetValue().ToDouble(&zz);
 
-    mInter->SetMatrix(MakeMatrix3d(xx*MHz,xy*MHz,xz*MHz,
-								   yx*MHz,yy*MHz,yz*MHz,
-								   zx*MHz,zy*MHz,zz*MHz));
+		mInter->SetMatrix(MakeMatrix3d(xx*MHz,xy*MHz,xz*MHz,
+									   yx*MHz,yy*MHz,yz*MHz,
+									   zx*MHz,zy*MHz,zz*MHz));
 
-  } else if(storage==Interaction::EIGENVALUES) {
-    double xx,yy,zz;
+	} else if(storage==Interaction::EIGENVALUES) {
+		double xx,yy,zz;
 
-    mEigenXXCtrl->GetValue().ToDouble(&xx);
-    mEigenYYCtrl->GetValue().ToDouble(&yy);
-    mEigenZZCtrl->GetValue().ToDouble(&zz);
+		mEigenXXCtrl->GetValue().ToDouble(&xx);
+		mEigenYYCtrl->GetValue().ToDouble(&yy);
+		mEigenZZCtrl->GetValue().ToDouble(&zz);
  
-    mInter->SetEigenvalues(xx*MHz,yy*MHz,zz*MHz,
-                           mOrientEigenvalueCtrl->GetOrient());
+		mInter->SetEigenvalues(xx*MHz,yy*MHz,zz*MHz,
+							   mOrientEigenvalueCtrl->GetOrient());
 
-  } else if(storage==Interaction::AXRHOM) {
-    double ax,rhom,iso;
+	} else if(storage==Interaction::AXRHOM) {
+		double ax,rhom,iso;
 
-    mAxCtrl->       GetValue().ToDouble(&ax);
-    mRhomCtrl->     GetValue().ToDouble(&rhom);
-    mAxRhomIsoCtrl->GetValue().ToDouble(&iso);
+		mAxCtrl->       GetValue().ToDouble(&ax);
+		mRhomCtrl->     GetValue().ToDouble(&rhom);
+		mAxRhomIsoCtrl->GetValue().ToDouble(&iso);
 
-    mInter->SetAxRhom(iso*MHz,ax*MHz,rhom*MHz,
-                      mOrientAxRhomCtrl->GetOrient());
-  } else if(storage==Interaction::SPANSKEW) {
-    double span,skew,iso;
+		mInter->SetAxRhom(iso*MHz,ax*MHz,rhom*MHz,
+						  mOrientAxRhomCtrl->GetOrient());
+	} else if(storage==Interaction::SPANSKEW) {
+		double span,skew,iso;
 
-    mSpanCtrl->       GetValue().ToDouble(&span);
-    mSkewCtrl->       GetValue().ToDouble(&skew);
-    mSpanSkewIsoCtrl->GetValue().ToDouble(&iso);
+		mSpanCtrl->       GetValue().ToDouble(&span);
+		mSkewCtrl->       GetValue().ToDouble(&skew);
+		mSpanSkewIsoCtrl->GetValue().ToDouble(&iso);
 
-    mInter->SetSpanSkew(iso*MHz,span*MHz,skew,
-                        mOrientSpanSkewCtrl->GetOrient());
-  }
-  interChangeConnect.unblock();
+		mInter->SetSpanSkew(iso*MHz,span*MHz,skew,
+							mOrientSpanSkewCtrl->GetOrient());
+	}
+	interChangeConnect.unblock();
 }
 
 
 void InterEditPanel::onTextChange(wxCommandEvent& e) {
-  if(mLoading) {  //If we are loading from a spin we should ignore
-		  //this event
-    return;
-  }
-  sigChange();
-  SaveToInter();
-  return;
+	if(mLoading) {  //If we are loading from a spin we should ignore
+		//this event
+		return;
+	}
+	sigChange();
+	SaveToInter();
+	return;
 }
 
 

@@ -199,7 +199,7 @@ bool SpinachApp::OnInit() {
     mSS = new SpinSystem;
 	//Set the active frame as the lab frame
 	SetFrame(mSS->GetLabFrame());
-
+	/*
 	Spin* spin1 = new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16);
 	mSS->InsertSpin(spin1);
 
@@ -222,7 +222,7 @@ bool SpinachApp::OnInit() {
 	mSS->GetLabFrame()->AddChild(f1);
 
 	f1->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
-
+	*/
     RootFrame* frame = new RootFrame(NULL);
     frame->Show();
 

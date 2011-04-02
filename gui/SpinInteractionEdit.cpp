@@ -50,7 +50,7 @@ void SpinInterEditPanel::SetSpin(Spin* spin) {
 
 void SpinInterEditPanel::Clear() {
 	mTempInteractions.resize(0);
-	//Enable(false);
+	Enable(false);
 }
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {

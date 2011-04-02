@@ -220,34 +220,10 @@ public:
 			Interaction::Type type = (Interaction::Type)i;
 			InterDisplaySettings* widget = new InterDisplaySettings(this,type);
 			bs->Add(widget,1,wxEXPAND);
-
-			//Connect the scalling sliders to the scalling
-			widget->GetLogSlider()->sigChange.connect(bind(&SetInterSize,type));
-
-			//Connect the colour controls to the tensor colours
-			bind(&SetInterColour,type);
-			//widget->sigColour.connect();
-
-			//Connect the visibility toggles to the tensor colours
-			widget->sigVisible.connect(bind(&SetInterVisible,type));
-
-			//Set sensible default scallings
-			widget->GetLogSlider()->SetValue(1);
-
-			//Set default visibility to NMR/EPR
-			widget->SetVisible(true);
-
-			//Setup the default colours
-			widget->SetColour(0,0,1);
 		}
 
 		this->SetSizer(bs);
 	}
-	//You could probably avoid needing these functions somehow, but it
-	//probably wouldn't be worth the templates at this point
-	void SlotScaleChange(double s,Interaction::Type t)                 {}
-	void SlotColourChange(float r,float g,float b,Interaction::Type t) {}
-	void SlotVisibleChange(bool b,Interaction::Type t)                 {}
 };
 
 //============================================================//

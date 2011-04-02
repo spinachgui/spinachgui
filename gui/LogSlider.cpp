@@ -19,12 +19,11 @@ LogSlider::LogSlider(wxWindow* parent,double value)
 
 void LogSlider::SetValue(double value) {
     if(value<=0) {
-	throw std::runtime_error("In LogSlider value<=0");
+		throw std::runtime_error("In LogSlider value<=0");
     }
     mLogValue=log10(value);
     wxClientDC dc(this);
     RealPaint(dc);
-    sigChange(pow(10,mLogValue));
 }
 
 double LogSlider::GetValue() {
@@ -89,10 +88,10 @@ void LogSlider::OnLeftUp(wxMouseEvent&e) {
 
 void LogSlider::OnMouseMove(wxMouseEvent&e) {
     if(e.Dragging()) {
-	wxSize size=GetClientSize();
-	int w=size.GetWidth();
+		wxSize size=GetClientSize();
+		int w=size.GetWidth();
 
-	mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
+		mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
     }
     Refresh();
     sigChange(pow(10,mLogValue+mLogValueDelta));

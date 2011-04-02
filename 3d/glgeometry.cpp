@@ -214,6 +214,11 @@ void MonoInterDrawer::Geometary() const {
 	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
 	
 	foreach(Interaction* inter,inters) {
+		Interaction::Type t = inter->GetType();
+		if(!GetInterVisible(t)) {
+			continue;
+		}
+
 		Spin* spin = inter->GetSpin1();
 
 		if(inter->GetIsBilinear()) {
@@ -225,7 +230,6 @@ void MonoInterDrawer::Geometary() const {
 				continue;
 			}
 		}
-		Interaction::Type t = inter->GetType();
 		GetInterColour(t).SetMaterial(0.5);
 
 		glPushMatrix(); {

@@ -50,15 +50,19 @@ RCActionShowSpinProperties::RCActionShowSpinProperties(wxWindow* parent)
 void RCActionShowSpinProperties::Exec(wxCommandEvent& e) {
     const set<Spin*>& selection = GetSelection();
     if(selection.begin() != selection.end()) {
-		Spin* spin = *(selection.begin());
-		SpinView spinV = spin->GetView(GetFrame(),GetUnitSystem());
-		SpinDialog* dialog=new SpinDialog(mParent,spinV);
-		dialog->ShowModal(); 
+	Spin* spin = *(selection.begin());
+	SpinView spinV = spin->GetView(GetFrame(),GetUnitSystem());
+	SpinDialog* dialog=new SpinDialog(mParent,spinV);
+	dialog->ShowModal(); 
+    } else if(GetHover() != NULL) {
+	SpinView spinV = GetHover()->GetView(GetFrame(),GetUnitSystem());
+	SpinDialog* dialog=new SpinDialog(mParent,spinV);
+	dialog->ShowModal();
     }
 }
 
 bool RCActionShowSpinProperties::Visible() const {
-    return GetSelectedCount() == 1;
+    return GetSelectedCount() == 1 || GetHover() != NULL;
 }
 
 //============================================================//

@@ -29,7 +29,11 @@ void Camera::Translate(float deltaX,float deltaY) {
 }
 
 void Camera::Rotate(float deltaX,float deltaY) {
-    cout << "Rotate(" << deltaX << "," << deltaY << ")" << endl;
+    if(deltaX < 0.001 && deltaY < 0.001) {
+	//If deltaX and deltaY are both small, it appears the
+	//transform operation becomes invalid. Don't let this happen.
+	return;
+    }
     //The angle is proptional to the distance moved by the mouse
     float dotProduct=(deltaX*deltaX+deltaY*deltaY);
     float norm=sqrt(dotProduct);
@@ -41,12 +45,12 @@ void Camera::Set(int width,int height) const {
     //vital
     glLoadIdentity();
     glOrtho(-width*mZoom ,width*mZoom,
-			-height*mZoom,height*mZoom,
-			-40.0, 40.0);
+	    -height*mZoom,height*mZoom,
+	    -40.0, 40.0);
 
     glMatrixMode(GL_MODELVIEW);
 
     glLoadIdentity();
     gluLookAt(0,0,15,0,0,0,0,1,0);
-	glMultMatrixf(mTransform.data());
+    glMultMatrixf(mTransform.data());
 }

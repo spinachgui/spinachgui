@@ -35,12 +35,10 @@ void SpinView::SetPosition(Vector3d Position) {
 void SpinView::GetCoordinates(double* _x,double* _y, double* _z) const {
     length ux,uy,uz;
     mData->GetCoordinates(&ux,&uy,&uz);
-	Vector4d v=mFrame->getTransformFromLab()*Vector4d(ux/mUnitSystem->lengthUnit,
-													  uy/mUnitSystem->lengthUnit,
-													  uz/mUnitSystem->lengthUnit,1);
-	*_x=v.x();
-	*_y=v.y();
-	*_z=v.z();
+    Vector4d v=mFrame->getTransformFromLab()*Vector4d(ux, uy, uz,1);
+	*_x=v.x()/mUnitSystem->lengthUnit;
+	*_y=v.y()/mUnitSystem->lengthUnit;
+	*_z=v.z()/mUnitSystem->lengthUnit;
 	
 }
 

@@ -81,9 +81,12 @@ GLPicking::~GLPicking() {
 	}
 }
 
-void GLPicking::SetMouseXY(long mouseX,long mouseY) {
-	mMouseX = mouseX;
-	mMouseY = mouseY;
+void GLPicking::SetBox(long top,long left,long width, long height) {
+	mMouseX = top;
+	mMouseY = left;
+	mWidth = width;
+	mHeight = height;
+	cout << top << " " << left << " " << width << " " << height << endl;
 }
 
 std::pair<long,GLuint*> GLPicking::GetBuffer() const {
@@ -103,7 +106,7 @@ void GLPicking::On() {
 	glGetDoublev(GL_PROJECTION_MATRIX,mProjmatrix);
 	
 	glLoadIdentity();	
-	gluPickMatrix(mMouseX,viewport[3]-mMouseY,3.0, 3.0, viewport);
+	gluPickMatrix(mMouseX,viewport[3]-mMouseY,3,3, viewport);
 	glMultMatrixd(mProjmatrix);
 
 	glInitNames();

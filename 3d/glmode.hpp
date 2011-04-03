@@ -35,19 +35,21 @@ public:
 
 class GLPicking : public GLMode {
 public:
-	GLPicking(long len);
-	~GLPicking();
-	void SetMouseXY(long mouseX,long mouseY);
-	std::pair<long,GLuint*> GetBuffer() const;
-	virtual void On();
-	virtual void Off();
+    GLPicking(long len);
+    ~GLPicking();
+    void SetBox(long top,long left,long width, long height);
+    std::pair<long,GLuint*> GetBuffer() const;
+    virtual void On();
+    virtual void Off();
 private:
-	long mLen;
-	long mHits;
-	GLuint* mBuff;
-	GLdouble mProjmatrix[16];
+    long mLen;
+    long mHits;
+    GLuint* mBuff;
+    GLdouble mProjmatrix[16];
     long mMouseX,mMouseY;
+    long mWidth,mHeight;
 };
+
 
 class ModeCollection : public GLMode {
 public:

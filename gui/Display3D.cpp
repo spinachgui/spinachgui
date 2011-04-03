@@ -138,13 +138,15 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 }
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
-    if(GetHover() == NULL) {
-	ClearSelection();
+    if(mBandBoxOn) {
+	cout << "Band Box Up" << endl;
+	mBandBoxOn = false;
 	return;
     }
 
-    if(mBandBoxOn) {
-	mBandBoxOn = false;
+    if(GetHover() == NULL) {
+	ClearSelection();
+	return;
     }
 
     if(!e.ShiftDown()) {
@@ -216,6 +218,7 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 	glVertex2i(mBandBoxStartX,height-mMouseY       );
 	glVertex2i(mBandBoxStartX,height-mBandBoxStartY);
 	glEnd();
+	
     }
 
     SwapBuffers();
@@ -229,38 +232,42 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 }
 
 void Display3D::StartPicking() {
-	mPicking->SetMouseXY(mMouseX,mMouseY);
-	mPicking->On();
+    if(mBandBoxOn) {
+	mPicking->SetBox(mMouseX,mMouseY,mBandBoxStartX-mMouseX,mBandBoxStartY-mMouseX);
+    } else {
+	mPicking->SetBox(mMouseX,mMouseY,3,3);
+    }
+    mPicking->On();
 }
 
 void Display3D::StopPicking() {
-	mPicking->Off();
+    mPicking->Off();
 
-	pair<long,GLuint*> tupple = mPicking->GetBuffer();
+    pair<long,GLuint*> tupple = mPicking->GetBuffer();
 
-	long hits = tupple.first;
-	GLuint* buff = tupple.second;
+    long hits = tupple.first;
+    GLuint* buff = tupple.second;
 
-	float closestDistance=HUGE_VAL;
-	GLuint* closestNames=NULL;
-	GLuint closestNameCount=0;
-	if(hits <= 0) {
-		OnMouseOver3D(0,NULL);
-		return;
+    float closestDistance=HUGE_VAL;
+    GLuint* closestNames=NULL;
+    GLuint closestNameCount=0;
+    if(hits <= 0) {
+	OnMouseOver3D(0,NULL);
+	return;
+    }
+    for(long i=0;i<hits;i++) {
+	GLuint name_count = *(buff++);
+	float d1=float(*(buff++))/0x7fffffff;
+	float d2=float(*(buff++))/0x7fffffff;
+	float thisDistance=d1<d2 ? d1 : d2;
+	if(closestDistance > thisDistance) {
+	    closestDistance=thisDistance;
+	    closestNames=buff;
+	    closestNameCount=name_count;
 	}
-	for(long i=0;i<hits;i++) {
-		GLuint name_count = *(buff++);
-		float d1=float(*(buff++))/0x7fffffff;
-		float d2=float(*(buff++))/0x7fffffff;
-		float thisDistance=d1<d2 ? d1 : d2;
-		if(closestDistance > thisDistance) {
-			closestDistance=thisDistance;
-			closestNames=buff;
-			closestNameCount=name_count;
-		}
-		buff+=name_count;
-	}
-	OnMouseOver3D(closestNameCount,closestNames);
+	buff+=name_count;
+    }
+    OnMouseOver3D(closestNameCount,closestNames);
 }
 
 BEGIN_EVENT_TABLE(Display3D,wxGLCanvas)

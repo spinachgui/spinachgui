@@ -197,17 +197,26 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     
     DrawScene();
 
-    //Draw any 2D components
-    Set2DView();
+    if(mBandBoxOn) {
+	//Draw any 2D components
+	Set2DView();
 
-    glColor3f(0.0,0.0,0.0);
+	glColor3f(0.0,0.0,0.0);
 
-    glBegin(GL_LINE);
-    glVertex2i(2,2);
-    glVertex2i(2,30);
-    glVertex2i(30,30);
-    glVertex2i(30,2);
-    glEnd();
+	glBegin(GL_LINE);
+	glVertex2i(mBandBoxStartX,height-mBandBoxStartY);
+	glVertex2i(mMouseX       ,height-mBandBoxStartY);
+
+	glVertex2i(mMouseX       ,height-mBandBoxStartY);
+	glVertex2i(mMouseX       ,height-mMouseY       );
+
+	glVertex2i(mMouseX       ,height-mMouseY       );
+	glVertex2i(mBandBoxStartX,height-mMouseY       );
+
+	glVertex2i(mBandBoxStartX,height-mMouseY       );
+	glVertex2i(mBandBoxStartX,height-mBandBoxStartY);
+	glEnd();
+    }
 
     SwapBuffers();
     while (true) {

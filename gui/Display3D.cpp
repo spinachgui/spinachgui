@@ -30,15 +30,20 @@ Display3D::Display3D(wxWindow* parent)
                  wxDefaultPosition,wxDefaultSize,
                  WX_GL_DOUBLEBUFFER,wxT("Display3D"),
                  gl_attribs) {
-	mCamera = new Camera;
-	mPicking = new GLPicking(2000);
+    mCamera = new Camera;
+    mPicking = new GLPicking(2000);
+
+    mBandBoxOn = false;
+    mBandBoxStartX = -1;
+    mBandBoxStartY = -1;
+
 
     mMouseX = 0;
     mMouseY = 0;
 
     mGLContext=NULL;
     mGLEnabled=false;
-	sig3DChange.connect(sigc::mem_fun(this,&Display3D::Redraw));
+    sig3DChange.connect(sigc::mem_fun(this,&Display3D::Redraw));
 }
 
 void Display3D::ResetView() {
@@ -95,10 +100,20 @@ void Display3D::ChangeViewport() {
 
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
-	if(e.Dragging() && e.RightIsDown()) {
-		mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+    if(e.Dragging() && e.RightIsDown()) {
+	mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
-		mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+	if(e.ShiftDown()) {
+	    //Band box select
+	    if(!mBandBoxOn) {
+		mBandBoxOn = true;
+		mBandBoxStartX = mMouseX;
+		mBandBoxStartY = mMouseY;
+	    }
+	} else {
+	    //Ajust camera angle
+	    mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+	}
     } 
     mMouseX=e.GetX();
     mMouseY=e.GetY();
@@ -123,19 +138,23 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 }
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
-	if(GetHover() == NULL) {
-		ClearSelection();
-		return;
-	}
+    if(GetHover() == NULL) {
+	ClearSelection();
+	return;
+    }
+
+    if(mBandBoxOn) {
+	mBandBoxOn = false;
+    }
 
     if(!e.ShiftDown()) {
-		SetSelection(GetHover());
+	SetSelection(GetHover());
     } else {
-		if(GetSelection().find(GetHover()) != GetSelection().end()) {
-			AddSelection(GetHover());
-		} else {
-			RemoveSelection(GetHover());
-		}
+	if(GetSelection().find(GetHover()) != GetSelection().end()) {
+	    AddSelection(GetHover());
+	} else {
+	    RemoveSelection(GetHover());
+	}
     }
 }
 
@@ -152,6 +171,16 @@ void Display3D::OnResize(wxSizeEvent& e) {
 void Display3D::OnDeleteSpinHover(wxCommandEvent& e) {
 }
 
+void Display3D::Set2DView() {
+    int width,height;
+    GetClientSize(&width,&height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0,width,0,height);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
 void Display3D::OnPaint(wxPaintEvent& e) {
     wxPaintDC dc(this);
 
@@ -162,19 +191,31 @@ void Display3D::OnPaint(wxPaintEvent& e) {
 
     int width,height;
     GetClientSize(&width,&height);
-	mCamera->Set(width,height);
+    mCamera->Set(width,height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //Draw opaque objects first
     
-	DrawScene();
+    DrawScene();
+
+    //Draw any 2D components
+    Set2DView();
+
+    glColor3f(0.0,0.0,0.0);
+
+    glBegin(GL_LINE);
+    glVertex2i(2,2);
+    glVertex2i(2,30);
+    glVertex2i(30,30);
+    glVertex2i(30,2);
+    glEnd();
 
     SwapBuffers();
     while (true) {
-		GLenum x = glGetError() ;
+	GLenum x = glGetError() ;
 
-		if ( x == GL_NO_ERROR )
-			break;
-		cout << "OpenGL error:" << gluErrorString(x) << endl;
+	if ( x == GL_NO_ERROR )
+	    break;
+	cout << "OpenGL error:" << gluErrorString(x) << endl;
     }
 }
 

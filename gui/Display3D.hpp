@@ -30,12 +30,14 @@ public:
     void OnDeleteSpinHover(wxCommandEvent& e);
 
     void ResetView();
+
+    void Set2DView();
     
     //To prevent flicker, overide this function to do nothing
     void OnEraseBackground(wxEraseEvent& e) {e.Skip(false);}
 
-	void StartPicking();
-	void StopPicking();
+    void StartPicking();
+    void StopPicking();
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -44,18 +46,18 @@ protected:
     void EnableGL();
     void ChangeViewport();
 
-	//Returns the name stack of the closest object moused over
-	virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) =0;
+    //Returns the name stack of the closest object moused over
+    virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) =0;
 	
-	virtual void DrawScene() = 0;
+    virtual void DrawScene() = 0;
 
-	//We only need this because binding Refresh directly in a signal
-	//is difficult due to the default arguments
-	void Redraw(){Refresh();}
+    //We only need this because binding Refresh directly in a signal
+    //is difficult due to the default arguments
+    void Redraw(){Refresh();}
 private:
 
 
-	GLPicking* mPicking;
+    GLPicking* mPicking;
 
     bool mGLEnabled;
     wxGLContext* mGLContext;
@@ -63,9 +65,15 @@ private:
     //GUI State Variables
     double mHoverDist;
     int mWidth,mHeight;
+    
+    bool mBandBoxOn;
+    int mBandBoxStartX;
+    int mBandBoxStartY;
 
     //3D Variables
-	Camera* mCamera;
+    Camera* mCamera;
+    Camera* m2DCamera;
+
     long mMouseX;
     long mMouseY;
 };

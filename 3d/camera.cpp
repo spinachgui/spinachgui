@@ -29,7 +29,7 @@ void Camera::Translate(float deltaX,float deltaY) {
 }
 
 void Camera::Rotate(float deltaX,float deltaY) {
-    if(deltaX < 0.001 && deltaY < 0.001) {
+    if(abs(deltaX) < 0.001 && abs(deltaY) < 0.001) {
 	//If deltaX and deltaY are both small, it appears the
 	//transform operation becomes invalid. Don't let this happen.
 	return;

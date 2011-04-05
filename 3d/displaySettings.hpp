@@ -4,6 +4,7 @@
 
 #include <shared/interaction.hpp>
 #include <3d/opengl.hpp>
+#include <set>
 
 //================================================================================//
 // Whenever any of the display settings we generally have to redraw
@@ -70,6 +71,12 @@ extern sigc::signal<void,SpinXML::Interaction::Type,bool>      sigInterVisible;
 extern sigc::signal<void,SpinXML::Interaction::Type,ColourRGB> sigInterColour;
 extern sigc::signal<void,SpinXML::Interaction::Type,double>    sigInterSize;
 
+//================================================================================//
+// Supress Interactions
+
+const std::set<SpinXML::Spin*>& GetSuppressedSpins();
+void SetSupressedSpins(const std::set<SpinXML::Spin*>& spins);
+extern sigc::signal<void,const std::set<SpinXML::Spin*>&> sigSupressedChange;
 
 //================================================================================//
 // Static module initalisation (private)

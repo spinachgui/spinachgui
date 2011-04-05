@@ -188,24 +188,28 @@ END_EVENT_TABLE()
 
 class StatusBar : public wxStatusBar {
 public:
-	StatusBar(wxWindow* parent) : wxStatusBar(parent) {
-		int widths_field[] = {-1,80,80};
-		SetFieldsCount(3,widths_field);
-		SlotUnitChange(DIM_LENGTH,GetUnit(DIM_LENGTH));
-		SlotUnitChange(DIM_ENERGY,GetUnit(DIM_ENERGY));
-	}
+    StatusBar(wxWindow* parent) : wxStatusBar(parent) {
+	int widths_field[] = {-1,80,80};
+	SetFieldsCount(3,widths_field);
+	SlotUnitChange(DIM_LENGTH,GetUnit(DIM_LENGTH));
+	SlotUnitChange(DIM_ENERGY,GetUnit(DIM_ENERGY));
+    }
 
-	void SlotUnitChange(PhysDimension d,unit u) {
-		wxString str = wxString(u.get_name().c_str(),wxConvUTF8);
-		switch(d) {
-		case DIM_LENGTH:
-			SetStatusText(str,1);
-			break;
-		case DIM_ENERGY:
-			SetStatusText(str,2);
-			break;
-		}
+    void SlotUnitChange(PhysDimension d,unit u) {
+	wxString str = wxString(u.get_name().c_str(),wxConvUTF8);
+	switch(d) {
+	case DIM_LENGTH:
+	    SetStatusText(str,1);
+	    break;
+	case DIM_ENERGY:
+	    SetStatusText(str,2);
+	    break;
 	}
+    }
+
+    void SlotSizeChange(Interaction::Type t,double s) {
+
+    }
 };
 
 //============================================================//

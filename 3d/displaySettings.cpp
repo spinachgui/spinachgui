@@ -93,6 +93,22 @@ sigc::signal<void,bool> sigShowBonds;
 ColourRGB gBondColour(0,0,0.9);
 
 //================================================================================//
+// Supress Interactions
+
+set<Spin*> gSupressed;
+
+const std::set<SpinXML::Spin*>& GetSuppressedSpins() {
+    return gSupressed;
+}
+void SetSupressedSpins(const std::set<SpinXML::Spin*>& spins) {
+    gSupressed = spins;
+    sigSupressedChange(gSupressed);
+    sig3DChange();
+}
+sigc::signal<void,const std::set<SpinXML::Spin*>&> sigSupressedChange;
+
+
+//================================================================================//
 // Interaction Display Settings
 
 __ModInit::__ModInit() {

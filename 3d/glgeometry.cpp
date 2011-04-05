@@ -215,6 +215,8 @@ MonoInterDrawer::MonoInterDrawer()
 void MonoInterDrawer::Geometary() const {
 	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
 	
+	const set<Spin*> supressed = GetSuppressedSpins();
+
 	foreach(Interaction* inter,inters) {
 		Interaction::Type t = inter->GetType();
 		if(!GetInterVisible(t)) {
@@ -222,6 +224,10 @@ void MonoInterDrawer::Geometary() const {
 		}
 
 		Spin* spin = inter->GetSpin1();
+
+		if(supressed.find(spin) != supressed.end()) {
+		    return;
+		}
 
 		if(inter->GetIsBilinear()) {
 			if(inter->GetType() == Interaction::HFC) {

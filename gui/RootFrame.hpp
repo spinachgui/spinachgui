@@ -48,6 +48,8 @@ public:
     void OnUndo(wxCommandEvent& e);
     void OnRedo(wxCommandEvent& e);
 
+    void OnMakeIso(wxCommandEvent& e);
+
     //View Menu Event Hanlders
     void OnNmrEpr(wxCommandEvent& e);
     void OnNmr(wxCommandEvent& e);

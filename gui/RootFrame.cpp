@@ -16,6 +16,7 @@
 #include <wx/statusbr.h>
 #include <wx/treectrl.h>
 #include <wx/aui/aui.h>
+#include <shared/foreach.hpp>
 
 //Input and output filters
 #define ID_UNIT_START 12345
@@ -532,6 +533,19 @@ void RootFrame::AUIToggle(wxWindow* p) {
 	mAuiManager->Update();
 }
 
+void RootFrame::OnMakeIso(wxCommandEvent& e) {
+    //cleanup: put this algorithum somewhere more logical
+    
+    set<Spin*> selection = GetSelection();
+
+    foreach(Spin* spin,selection) {
+	vector<Interaction*> inters = GetRawSS()->GetInteractionsBySpin(spin);
+
+	foreach(Interaction* inter,inters) {
+	    inter->ToScalar();
+	}
+    }
+}
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
@@ -545,6 +559,8 @@ EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
 //Edit Menu
 EVT_MENU(ID_UNDO,RootFrame::OnUndo)
 EVT_MENU(ID_REDO,RootFrame::OnRedo)
+
+EVT_MENU(ID_EDIT_ISO,RootFrame::OnMakeIso)
 
 //View Menu
 EVT_MENU(ID_NMR_EPR,RootFrame::OnNmrEpr)

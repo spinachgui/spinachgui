@@ -301,9 +301,6 @@ void RootFrame::InitFrame() {
 		(wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
 	Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
 
-	//Debug code, print the details of the root frame
-	//cout << GetFrame() << endl;
-	//cout << GetRawSS()->GetRootFrame() << endl;
 }
 
 
@@ -329,6 +326,16 @@ void RootFrame::OnNew(wxCommandEvent& e) {
     mOpenDir=wxT("");
     UpdateTitle();
 }
+
+void RootFrame::OnSupress(wxCommandEvent& e) {
+    SetSupressedSpins(GetSelection());
+}
+
+void RootFrame::OnUnSupress(wxCommandEvent& e) {
+    set<Spin*> empty; //Empty set
+    SetSupressedSpins(empty);
+}
+
 
 void RootFrame::UpdateTitle() {
     SetTitle(wxString() << mOpenFile << wxT(" - Spinach (") << mOpenPath << wxT(")"));
@@ -551,6 +558,9 @@ EVT_MENU(ID_VIEW_GRID,      RootFrame::OnToggleGrid)
 EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleTensorVis)
 EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleInterEdit)
 EVT_MENU(ID_VIEW_FRAMES,    RootFrame::OnToggleFrames)
+
+EVT_MENU(ID_SUPRESS_SELECTION,RootFrame::OnSupress)
+EVT_MENU(ID_UNSUPRESS        ,RootFrame::OnUnSupress)
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)

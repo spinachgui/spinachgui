@@ -60,6 +60,9 @@ public:
 	void OnToggleInterEdit(wxCommandEvent& e);
 	void OnToggleFrames(wxCommandEvent& e);
 
+	void OnSupress(wxCommandEvent& e);
+	void OnUnSupress(wxCommandEvent& e);
+
     //To prevent flicker, overide this function to do nothing
     void OnEraseBackground(wxEraseEvent& e) {e.Skip(false);}
 

@@ -485,6 +485,40 @@
                         <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
                     </object>
+                    <object class="separator" expanded="1">
+                        <property name="name">m_separator51</property>
+                        <property name="permission">none</property>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_SUPRESS_SELECTION</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Supress Interactions on Selection</property>
+                        <property name="name">mMenuItemSupress</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection"></event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">ID_UNSUPRESS</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Unsupress Interactions</property>
+                        <property name="name">mMenuItemUnspress</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection"></event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
                 </object>
                 <object class="wxMenu" expanded="1">
                     <property name="label">Units</property>

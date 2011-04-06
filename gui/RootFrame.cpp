@@ -547,6 +547,27 @@ void RootFrame::OnMakeIso(wxCommandEvent& e) {
     }
 }
 
+void RootFrame::OnCarbon(wxCommandEvent& e) {
+    ClearSelection();
+    vector<Spin*> spins = GetRawSS()->GetSpins();
+    foreach(Spin* spin,spins) {
+	if(spin->GetElement() == 6) {
+	    AddSelection(spin);
+	}
+    }
+}
+
+void RootFrame::OnHydrogen(wxCommandEvent& e) {
+    ClearSelection();
+    vector<Spin*> spins = GetRawSS()->GetSpins();
+    foreach(Spin* spin,spins) {
+	if(spin->GetElement() == 1) {
+	    AddSelection(spin);
+	}
+    }
+}
+
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
 //File Menu
@@ -577,6 +598,10 @@ EVT_MENU(ID_VIEW_FRAMES,    RootFrame::OnToggleFrames)
 
 EVT_MENU(ID_SUPRESS_SELECTION,RootFrame::OnSupress)
 EVT_MENU(ID_UNSUPRESS        ,RootFrame::OnUnSupress)
+
+//Selection Menu
+EVT_MENU(ID_SEL_HYDROGEN, RootFrame::OnHydrogen)
+EVT_MENU(ID_SEL_CARBON  , RootFrame::OnCarbon)
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)

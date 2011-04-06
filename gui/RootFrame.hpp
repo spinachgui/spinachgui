@@ -50,6 +50,10 @@ public:
 
     void OnMakeIso(wxCommandEvent& e);
 
+    //Selection Menu
+    void OnCarbon(wxCommandEvent& e);
+    void OnHydrogen(wxCommandEvent& e);
+
     //View Menu Event Hanlders
     void OnNmrEpr(wxCommandEvent& e);
     void OnNmr(wxCommandEvent& e);
@@ -70,6 +74,8 @@ public:
 
     //Resize Event
     void OnResize(wxSizeEvent& e);
+
+
 
 	//Unit Menu
 	void OnUnitChange(wxCommandEvent& e);

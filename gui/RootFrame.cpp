@@ -8,6 +8,7 @@
 #include <gui/SpinachApp.hpp>
 #include <gui/MolSceneGraph.hpp>
 #include <gui/SpinGrid.hpp>
+#include <gui/SpinInteractionEdit.hpp>
 
 #include <shared/spinsys.hpp>
 

@@ -4,25 +4,6 @@
 
 using namespace SpinXML;
 
-
-
-//============================================================//
-// InterPopup
-
-InterPopup::InterPopup(wxWindow* Parent, Spin* spin, wxWindowID id)
-	: wxFrame(Parent,
-			  id,
-			  wxT("Popup panel"),
-			  wxDefaultPosition,
-			  wxDefaultSize,
-			  wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR),
-	  mPanel(new SpinInterEditPanel(this)) {
-	mPanel->SetSpin(spin);
-	wxBoxSizer* sizer=new wxBoxSizer(wxVERTICAL);
-	sizer->Add(mPanel,1.0,wxALL | wxEXPAND);
-	SetSizer(sizer);  
-}
-
 //============================================================//
 // SpinInterEditPanel
 
@@ -31,8 +12,7 @@ SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id)
 	: SpinInterEditPanelBase(parent,id),
 	  mEditMode(EDIT_ALL),
 	  mSpin(SpinView(NULL,GetFrame(),GetUnitSystem())),
-	  mUpdatingListBox(false),
-	  mDialogMode(true) {
+	  mUpdatingListBox(false) {
 	mInterEdit=new InterEditPanel(this);
 	mInterEdit->sigChange.connect(mem_fun(*this,&SpinInterEditPanel::DirtySelected));
 	GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
@@ -127,9 +107,6 @@ void SpinInterEditPanel::UpdateListBox() {
 			}
 		}
 		wxString interTitle=NameInteraction(inter);
-		if(mTempInteractions[i].modified && mDialogMode) {
-			interTitle << wxT("*");
-		} 
 		mLBIndex2SpinIndex.push_back(i);
 		mInterListBox->Append(interTitle);
 	}

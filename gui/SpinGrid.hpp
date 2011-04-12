@@ -2,7 +2,6 @@
 #ifndef SPINGRID_H
 #define SPINGRID_H
 
-#include <gui/SpinInteractionEdit.hpp>
 #include <sigc++/sigc++.h>
 #include <shared/spinsys.hpp>
 

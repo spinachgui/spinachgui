@@ -12,8 +12,6 @@ public:
 	SpinInterEditPanel(wxWindow* parent,wxWindowID id= -1);
 	~SpinInterEditPanel();
 
-	void SetDialogMode(bool dialogMode=true) {mDialogMode=dialogMode; mInterEdit->SetDialogMode();}
-
 	void SetSpin(SpinXML::Spin* spin);
 
 	//wx events originating from within
@@ -70,19 +68,6 @@ private:
 	///when mUpdatingListBox is true should usually be ignored
 	bool mUpdatingListBox;
 	std::vector<ListBoxInteraction> mTempInteractions;
-
-	///If in dialog mode do not checkpoint changes and show a star* next
-	///to changed interactions. On by default
-	bool mDialogMode;
 };
-
-class InterPopup : public wxFrame {
-public:
-	InterPopup(wxWindow* Parent,SpinXML::Spin* spin,wxWindowID id=-1);
-private:
-	SpinInterEditPanel* mPanel;
-};
-
-
 
 #endif

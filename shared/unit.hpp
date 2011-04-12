@@ -75,11 +75,12 @@ const unit eV("eV",1.60217646e-19);
 
 const unit seconds("Seconds",1.0);
 
-const unit metres("metres",1.0);
-const unit milimetre("milimetre",1e-3);
-const unit micrometre("micrometre",1e-6);
-const unit nanometre("nanometre",1e-9);
+const unit metres("Metres",1.0);
+const unit milimetre("Milimetre",1e-3);
+const unit micrometre("Micrometre",1e-6);
+const unit nanometre("Nanometre",1e-9);
 const unit Angstroms("Angstroms",1e-10);
+const unit BohrRadius("Bohr Radius",52.9177e-12);
 
 //============================================================//
 // Define an enum of physical dimensions that we care about

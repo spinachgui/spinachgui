@@ -284,6 +284,8 @@ void RootFrame::InitFrame() {
 
 	mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
 	mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
+	mIdToUnit.push_back(p(DIM_LENGTH,BohrRadius));
+
 	mIdToUnit.push_back(p(DIM_LENGTH,metres));
 
 	mIdToUnit.push_back(p(DIM_ENERGY,Hz));  //Default

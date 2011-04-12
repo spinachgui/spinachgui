@@ -189,7 +189,7 @@ void SpinGrid::UpdateRow(long rowNumber) {
         wxString str(getElementSymbol(element),wxConvUTF8);
         str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
         SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
-		SetCellValue(rowNumber,SpinGrid::COL_ISOTOPES,wxString() << isotope);
+		SetCellValue(rowNumber,SpinGrid::COL_ISOTOPES,wxString() << isotope + element);
 }
 
 void SpinGrid::SetupRow(long rowNumber) {
@@ -244,8 +244,8 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
     } else if(e.GetCol()==SpinGrid::COL_ISOTOPES) {
 		long iso;
         GetCellValue(e.GetRow(),COL_ISOTOPES).ToLong(&iso);
-
-		GetSS().GetSpin(e.GetRow()).SetIsotope(iso);
+		Spin* spin =GetRawSS()->GetSpin(e.GetRow());
+		spin->SetIsotope(iso-spin->GetElement());
 	} else if(e.GetCol()==COL_LABEL) {
         Chkpoint(wxT("Change Spin Label"));
         std::string label(GetCellValue(e.GetRow(),e.GetCol()).char_str());

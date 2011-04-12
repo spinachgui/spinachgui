@@ -17,7 +17,7 @@ namespace SpinXML {
     class Spin : public SpinXMLBase<Spin,SpinView> {
     public:  
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-        Spin(Eigen::Vector3d mPosition,std::string mLabel,long atomicNumber=1,long isotope=1);
+        Spin(Eigen::Vector3d mPosition,std::string mLabel,long atomicNumber=1,long isotope=-1);
         Spin(const Spin& s);
         ~Spin();
   

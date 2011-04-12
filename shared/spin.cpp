@@ -58,6 +58,9 @@ Spin::Spin(Vector3d Position,string Label,long atomicNumber,long isotope)
       mLabel(Label),
       mElement(atomicNumber),
       mIsotope(isotope) {
+	if(mIsotope == -1) {
+		mIsotope = getCommonIsotope(mElement);
+	}
 }
 
 Spin::Spin(const Spin& s) :

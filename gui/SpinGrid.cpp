@@ -114,7 +114,13 @@ void SpinGrid::SlotSelectChange(set<Spin*> spins) {
 	foreach(Spin* spin,spins) {
 		long row = GetRawSS()->GetSpinNumber(spin);
 		ColourRow(row,selectedC);
+		SetGridCursor(row,COL_LABEL);
+		//According to the wxWidgets documentation SetGridCursor
+		//should call MakeCellVisible, but that doesn't seem to be the
+		//case
+		MakeCellVisible(row,COL_LABEL);
 	}
+	SetFocus();
 }
 
 

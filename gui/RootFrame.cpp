@@ -256,7 +256,7 @@ void RootFrame::InitFrame() {
     display3dinfo.CloseButton(false);
     display3dinfo.Movable(false);
     mAuiManager->AddPane(mDisplay3D,display3dinfo);
-    mAuiManager->AddPane(mSpinGrid,wxBOTTOM,wxT("Grid View"));
+    mAuiManager->AddPane(mSpinGrid,wxBOTTOM,wxT("Spins"));
 	mAuiManager->AddPane(mFrameTree,wxRIGHT,wxT("Reference Frames"));
 
     wxAuiPaneInfo tensorVisinfo;

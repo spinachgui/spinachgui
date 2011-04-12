@@ -101,19 +101,19 @@ void Display3D::ChangeViewport() {
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
     if(e.Dragging() && e.RightIsDown()) {
-	mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+		mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
-	if(e.ShiftDown()) {
-	    //Band box select
-	    if(!mBandBoxOn) {
-		mBandBoxOn = true;
-		mBandBoxStartX = mMouseX;
-		mBandBoxStartY = mMouseY;
-	    }
-	} else {
-	    //Ajust camera angle
-	    mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
-	}
+		if(e.ShiftDown()) {
+			//Band box select
+			if(!mBandBoxOn) {
+				mBandBoxOn = true;
+				mBandBoxStartX = mMouseX;
+				mBandBoxStartY = mMouseY;
+			}
+		} else {
+			//Ajust camera angle
+			mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+		}
     } 
     mMouseX=e.GetX();
     mMouseY=e.GetY();
@@ -139,24 +139,24 @@ void Display3D::OnRightClick(wxMouseEvent& e) {
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(mBandBoxOn) {
-	cout << "Band Box Up" << endl;
-	mBandBoxOn = false;
-	return;
+		cout << "Band Box Up" << endl;
+		mBandBoxOn = false;
+		return;
     }
 
     if(GetHover() == NULL) {
-	ClearSelection();
-	return;
+		ClearSelection();
+		return;
     }
 
     if(!e.ShiftDown()) {
-	SetSelection(GetHover());
+		SetSelection(GetHover());
     } else {
-	if(GetSelection().find(GetHover()) != GetSelection().end()) {
-	    AddSelection(GetHover());
-	} else {
-	    RemoveSelection(GetHover());
-	}
+		if(GetSelection().find(GetHover()) != GetSelection().end()) {
+			AddSelection(GetHover());
+		} else {
+			RemoveSelection(GetHover());
+		}
     }
 }
 
@@ -252,20 +252,20 @@ void Display3D::StopPicking() {
     GLuint* closestNames=NULL;
     GLuint closestNameCount=0;
     if(hits <= 0) {
-	OnMouseOver3D(0,NULL);
-	return;
+		OnMouseOver3D(0,NULL);
+		return;
     }
     for(long i=0;i<hits;i++) {
-	GLuint name_count = *(buff++);
-	float d1=float(*(buff++))/0x7fffffff;
-	float d2=float(*(buff++))/0x7fffffff;
-	float thisDistance=d1<d2 ? d1 : d2;
-	if(closestDistance > thisDistance) {
-	    closestDistance=thisDistance;
-	    closestNames=buff;
-	    closestNameCount=name_count;
-	}
-	buff+=name_count;
+		GLuint name_count = *(buff++);
+		float d1=float(*(buff++))/0x7fffffff;
+		float d2=float(*(buff++))/0x7fffffff;
+		float thisDistance=d1<d2 ? d1 : d2;
+		if(closestDistance > thisDistance) {
+			closestDistance=thisDistance;
+			closestNames=buff;
+			closestNameCount=name_count;
+		}
+		buff+=name_count;
     }
     OnMouseOver3D(closestNameCount,closestNames);
 }

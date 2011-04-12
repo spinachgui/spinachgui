@@ -5,6 +5,7 @@
 #include <iostream>
 #include <gui/RightClickMenu.hpp>
 #include <wx/debug.h>
+#include <shared/foreach.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -85,15 +86,24 @@ void SpinGrid::ColourRow(long rowNumber,const wxColor& c) {
 }
 
 void SpinGrid::SlotHover(Spin* spin) {
+	//Change the colour of the last spin hovered over back to how it
+	//was before
 	if(mLastHover != -1) {
-		ColourRow(mLastHover,wxColor(defaultC));
+		Spin* lastSpin = GetRawSS()->GetSpin(mLastHover);
+		cout << GetSelection().size() << endl;
+		if(GetSelection().find(lastSpin) == GetSelection().end()) {
+			ColourRow(mLastHover,defaultC);
+		} else {
+			ColourRow(mLastHover,selectedC);
+		}
 		mLastHover = -1;
 	}
+	//Now paint the new spin
 	if(spin == NULL) {
 		return;
 	}
 	long spinN = GetRawSS()->GetSpinNumber(spin);
-	ColourRow(spinN,wxColor(hoverC));
+	ColourRow(spinN,hoverC);
 	mLastHover = spinN;
 }
 
@@ -101,8 +111,8 @@ void SpinGrid::SlotSelectChange(set<Spin*> spins) {
 	for(long i=0;i<GetNumberRows();i++) {
 		ColourRow(i,defaultC);
 	}
-	for(set<Spin*>::iterator i = spins.begin();i!=spins.end();++i) {
-		long row = GetRawSS()->GetSpinNumber(*i);
+	foreach(Spin* spin,spins) {
+		long row = GetRawSS()->GetSpinNumber(spin);
 		ColourRow(row,selectedC);
 	}
 }

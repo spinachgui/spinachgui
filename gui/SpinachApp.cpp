@@ -277,9 +277,8 @@ Spin* GetHover() {
 
 void ClearSelection() {
 	AssertSelectionExists();
-	cout << "Clear selection" << endl;
-
 	gSelection.clear();
+	sigSelectChange(gSelection);
 }
 
 void DeleteSelectedSpins(){

@@ -140,9 +140,9 @@ void SpinDrawer::Geometary() const {
 			material[1] = 1.0;
 			material[2] = 200/255.0;
 		} else if(selection.find(spin) != selection.end()) {
-			material[0] = 1.0;
-			material[1] = 1.0;
-			material[2] = 200/255.0;
+			material[0] = 255/255.0;
+			material[1] = 100/255.0;
+			material[2] = 100/255.0;
 		} else {
 			material[0] = getElementR(spin->GetElement());
 			material[1] = getElementG(spin->GetElement());
@@ -153,7 +153,7 @@ void SpinDrawer::Geometary() const {
 		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
 
 		glPushName(i);
-		gluSphere(GetQuadric(),0.1,14,14);
+		gluSphere(GetQuadric(),0.4,14,14);
 		glPopName();
 
 		glPopMatrix();

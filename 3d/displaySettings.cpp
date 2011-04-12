@@ -123,6 +123,7 @@ __ModInit::__ModInit() {
 	gluQuadricNormals  (gWireQuadric,GLU_SMOOTH);
 
 	//Set sensible default scallings
+	sizeMap[Interaction::HFC             ] = 1;
 	sizeMap[Interaction::G_TENSER        ] = 1;
 	sizeMap[Interaction::ZFS             ] = 1;
 	sizeMap[Interaction::EXCHANGE        ] = 1;
@@ -134,6 +135,7 @@ __ModInit::__ModInit() {
 	sizeMap[Interaction::CUSTOM_BILINEAR ] = 1;
 	sizeMap[Interaction::CUSTOM_QUADRATIC] = 1;
 
+	visableMap[Interaction::HFC             ] = true;
 	visableMap[Interaction::G_TENSER        ] = true;
 	visableMap[Interaction::ZFS             ] = true;
 	visableMap[Interaction::EXCHANGE        ] = true;
@@ -145,6 +147,7 @@ __ModInit::__ModInit() {
 	visableMap[Interaction::CUSTOM_BILINEAR ] = true;
 	visableMap[Interaction::CUSTOM_QUADRATIC] = true;
 
+	colourMap[Interaction::HFC             ] = ColourRGB(0.0,0.0,0.0);
 	colourMap[Interaction::G_TENSER        ] = ColourRGB(0.0,0.0,0.0);
 	colourMap[Interaction::ZFS             ] = ColourRGB(0.0,0.0,0.0);
 	colourMap[Interaction::EXCHANGE        ] = ColourRGB(0.0,0.0,0.0);

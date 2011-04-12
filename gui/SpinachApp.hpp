@@ -79,7 +79,7 @@ void SetSelection(std::set<SpinXML::Spin*>& selection);
 void AddSelection(SpinXML::Spin* spinToAdd);
 void RemoveSelection(SpinXML::Spin* spin);
 SpinXML::Spin* GetHover();
-std::set<SpinXML::Spin*> GetSelection();
+const std::set<SpinXML::Spin*>& GetSelection();
 
 //Selection Actions
 void DeleteSelectedSpins();

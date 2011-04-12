@@ -264,7 +264,7 @@ unsigned int GetSelectedCount(){
 	return gSelection.size();
 }
 
-set<Spin*> GetSelection() {
+const set<Spin*>& GetSelection() {
 	AssertSelectionExists();
 	return gSelection;
 }

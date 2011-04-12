@@ -2,9 +2,6 @@
 
 #include<algorithm>
 
-#include <gui/SpinachApp.hpp>
-
-#include <gui/SpinDialog.hpp>
 
 #include <shared/nuclear_data.hpp>
 #include <gui/RootFrame.hpp>
@@ -21,11 +18,14 @@
 
 #include <shared/unit.hpp>
 
+#include <gui/SpinachApp.hpp>
+
 #ifndef __LINUX__
 #include <windows.h>
 #endif
 
 using namespace SpinXML;
+using namespace std;
 using namespace Eigen;
 
 extern char spinxmlSchema[];

@@ -1,6 +1,5 @@
 
 #include <gui/RightClickMenu.hpp>
-#include <gui/SpinDialog.hpp>
 #include <gui/SpinachApp.hpp>
 
 using namespace SpinXML;
@@ -41,29 +40,6 @@ void RCActionDeleteHover::Exec(wxCommandEvent& e) {
     delete mHoverAtTimeOfOpening;
 }
 
-//-- Spin Properties
-
-RCActionShowSpinProperties::RCActionShowSpinProperties(wxWindow* parent) 
-    : RightClickAction(wxT("Properties")), mParent(parent) {
-}
-
-void RCActionShowSpinProperties::Exec(wxCommandEvent& e) {
-    const set<Spin*>& selection = GetSelection();
-    if(selection.begin() != selection.end()) {
-	Spin* spin = *(selection.begin());
-	SpinView spinV = spin->GetView(GetFrame(),GetUnitSystem());
-	SpinDialog* dialog=new SpinDialog(mParent,spinV);
-	dialog->ShowModal(); 
-    } else if(GetHover() != NULL) {
-	SpinView spinV = GetHover()->GetView(GetFrame(),GetUnitSystem());
-	SpinDialog* dialog=new SpinDialog(mParent,spinV);
-	dialog->ShowModal();
-    }
-}
-
-bool RCActionShowSpinProperties::Visible() const {
-    return GetSelectedCount() == 1 || GetHover() != NULL;
-}
 
 //============================================================//
 // PopupMenu
@@ -100,7 +76,6 @@ void RightClickMenu::Build() {
     vector<RightClickAction*> actions;
     actions.push_back(new RCActionDeleteHover                );
     actions.push_back(new RCActionDeleteSelection	     );
-    actions.push_back(new RCActionShowSpinProperties(mParent));
     Build(actions);
 }
 

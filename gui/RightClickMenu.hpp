@@ -71,13 +71,4 @@ public:
     virtual bool Visible() const;
 };
 
-class RCActionShowSpinProperties : public RightClickAction {
-public:
-    RCActionShowSpinProperties(wxWindow* parent);
-    virtual void Exec(wxCommandEvent& e);
-    virtual bool Visible() const;
-private:
-    wxWindow* mParent;
-};
-
 #endif RIGHT_CLICK_MENU_H

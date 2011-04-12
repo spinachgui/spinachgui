@@ -574,6 +574,14 @@ void RootFrame::OnCalcDipoles(wxCommandEvent& e) {
 	GetRawSS()->CalcNuclearDipoleDipole();
 }
 
+void RootFrame::OnAxes(wxCommandEvent& e) {
+	SetMonoDrawMode(MONO_AXES);
+}
+
+void RootFrame::OnEllipsoid(wxCommandEvent& e) {
+	SetMonoDrawMode(MONO_ELIPSOID);
+}
+
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
@@ -606,6 +614,9 @@ EVT_MENU(ID_VIEW_FRAMES,    RootFrame::OnToggleFrames)
 
 EVT_MENU(ID_SUPRESS_SELECTION,RootFrame::OnSupress)
 EVT_MENU(ID_UNSUPRESS        ,RootFrame::OnUnSupress)
+
+EVT_MENU(ID_AXES,             RootFrame::OnAxes)
+EVT_MENU(ID_ELLIPSOIDS,      RootFrame::OnEllipsoid)
 
 //Selection Menu
 EVT_MENU(ID_SEL_HYDROGEN, RootFrame::OnHydrogen)

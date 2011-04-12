@@ -55,6 +55,17 @@ extern sigc::signal<void,bool> sigShowBonds;
 
 extern ColourRGB gBondColour;
 
+//================================================================================//
+// Should we draw an ellipsoid of an eigenframe
+
+enum MONO_DRAW_MODE {
+	MONO_ELIPSOID,
+	MONO_AXES
+};
+
+void SetMonoDrawMode(MONO_DRAW_MODE mode);
+MONO_DRAW_MODE GetMonoDrawMode();
+extern sigc::signal<void,MONO_DRAW_MODE> sigDrawMode;
 
 //================================================================================//
 //Interaction Display Settings

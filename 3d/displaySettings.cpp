@@ -107,6 +107,21 @@ void SetSupressedSpins(const std::set<SpinXML::Spin*>& spins) {
 }
 sigc::signal<void,const std::set<SpinXML::Spin*>&> sigSupressedChange;
 
+//================================================================================//
+// Mono draw mode
+
+MONO_DRAW_MODE gMonoDrawMode = MONO_ELIPSOID;
+
+void SetMonoDrawMode(MONO_DRAW_MODE mode) {
+	gMonoDrawMode = mode;
+	sigDrawMode(mode);
+	sig3DChange();
+}
+MONO_DRAW_MODE GetMonoDrawMode() {
+	return gMonoDrawMode;
+}
+sigc::signal<void,MONO_DRAW_MODE> sigDrawMode;
+
 
 //================================================================================//
 // Interaction Display Settings

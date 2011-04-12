@@ -280,8 +280,25 @@ void MonoInterDrawer::Geometary() const {
 			glScaled(xx / MHz,yy / MHz, zz / MHz);
 			
 			double size = GetInterSize(t);
-			glScaled(size,size,size);
-			gluSphere(GetQuadric(),0.01,11,13);
+			glScaled(size*0.01,size*0.01,size*0.01);
+			if(GetMonoDrawMode() == MONO_ELIPSOID) {
+				gluSphere(GetQuadric(),1,11,13);
+			} else {
+			    glBegin(GL_LINES); {
+					glVertex3f(0,0,0);
+					glVertex3f(1,0,0);
+				}glEnd();
+
+				glBegin(GL_LINES); {
+					glVertex3f(0,0,0);
+					glVertex3f(0,1,0);
+				} glEnd();
+
+				glBegin(GL_LINES); {
+					glVertex3f(0,0,0);
+					glVertex3f(0,0,1);
+				} glEnd();
+			}
 
 		} glPopMatrix();
 	}

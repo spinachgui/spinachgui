@@ -69,6 +69,10 @@ public:
 	void OnSupress(wxCommandEvent& e);
 	void OnUnSupress(wxCommandEvent& e);
 
+	void OnAxes(wxCommandEvent& e);
+	void OnEllipsoid(wxCommandEvent& e);
+
+
     //To prevent flicker, overide this function to do nothing
     void OnEraseBackground(wxEraseEvent& e) {e.Skip(false);}
 

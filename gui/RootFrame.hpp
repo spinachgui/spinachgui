@@ -49,7 +49,7 @@ public:
     void OnRedo(wxCommandEvent& e);
 
     void OnMakeIso(wxCommandEvent& e);
-
+	void OnCalcDipoles(wxCommandEvent& e);
     //Selection Menu
     void OnCarbon(wxCommandEvent& e);
     void OnHydrogen(wxCommandEvent& e);

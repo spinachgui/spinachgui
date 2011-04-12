@@ -570,6 +570,10 @@ void RootFrame::OnHydrogen(wxCommandEvent& e) {
     }
 }
 
+void RootFrame::OnCalcDipoles(wxCommandEvent& e) {
+	GetRawSS()->CalcNuclearDipoleDipole();
+}
+
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
@@ -585,6 +589,7 @@ EVT_MENU(ID_UNDO,RootFrame::OnUndo)
 EVT_MENU(ID_REDO,RootFrame::OnRedo)
 
 EVT_MENU(ID_EDIT_ISO,RootFrame::OnMakeIso)
+EVT_MENU(ID_CALC_DIPOLE,RootFrame::OnCalcDipoles)
 
 //View Menu
 EVT_MENU(ID_NMR_EPR,RootFrame::OnNmrEpr)

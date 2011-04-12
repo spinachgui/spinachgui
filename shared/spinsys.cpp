@@ -166,6 +166,11 @@ void SpinSystem::SaveToFile(const char* filename,ISpinSystemLoader* saver) const
 }
 
 void SpinSystem::CalcNuclearDipoleDipole() {
+	foreach(Interaction* inter,mInteractions) {
+		if(inter->GetType() == Interaction::DIPOLAR) {
+			RemoveInteraction(inter);
+		}
+	}
     for(unsigned long i=0;i<mSpins.size();i++) {
         Spin* spin1=mSpins[i];
         long element1=spin1->GetElement();

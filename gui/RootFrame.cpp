@@ -125,7 +125,7 @@ class FrameTree : public wxTreeCtrl , public sigc::trackable {
 public:
 
 	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
-		mRoot = AddRoot(wxT("Lab Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
+		mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
 
 
 		RefreshFromSpinSystem();

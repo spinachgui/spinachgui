@@ -17,11 +17,7 @@ public:
 	//wx events originating from within
 	void OnNewButton(wxCommandEvent& e);
 	void OnDeleteButton(wxCommandEvent& e);
-	void OnSSChange(wxCommandEvent& e);
 	void OnInteractionChange(wxCommandEvent& e);
-
-	//Slots for use with boost::signals
-	void DirtySelected();
 
 	void LoadFromSpin();
 
@@ -49,25 +45,12 @@ private:
 	///Are we editing linear, bilinear, quadrapolar or all the
 	///interactions which apply to this spin
 	EDIT_MODE mEditMode;
-	///A mapping of the list box index to the interaction index.
-	///Updated when UpdateListBox() is called. Will be the identity
-	///mapping if the edit mode is EDIT_ALL
-	std::vector<long> mLBIndex2SpinIndex;
-
-	struct ListBoxInteraction {
-		SpinXML::Interaction* inter;
-		bool modified;
-	};
-
-	long GetSelectedInterIndex() const;
 
 	//Data
 	SpinXML::SpinView mSpin;
   
-	///True when the GUI list box is being updated.  Events generated
-	///when mUpdatingListBox is true should usually be ignored
 	bool mUpdatingListBox;
-	std::vector<ListBoxInteraction> mTempInteractions;
+
 };
 
 #endif

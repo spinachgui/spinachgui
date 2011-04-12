@@ -1,12 +1,12 @@
 
 #include <gui/SpinInteractionEdit.hpp>
 #include <gui/SpinachApp.hpp>
+#include <shared/foreach.hpp>
 
 using namespace SpinXML;
 
 //============================================================//
 // SpinInterEditPanel
-
 
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id) 
 	: SpinInterEditPanelBase(parent,id),
@@ -14,7 +14,6 @@ SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id)
 	  mSpin(SpinView(NULL,GetFrame(),GetUnitSystem())),
 	  mUpdatingListBox(false) {
 	mInterEdit=new InterEditPanel(this);
-	mInterEdit->sigChange.connect(mem_fun(*this,&SpinInterEditPanel::DirtySelected));
 	GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
 	Enable(false);
 };
@@ -29,19 +28,12 @@ void SpinInterEditPanel::SetSpin(Spin* spin) {
 }
 
 void SpinInterEditPanel::Clear() {
-	mTempInteractions.resize(0);
 	Enable(false);
 }
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 	Interaction* inter=new Interaction(0.0*Hz,Interaction::SHIELDING,mSpin.Get());
 	GetRawSS()->InsertInteraction(inter);
-
-	ListBoxInteraction lbi;
-	lbi.inter=inter;
-	lbi.modified=true;
-
-	mTempInteractions.push_back(lbi);
 
 	UpdateListBox();
 	mInterListBox->SetSelection(mInterListBox->GetCount()-1);
@@ -50,9 +42,8 @@ void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
 }
 
 void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
-	long n=GetSelectedInterIndex();
-	GetRawSS()->DiscardInteraction(mTempInteractions[n].inter);
-	mTempInteractions.erase(mTempInteractions.begin() + n);
+	long n=mInterListBox->GetSelection();
+	GetRawSS()->DiscardInteraction((Interaction*)mInterListBox->GetClientData(n));
 	UpdateListBox();
 	mInterEdit->SetInter(NULL,NULL);
 	InteractionChange();
@@ -66,33 +57,17 @@ void SpinInterEditPanel::LoadFromSpin() {
 		Enable(true);
 	}
 
-	std::vector<Interaction*> oldInteractions=GetRawSS()->GetInteractionsBySpin(mSpin.Get());
-	//Make sure all the interactions here are copies
-	for(unsigned long i=0;i<oldInteractions.size();i++) {
-		ListBoxInteraction lbi;
-		lbi.inter=oldInteractions[i];
-		lbi.modified=false;
-		mTempInteractions.push_back(lbi);
-	}
-
 	UpdateListBox();
 	InteractionChange();
-}
-
-void SpinInterEditPanel::DirtySelected() {
-	mTempInteractions[GetSelectedInterIndex()].modified=true;
-	UpdateListBox();
 }
 
 void SpinInterEditPanel::UpdateListBox() {
 	mUpdatingListBox=true;
 	mInterListBox->Clear();
-	long len=mTempInteractions.size();
 
-	mLBIndex2SpinIndex.resize(0);
+	std::vector<Interaction*> inters = GetRawSS()->GetInteractionsBySpin(mSpin.Get());
 
-	for (long i=0;i<len;i++) {
-		Interaction* inter=mTempInteractions[i].inter;
+	foreach(Interaction* inter,inters) {
 		if(inter->GetIsQuadratic()) {
 			if(mEditMode!=EDIT_QUAD && mEditMode!=EDIT_ALL) {
 				continue;
@@ -107,8 +82,7 @@ void SpinInterEditPanel::UpdateListBox() {
 			}
 		}
 		wxString interTitle=NameInteraction(inter);
-		mLBIndex2SpinIndex.push_back(i);
-		mInterListBox->Append(interTitle);
+		mInterListBox->Append(interTitle,(void*)inter);
 	}
 	mUpdatingListBox=false;
 }
@@ -131,35 +105,13 @@ void SpinInterEditPanel::OnInteractionChange(wxCommandEvent& e) {
 }
 
 void SpinInterEditPanel::InteractionChange() {
-	long selected=GetSelectedInterIndex();
+	long selected=mInterListBox->GetSelection();
 	if(selected >-1) {
-		Interaction* inter=mTempInteractions[selected].inter;
+		Interaction* inter = (Interaction*)mInterListBox->GetClientData(selected);
 		mInterEdit->SetInter(inter,mSpin.Get());
 	} else {
 		mInterEdit->SetInter(NULL,NULL);
 	}
-}
-
-void SpinInterEditPanel::OnSSChange(wxCommandEvent& e) {
-	if(mSpin.Get()==NULL) {
-		return;
-	}
-	//If one of the interactions we're interested in just changed, it must
-	//be the one currently being displayed, thus that is the one we mark as modifed
-	long selected=GetSelectedInterIndex();
-	if(selected >-1) {
-		mTempInteractions[selected].modified=true;
-	} 
-	UpdateListBox();
-	e.Skip();
-}
-
-long SpinInterEditPanel::GetSelectedInterIndex() const {
-	long selected = mInterListBox->GetSelection();
-	if(selected < 0) {
-		return -1;
-	} 
-	return mLBIndex2SpinIndex[selected];
 }
 
 

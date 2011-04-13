@@ -47,7 +47,7 @@ Display3D::Display3D(wxWindow* parent)
 }
 
 void Display3D::ResetView() {
-	cout << "Not implimented" << endl;
+	cout << "Not implimented Display3D::ResetView()" << endl;
     Refresh();
 }
 
@@ -163,7 +163,7 @@ void Display3D::OnLeftClick(wxMouseEvent& e) {
 void Display3D::OnResize(wxSizeEvent& e) {
     int w,h;
     GetClientSize(&w,&h);
-    cout << "Resize event, width=" << w << " height = " << h << endl;
+
     if(mGLEnabled) {
         ChangeViewport();
     }

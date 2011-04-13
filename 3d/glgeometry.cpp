@@ -97,8 +97,6 @@ void DrawCylinder(Vector3d R1,Vector3d R2,length width) {
     double x1=R1.x(),y1=R1.y(),z1=R1.z();
     double x2=R2.x(),y2=R2.y(),z2=R2.z();
 
-	cout << "Draw cyllinder from " << R1 << " to " << " R2" << R2 << endl;
-
     double len=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
 			
     //Now we need to find the rotation between the z axis
@@ -348,7 +346,7 @@ void BilinearInterDrawer::Geometary() const {
 		if(minCuttoff < norm) {
 			double width=(norm > maxCuttoff) ? 1.0 : (norm-minCuttoff)/(maxCuttoff-minCuttoff);
 			double realWidth = width * 0.04;
-			cout << "We should be drawing, width = " << realWidth << endl;
+
 			DrawCylinder(spin1->GetPosition() * Angstroms.get_from_si(), spin2->GetPosition() * Angstroms.get_from_si(), realWidth);
 		}
 

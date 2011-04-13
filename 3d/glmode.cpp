@@ -86,7 +86,6 @@ void GLPicking::SetBox(long top,long left,long width, long height) {
 	mMouseY = left;
 	mWidth = width;
 	mHeight = height;
-	cout << top << " " << left << " " << width << " " << height << endl;
 }
 
 std::pair<long,GLuint*> GLPicking::GetBuffer() const {

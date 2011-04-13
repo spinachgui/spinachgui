@@ -232,6 +232,7 @@ public:
 	}
 };
 
+
 //============================================================//
 // RootFrame
 
@@ -255,16 +256,33 @@ void RootFrame::InitFrame() {
     display3dinfo.CaptionVisible(false);
     display3dinfo.CloseButton(false);
     display3dinfo.Movable(false);
+	display3dinfo.FloatingSize(wxSize(600,600)); //Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mDisplay3D,display3dinfo);
-    mAuiManager->AddPane(mSpinGrid,wxBOTTOM,wxT("Spins"));
-	mAuiManager->AddPane(mFrameTree,wxRIGHT,wxT("Reference Frames"));
+
+	wxAuiPaneInfo spinGridInfo;
+	spinGridInfo.Bottom();
+	spinGridInfo.Caption(wxT("Spins"));
+	spinGridInfo.FloatingSize(wxSize(600,600));//Workaround for http://trac.wxwidgets.org/ticket/12409
+    mAuiManager->AddPane(mSpinGrid,spinGridInfo);
+
+	wxAuiPaneInfo frameInfo;
+	frameInfo.Right();
+	frameInfo.Caption(wxT("Reference Frames"));
+	frameInfo.FloatingSize(wxSize(300,400));
+	mAuiManager->AddPane(mFrameTree,frameInfo);
 
     wxAuiPaneInfo tensorVisinfo;
 	tensorVisinfo.Float();
 	tensorVisinfo.Hide();
 	tensorVisinfo.Caption(wxT("Tensor Visualisation"));
+	tensorVisinfo.FloatingSize(wxSize(300,600)); //Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mInterSizePanel,tensorVisinfo);
-    mAuiManager->AddPane(mSpinInterEdit,wxBOTTOM,wxT("Interaction Editor"));
+
+	wxAuiPaneInfo spinInterEditInfo;
+	spinInterEditInfo.Bottom();
+	spinInterEditInfo.Caption(wxT("Interactions"));
+	spinInterEditInfo.FloatingSize(wxSize(600,400));//Workaround for http://trac.wxwidgets.org/ticket/12490
+    mAuiManager->AddPane(mSpinInterEdit,spinInterEditInfo);
 
     //Grey the undo and redo menu ideams. They can be ungreyed when
     //there is an undo history

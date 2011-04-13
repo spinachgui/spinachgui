@@ -198,22 +198,125 @@ END_EVENT_TABLE()
 //============================================================//
 // Toolbar
 
+
+struct ToolbarAction {
+	ToolbarAction(const wxString& text,const wxString& tooltip,wxBitmap bitmap) 
+		: mText(text),mTooltip(tooltip),mBitmap(bitmap) {
+	}
+	virtual void Exec(wxCommandEvent& e) = 0;
+	virtual wxItemKind GetItemKind() {
+		return wxITEM_NORMAL;
+	}
+	virtual const wxString& GetText() {
+		return mText;
+	}
+	virtual const wxString& GetTooltip() {
+		return mTooltip;
+	}
+	virtual wxBitmap GetBitmap() {
+		return mBitmap;
+	}
+private:
+	wxString mText;
+	wxString mTooltip;
+	wxBitmap mBitmap;
+};
+
+struct TBNew : public ToolbarAction {
+	TBNew()
+		: ToolbarAction(wxT("New"),wxT("New"),wxBitmap( document_new_xpm )) {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		cout << "New" << endl;
+	}
+};
+
+struct TBOpen : public ToolbarAction {
+	TBOpen()
+		: ToolbarAction(wxT("Open"),wxT("Open"),wxBitmap( document_open_xpm )) {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		cout << "Open" << endl;
+	}
+};
+
+struct TBSave : public ToolbarAction {
+	TBSave()
+		: ToolbarAction(wxT("Save"),wxT("Save"),wxBitmap( document_save_xpm )) {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		cout << "Save" << endl;
+	}
+};
+
+struct TBNmrEpr : public ToolbarAction {
+	TBNmrEpr()
+		: ToolbarAction(wxT("Show All Interactions"),wxT("Show All Interactions"),wxBitmap( nmr_epr_xpm )) {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		cout << "NMR EPR" << endl;
+	}
+};
+
+struct TBNmr : public ToolbarAction {
+	TBNmr()
+		: ToolbarAction(wxT("NMR Mode"),wxT("NMR Mode"),wxBitmap( nmr_xpm )) {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		cout << "NMR" << endl;
+	}
+};
+
+struct TBEpr : public ToolbarAction {
+	TBEpr()
+		: ToolbarAction(wxT("EPR Mode"),wxT("EPR Mode"),wxBitmap( epr_xpm )) {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		cout << "EPR" << endl;
+	}
+};
+
+struct TBBonds : public ToolbarAction {
+	TBBonds()
+		: ToolbarAction(wxT("Toggle Bonds"),wxT("Toggle Bonds"),wxBitmap( bonds_xpm )) {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		cout << "Toggle Bonds" << endl;
+	}
+};
+
 class Toolbar : public wxToolBar {
 public:
 	Toolbar(wxWindow* parent, wxWindowID id = -1)
-		: wxToolBar(parent,id) {
-		AddTool( ID_NEW, wxT("New"),    wxBitmap( document_new_xpm ),wxT("Tooltip?"), wxITEM_NORMAL); 
-		AddTool( ID_OPEN, wxT("Open"), wxBitmap( document_open_xpm ),wxT("Tooltip?"), wxITEM_NORMAL); 
-		AddTool( ID_SAVE, wxT("Save"), wxBitmap( document_save_xpm ),wxT("Tooltip?"), wxITEM_NORMAL); 
-		AddSeparator(); 
-		AddTool( ID_NMR_EPR, wxT("Show All Interactions"), wxBitmap( nmr_epr_xpm ),wxT("Show All Interactions")); 
-		AddTool( ID_EPR, wxT("EPR Mode"), wxBitmap( epr_xpm ), wxT("Show EPR Interactions")); 
-		AddTool( ID_NMR, wxT("NMR Mode"), wxBitmap( nmr_xpm ), wxT("Show NMR Interactions")); 
-		AddSeparator(); 
-		AddTool( ID_BOND_TOGGLE, wxT("tool"), wxBitmap( bonds_xpm ), wxT("Toggle Bonds"),wxITEM_CHECK); 
+		: wxToolBar(parent,id),mIdCounter(0) {
 		Realize(); 
 	}
+	~Toolbar() {
+		foreach(ToolbarAction* action,mActions) {
+			delete action;
+		}
+	}
+	void AddAction(ToolbarAction* action) {
+		mActions.push_back(action);
+		AddTool(mIdCounter,	action->GetText(),action->GetBitmap(),action->GetTooltip(),action->GetItemKind());
+		mIdCounter++;
+	}
+	void OnClick(wxCommandEvent& e) {
+		ToolbarAction* action = mActions[e.GetId()];
+		action->Exec(e);
+		e.Skip(false);
+	}
+    DECLARE_EVENT_TABLE();
+private:
+	long mIdCounter;
+	vector<ToolbarAction*> mActions;
 };
+
+BEGIN_EVENT_TABLE(Toolbar,wxToolBar)
+
+EVT_MENU(wxID_ANY,       Toolbar::OnClick)
+
+END_EVENT_TABLE()
 
 //============================================================//
 // Custom Status Bar
@@ -272,7 +375,17 @@ void RootFrame::InitFrame() {
 	SetStatusBar(statusBar);
 
 	//Setup the toolbar
-	SetToolBar(new Toolbar(this));
+	Toolbar* toolbar = new Toolbar(this);
+	toolbar->AddAction(new TBNew);
+	toolbar->AddAction(new TBOpen);
+	toolbar->AddAction(new TBSave);
+	toolbar->AddSeparator();
+	toolbar->AddAction(new TBNmrEpr);
+	toolbar->AddAction(new TBNmr);
+	toolbar->AddAction(new TBEpr);
+	toolbar->AddSeparator();
+	toolbar->AddAction(new TBBonds);
+	SetToolBar(toolbar);
 
 	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);

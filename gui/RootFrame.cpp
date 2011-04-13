@@ -18,6 +18,17 @@
 #include <wx/treectrl.h>
 #include <wx/aui/aui.h>
 #include <shared/foreach.hpp>
+#include <wx/toolbar.h>
+
+//XPM resources
+#include "../res/bonds.xpm"
+#include "../res/document_new.xpm"
+#include "../res/document_open.xpm"
+#include "../res/document_save.xpm"
+#include "../res/epr.xpm"
+#include "../res/nmr.xpm"
+#include "../res/nmr_epr.xpm"
+
 
 //Input and output filters
 #define ID_UNIT_START 12345
@@ -184,6 +195,25 @@ EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, FrameTree::OnRightClick)
 
 END_EVENT_TABLE()
 
+//============================================================//
+// Toolbar
+
+class Toolbar : public wxToolBar {
+public:
+	Toolbar(wxWindow* parent, wxWindowID id = -1)
+		: wxToolBar(parent,id) {
+		AddTool( ID_NEW, wxT("New"),    wxBitmap( document_new_xpm ),wxT("Tooltip?"), wxITEM_NORMAL); 
+		AddTool( ID_OPEN, wxT("Open"), wxBitmap( document_open_xpm ),wxT("Tooltip?"), wxITEM_NORMAL); 
+		AddTool( ID_SAVE, wxT("Save"), wxBitmap( document_save_xpm ),wxT("Tooltip?"), wxITEM_NORMAL); 
+		AddSeparator(); 
+		AddTool( ID_NMR_EPR, wxT("Show All Interactions"), wxBitmap( nmr_epr_xpm ),wxT("Show All Interactions")); 
+		AddTool( ID_EPR, wxT("EPR Mode"), wxBitmap( epr_xpm ), wxT("Show EPR Interactions")); 
+		AddTool( ID_NMR, wxT("NMR Mode"), wxBitmap( nmr_xpm ), wxT("Show NMR Interactions")); 
+		AddSeparator(); 
+		AddTool( ID_BOND_TOGGLE, wxT("tool"), wxBitmap( bonds_xpm ), wxT("Toggle Bonds"),wxITEM_CHECK); 
+		Realize(); 
+	}
+};
 
 //============================================================//
 // Custom Status Bar
@@ -240,6 +270,9 @@ void RootFrame::InitFrame() {
 	//Setup the status bar
 	StatusBar* statusBar = new StatusBar(this);
 	SetStatusBar(statusBar);
+
+	//Setup the toolbar
+	SetToolBar(new Toolbar(this));
 
 	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
@@ -502,17 +535,17 @@ void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {
     mMenuItemNmrEpr->Check(true);
-    mRootToolbar->ToggleTool(ID_NMR_EPR,true);
+    GetToolBar()->ToggleTool(ID_NMR_EPR,true);
 }
 
 void RootFrame::OnNmr(wxCommandEvent& e) {
     mMenuItemNmr->Check(true);
-    mRootToolbar->ToggleTool(ID_NMR,true);
+    GetToolBar()->ToggleTool(ID_NMR,true);
 }
 
 void RootFrame::OnEpr(wxCommandEvent& e) {
     mMenuItemEpr->Check(true);
-    mRootToolbar->ToggleTool(ID_EPR,true);
+    GetToolBar()->ToggleTool(ID_EPR,true);
 }
 
 
@@ -523,7 +556,7 @@ void RootFrame::OnResize(wxSizeEvent&e) {
 void RootFrame::OnBondToggle(wxCommandEvent& e) {
     bool showBonds=e.IsChecked();
     mMenuItemBondToggle->Check(showBonds);
-    mRootToolbar->ToggleTool(ID_BOND_TOGGLE,showBonds);
+    GetToolBar()->ToggleTool(ID_BOND_TOGGLE,showBonds);
     SetShowBonds(showBonds);
 }
 	     

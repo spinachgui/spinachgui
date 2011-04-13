@@ -1,6 +1,7 @@
 
 #include <gui/RightClickMenu.hpp>
 #include <gui/SpinachApp.hpp>
+#include <shared/foreach.hpp>
 
 using namespace SpinXML;
 using namespace std;
@@ -11,7 +12,7 @@ using namespace std;
 //-- Lambda
 
 RCActionLambda::RCActionLambda(wxString str,CommandT command)
-	: RightClickAction(str),mCommand(command) {
+	: Action(str,str),mCommand(command) {
 }
 
 void RCActionLambda::Exec(wxCommandEvent& e) {
@@ -24,7 +25,7 @@ void RCActionDeleteSelection::Exec(wxCommandEvent&e) {
     DeleteSelectedSpins();
 }
 
-bool RCActionDeleteSelection::Visible() const {
+bool RCActionDeleteSelection::Enabled() const {
     return GetSelectedCount() >=0;
 }
 
@@ -32,7 +33,7 @@ bool RCActionDeleteSelection::Visible() const {
 //-- Delete Hover
 
 RCActionDeleteHover::RCActionDeleteHover()
-    : RightClickAction(wxT("Delete Spin (under mouse)")),
+    : Action(wxT("Delete Spin (under mouse)"),wxT("Delete Spin (under mouse)")),
       mHoverAtTimeOfOpening(GetHover()) {
 }
 
@@ -50,20 +51,18 @@ RightClickMenu::RightClickMenu(wxWindow* parent)
     Connect(wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(RightClickMenu::OnSelect));
 }
 
- RightClickMenu::~RightClickMenu() {
-    for(std::vector<RightClickAction*>::iterator i = mActions.begin();i!=mActions.end();++i) {
-	delete *i;
+RightClickMenu::~RightClickMenu() {
+    for(std::vector<Action*>::iterator i = mActions.begin();i!=mActions.end();++i) {
+		delete *i;
     }
- }
+}
 
-void RightClickMenu::Build(std::vector<RightClickAction*> actions) {
+void RightClickMenu::Build(std::vector<Action*> actions) {
     mActions = actions;
     int id = 0;
-    for(std::vector<RightClickAction*>::iterator i = actions.begin();i!=actions.end();++i) {
-	if ((*i)->Visible()) {
-	    Append(id, (*i)->mText);
-	}
-	id++;
+    foreach(Action* action,actions) {
+		Append(id, action->GetText());
+		id++;
     }
 }
 
@@ -73,7 +72,7 @@ void RightClickMenu::OnSelect(wxCommandEvent& e) {
 
 
 void RightClickMenu::Build() {
-    vector<RightClickAction*> actions;
+    vector<Action*> actions;
     actions.push_back(new RCActionDeleteHover                );
     actions.push_back(new RCActionDeleteSelection	     );
     Build(actions);

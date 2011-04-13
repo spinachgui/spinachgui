@@ -9,6 +9,7 @@
 #include <gui/MolSceneGraph.hpp>
 #include <gui/SpinGrid.hpp>
 #include <gui/SpinInteractionEdit.hpp>
+#include <gui/Action.hpp>
 
 #include <shared/spinsys.hpp>
 
@@ -19,6 +20,8 @@
 #include <wx/aui/aui.h>
 #include <shared/foreach.hpp>
 #include <wx/toolbar.h>
+
+
 
 //XPM resources
 #include "../res/bonds.xpm"
@@ -110,10 +113,10 @@ GLWire        SpinSysDisplay3D::wire;
 //============================================================//
 // Reference frame tree view
 
-class RCActionActivateFrame : public RightClickAction {
+class RCActionActivateFrame : public Action {
 public:
 	RCActionActivateFrame(Frame* frame) 
-		: RightClickAction(wxT("Activate Frame")), mFrame(frame) {
+		: Action(wxT("Activate Frame"),wxT("Activate Frame")), mFrame(frame) {
 	}
 	bool Visible() const {return true;}
 	void Exec(wxCommandEvent& e) {
@@ -175,7 +178,7 @@ private:
 		FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
 		RightClickMenu* menu = new RightClickMenu(this);
 
-		vector<RightClickAction*> actions;
+		vector<Action*> actions;
 		actions.push_back(new RCActionActivateFrame(fp->frame));
 
 		menu->Build(actions);
@@ -198,87 +201,63 @@ END_EVENT_TABLE()
 //============================================================//
 // Toolbar
 
-
-struct ToolbarAction {
-	ToolbarAction(const wxString& text,const wxString& tooltip,wxBitmap bitmap) 
-		: mText(text),mTooltip(tooltip),mBitmap(bitmap) {
-	}
-	virtual void Exec(wxCommandEvent& e) = 0;
-	virtual wxItemKind GetItemKind() {
-		return wxITEM_NORMAL;
-	}
-	virtual const wxString& GetText() {
-		return mText;
-	}
-	virtual const wxString& GetTooltip() {
-		return mTooltip;
-	}
-	virtual wxBitmap GetBitmap() {
-		return mBitmap;
-	}
-private:
-	wxString mText;
-	wxString mTooltip;
-	wxBitmap mBitmap;
-};
-
-struct TBNew : public ToolbarAction {
+struct TBNew : public Action {
 	TBNew()
-		: ToolbarAction(wxT("New"),wxT("New"),wxBitmap( document_new_xpm )) {
+		: Action(wxT("New"),wxT("New"),wxBitmap( document_new_xpm )) {
 	}
 	virtual void Exec(wxCommandEvent& e) {
 		cout << "New" << endl;
 	}
 };
 
-struct TBOpen : public ToolbarAction {
+struct TBOpen : public Action {
 	TBOpen()
-		: ToolbarAction(wxT("Open"),wxT("Open"),wxBitmap( document_open_xpm )) {
+		: Action(wxT("Open"),wxT("Open"),wxBitmap( document_open_xpm )) {
 	}
 	virtual void Exec(wxCommandEvent& e) {
 		cout << "Open" << endl;
 	}
 };
 
-struct TBSave : public ToolbarAction {
+struct TBSave : public Action {
 	TBSave()
-		: ToolbarAction(wxT("Save"),wxT("Save"),wxBitmap( document_save_xpm )) {
+		: Action(wxT("Save"),wxT("Save"),wxBitmap( document_save_xpm )) {
 	}
 	virtual void Exec(wxCommandEvent& e) {
 		cout << "Save" << endl;
 	}
 };
 
-struct TBNmrEpr : public ToolbarAction {
+struct TBNmrEpr : public Action {
 	TBNmrEpr()
-		: ToolbarAction(wxT("Show All Interactions"),wxT("Show All Interactions"),wxBitmap( nmr_epr_xpm )) {
+		: Action(wxT("Show All Interactions"),wxT("Show All Interactions"),wxBitmap( nmr_epr_xpm )) {
 	}
 	virtual void Exec(wxCommandEvent& e) {
 		cout << "NMR EPR" << endl;
 	}
 };
 
-struct TBNmr : public ToolbarAction {
+struct TBNmr : public Action {
 	TBNmr()
-		: ToolbarAction(wxT("NMR Mode"),wxT("NMR Mode"),wxBitmap( nmr_xpm )) {
+		: Action(wxT("NMR Mode"),wxT("NMR Mode"),wxBitmap( nmr_xpm )) {
 	}
 	virtual void Exec(wxCommandEvent& e) {
 		cout << "NMR" << endl;
 	}
 };
 
-struct TBEpr : public ToolbarAction {
+struct TBEpr : public Action {
 	TBEpr()
-		: ToolbarAction(wxT("EPR Mode"),wxT("EPR Mode"),wxBitmap( epr_xpm )) {
+		: Action(wxT("EPR Mode"),wxT("EPR Mode"),wxBitmap( epr_xpm )) {
 	}
 	virtual void Exec(wxCommandEvent& e) {
 		cout << "EPR" << endl;
 	}
 };
 
-struct TBBonds : public ToolbarAction {
+struct TBBonds : public Action {
 	TBBonds()
-		: ToolbarAction(wxT("Toggle Bonds"),wxT("Toggle Bonds"),wxBitmap( bonds_xpm )) {
+		: Action(wxT("Toggle Bonds"),wxT("Toggle Bonds"),wxBitmap( bonds_xpm )) {
 	}
 	virtual void Exec(wxCommandEvent& e) {
 		cout << "Toggle Bonds" << endl;
@@ -292,24 +271,24 @@ public:
 		Realize(); 
 	}
 	~Toolbar() {
-		foreach(ToolbarAction* action,mActions) {
+		foreach(Action* action,mActions) {
 			delete action;
 		}
 	}
-	void AddAction(ToolbarAction* action) {
+	void AddAction(Action* action) {
 		mActions.push_back(action);
 		AddTool(mIdCounter,	action->GetText(),action->GetBitmap(),action->GetTooltip(),action->GetItemKind());
 		mIdCounter++;
 	}
 	void OnClick(wxCommandEvent& e) {
-		ToolbarAction* action = mActions[e.GetId()];
+		Action* action = mActions[e.GetId()];
 		action->Exec(e);
 		e.Skip(false);
 	}
     DECLARE_EVENT_TABLE();
 private:
 	long mIdCounter;
-	vector<ToolbarAction*> mActions;
+	vector<Action*> mActions;
 };
 
 BEGIN_EVENT_TABLE(Toolbar,wxToolBar)

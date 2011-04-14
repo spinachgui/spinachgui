@@ -20,9 +20,20 @@ namespace SpinXML {
 	class ISpinSystemLoader;
 };
 
-class RootFrame : public RootFrameBase {
+class MenuFrame : public wxFrame {
+	/*
+	  The entire purpose of this class is to work around a bug in
+	  wxWidgets 2.8 that causes classes derived from wxMenu to be
+	  unable to recieve events
+	 */
 public:
-    RootFrame(wxWindow* parent) : RootFrameBase(parent) {
+    DECLARE_EVENT_TABLE();
+}
+
+class RootFrame : public wxFrame {
+public:
+    RootFrame(wxWindow* parent)
+		: wxFrame(parent, wxID_ANY, wxT("Spinach")) {
         SetSize(wxSize(1024,768));
         InitFrame();
     }

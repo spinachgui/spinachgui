@@ -298,6 +298,90 @@ EVT_MENU(wxID_ANY,       Toolbar::OnClick)
 END_EVENT_TABLE()
 
 //============================================================//
+// Custom Menus
+
+struct AExit : public Action {
+	AExit() 
+		: Action(wxT("Exit"),wxT("Exit"),wxNullBitmap)  {
+	}
+	virtual void Exec(wxCommandEvent& e) {
+		exit(0);
+	}
+};
+
+class Menu : public wxMenu {
+public:
+	Menu() {
+	}
+	~Menu() {
+		foreach(Action* action,mActions) {
+			delete action;
+		}
+	}
+	long AddAction(Action* action) {
+		mActions.push_back(action);
+		Append(new wxMenuItem(this,mIdCounter,action->GetText()));
+		mIdCounter++;
+		return mIdCounter;
+	}
+	void OnClick(wxCommandEvent& e) {
+		cout << "click" << endl;
+		Action* action = mActions[e.GetId()];
+		action->Exec(e);
+		e.Skip(false);
+	}
+    DECLARE_EVENT_TABLE();
+private:
+	long mIdCounter;
+	vector<Action*> mActions;
+};
+
+BEGIN_EVENT_TABLE(Menu,wxMenu)
+EVT_MENU(wxID_ANY,       Menu::OnClick)
+END_EVENT_TABLE()
+
+
+class FileMenu : public Menu {
+public:
+	FileMenu() {
+		AddAction(new TBNew);
+		AddAction(new TBOpen);
+		AddAction(new TBSave);
+		AppendSeparator();
+		AddAction(new AExit);
+	}
+    DECLARE_EVENT_TABLE();
+};
+BEGIN_EVENT_TABLE(FileMenu,Menu)
+END_EVENT_TABLE()
+
+
+//================================================================================//
+// Custum menu bar
+
+class MenuBar : public wxMenuBar {
+public:
+	MenuBar() {
+		Append(new FileMenu,wxT("File"));
+	}
+	void OnOpen(wxMenuEvent& e) {
+		//Destroy the menu and recreate
+		//We shall see if this is needed or overkill
+	}
+	void test(wxCommandEvent& e) {
+		cout << "test" << endl;
+	}
+    DECLARE_EVENT_TABLE();
+private:
+	
+};
+
+BEGIN_EVENT_TABLE(MenuBar,wxMenuBar) 
+EVT_MENU_OPEN(MenuBar::OnOpen)
+END_EVENT_TABLE()
+
+
+//============================================================//
 // Custom Status Bar
 
 class StatusBar : public wxStatusBar {
@@ -325,6 +409,7 @@ public:
 
     }
 };
+
 
 //============================================================//
 
@@ -365,6 +450,9 @@ void RootFrame::InitFrame() {
 	toolbar->AddSeparator();
 	toolbar->AddAction(new TBBonds);
 	SetToolBar(toolbar);
+
+	//Setup the menu bar
+	SetMenuBar(new MenuBar());
 
 	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
@@ -409,12 +497,6 @@ void RootFrame::InitFrame() {
 	spinInterEditInfo.FloatingSize(wxSize(600,400));//Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mSpinInterEdit,spinInterEditInfo);
 
-    //Grey the undo and redo menu ideams. They can be ungreyed when
-    //there is an undo history
-
-    mMenuItemUndo->Enable(false);
-    mMenuItemRedo->Enable(false);
-
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
 	sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
@@ -423,6 +505,7 @@ void RootFrame::InitFrame() {
 	//(which would make making units configurable impossible) we
 	//connect them all to the same handler and setup a lookup for
 	//translating the id into a unit and physical dimension.
+	/*
 	typedef pair<PhysDimension,unit> p;
 
 	mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
@@ -447,7 +530,7 @@ void RootFrame::InitFrame() {
 	wxObjectEventFunction afterCast = 
 		(wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
 	Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
-
+	*/
 }
 
 
@@ -626,17 +709,17 @@ void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {
 }
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {
-    mMenuItemNmrEpr->Check(true);
+    //mMenuItemNmrEpr->Check(true);
     GetToolBar()->ToggleTool(ID_NMR_EPR,true);
 }
 
 void RootFrame::OnNmr(wxCommandEvent& e) {
-    mMenuItemNmr->Check(true);
+    //mMenuItemNmr->Check(true);
     GetToolBar()->ToggleTool(ID_NMR,true);
 }
 
 void RootFrame::OnEpr(wxCommandEvent& e) {
-    mMenuItemEpr->Check(true);
+    //mMenuItemEpr->Check(true);
     GetToolBar()->ToggleTool(ID_EPR,true);
 }
 
@@ -647,7 +730,7 @@ void RootFrame::OnResize(wxSizeEvent&e) {
 
 void RootFrame::OnBondToggle(wxCommandEvent& e) {
     bool showBonds=e.IsChecked();
-    mMenuItemBondToggle->Check(showBonds);
+    //mMenuItemBondToggle->Check(showBonds);
     GetToolBar()->ToggleTool(ID_BOND_TOGGLE,showBonds);
     SetShowBonds(showBonds);
 }

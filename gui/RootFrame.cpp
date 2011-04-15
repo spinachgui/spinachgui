@@ -10,6 +10,7 @@
 #include <gui/SpinGrid.hpp>
 #include <gui/SpinInteractionEdit.hpp>
 #include <gui/Action.hpp>
+#include <gui/State.hpp>
 
 #include <shared/spinsys.hpp>
 
@@ -22,16 +23,7 @@
 #include <wx/toolbar.h>
 
 
-
-//XPM resources
-#include "../res/bonds.xpm"
-#include "../res/document_new.xpm"
-#include "../res/document_open.xpm"
-#include "../res/document_save.xpm"
-#include "../res/epr.xpm"
-#include "../res/nmr.xpm"
-#include "../res/nmr_epr.xpm"
-
+#include <iostream>
 
 //Input and output filters
 #define ID_UNIT_START 12345
@@ -198,71 +190,6 @@ EVT_TREE_ITEM_RIGHT_CLICK(wxID_ANY, FrameTree::OnRightClick)
 
 END_EVENT_TABLE()
 
-//============================================================//
-// Toolbar
-
-struct TBNew : public Action {
-	TBNew()
-		: Action(wxT("New"),wxT("New"),wxBitmap( document_new_xpm )) {
-	}
-	virtual void Exec(wxCommandEvent& e) {
-		cout << "New" << endl;
-	}
-};
-
-struct TBOpen : public Action {
-	TBOpen()
-		: Action(wxT("Open"),wxT("Open"),wxBitmap( document_open_xpm )) {
-	}
-	virtual void Exec(wxCommandEvent& e) {
-		cout << "Open" << endl;
-	}
-};
-
-struct TBSave : public Action {
-	TBSave()
-		: Action(wxT("Save"),wxT("Save"),wxBitmap( document_save_xpm )) {
-	}
-	virtual void Exec(wxCommandEvent& e) {
-		cout << "Save" << endl;
-	}
-};
-
-struct TBNmrEpr : public Action {
-	TBNmrEpr()
-		: Action(wxT("Show All Interactions"),wxT("Show All Interactions"),wxBitmap( nmr_epr_xpm )) {
-	}
-	virtual void Exec(wxCommandEvent& e) {
-		cout << "NMR EPR" << endl;
-	}
-};
-
-struct TBNmr : public Action {
-	TBNmr()
-		: Action(wxT("NMR Mode"),wxT("NMR Mode"),wxBitmap( nmr_xpm )) {
-	}
-	virtual void Exec(wxCommandEvent& e) {
-		cout << "NMR" << endl;
-	}
-};
-
-struct TBEpr : public Action {
-	TBEpr()
-		: Action(wxT("EPR Mode"),wxT("EPR Mode"),wxBitmap( epr_xpm )) {
-	}
-	virtual void Exec(wxCommandEvent& e) {
-		cout << "EPR" << endl;
-	}
-};
-
-struct TBBonds : public Action {
-	TBBonds()
-		: Action(wxT("Toggle Bonds"),wxT("Toggle Bonds"),wxBitmap( bonds_xpm )) {
-	}
-	virtual void Exec(wxCommandEvent& e) {
-		cout << "Toggle Bonds" << endl;
-	}
-};
 
 class Toolbar : public wxToolBar {
 public:
@@ -387,6 +314,50 @@ public:
 	}
 };
 
+class EditMenu : public Menu {
+	EditMenu(MenuFrame* p) : Menu(p) {
+		AddAction(new AIsotripic);
+		AddAction(new ACalcDipoleDipole);
+	}
+};
+
+class ViewMenu : public Menu {
+	ViewMenu(MenuFrame* p) : Menu(p) {
+		AddAction(new AWireframe);
+		AddAction(new ASolid);
+		AppendSeparator();
+		AddAction(new AWireframe);
+		AddAction(new ASolid);
+		AppendSeparator();
+		AddAction(new TBNmrEpr);
+		AddAction(new TBNmr);
+		AddAction(new TBEpr);
+		AppendSeparator();
+		AddAction(new ShowHideGrid);
+		AddAction(new TensorOptions);
+		AddAction(new InteractionEditor);
+		AddAction(new ReferenceFrames);
+		AppendSeparator();
+		AddAction(new DrawEllipsoid);
+		AddAction(new DrawTensorAxies);
+	}
+};
+
+class UnitsMenu : public Menu {
+	UnitsMenu(MenuFrame* p) : Menu(p) {
+
+	}
+	//Two submenus
+};
+
+class SelectionMenu : public Menu {
+	SelectionMenu(MenuFrame* p) : Menu(p) {
+
+	}
+	//By element
+};
+
+
 
 //================================================================================//
 // Custum menu bar
@@ -396,8 +367,6 @@ public:
 	MenuBar(MenuFrame* p) {
 		Append(new FileMenu(p),wxT("File"));
 	}
-private:
-	
 };
 
 

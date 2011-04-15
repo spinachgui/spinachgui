@@ -90,6 +90,8 @@ void Display3D::EnableGL() {
     //glGenTextures(1,&mTexDepth);
     //Generate a texture for saving the depth buffer to
     //glGenFramebuffers(1,&mFB);
+
+	glEnable(GL_NORMALIZE);
 }
 
 void Display3D::ChangeViewport() {

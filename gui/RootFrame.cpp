@@ -241,6 +241,9 @@ void RootFrame::InitFrame() {
 	StatusBar* statusBar = new StatusBar(this);
 	SetStatusBar(statusBar);
 
+	//We start with bonds shown
+    mRootToolbar->ToggleTool(ID_BOND_TOGGLE,true);
+
 	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
 
@@ -283,6 +286,13 @@ void RootFrame::InitFrame() {
 	spinInterEditInfo.Caption(wxT("Interactions"));
 	spinInterEditInfo.FloatingSize(wxSize(600,400));//Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mSpinInterEdit,spinInterEditInfo);
+
+	//Setup the menu checks to reflect the default
+	mMenuItemGrid->Check(true);
+	mMenuItemTensorVis->Check(false);
+	mMenuItemIntEdit->Check(true);
+	mMenuItemFrames->Check(true);
+
 
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));

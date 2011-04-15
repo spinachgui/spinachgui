@@ -431,7 +431,7 @@
                         <property name="kind">wxITEM_CHECK</property>
                         <property name="label">Grid</property>
                         <property name="name">mMenuItemGrid</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>
@@ -446,7 +446,7 @@
                         <property name="kind">wxITEM_CHECK</property>
                         <property name="label">Interaction Tensor Visualisation</property>
                         <property name="name">mMenuItemTensorVis</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>
@@ -461,7 +461,7 @@
                         <property name="kind">wxITEM_CHECK</property>
                         <property name="label">Interaction Editor</property>
                         <property name="name">mMenuItemIntEdit</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>
@@ -476,7 +476,7 @@
                         <property name="kind">wxITEM_CHECK</property>
                         <property name="label">Reference Frames</property>
                         <property name="name">mMenuItemFrames</property>
-                        <property name="permission">none</property>
+                        <property name="permission">protected</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection"></event>

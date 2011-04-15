@@ -2,12 +2,14 @@
 #ifndef ROOT_FRAME_H
 #define ROOT_FRAME_H
 
-#include <auto/SpinachGUI.h>
-
 #include <shared/unit.hpp>
 
 #include <utility>
 #include <vector>
+#include <wx/event.h>
+#include <wx/frame.h>
+
+#include <map>
 
 class InterDisplaySettingsPanel;
 class FrameTree;
@@ -15,6 +17,10 @@ class wxAuiManager;
 class SpinGrid;
 class Display3D;
 class SpinInterEditPanel;
+
+class wxMenuBar;
+class Menu;
+class Action;
 
 namespace SpinXML {
 	class ISpinSystemLoader;
@@ -27,17 +33,23 @@ class MenuFrame : public wxFrame {
 	  unable to recieve events
 	 */
 public:
+	MenuFrame(wxWindow* parent, wxWindowID id, const wxString& title);
+	//Once an action is registed, when this class hears an event with
+	//the specified id will be sent to the specified menu
+	void RegisterAddActionWorkaround(Menu* menu,wxWindowID id);
+	void OnClick(wxCommandEvent& e);
     DECLARE_EVENT_TABLE();
-}
+private:
+	std::map<long,Menu*> mIdToMenu;
+};
 
-class RootFrame : public wxFrame {
+class RootFrame : public MenuFrame {
 public:
     RootFrame(wxWindow* parent)
-		: wxFrame(parent, wxID_ANY, wxT("Spinach")) {
+		: MenuFrame(parent, wxID_ANY, wxT("Spinach")) {
         SetSize(wxSize(1024,768));
         InitFrame();
     }
-    
     ~RootFrame() {};
 
     void InitFrame();

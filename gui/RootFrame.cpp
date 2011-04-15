@@ -268,17 +268,18 @@ class Toolbar : public wxToolBar {
 public:
 	Toolbar(wxWindow* parent, wxWindowID id = -1)
 		: wxToolBar(parent,id),mIdCounter(0) {
-		Realize(); 
+		Realize();
 	}
 	~Toolbar() {
 		foreach(Action* action,mActions) {
 			delete action;
 		}
 	}
-	void AddAction(Action* action) {
+	long AddAction(Action* action) {
 		mActions.push_back(action);
 		AddTool(mIdCounter,	action->GetText(),action->GetBitmap(),action->GetTooltip(),action->GetItemKind());
 		mIdCounter++;
+		return mIdCounter-1;
 	}
 	void OnClick(wxCommandEvent& e) {
 		Action* action = mActions[e.GetId()];
@@ -291,11 +292,76 @@ private:
 	vector<Action*> mActions;
 };
 
+
 BEGIN_EVENT_TABLE(Toolbar,wxToolBar)
 
 EVT_MENU(wxID_ANY,       Toolbar::OnClick)
 
 END_EVENT_TABLE()
+
+//============================================================//
+
+class Menu : public wxMenu {
+public:
+	Menu(MenuFrame* mf) {
+		mMenuFrame = mf;
+	}
+	~Menu() {
+		for(map<long,Action*>::iterator i = mActions.begin();i!=mActions.end();++i) {
+			delete i->second;
+		}
+	}
+	void AddAction(Action* action) {
+		mActions[mIdCounter] = action;
+		Append(new wxMenuItem(this,mIdCounter,action->GetText()));
+		mMenuFrame->RegisterAddActionWorkaround(this,mIdCounter);
+		mIdCounter++;
+	}
+	void OnClick(wxCommandEvent& e) {
+		cout << "click" << endl;
+		Action* action = mActions[e.GetId()];
+		action->Exec(e);
+		e.Skip(false);
+	}
+    DECLARE_EVENT_TABLE();
+private:
+	MenuFrame* mMenuFrame;
+	static long mIdCounter;
+	map<long,Action*> mActions;
+};
+
+//We need this to be static to work around the 2.8 wxMenu bug
+long Menu::mIdCounter(30000);
+
+
+BEGIN_EVENT_TABLE(Menu,wxMenu)
+EVT_MENU(wxID_ANY,       Menu::OnClick)
+END_EVENT_TABLE()
+
+
+
+//============================================================//
+// MenuFrame workaround class
+
+
+MenuFrame::MenuFrame(wxWindow* parent, wxWindowID id, const wxString& title) 
+: wxFrame(parent,id,title)  {
+}
+
+void MenuFrame::RegisterAddActionWorkaround(Menu* menu,wxWindowID id) {
+	mIdToMenu[long(id)] = menu;
+}
+
+void MenuFrame::OnClick(wxCommandEvent& e) {
+	cout << "MenuFrame::OnClick, id=" << e.GetId() << endl;
+	Menu* menu = mIdToMenu[e.GetId()];
+	menu->OnClick(e);
+}
+
+BEGIN_EVENT_TABLE(MenuFrame,wxFrame)
+EVT_MENU(wxID_ANY,       MenuFrame::OnClick)
+END_EVENT_TABLE()
+
 
 //============================================================//
 // Custom Menus
@@ -309,51 +375,17 @@ struct AExit : public Action {
 	}
 };
 
-class Menu : public wxMenu {
-public:
-	Menu() {
-	}
-	~Menu() {
-		foreach(Action* action,mActions) {
-			delete action;
-		}
-	}
-	long AddAction(Action* action) {
-		mActions.push_back(action);
-		Append(new wxMenuItem(this,mIdCounter,action->GetText()));
-		mIdCounter++;
-		return mIdCounter;
-	}
-	void OnClick(wxCommandEvent& e) {
-		cout << "click" << endl;
-		Action* action = mActions[e.GetId()];
-		action->Exec(e);
-		e.Skip(false);
-	}
-    DECLARE_EVENT_TABLE();
-private:
-	long mIdCounter;
-	vector<Action*> mActions;
-};
-
-BEGIN_EVENT_TABLE(Menu,wxMenu)
-EVT_MENU(wxID_ANY,       Menu::OnClick)
-END_EVENT_TABLE()
-
 
 class FileMenu : public Menu {
 public:
-	FileMenu() {
+	FileMenu(MenuFrame* p) : Menu(p) {
 		AddAction(new TBNew);
 		AddAction(new TBOpen);
 		AddAction(new TBSave);
 		AppendSeparator();
 		AddAction(new AExit);
 	}
-    DECLARE_EVENT_TABLE();
 };
-BEGIN_EVENT_TABLE(FileMenu,Menu)
-END_EVENT_TABLE()
 
 
 //================================================================================//
@@ -361,24 +393,12 @@ END_EVENT_TABLE()
 
 class MenuBar : public wxMenuBar {
 public:
-	MenuBar() {
-		Append(new FileMenu,wxT("File"));
+	MenuBar(MenuFrame* p) {
+		Append(new FileMenu(p),wxT("File"));
 	}
-	void OnOpen(wxMenuEvent& e) {
-		//Destroy the menu and recreate
-		//We shall see if this is needed or overkill
-	}
-	void test(wxCommandEvent& e) {
-		cout << "test" << endl;
-	}
-    DECLARE_EVENT_TABLE();
 private:
 	
 };
-
-BEGIN_EVENT_TABLE(MenuBar,wxMenuBar) 
-EVT_MENU_OPEN(MenuBar::OnOpen)
-END_EVENT_TABLE()
 
 
 //============================================================//
@@ -452,7 +472,7 @@ void RootFrame::InitFrame() {
 	SetToolBar(toolbar);
 
 	//Setup the menu bar
-	SetMenuBar(new MenuBar());
+	SetMenuBar(new MenuBar(this));
 
 	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
@@ -462,6 +482,7 @@ void RootFrame::InitFrame() {
 	mSpinInterEdit = new SpinInterEditPanel(this);
 	mDisplay3D     = new SpinSysDisplay3D(this);
 	mFrameTree     = new FrameTree(this);
+
 
     // add the panes to the manager
     wxAuiPaneInfo display3dinfo;
@@ -809,7 +830,7 @@ void RootFrame::OnEllipsoid(wxCommandEvent& e) {
 }
 
 
-BEGIN_EVENT_TABLE(RootFrame,wxFrame)
+BEGIN_EVENT_TABLE(RootFrame,MenuFrame)
 
 //File Menu
 EVT_MENU(ID_NEW   ,RootFrame::OnNew   )

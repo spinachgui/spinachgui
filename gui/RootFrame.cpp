@@ -284,12 +284,6 @@ void RootFrame::InitFrame() {
 	spinInterEditInfo.FloatingSize(wxSize(600,400));//Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mSpinInterEdit,spinInterEditInfo);
 
-    //Grey the undo and redo menu ideams. They can be ungreyed when
-    //there is an undo history
-
-    mMenuItemUndo->Enable(false);
-    mMenuItemRedo->Enable(false);
-
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
 	sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
@@ -331,14 +325,6 @@ void RootFrame::OnUnitChange(wxCommandEvent& e) {
 	PhysDimension d = thePair.first;
 	unit u = thePair.second;
 	SetUnit(d,u);
-}
-
-void RootFrame::OnUndo(wxCommandEvent& e) {
-
-}
-
-void RootFrame::OnRedo(wxCommandEvent& e) {
-
 }
 
 void RootFrame::OnNew(wxCommandEvent& e) {
@@ -527,9 +513,6 @@ void RootFrame::OnBondToggle(wxCommandEvent& e) {
     SetShowBonds(showBonds);
 }
 	     
-void RootFrame::OnToggle3D(wxCommandEvent& e) {
-	AUIToggle(mDisplay3D);
-}
 
 void RootFrame::OnToggleGrid(wxCommandEvent& e) {
 	AUIToggle(mSpinGrid);
@@ -611,9 +594,6 @@ EVT_MENU(ID_SAVEAS,RootFrame::OnSaveAs)
 EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
 
 //Edit Menu
-EVT_MENU(ID_UNDO,RootFrame::OnUndo)
-EVT_MENU(ID_REDO,RootFrame::OnRedo)
-
 EVT_MENU(ID_EDIT_ISO,RootFrame::OnMakeIso)
 EVT_MENU(ID_CALC_DIPOLE,RootFrame::OnCalcDipoles)
 
@@ -624,7 +604,6 @@ EVT_MENU(ID_EPR,    RootFrame::OnEpr)
 
 EVT_MENU(ID_BOND_TOGGLE,  RootFrame::OnBondToggle)
 
-EVT_MENU(ID_VIEW_3D,        RootFrame::OnToggle3D)
 EVT_MENU(ID_VIEW_GRID,      RootFrame::OnToggleGrid)
 EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleTensorVis)
 EVT_MENU(ID_VIEW_TENSORVIS, RootFrame::OnToggleInterEdit)

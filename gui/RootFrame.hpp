@@ -45,11 +45,9 @@ public:
     void OnExit  (wxCommandEvent& e);
 
     //Edit Menu Event handlers
-    void OnUndo(wxCommandEvent& e);
-    void OnRedo(wxCommandEvent& e);
-
     void OnMakeIso(wxCommandEvent& e);
 	void OnCalcDipoles(wxCommandEvent& e);
+
     //Selection Menu
     void OnCarbon(wxCommandEvent& e);
     void OnHydrogen(wxCommandEvent& e);
@@ -60,7 +58,6 @@ public:
     void OnEpr(wxCommandEvent& e);
     void OnBondToggle(wxCommandEvent& e);
 
-	void OnToggle3D(wxCommandEvent& e);
 	void OnToggleGrid(wxCommandEvent& e);
 	void OnToggleTensorVis(wxCommandEvent& e);
 	void OnToggleInterEdit(wxCommandEvent& e);

@@ -49,8 +49,7 @@ public:
 	void OnCalcDipoles(wxCommandEvent& e);
 
     //Selection Menu
-    void OnCarbon(wxCommandEvent& e);
-    void OnHydrogen(wxCommandEvent& e);
+	void OnElementSelect(wxCommandEvent& e);
 
     //View Menu Event Hanlders
     void OnNmrEpr(wxCommandEvent& e);
@@ -69,6 +68,8 @@ public:
 	void OnAxes(wxCommandEvent& e);
 	void OnEllipsoid(wxCommandEvent& e);
 
+	//Menu event, fired when a user opens a menu
+	void OnMenu(wxMenuEvent& e);
 
     //To prevent flicker, overide this function to do nothing
     void OnEraseBackground(wxEraseEvent& e) {e.Skip(false);}

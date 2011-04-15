@@ -18,10 +18,13 @@
 #include <wx/treectrl.h>
 #include <wx/aui/aui.h>
 #include <shared/foreach.hpp>
+#include <shared/nuclear_data.hpp>
 
 //Input and output filters
 #define ID_UNIT_START 12345
-
+#define ID_ELEMENT_START 20000
+#define ID_ELEMENT_END   20500   //A periodic table up to element 500
+								 //should be good enough for anyone
 
 using namespace std;
 using namespace SpinXML;
@@ -244,6 +247,12 @@ void RootFrame::InitFrame() {
 	//We start with bonds shown
     mRootToolbar->ToggleTool(ID_BOND_TOGGLE,true);
 
+	//We need to use Connect to set up an event handler for the
+	//selection->element trigger expicitly
+	wxObjectEventFunction afterCastElement = 
+		(wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnElementSelect);
+	Connect(ID_ELEMENT_START,ID_ELEMENT_END,wxEVT_COMMAND_MENU_SELECTED,afterCastElement);
+
 	//Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
 
@@ -329,6 +338,17 @@ void RootFrame::InitFrame() {
 
 }
 
+void RootFrame::OnElementSelect(wxCommandEvent& e) {
+	cout << "OnElement" << endl;
+	int element = e.GetId() - ID_ELEMENT_START;
+    ClearSelection();
+    vector<Spin*> spins = GetRawSS()->GetSpins();
+    foreach(Spin* spin,spins) {
+		if(spin->GetElement() == element) {
+			AddSelection(spin);
+		}
+    }
+}
 
 void RootFrame::OnUnitChange(wxCommandEvent& e) {
 	pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
@@ -561,25 +581,6 @@ void RootFrame::OnMakeIso(wxCommandEvent& e) {
     }
 }
 
-void RootFrame::OnCarbon(wxCommandEvent& e) {
-    ClearSelection();
-    vector<Spin*> spins = GetRawSS()->GetSpins();
-    foreach(Spin* spin,spins) {
-	if(spin->GetElement() == 6) {
-	    AddSelection(spin);
-	}
-    }
-}
-
-void RootFrame::OnHydrogen(wxCommandEvent& e) {
-    ClearSelection();
-    vector<Spin*> spins = GetRawSS()->GetSpins();
-    foreach(Spin* spin,spins) {
-	if(spin->GetElement() == 1) {
-	    AddSelection(spin);
-	}
-    }
-}
 
 void RootFrame::OnCalcDipoles(wxCommandEvent& e) {
 	GetRawSS()->CalcNuclearDipoleDipole();
@@ -593,8 +594,29 @@ void RootFrame::OnEllipsoid(wxCommandEvent& e) {
 	SetMonoDrawMode(MONO_ELIPSOID);
 }
 
+void RootFrame::OnMenu(wxMenuEvent& e) {
+	wxMenu* menu = e.GetMenu();
+	if(menu == mMenuSelection) {
+		//Destory the old menu
+		while(menu->GetMenuItemCount() >0) {
+			menu->Destroy(menu->FindItemByPosition(0));
+		}
+		//Rebuild based on the list of elements present
+		vector<Spin*> spins = GetRawSS()->GetSpins();
+		set<int> elements;
+		foreach(Spin* spin,spins) {
+			elements.insert(spin->GetElement());
+		}
+		foreach(int element,elements) {
+			wxString name(getElementName(element),wxConvUTF8);
+			menu->Append(ID_ELEMENT_START + element, name);
+		}
+	}
+}
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
+
+EVT_MENU_OPEN(RootFrame::OnMenu)
 
 //File Menu
 EVT_MENU(ID_NEW   ,RootFrame::OnNew   )
@@ -626,8 +648,7 @@ EVT_MENU(ID_AXES,             RootFrame::OnAxes)
 EVT_MENU(ID_ELLIPSOIDS,      RootFrame::OnEllipsoid)
 
 //Selection Menu
-EVT_MENU(ID_SEL_HYDROGEN, RootFrame::OnHydrogen)
-EVT_MENU(ID_SEL_CARBON  , RootFrame::OnCarbon)
+//Explicitly set up with Connect in the constructor
 
 //Resize
 EVT_SIZE(RootFrame::OnResize)

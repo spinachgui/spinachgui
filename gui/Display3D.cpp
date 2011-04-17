@@ -180,7 +180,7 @@ void Display3D::Set2DView() {
     GetClientSize(&width,&height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0,width,0,height);
+    glOrtho(0,width,0,height,-100,100);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -201,11 +201,12 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     
     DrawScene();
 
+    Set2DView();
+    DrawForeground();
     if(mBandBoxOn) {
 	//Draw any 2D components
-	Set2DView();
-
 	glColor3f(0.0,0.0,0.0);
+
 
 	glBegin(GL_LINE);
 	glVertex2i(mBandBoxStartX,height-mBandBoxStartY);

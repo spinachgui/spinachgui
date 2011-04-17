@@ -6,6 +6,7 @@
 
 #include <3d/glmode.hpp>
 #include <3d/opengl.hpp>
+#include <3d/camera.hpp>
 
 enum GLName {
 	NAME_NONE = 0,
@@ -66,6 +67,13 @@ protected:
     virtual void Geometary() const;
 };
 
+class ElectronScene : public Renderer {
+public:
+    ElectronScene(Camera* camera);
+protected:
+    virtual void Geometary() const;
+    Camera* mCamera;
+};
 
 class BondDrawer : public Renderer {
 public:

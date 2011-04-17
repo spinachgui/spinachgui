@@ -118,7 +118,6 @@ void SpinDrawer::Geometary() const {
 	Spin* hover = GetHover();
 	set<Spin*> selection = GetSelection();
 
-	glPushName(0);
     long count=GetRawSS()->GetSpinCount();
     for(long i=0;i<count;i++) {
 		Spin* spin=GetRawSS()->GetSpin(i);
@@ -157,7 +156,6 @@ void SpinDrawer::Geometary() const {
 		glPopMatrix();
 
     }
-	glPopName();
 }
 
 //============================================================//
@@ -211,48 +209,47 @@ MonoInterDrawer::MonoInterDrawer()
 }
 
 void MonoInterDrawer::Geometary() const {
-	vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
+    vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
 	
-	const set<Spin*> supressed = GetSuppressedSpins();
+    const set<Spin*> supressed = GetSuppressedSpins();
+    foreach(Interaction* inter,inters) {
+	Interaction::Type t = inter->GetType();
+	if(!GetInterVisible(t)) {
+	    continue;
+	}
 
-	foreach(Interaction* inter,inters) {
-		Interaction::Type t = inter->GetType();
-		if(!GetInterVisible(t)) {
-			continue;
+	Spin* spin = inter->GetSpin1();
+
+	if(supressed.find(spin) != supressed.end()) {
+	    return;
+	}
+
+	if(inter->GetIsBilinear()) {
+	    if(inter->GetType() == Interaction::HFC) {
+		if(spin->GetElement() == 0) {
+		    spin = inter->GetSpin2();
 		}
+	    } else {
+		continue;
+	    }
+	}
+	GetInterColour(t).SetMaterial(0.5);
 
-		Spin* spin = inter->GetSpin1();
+	glPushMatrix(); {
+	    glTranslatef(spin->GetPosition().x() / Angstroms,
+			 spin->GetPosition().y() / Angstroms,
+			 spin->GetPosition().z() / Angstroms);
 
-		if(supressed.find(spin) != supressed.end()) {
-		    return;
-		}
-
-		if(inter->GetIsBilinear()) {
-			if(inter->GetType() == Interaction::HFC) {
-				if(spin->GetElement() == 0) {
-					spin = inter->GetSpin2();
-				}
-			} else {
-				continue;
-			}
-		}
-		GetInterColour(t).SetMaterial(0.5);
-
-		glPushMatrix(); {
-			glTranslatef(spin->GetPosition().x() / Angstroms,
-						 spin->GetPosition().y() / Angstroms,
-						 spin->GetPosition().z() / Angstroms);
-
-			Eigenvalues ev = inter->AsEigenvalues();
+	    Eigenvalues ev = inter->AsEigenvalues();
 
 			
-			double xx = ev.xx;
-			double yy = ev.yy;
-			double zz = ev.zz;
+	    double xx = ev.xx;
+	    double yy = ev.yy;
+	    double zz = ev.zz;
 
-			Matrix3d mat3 = ev.mOrient.GetAsDCM();
+	    Matrix3d mat3 = ev.mOrient.GetAsDCM();
 
-			GLfloat mat[16];
+	    GLfloat mat[16];
             mat[3 ]=0;
             mat[7 ]=0;
             mat[11]=0;
@@ -273,33 +270,37 @@ void MonoInterDrawer::Geometary() const {
             mat[9 ]=mat3(2,1);
             mat[10]=mat3(2,2);
 
-			glMultMatrixf(mat);
+	    glMultMatrixf(mat);
 
-			glScaled(xx / MHz,yy / MHz, zz / MHz);
+	    glScaled(xx / MHz,yy / MHz, zz / MHz);
 			
-			double size = GetInterSize(t);
-			glScaled(size*0.01,size*0.01,size*0.01);
-			if(GetMonoDrawMode() == MONO_ELIPSOID) {
-				gluSphere(GetQuadric(),1,11,13);
-			} else {
-			    glBegin(GL_LINES); {
-					glVertex3f(0,0,0);
-					glVertex3f(1,0,0);
-				}glEnd();
+	    double size = GetInterSize(t);
+	    glScaled(size*0.01,size*0.01,size*0.01);
 
-				glBegin(GL_LINES); {
-					glVertex3f(0,0,0);
-					glVertex3f(0,1,0);
-				} glEnd();
+	    glPushName(GetRawSS()->GetSpinNumber(spin));
 
-				glBegin(GL_LINES); {
-					glVertex3f(0,0,0);
-					glVertex3f(0,0,1);
-				} glEnd();
-			}
+	    if(GetMonoDrawMode() == MONO_ELIPSOID) {
+		gluSphere(GetQuadric(),1,11,13);
+	    } else {
+		glBegin(GL_LINES); {
+		    glVertex3f(0,0,0);
+		    glVertex3f(1,0,0);
+		}glEnd();
 
-		} glPopMatrix();
-	}
+		glBegin(GL_LINES); {
+		    glVertex3f(0,0,0);
+		    glVertex3f(0,1,0);
+		} glEnd();
+
+		glBegin(GL_LINES); {
+		    glVertex3f(0,0,0);
+		    glVertex3f(0,0,1);
+		} glEnd();
+	    }
+	    glPopName();
+
+	} glPopMatrix();
+    }
 }
 
 //============================================================//

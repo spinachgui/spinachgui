@@ -19,6 +19,7 @@
 #include <wx/aui/aui.h>
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
+#include <gui/TextBitmap.hpp>
 
 //Input and output filters
 #define ID_UNIT_START 12345
@@ -266,6 +267,7 @@ public:
 // RootFrame
 
 void RootFrame::InitFrame() {
+    TextBitmap tb(wxT("hello world"));
         //Setup the status bar
         StatusBar* statusBar = new StatusBar(this);
         SetStatusBar(statusBar);

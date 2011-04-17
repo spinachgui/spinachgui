@@ -162,6 +162,7 @@ SpinachApp::~SpinachApp() {
 }
 
 bool SpinachApp::OnInit() {
+    wxInitAllImageHandlers();
 	printf("%p %u\n",spinxmlSchema, spinxmlSchemaSize);
     //Load the I/O Filters
 

@@ -58,7 +58,7 @@ file(GLOB threeDeeSources 3d/*.cpp)
 
 set(guiSources ${guiSources} ${threeDeeSources} gui/schema_import.s)
 set(wxformbuilderSources ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp)
-set(xmlSources           ${CMAKE_CURRENT_BINARY_DIR}/auto/spinxml_schema.cpp)
+set(xmlSources           shared/formats/xsd/spinxml_schema.cpp)
 
 ############################################################
 # Link and include directories

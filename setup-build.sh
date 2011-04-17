@@ -5,8 +5,7 @@ SDIR=$(dirname $0)
 mkdir $BDIR/auto
 
 wxformbuilder -g $SDIR/spinach.fbp
-mv $SDIR/auto/* $BDIR/auto/
+mv $SDIR/auto/SpinachGUI.h $BDIR/auto/SpinachGUI.hpp
+mv $SDIR/auto/SpinachGUI.cpp $BDIR/auto/
 
 ln -s $SDIR/res/ $BDIR/res
-
-xsdcxx cxx-tree  --generate-serialization --generate-doxygen --cxx-suffix .cpp --hxx-suffix .hpp --output-dir $BDIR/auto --generate-doxygen  $SDIR/data/spinxml_schema.xsd

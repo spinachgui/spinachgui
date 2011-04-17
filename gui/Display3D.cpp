@@ -257,6 +257,7 @@ void Display3D::StopPicking() {
 		OnMouseOver3D(0,NULL);
 		return;
     }
+
     for(long i=0;i<hits;i++) {
 		GLuint name_count = *(buff++);
 		float d1=float(*(buff++))/0x7fffffff;
@@ -268,6 +269,7 @@ void Display3D::StopPicking() {
 			closestNameCount=name_count;
 		}
 		buff+=name_count;
+		cout << endl;
     }
     OnMouseOver3D(closestNameCount,closestNames);
 }

@@ -67,6 +67,7 @@ protected:
 
 		StartPicking();
 		mMolScene.Draw();
+		mInteractionScene.Draw();
 		StopPicking();
 	}
 	virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) {
@@ -74,13 +75,19 @@ protected:
 			SetHover(NULL);
 			return;
 		}
-		if(ClosestName[0] == NAME_SPINS) {
-			Spin* hover = GetHover();
-			Spin* newHover = GetRawSS()->GetSpin(ClosestName[stackLength-1]);
+		Spin* hover;
+		Spin* newHover;
+		switch(ClosestName[0]) {
+		case NAME_MONO_INTERACTIONS:
+			cout << "Moused over a spin" << endl;
+		case NAME_SPINS:
+			hover = GetHover();
+			newHover = GetRawSS()->GetSpin(ClosestName[stackLength-1]);
 			if(hover != newHover) {
 				SetHover(newHover);
 			}
-		} else {
+			break;
+		default:
 			SetHover(NULL);
 		}
 	}

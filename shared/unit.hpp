@@ -67,6 +67,8 @@ typedef double mass;
 
 typedef double energy;
 
+const unit Unitless("Unitless",1.0);
+
 const unit Joules("Joule",1.0);
 const unit Hz("Hz",6.626068e-34);
 const unit KHz("KHz",6.626068e-31);

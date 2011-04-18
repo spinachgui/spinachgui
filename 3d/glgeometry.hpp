@@ -75,6 +75,14 @@ protected:
     Camera* mCamera;
 };
 
+class ElectronInterDrawer : public Renderer {
+public:
+	ElectronInterDrawer(Camera* camera);
+protected:
+    virtual void Geometary() const;
+    Camera* mCamera;
+};
+
 class BondDrawer : public Renderer {
 public:
     BondDrawer();

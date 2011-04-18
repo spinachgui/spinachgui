@@ -138,17 +138,17 @@ __ModInit::__ModInit() {
 	gluQuadricNormals  (gWireQuadric,GLU_SMOOTH);
 
 	//Set sensible default scallings
-	sizeMap[Interaction::HFC             ] = 1;
+	sizeMap[Interaction::HFC             ] = 0.01;
 	sizeMap[Interaction::G_TENSER        ] = 1;
-	sizeMap[Interaction::ZFS             ] = 1;
-	sizeMap[Interaction::EXCHANGE        ] = 1;
-	sizeMap[Interaction::SHIELDING       ] = 1;
-	sizeMap[Interaction::SCALAR          ] = 1;
-	sizeMap[Interaction::QUADRUPOLAR     ] = 1;
-	sizeMap[Interaction::DIPOLAR         ] = 1;
-	sizeMap[Interaction::CUSTOM_LINEAR   ] = 1;
-	sizeMap[Interaction::CUSTOM_BILINEAR ] = 1;
-	sizeMap[Interaction::CUSTOM_QUADRATIC] = 1;
+	sizeMap[Interaction::ZFS             ] = 0.01;
+	sizeMap[Interaction::EXCHANGE        ] = 0.01;
+	sizeMap[Interaction::SHIELDING       ] = 0.01;
+	sizeMap[Interaction::SCALAR          ] = 0.01;
+	sizeMap[Interaction::QUADRUPOLAR     ] = 0.01;
+	sizeMap[Interaction::DIPOLAR         ] = 0.01;
+	sizeMap[Interaction::CUSTOM_LINEAR   ] = 0.01;
+	sizeMap[Interaction::CUSTOM_BILINEAR ] = 0.01;
+	sizeMap[Interaction::CUSTOM_QUADRATIC] = 0.01;
 
 	visableMap[Interaction::HFC             ] = true;
 	visableMap[Interaction::G_TENSER        ] = true;
@@ -163,7 +163,7 @@ __ModInit::__ModInit() {
 	visableMap[Interaction::CUSTOM_QUADRATIC] = true;
 
 	colourMap[Interaction::HFC             ] = ColourRGB(0.0,0.0,0.0);
-	colourMap[Interaction::G_TENSER        ] = ColourRGB(0.0,0.0,0.0);
+	colourMap[Interaction::G_TENSER        ] = ColourRGB(0.1,0.8,0.1);
 	colourMap[Interaction::ZFS             ] = ColourRGB(0.0,0.0,0.0);
 	colourMap[Interaction::EXCHANGE        ] = ColourRGB(0.0,0.0,0.0);
 	colourMap[Interaction::SHIELDING       ] = ColourRGB(0.0,0.0,0.0);

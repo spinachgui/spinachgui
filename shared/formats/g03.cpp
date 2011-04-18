@@ -21,8 +21,8 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	vector<Eigenvalues> anisoHFC;
 
 	ss->Clear();
-	Spin* s=new Spin(Vector3d(0,0,0),string("Unpaired Electron"),0);
-	ss->InsertSpin(s);
+	Spin* electron=new Spin(Vector3d(0,0,0),string("Unpaired Electron"),0);
+	ss->InsertSpin(electron);
 
 	ifstream fin(filename);
 	cout << "Opening a g03 file:" << filename << endl;
@@ -78,8 +78,33 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			}
 			standardOrientFound=true;
 
-		} else if(line=="g tensor (ppm):") {      
+		} else if(line=="g tensor (ppm):") {
 		} else if(line=="g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:") {
+			string dummyXX, dummyYX, dummyZX;
+			string dummyXY, dummyYY, dummyZY;
+			string dummyXZ, dummyYZ, dummyZZ;
+
+			double XX, YX, ZX;
+			double XY, YY, ZY;
+			double XZ, YZ, ZZ;
+
+			istringstream stream;
+
+			fin.getline(buff,500); line=buff; stream.str(line); //Read a line
+			stream >> dummyXX >> XX >> dummyYX >> YX >> dummyZX >> ZX;
+			fin.getline(buff,500); line=buff; stream.str(line); //Read a line
+			stream >> dummyXY >> XY >> dummyYY >> YY >> dummyZY >> ZY;
+			fin.getline(buff,500); line=buff; stream.str(line); //Read a line
+			stream >> dummyXX >> XZ >> dummyYX >> YZ >> dummyZZ >> ZZ;
+			
+			Matrix3d gTensor;
+			gTensor <<
+				XX, YX, ZX,
+				XY, YY, ZY,
+				XZ, YZ, ZZ;
+
+			Interaction* inter=new Interaction(gTensor, Interaction::G_TENSER,electron); 
+			ss->InsertInteraction(inter);
 		} else if(line=="SCF GIAO Magnetic shielding tensor (ppm):") {
 			for(long i=0;i<nAtoms;i++) {
 				long centerNumber; 

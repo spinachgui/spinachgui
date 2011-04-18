@@ -165,7 +165,9 @@ bool SpinachApp::OnInit() {
 	printf("%p %u\n",spinxmlSchema, spinxmlSchemaSize);
     //Load the I/O Filters
 
-    mIOFilters.push_back(new G03Loader);
+	ISpinSystemLoader* g03 = new G03Loader;
+
+    mIOFilters.push_back(g03);
     mIOFilters.push_back(new SIMPSONLoader);
     mIOFilters.push_back(new CASTEPLoader);
     mIOFilters.push_back(new EasySpinLoader);
@@ -199,6 +201,9 @@ bool SpinachApp::OnInit() {
     mSS = new SpinSystem;
 	//Set the active frame as the lab frame
 	SetFrame(mSS->GetLabFrame());
+
+	mSS->LoadFromFile("examples/Gaussian/ESR/methyl.log",g03);
+
 	/*
 	Spin* spin1 = new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16);
 	mSS->InsertSpin(spin1);

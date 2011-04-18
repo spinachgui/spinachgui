@@ -1,6 +1,6 @@
 
 #include <shared/formats/xml.hpp>
-#include <auto/spinxml_schema.hpp>
+#include <shared/formats/xsd/spinxml_schema.hpp>
 #include <shared/nuclear_data.hpp>
 #include <fstream>
 #include <sstream>

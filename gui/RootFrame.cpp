@@ -71,19 +71,19 @@ protected:
         StopPicking();
     }
     virtual void DrawForeground() {
-	int mWidth, mHeight;
-	GetClientSize(&mWidth,&mHeight);
+        int mWidth, mHeight;
+        GetClientSize(&mWidth,&mHeight);
 
-	glColor3f(0.0,0.0,0.0);
+        glColor3f(0.0,0.0,0.0);
 
         lighting.On();
 
-	glPushMatrix();
-	//Place the electron tensors along the top of the screne
-	//starting from the left
-	glTranslatef(40,mHeight-40,0);
-	mElectronScene.Draw();
-	glPopMatrix();
+        glPushMatrix();
+        //Place the electron tensors along the top of the screne
+        //starting from the left
+        glTranslatef(40,mHeight-40,0);
+        mElectronScene.Draw();
+        glPopMatrix();
 
         lighting.Off();
     }

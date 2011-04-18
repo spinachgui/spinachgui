@@ -21,7 +21,7 @@ OrientEditPanel::OrientEditPanel(wxWindow* parent,
                                  const wxPoint& pos,
                                  const wxSize& size,
                                  long style)
-    : OrientEditPanelBase(parent,id,pos,size,style),mOrient(Quaterniond(1,0,0,0)),mLoading(false),mDirty(false) {
+    : OrientEditPanelBase(parent,id,pos,size,style),mLoading(false),mDirty(false) {
     Enable(false);
 }
 

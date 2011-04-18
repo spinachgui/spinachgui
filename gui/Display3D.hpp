@@ -72,6 +72,8 @@ private:
     int mBandBoxStartX;
     int mBandBoxStartY;
 
+	bool mDraging;
+
     //3D Variables
     Camera* mCamera;
     Camera* m2DCamera;

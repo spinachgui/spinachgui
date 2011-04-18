@@ -33,6 +33,8 @@ Display3D::Display3D(wxWindow* parent)
     mCamera = new Camera;
     mPicking = new GLPicking(2000);
 
+	mDraging = false;
+
     mBandBoxOn = false;
     mBandBoxStartX = -1;
     mBandBoxStartY = -1;
@@ -102,6 +104,11 @@ void Display3D::ChangeViewport() {
 
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
+	if(e.Dragging()) {
+		mDraging = true;
+	} else {
+		mDraging = false;
+	}
     if(e.Dragging() && e.RightIsDown()) {
 		mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
@@ -129,7 +136,7 @@ void Display3D::OnWheel(wxMouseEvent& e) {
 }
 
 void Display3D::OnRightClick(wxMouseEvent& e) {
-    if(!e.Dragging()) {
+    if(!mDraging) {
 		if(GetHover()!=NULL) {
 			RightClickMenu* menu = new RightClickMenu(this);
 			menu->Build();
@@ -145,21 +152,25 @@ void Display3D::OnLeftClick(wxMouseEvent& e) {
 		mBandBoxOn = false;
 		return;
     }
+	if(mDraging) {
+		return;
+	}
 
-    if(GetHover() == NULL) {
+	if(GetHover() == NULL) {
 		ClearSelection();
 		return;
-    }
+	}
 
-    if(!e.ShiftDown()) {
+	if(!e.ShiftDown()) {
 		SetSelection(GetHover());
-    } else {
+	} else {
 		if(GetSelection().find(GetHover()) != GetSelection().end()) {
 			AddSelection(GetHover());
 		} else {
 			RemoveSelection(GetHover());
 		}
-    }
+	}
+
 }
 
 void Display3D::OnResize(wxSizeEvent& e) {

@@ -83,10 +83,21 @@ protected:
         //starting from the left
         glTranslatef(40,mHeight-40,0);
         mElectronScene.Draw();
+        mInteractionScene.Draw();
+
+        translucent.On();
 		mElectronInterDrawer.Draw();
+        translucent.Off();
+
+        wire.On();
+        mElectronInterDrawer.Draw();
+        wire.Off();
+
+        lighting.Off();		
+
         glPopMatrix();
 
-        lighting.Off();
+
     }
 
     virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) {

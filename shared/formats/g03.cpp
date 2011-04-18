@@ -80,22 +80,29 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 
 		} else if(line=="g tensor (ppm):") {
 		} else if(line=="g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:") {
-			string dummyXX, dummyYX, dummyZX;
-			string dummyXY, dummyYY, dummyZY;
-			string dummyXZ, dummyYZ, dummyZZ;
-
-			double XX, YX, ZX;
-			double XY, YY, ZY;
-			double XZ, YZ, ZZ;
+			double XX = -1, YX = -1, ZX = -1;
+			double XY = -1, YY = -1, ZY = -1;
+			double XZ = -1, YZ = -1, ZZ = -1;
 
 			istringstream stream;
 
-			fin.getline(buff,500); line=buff; stream.str(line); //Read a line
-			stream >> dummyXX >> XX >> dummyYX >> YX >> dummyZX >> ZX;
-			fin.getline(buff,500); line=buff; stream.str(line); //Read a line
-			stream >> dummyXY >> XY >> dummyYY >> YY >> dummyZY >> ZY;
-			fin.getline(buff,500); line=buff; stream.str(line); //Read a line
-			stream >> dummyXX >> XZ >> dummyYX >> YZ >> dummyZZ >> ZZ;
+			fin.getline(buff,500);
+			for(long i=0;i<500;i++) if(buff[i]=='D') buff[i]='e';   //Replace fortran's "D" with "e"
+			for(long i=0;i<500;i++) if(buff[i]=='X'||buff[i]=='Y'||buff[i]=='Z'||buff[i]=='=') buff[i]=' ';   //Get rid of the junk
+			stream.str(buff);
+			stream >> XX >> YX >> ZX;
+
+			fin.getline(buff,500);
+			for(long i=0;i<500;i++) if(buff[i]=='D') buff[i]='e';   //Replace fortran's "D" with "e"
+			for(long i=0;i<500;i++) if(buff[i]=='X'||buff[i]=='Y'||buff[i]=='Z'||buff[i]=='=') buff[i]=' ';   //Get rid of the junk
+			stream.str(buff);
+			stream >> XY >> YY >> ZY;
+
+			fin.getline(buff,500);
+			for(long i=0;i<500;i++) if(buff[i]=='D') buff[i]='e';   //Replace fortran's "D" with "e"
+			for(long i=0;i<500;i++) if(buff[i]=='X'||buff[i]=='Y'||buff[i]=='Z'||buff[i]=='=') buff[i]=' ';   //Get rid of the junk
+			stream.str(buff);
+			stream >> XZ >> YZ >> ZZ;
 			
 			Matrix3d gTensor;
 			gTensor <<

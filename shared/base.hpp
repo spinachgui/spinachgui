@@ -10,6 +10,7 @@ namespace SpinXML {
 	class SpinXMLBase  : public sigc::trackable {
 	public:
 		SpinXMLBase() : mFrame(NULL) {
+			sigChange.connect(mem_fun(this,&SpinXMLBase::relayToAnyChange));
 		}
 		~SpinXMLBase() {
 			sigDying(static_cast<Derived*>(this));
@@ -24,9 +25,17 @@ namespace SpinXML {
 
 		sigc::signal<void,Derived*> sigDying;
         sigc::signal<void> sigChange;
+
+		static sigc::signal<void> sigAnyChange;
 	private:
+		void relayToAnyChange() {
+			sigAnyChange();
+		}
 		Frame* mFrame;
 	};
 
+	template<typename Derived,typename DerivedView>
+	sigc::signal<void> SpinXMLBase<Derived,DerivedView>::sigAnyChange;
 };
+
 #endif

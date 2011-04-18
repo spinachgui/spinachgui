@@ -46,8 +46,16 @@ class SpinSysDisplay3D : public Display3D {
 public:
     SpinSysDisplay3D(wxWindow* parent) 
         : Display3D(parent),mElectronScene(GetCamera()),mElectronInterDrawer(GetCamera()) {
-        GetSS().sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
+        GetRawSS()->sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
+		
+		//Make sure that if anything changes we redraw the scene
+		SpinSystem::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinChange));
+		Spin::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotInterChange));
+		Interaction::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinSysChange));
     }
+	void SlotSpinChange() {Refresh();}
+	void SlotInterChange() {Refresh();}
+	void SlotSpinSysChange() {Refresh();}
 protected:
     virtual void DrawScene() {
         lighting.On();

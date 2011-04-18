@@ -8,14 +8,12 @@
 #include <iostream>
 #include <wx/file.h>
 
-#include <shared/spinsys.hpp>
 
 #include <3d/glgeometry.hpp>
 #include <3d/glmode.hpp>
 #include <3d/camera.hpp>
 
 using namespace std;
-using namespace SpinXML;
 using namespace sigc;
 
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5};

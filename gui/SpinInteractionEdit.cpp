@@ -14,6 +14,8 @@ SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id)
 	  mSpin(SpinView(NULL,GetFrame(),GetUnitSystem())),
 	  mUpdatingListBox(false) {
 	mInterEdit=new InterEditPanel(this);
+	mInterEdit->sigChange.connect(mem_fun(this,&SpinInterEditPanel::UpdateListBox));
+
 	GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
 	Enable(false);
 };

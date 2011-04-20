@@ -296,8 +296,8 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
 		//this event
 		return;
 	}
-	sigChange();
 	SaveToInter();
+	sigChange();
 	return;
 }
 

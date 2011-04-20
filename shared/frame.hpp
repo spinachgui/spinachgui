@@ -78,8 +78,8 @@ namespace SpinXML {
     Eigen::Vector3d ToLabVec3d(Frame* frame,const Eigen::Vector3d& v);
     Eigen::Vector3d FromLabVec3d(Frame* frame,const Eigen::Vector3d& v);
 
-    Eigen::Vector3d ToLabMatrix3d(Frame* frame,const Eigen::Matrix3d& m);
-    Eigen::Vector3d FromLabMatrix3d(Frame* frame,const Eigen::Matrix3d& m);
+    Eigen::Matrix3d ToLabMatrix3d(Frame* frame,const Eigen::Matrix3d& m);
+    Eigen::Matrix3d FromLabMatrix3d(Frame* frame,const Eigen::Matrix3d& m);
 
 };
 

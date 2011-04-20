@@ -12,10 +12,10 @@ UnitSystem::UnitSystem()
 
 //============================================================//
 
-Frame::Frame(Vector3d translation, Orientation rotation, const UnitSystem* unitSystem) 
+Frame::Frame(Vector3d translation, Orientation rotation) 
     : mParent(NULL),
-	  mTranslate(translation * (unitSystem->lengthUnit.get_to_si())),
-	  mOrient(rotation),mUnitSystem(unitSystem) {
+	  mTranslate(translation),
+	  mOrient(rotation) {
     updateAfine();
 	Invariant();
 }

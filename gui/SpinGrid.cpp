@@ -178,10 +178,11 @@ void SpinGrid::UpdateRow(long rowNumber) {
         //Set the label
         SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
 
+#warning "Frame translation goes here"
         //Set the x,y,z coordinates
-        SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
-        SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y);
-        SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z);
+        SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x / GetUnitSystem()->lengthUnit);
+        SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y / GetUnitSystem()->lengthUnit);
+        SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z / GetUnitSystem()->lengthUnit);
 
         //Set the element and isotope
         long element=spin->GetElement();
@@ -228,8 +229,10 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         GetCellValue(e.GetRow(),COL_Z).ToDouble(&z);
 
         Chkpoint(wxT("Spin Coordinates"));
-#warning "Frame/Unit translation goes here"
-        GetRawSS()->GetSpin(e.GetRow())->SetCoordinates(x,y,z);
+#warning "Frame translation goes here"
+        GetRawSS()->GetSpin(e.GetRow())->SetCoordinates(x * GetUnitSystem()->lengthUnit,
+														y * GetUnitSystem()->lengthUnit,
+														z * GetUnitSystem()->lengthUnit);
     } else if(e.GetCol()==COL_ELEMENT) {
         wxString content=GetCellValue(e.GetRow(),e.GetCol());
         long space=content.Find(wxT(" "));

@@ -36,11 +36,10 @@ struct Setup {
 #define SETUP_FRAME(fName,V,O,P)							\
     fName##_V = (V);										\
 	fName##_O = Orientation((O));							\
-	fName = new Frame(fName##_V,fName##_O,unitSystem);		\
+	fName = new Frame(fName##_V,fName##_O);		\
 	if(P != NULL) {fName->AddChild((P));}
 
-    Setup()	
-		: unitSystem(new UnitSystem) {
+    Setup() {
 
         // Frames A,B and C are pure translational
         SETUP_FRAME(FrameA,Vector3d(1,0,0),Quaterniond(1,0,0,0),NULL);
@@ -67,8 +66,6 @@ struct Setup {
     }
 #define DECLARE_FRAME(fName)									\
     Vector3d fName##_V; Orientation fName##_O; Frame* fName;
-
-	UnitSystem* unitSystem;
 
     DECLARE_FRAME(FrameA);
     DECLARE_FRAME(FrameB);

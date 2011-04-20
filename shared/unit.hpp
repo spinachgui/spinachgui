@@ -21,6 +21,7 @@ unit type being assigned to the ddouble)
 
 #include <iostream>
 #include <string>
+#include <Eigen/Dense>
 
 struct unit {
     unit(const std::string& name,double toSIf) : mName(name) {
@@ -56,6 +57,12 @@ private:
 
 double operator*(double number,const unit& u);
 double operator/(double number,const unit& u);
+
+Eigen::Vector3d operator*(const Eigen::Vector3d& v,const unit& u);
+Eigen::Vector3d operator/(const Eigen::Vector3d& v,const unit& u);
+
+Eigen::Matrix3d operator*(const Eigen::Matrix3d& m,const unit& u);
+Eigen::Matrix3d operator/(const Eigen::Matrix3d& m,const unit& u);
 
 //============================================================//
 // Define speicific units

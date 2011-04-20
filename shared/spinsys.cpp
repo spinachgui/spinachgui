@@ -18,12 +18,12 @@ using namespace boost;
 // SpinSystem
 
 SpinSystem::SpinSystem()
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
 }
 
 
 SpinSystem::SpinSystem(const SpinSystem& system)
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
     long spinCount=system.mSpins.size();
 
     mSpins.resize(spinCount);
@@ -46,7 +46,7 @@ void SpinSystem::Clear() {
     }
 
 	delete mRootFrame;
-	mRootFrame = new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem);
+	mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
 
     sigReloaded();
 }

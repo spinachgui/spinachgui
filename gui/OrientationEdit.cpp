@@ -51,16 +51,16 @@ void OrientEditPanel::LoadFromOrient() {
     case Orientation::EULER: {
         double alpha,beta,gamma;
         mOrient.GetEuler(&alpha,&beta,&gamma);
-        mAlphaCtrl->SetValue(wxString() << alpha);
-        mBetaCtrl-> SetValue(wxString() << beta);
-        mGammaCtrl->SetValue(wxString() << gamma);
+        mAlphaCtrl->SetValue(wxString() << alpha / (2*PI) * 360);
+        mBetaCtrl-> SetValue(wxString() << beta  / (2*PI) * 360);
+		mGammaCtrl->SetValue(wxString() << gamma / (2*PI) * 360);
         break;
     }
     case Orientation::ANGLE_AXIS: {
         double angle;
         Vector3d axis;
         mOrient.GetAngleAxis(&angle,&axis);
-        mAngleCtrl->SetValue(wxString() << angle);
+        mAngleCtrl->SetValue(wxString() << angle / (2*PI) * 360);
         mXCtrl->SetValue(wxString() << axis.x());
         mYCtrl->SetValue(wxString() << axis.y());
         mZCtrl->SetValue(wxString() << axis.z());
@@ -108,7 +108,7 @@ void OrientEditPanel::SaveToOrient() {
         mBetaCtrl ->GetValue().ToDouble(&beta);
         mGammaCtrl->GetValue().ToDouble(&gamma);
 
-        mOrient = EulerAngles(alpha,beta,gamma);
+        mOrient = EulerAngles(alpha * (2*PI) / 360,beta * (2*PI) / 360,gamma * (2*PI) / 360);
         break;
     }
     case 1: {
@@ -119,7 +119,7 @@ void OrientEditPanel::SaveToOrient() {
         mYCtrl    ->GetValue().ToDouble(&y);
         mZCtrl    ->GetValue().ToDouble(&z);
 
-        mOrient = AngleAxisd(angle,Vector3d(x,y,z));
+        mOrient = AngleAxisd(angle  * (2*PI) / 360,Vector3d(x,y,z));
         break;
     }
     case 2: {

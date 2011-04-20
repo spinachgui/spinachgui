@@ -317,7 +317,15 @@ void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
 		cout << "setting subtype to a linear or quadratic form" << endl;
 	} else {
 		Spin* spin=(Spin*)mSpin2Combo->GetClientData(mSpin2Combo->GetSelection());
-		cout << "setting spin 2 to " << spin << endl;
+		if(spin == NULL) {
+			//If spin is null then we are probably converting from a
+			//linear or quadratic interaction where the mSpin2Combo is
+			//greyed out and so all we can do is guess a spin to
+			//couple mWithRespectTo to. Guess the first spin.
+			
+			spin = GetRawSS()->GetSpin(0);
+		}
+
 		mInter.SetType(t,mWithRespectTo,spin);
 	}
 

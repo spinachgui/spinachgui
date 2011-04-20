@@ -137,7 +137,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 #else
    wxEntry(hInstance,hPrevInstance,NULL,nShowCmd);
 #endif
-    return 1;
   } catch (logic_error& e) {
     cerr << "Uncaught logic_error what()=" << e.what() << endl;
   } catch (runtime_error& e) {
@@ -145,6 +144,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
   } catch (...) {
     cerr << "Uncaught unknown exception." << endl;
   }
+  //Print out a memory leak report
+  cout << "========================================" << endl;
+  cout << "             Leak Report" << endl;
+  cout << "========================================" << endl;
+  cout << "UnitSystem:" << UnitSystem::objCount() << endl;
+  cout << "========================================" << endl;
+
   return 0;
 }
 

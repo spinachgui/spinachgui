@@ -7,12 +7,13 @@
 #include <sigc++/sigc++.h>
 #include <shared/orientation.hpp>
 #include <vector>
-
+#include <shared/objcounter.hpp>
 
 namespace SpinXML {
 
-    class UnitSystem {
+    class UnitSystem : private Counter<UnitSystem> {
 	public:
+		using Counter<UnitSystem>::objCount;
         //SI by default
         UnitSystem();
         unit energyUnit;

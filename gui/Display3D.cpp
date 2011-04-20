@@ -7,6 +7,7 @@
 #include <wx/dcmemory.h>
 #include <iostream>
 #include <wx/file.h>
+#include <shared/foreach.hpp>
 
 
 #include <3d/glgeometry.hpp>
@@ -15,6 +16,7 @@
 
 using namespace std;
 using namespace sigc;
+using namespace SpinXML;
 
 GLfloat defaultMaterial[3] = {0.5, 0.5,  0.5};
 
@@ -162,7 +164,7 @@ void Display3D::OnLeftClick(wxMouseEvent& e) {
 	if(!e.ShiftDown()) {
 		SetSelection(GetHover());
 	} else {
-		if(GetSelection().find(GetHover()) != GetSelection().end()) {
+		if(GetSelection().find(GetHover()) == GetSelection().end()) {
 			AddSelection(GetHover());
 		} else {
 			RemoveSelection(GetHover());

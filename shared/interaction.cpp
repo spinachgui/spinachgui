@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <shared/basic_math.hpp>
 
+#include <shared/panic.hpp>
+
 using namespace SpinXML;
 using namespace std;
 using namespace boost;
@@ -335,31 +337,33 @@ void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientatio
 }
 
 void Interaction::SetScalar(energy Scalar) {
-    sigChange();
     mData=Scalar;
+    sigChange();
+	Invariant();
 }
 
 void Interaction::SetMatrix(const Matrix3d& Matrix) {
-    sigChange();
     mData=Matrix3d(Matrix);
+	Invariant();
+    sigChange();
 }
 
 void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
-    sigChange();
     mData=Eigenvalues(XX,YY,ZZ,Orient);
-    return;
+	Invariant();
+    sigChange();
 }
 
 void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
-    sigChange();
     mData=AxRhom(iso,ax,rh,Orient);
-    return;
+	Invariant();
+    sigChange();
 }
 
 void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
     sigChange();
     mData=SpanSkew(iso,Span,Skew,Orient);
-    return;
+	Invariant();
 }
 
 
@@ -381,10 +385,13 @@ void Interaction::InitalSetType(Type t,Spin* spin1,Spin* spin2) {
     mType=t;
 	mSpin1 = spin1;
 	mSpin2 = spin2;
-	if(mSpin1)
+	if(mSpin1) {
 		mDyingConnect1=mSpin1->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
-	if(mSpin2)
+	}
+	if(mSpin2) {
 		mDyingConnect2=mSpin2->sigDying.connect(mem_fun(this,&Interaction::OnSpinDying));
+	}
+	Invariant();
 }
 
 void Interaction::SetType(Type t,Spin* spin1,Spin* spin2) {
@@ -551,6 +558,7 @@ bool Interaction::GetIsQuadratic() const {
 DEFINE_CONVERTER(getAsScalarVisitor,energy,ConvertToScalar);
 void Interaction::ToScalar() {
     mData=apply_visitor(getAsScalarVisitor(),mData);
+	Invariant();
 }
 energy Interaction::AsScalar() const {
     return apply_visitor(getAsScalarVisitor(),mData);
@@ -559,6 +567,7 @@ energy Interaction::AsScalar() const {
 DEFINE_CONVERTER(getAsMatrixVisitor,Matrix3d,ConvertToMatrix);
 void Interaction::ToMatrix() {
     mData=apply_visitor(getAsMatrixVisitor(),mData);
+	Invariant();
 }
 Matrix3d Interaction::AsMatrix() const {
     return apply_visitor(getAsMatrixVisitor(),mData);
@@ -567,6 +576,7 @@ Matrix3d Interaction::AsMatrix() const {
 DEFINE_CONVERTER(getAsEigenvaluesVisitor,Eigenvalues,ConvertToEigenvalues);
 void Interaction::ToEigenvalues() {
     mData=apply_visitor(getAsEigenvaluesVisitor(),mData);
+	Invariant();
 }
 Eigenvalues Interaction::AsEigenvalues() const {
     return apply_visitor(getAsEigenvaluesVisitor(),mData);
@@ -576,6 +586,7 @@ DEFINE_CONVERTER(getAsAxRhomVisitor,AxRhom,ConvertToAxRhom);
 void Interaction::ToAxRhom() {
     cout << "ToAxRhom" << endl;
     mData=apply_visitor(getAsAxRhomVisitor(),mData);
+	Invariant();
 }
 AxRhom Interaction::AsAxRhom() const {
     cout << "AsAxRhom" << endl;
@@ -585,6 +596,7 @@ AxRhom Interaction::AsAxRhom() const {
 DEFINE_CONVERTER(getAsSpanSkewVisitor,SpanSkew,ConvertToSpanSkew);
 void Interaction::ToSpanSkew() {
     mData=apply_visitor(getAsSpanSkewVisitor(),mData);
+	Invariant();
 }
 SpanSkew Interaction::AsSpanSkew() const {
     return apply_visitor(getAsSpanSkewVisitor(),mData);
@@ -616,6 +628,72 @@ void Interaction::valid_or_throw() const {
         break;
     default:
         throw runtime_error("Unknown, invalid type in Interaction");
+    }
+}
+
+class InvariantVisitor : public static_visitor<> {
+public:
+    void operator()(const energy& dat) const {
+		NaNPANIC(dat,"Interaction(Energy) is NaN");
+    }
+    void operator()(const Matrix3d& dat) const {
+		NaNPANIC(dat(0,0),"Interaction(Matrix3d) has a NaN");
+		NaNPANIC(dat(0,1),"Interaction(Matrix3d) has a NaN");
+		NaNPANIC(dat(0,2),"Interaction(Matrix3d) has a NaN");
+
+		NaNPANIC(dat(1,0),"Interaction(Matrix3d) has a NaN");
+		NaNPANIC(dat(1,1),"Interaction(Matrix3d) has a NaN");
+		NaNPANIC(dat(1,2),"Interaction(Matrix3d) has a NaN");
+
+		NaNPANIC(dat(2,0),"Interaction(Matrix3d) has a NaN");
+		NaNPANIC(dat(2,1),"Interaction(Matrix3d) has a NaN");
+		NaNPANIC(dat(2,2),"Interaction(Matrix3d) has a NaN");
+    }
+    void operator()(const Eigenvalues& dat) const {
+		NaNPANIC(dat.xx,"Interaction(Eigenvalues).xx has a NaN");
+		NaNPANIC(dat.yy,"Interaction(Eigenvalues).yy has a NaN");
+		NaNPANIC(dat.zz,"Interaction(Eigenvalues).zz has a NaN");
+    }
+    void operator()(const AxRhom& dat) const {
+		NaNPANIC(dat.ax ,"Interaction(AxRhom).ax  has a NaN");
+		NaNPANIC(dat.rh ,"Interaction(AxRhom).rh  has a NaN");
+		NaNPANIC(dat.iso,"Interaction(AxRhom).iso has a NaN");
+    }
+    void operator()(const SpanSkew& dat) const {
+		NaNPANIC(dat.span ,"Interaction(SpanSkew).span  has a NaN");
+		NaNPANIC(dat.skew ,"Interaction(SpanSkew).skew  has a NaN");
+		NaNPANIC(dat.iso,  "Interaction(SpanSkew).iso   has a NaN");
+    }
+};
+void Interaction::Invariant() const {
+	//Check the data for NaNs
+	apply_visitor(InvariantVisitor(),mData);
+	//Make sure the type makes sense
+    switch(mType) {
+    case ANY:
+    case NMR:
+    case EPR:
+		PANIC("Interaction has type ANY,NMR or EPR");
+        break;
+    case SCALAR:
+    case EXCHANGE:
+    case HFC:
+    case CUSTOM_BILINEAR:
+    case DIPOLAR:
+        if(mSpin1 == NULL || mSpin2 == NULL)
+            PANIC("Bilinar Interactions but one of mSpin1 or mSpin2 is null!");
+        break;
+    case CUSTOM_LINEAR:
+    case SHIELDING:
+    case G_TENSER:
+    case ZFS:
+    case QUADRUPOLAR:
+    case CUSTOM_QUADRATIC:
+        if(mSpin1 != NULL && mSpin2 != NULL)
+            PANIC("Linear or quadratic interaction but both mSpin1 and mSpin2 are not null");
+        break;
+    default:
+        PANIC("Unknown, invalid type in Interaction");
     }
 }
 

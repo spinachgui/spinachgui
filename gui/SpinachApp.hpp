@@ -21,7 +21,6 @@ namespace SpinXML {
 	class SpinSystem;
 	class ISpinSystemLoader;
 };
-void PANIC(std::string s);
 
 
 class SpinachApp : public wxApp {

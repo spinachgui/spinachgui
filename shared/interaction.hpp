@@ -137,37 +137,35 @@ namespace SpinXML {
         Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const Eigen::Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const Eigenvalues& inter ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const AxRhom& inter      ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const SpanSkew& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL)  {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
 	protected:
 		void InitalSetType(Type t,Spin* spin1, Spin* spin2);
 	public:
-        ///Copy constructor
-        Interaction(const Interaction& inter);
         ///Destructor
         ~Interaction();
 
@@ -271,7 +269,7 @@ namespace SpinXML {
 		///Returns true if the interaction involves Spin spin
 		bool GetHasSpin(const Spin* spin) const {return mSpin1 == spin || mSpin2 == spin;}
     private:
-
+		void Invariant() const;
         void valid_or_throw() const;
 
 		typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;

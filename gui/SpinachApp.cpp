@@ -13,6 +13,7 @@
 #include <shared/formats/castep.hpp>
 #include <shared/formats/simpson.hpp>
 #include <shared/formats/easyspin.hpp>
+#include <shared/panic.hpp>
 
 #include <wx/filename.h>
 
@@ -31,14 +32,6 @@ using namespace Eigen;
 extern char spinxmlSchema[];
 extern unsigned int spinxmlSchemaSize;
 
-void PANIC(string s) {
-	cout << "Panicking, " << s << endl;
-	int* x = NULL;
-	x++;
-	x--;
-	//Make use we use x with a side effect
-	cout << (*x) << endl;
-}
 
 template<typename T>
   class InvariantChecker {
@@ -202,7 +195,6 @@ bool SpinachApp::OnInit() {
 	//Set the active frame as the lab frame
 	SetFrame(mSS->GetLabFrame());
 
-	mSS->LoadFromFile("examples/Gaussian/ESR/methyl.log",g03);
 
 	/*
 	Spin* spin1 = new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16);

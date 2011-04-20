@@ -1,6 +1,7 @@
 
 #include <shared/frame.hpp>
 #include <Eigen/Geometry>
+#include <shared/panic.hpp>
 
 using namespace SpinXML;
 using namespace Eigen;
@@ -16,6 +17,7 @@ Frame::Frame(Vector3d translation, Orientation rotation, const UnitSystem* unitS
 	  mTranslate(translation * (unitSystem->lengthUnit.get_to_si())),
 	  mOrient(rotation),mUnitSystem(unitSystem) {
     updateAfine();
+	Invariant();
 }
 
 Frame::~Frame() {
@@ -29,12 +31,14 @@ void Frame::SetTranslation(const Vector3d& vec) {
     mTranslate = vec;
     updateAfine();
 	sigChange(this);
+	Invariant();
 }
 
 void Frame::SetOrientation(const Orientation orient) {
     mOrient = orient;
     updateAfine();
 	sigChange(this);
+	Invariant();
 }
 
 
@@ -51,6 +55,7 @@ void Frame::AddChild(Frame* frame) {
 	frame->mParent = frame;
 	sigChange(this);
 	frame->sigChange(frame);
+	Invariant();
 }
 
 
@@ -60,6 +65,37 @@ Matrix4d Frame::getTransformFromLab() const {
 
 Matrix4d Frame::getTransformToLab() const {
 	return mInvertedAffine;
+}
+
+
+void Frame::Invariant() const {
+	NaNPANIC(mTranslate.x(),"mTranslate.x is NaN");
+	NaNPANIC(mTranslate.y(),"mTranslate.x is NaN");
+	NaNPANIC(mTranslate.z(),"mTranslate.x is NaN");
+
+	NaNPANIC(mAffine(0,0),"mAffine containts a NaN element");
+	NaNPANIC(mAffine(0,1),"mAffine containts a NaN element");
+	NaNPANIC(mAffine(0,2),"mAffine containts a NaN element");
+
+	NaNPANIC(mAffine(1,0),"mAffine containts a NaN element");
+	NaNPANIC(mAffine(1,1),"mAffine containts a NaN element");
+	NaNPANIC(mAffine(1,2),"mAffine containts a NaN element");
+
+	NaNPANIC(mAffine(2,0),"mAffine containts a NaN element");
+	NaNPANIC(mAffine(2,1),"mAffine containts a NaN element");
+	NaNPANIC(mAffine(2,2),"mAffine containts a NaN element");
+
+	NaNPANIC(mInvertedAffine(0,0),"mInvertedAffine containts a NaN element");
+	NaNPANIC(mInvertedAffine(0,1),"mInvertedAffine containts a NaN element");
+	NaNPANIC(mInvertedAffine(0,2),"mInvertedAffine containts a NaN element");
+
+	NaNPANIC(mInvertedAffine(1,0),"mInvertedAffine containts a NaN element");
+	NaNPANIC(mInvertedAffine(1,1),"mInvertedAffine containts a NaN element");
+	NaNPANIC(mInvertedAffine(1,2),"mInvertedAffine containts a NaN element");
+
+	NaNPANIC(mInvertedAffine(2,0),"mInvertedAffine containts a NaN element");
+	NaNPANIC(mInvertedAffine(2,1),"mInvertedAffine containts a NaN element");
+	NaNPANIC(mInvertedAffine(2,2),"mInvertedAffine containts a NaN element");
 }
 
 

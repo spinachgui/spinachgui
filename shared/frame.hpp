@@ -63,6 +63,7 @@ namespace SpinXML {
         ///Emited when a ancesstor of this frame is changed.
         sigc::signal<void,Frame*> sigAncestorChange;
     private:
+		void Invariant() const;
         void updateAfine();
 
         Frame* mParent;

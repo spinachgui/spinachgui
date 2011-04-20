@@ -162,7 +162,7 @@ void InterEditPanel::LoadFromInter() {
 	//Populate the spin 2 combobox with every other spin
 	mSpin2Combo->Clear();
   
-	long spinCount=GetSS().GetSpinCount();
+	long spinCount=GetRawSS()->GetSpinCount();
 
 	for(long i=0;i<spinCount;i++) {
 		SpinView spin=GetSS().GetSpin(i);

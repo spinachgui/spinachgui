@@ -67,6 +67,36 @@ Matrix4d Frame::getTransformToLab() const {
 	return mInvertedAffine;
 }
 
+Vector3d ToLabVec3d(Frame* frame,const Vector3d& v) {
+	Vector3d vprime = Affine3d(frame->getTransformToLab()) * v;
+	NaNPANIC(vprime,"ToLabVec3D result is NaN");
+	return vprime;
+}
+Vector3d FromLabVec3d(Frame* frame,const Vector3d& v) {
+	Vector3d vprime = Affine3d(frame->getTransformFromLab()) * v;
+	NaNPANIC(vprime,"ToLabVec3D result is NaN");
+	return vprime;
+}
+
+Matrix3d ToLabMatrix3d(Frame* frame,const Matrix3d& m) {
+	Matrix3d RFromLab = Affine3d(frame->getTransformFromLab()).rotation();
+	Matrix3d RToLab   = Affine3d(frame->getTransformToLab()).rotation();
+	Matrix3d mprime   = RFromLab * m * RToLab;
+	NaNPANIC(mprime,"ToLabMatrix3d result is NaN");
+	return mprime;
+}
+Matrix3d FromLabMatrix3d(Frame* frame,const Matrix3d& m) {
+	Matrix3d RFromLab = Affine3d(frame->getTransformFromLab()).rotation();
+	Matrix3d RToLab   = Affine3d(frame->getTransformToLab()).rotation();
+	Matrix3d mprime   =  RToLab * m * RFromLab;
+	NaNPANIC(mprime,"ToLabMatrix3d result is NaN");
+	return mprime;
+}
+
+
+
+//================================================================================//
+
 
 void Frame::Invariant() const {
 	NaNPANIC(mTranslate.x(),"mTranslate.x is NaN");

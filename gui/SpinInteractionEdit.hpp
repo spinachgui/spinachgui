@@ -47,7 +47,7 @@ private:
 	EDIT_MODE mEditMode;
 
 	//Data
-	SpinXML::SpinView mSpin;
+	SpinXML::Spin* mSpin;
   
 	bool mUpdatingListBox;
 

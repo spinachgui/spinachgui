@@ -42,7 +42,7 @@ private:
 	OrientDialogCombo* mOrientSpanSkewCtrl;
 
 	SpinXML::Spin* mWithRespectTo;
-	SpinXML::InteractionView mInter;
+	SpinXML::Interaction* mInter;
 
 	///Update the interaction subtype drop down box. If subtypeWarning
 	///is set to true the user will be informed that the interaction has

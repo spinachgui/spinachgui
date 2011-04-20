@@ -174,57 +174,57 @@ struct FramePointer : public wxTreeItemData {
 class FrameTree : public wxTreeCtrl , public sigc::trackable {
 public:
 
-        FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
-                mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
+	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
+		mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
 
 
-                RefreshFromSpinSystem();
-                sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
-        }
+		RefreshFromSpinSystem();
+		sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
+	}
         
-        void RefreshFromSpinSystem() {
-                mapFrameToId.clear();
-                mapFrameToId[GetSS().GetLabFrame()] = mRoot;
+	void RefreshFromSpinSystem() {
+		mapFrameToId.clear();
+		mapFrameToId[GetRawSS()->GetLabFrame()] = mRoot;
 
-                RefreshFromSpinSystemRecursive(mRoot,GetRawSS()->GetLabFrame());
+		RefreshFromSpinSystemRecursive(mRoot,GetRawSS()->GetLabFrame());
 
-                mActive = mapFrameToId[GetFrame()];
-                SetItemBold(mActive);
-                Refresh(); //Seems like we need to explicitly ask for a
-                                   //repaint
-        }
+		mActive = mapFrameToId[GetFrame()];
+		SetItemBold(mActive);
+		Refresh(); //Seems like we need to explicitly ask for a
+		//repaint
+	}
 
-        void SlotFrameChange(Frame* frame) {
-                SetItemBold(mActive,false);
-                mActive = mapFrameToId[frame];
-                SetItemBold(mActive);
-                Refresh();
-        }
+	void SlotFrameChange(Frame* frame) {
+		SetItemBold(mActive,false);
+		mActive = mapFrameToId[frame];
+		SetItemBold(mActive);
+		Refresh();
+	}
 private:
-        void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
-                mapFrameToId[frame] = itemId;
-                vector<Frame*> children = frame->GetChildren();
-                for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
-                        wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
-                        RefreshFromSpinSystemRecursive(nextItemId,*i);
-                }
-        }
+	void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
+		mapFrameToId[frame] = itemId;
+		vector<Frame*> children = frame->GetChildren();
+		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
+			wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
+			RefreshFromSpinSystemRecursive(nextItemId,*i);
+		}
+	}
     
     void OnRightClick(wxTreeEvent& e) {
-                FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
-                RightClickMenu* menu = new RightClickMenu(this);
+		FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
+		RightClickMenu* menu = new RightClickMenu(this);
 
-                vector<RightClickAction*> actions;
-                actions.push_back(new RCActionActivateFrame(fp->frame));
+		vector<RightClickAction*> actions;
+		actions.push_back(new RCActionActivateFrame(fp->frame));
 
-                menu->Build(actions);
-                PopupMenu(menu);
-                delete menu;
+		menu->Build(actions);
+		PopupMenu(menu);
+		delete menu;
     }
     DECLARE_EVENT_TABLE();
-        wxTreeItemId mRoot;
-        wxTreeItemId mActive;
-        map<Frame*,wxTreeItemId> mapFrameToId;
+	wxTreeItemId mRoot;
+	wxTreeItemId mActive;
+	map<Frame*,wxTreeItemId> mapFrameToId;
 };
 
 

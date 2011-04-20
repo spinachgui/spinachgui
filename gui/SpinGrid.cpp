@@ -62,8 +62,8 @@ SpinGrid::SpinGrid(wxWindow* parent)
 
 	//Signals
 
-    GetSS().sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
-    GetSS().sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
+    GetRawSS()->sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
+    GetRawSS()->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
 	sigAnySpinDying.connect(mem_fun(this,&SpinGrid::SlotAnySpinDie));
 
 	sigHover.connect(mem_fun(this,&SpinGrid::SlotHover));
@@ -172,11 +172,11 @@ void SpinGrid::RefreshFromSpinSystem() {
 void SpinGrid::UpdateRow(long rowNumber) {
         length x,y,z;
 		cout << rowNumber << endl;
-        SpinView spin = GetSS().GetSpin(rowNumber);
-		spin.GetCoordinates(&x,&y,&z);
+        Spin* spin = GetRawSS()->GetSpin(rowNumber);
+		spin->GetCoordinates(&x,&y,&z);
 
         //Set the label
-        SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin.GetLabel(),wxConvUTF8));
+        SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
 
         //Set the x,y,z coordinates
         SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
@@ -184,8 +184,8 @@ void SpinGrid::UpdateRow(long rowNumber) {
         SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z);
 
         //Set the element and isotope
-        long element=spin.GetElement();
-        long isotope=spin.GetIsotope();
+        long element=spin->GetElement();
+        long isotope=spin->GetIsotope();
         wxString str(getElementSymbol(element),wxConvUTF8);
         str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
         SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
@@ -228,7 +228,8 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         GetCellValue(e.GetRow(),COL_Z).ToDouble(&z);
 
         Chkpoint(wxT("Spin Coordinates"));
-        GetSS().GetSpin(e.GetRow()).SetCoordinates(x,y,z);
+#warning "Frame/Unit translation goes here"
+        GetRawSS()->GetSpin(e.GetRow())->SetCoordinates(x,y,z);
     } else if(e.GetCol()==COL_ELEMENT) {
         wxString content=GetCellValue(e.GetRow(),e.GetCol());
         long space=content.Find(wxT(" "));

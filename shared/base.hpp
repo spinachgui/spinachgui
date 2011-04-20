@@ -6,7 +6,7 @@
 
 namespace SpinXML {
 
-	template<typename Derived,typename DerivedView>
+	template<typename Derived>
 	class SpinXMLBase  : public sigc::trackable {
 	public:
 		SpinXMLBase() : mFrame(NULL) {
@@ -14,10 +14,6 @@ namespace SpinXML {
 		}
 		~SpinXMLBase() {
 			sigDying(static_cast<Derived*>(this));
-		}
-
-		DerivedView GetView(const Frame* frame, const UnitSystem* unitSystem) {
-			return DerivedView(static_cast<Derived*>(this),frame,unitSystem);
 		}
 
 		Frame* GetPreferedFrame() {return mFrame;}
@@ -34,8 +30,8 @@ namespace SpinXML {
 		Frame* mFrame;
 	};
 
-	template<typename Derived,typename DerivedView>
-	sigc::signal<void> SpinXMLBase<Derived,DerivedView>::sigAnyChange;
+	template<typename Derived>
+	sigc::signal<void> SpinXMLBase<Derived>::sigAnyChange;
 };
 
 #endif

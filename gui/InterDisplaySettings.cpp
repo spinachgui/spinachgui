@@ -47,6 +47,7 @@ InterDisplaySettings::InterDisplaySettings(wxWindow* parent,Interaction::Type t)
 	mColour->SetColour(wxColour(c.r*256,c.g*256,c.b*256));
 
 				//Connect the scalling sliders to the scalling
+	GetLogSlider()->SetValue(GetInterSize(mType));
 	GetLogSlider()->sigChange.connect(bind(&SetInterSize,mType));
 
 	sigInterVisible.connect(mem_fun(this,&InterDisplaySettings::SlotVisible));

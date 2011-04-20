@@ -268,18 +268,18 @@ public:
 
 class InterDisplaySettingsPanel : public wxPanel,public sigc::trackable {
 public:
-        InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
-                wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
+	InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
+		wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
 
-                //HACK: Quick hack to iterate though an enum
-                for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
-                        Interaction::Type type = (Interaction::Type)i;
-                        InterDisplaySettings* widget = new InterDisplaySettings(this,type);
-                        bs->Add(widget,1,wxEXPAND);
-                }
+		//HACK: Quick hack to iterate though an enum
+		for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
+			Interaction::Type type = (Interaction::Type)i;
+			InterDisplaySettings* widget = new InterDisplaySettings(this,type);
+			bs->Add(widget,1,wxEXPAND);
+		}
 
-                this->SetSizer(bs);
-        }
+		this->SetSizer(bs);
+	}
 };
 
 

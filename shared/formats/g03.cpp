@@ -211,6 +211,12 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				}
 			}
 		} else if(line=="Isotropic Fermi Contact Couplings") {
+			if (isoHFC.size() > 0) {
+				//Sometimes Gaussian seems to just feel like giving
+				//you these twice. Assume the last occurence is the
+				//one we want
+				isoHFC.clear();
+			}
 			cout << "Isotropic couplings found" << endl;
 			//Skip a line
 			fin.getline(buff,500); line=buff; //Read a line
@@ -227,6 +233,12 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			}          
 		}
 		if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
+			if (anisoHFC.size() > 0) {
+				//Sometimes Gaussian seems to just feel like giving
+				//you these twice. Assume the last occurence is the
+				//one we want
+				anisoHFC.clear();
+			}
 			cout << "Anisotropic couplings found" << endl;
 			//Skip 4 lines
 			fin.getline(buff,500); line=buff; //Read a line

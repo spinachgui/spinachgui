@@ -82,8 +82,9 @@ namespace SpinXML {
     SpanSkew ConvertToSpanSkew(const SpanSkew& inter);
 
 
-    class Interaction : public SpinXMLBase<Interaction> {
+    class Interaction : public SpinXMLBase<Interaction>, private Counter<Interaction> {
     public:
+		using Counter<Interaction>::objCount;
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Enumeration of the storage conventions used by this interaction
         enum Storage {

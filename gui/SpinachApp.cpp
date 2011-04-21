@@ -21,6 +21,8 @@
 
 #include <gui/SpinachApp.hpp>
 
+#include <cstdlib>
+
 #ifndef __LINUX__
 #include <windows.h>
 #endif
@@ -109,7 +111,7 @@ void CheesyFrameChangerHandler(Frame* frame) {
 
 sigc::signal<void,SpinXML::Frame*> sigFrameChange;
 
-
+void leakReport();
 
 //--------------------------------------------------------------------------------//
 // The Application Object
@@ -129,6 +131,7 @@ int main(int argc,char** argv) {
 					   int nShowCmd) {
 
 #endif
+		atexit(&leakReport);
 		try {
 			gApp = new SpinachApp;
 			wxApp::SetInstance(gApp);
@@ -144,20 +147,28 @@ int main(int argc,char** argv) {
 		} catch (...) {
 			cerr << "Uncaught unknown exception." << endl;
 		}
+
+
+		return 0;
+	}
+
+	void leakReport() {
 		//Print out a memory leak report
 		cout << "========================================" << endl;
 		cout << "             Leak Report" << endl;
 		cout << "========================================" << endl;
+		cout << "Spin:" << Spin::objCount() << endl;
+		cout << "Interaction:" << Interaction::objCount() << endl;
+		cout << "Orientation:" << Orientation::objCount() << endl;
 		cout << "UnitSystem:" << UnitSystem::objCount() << endl;
 		cout << "========================================" << endl;
-
-		return 0;
 	}
 
 	SpinachApp::~SpinachApp() {
 		for(unsigned long i=0;i<mIOFilters.size();i++) {
 			delete mIOFilters[i];
 		}
+		delete mSS;
 	}
 
 	bool SpinachApp::OnInit() {

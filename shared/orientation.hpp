@@ -8,6 +8,7 @@
 #include <boost/variant.hpp>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <shared/objcounter.hpp>
 
 #define PI 3.141592653589793238462643
 using std::complex;
@@ -81,8 +82,10 @@ namespace SpinXML {
     Eigen::AngleAxisd  NormalizeRotation(const Eigen::AngleAxisd& rot);
 
     ///Class for storing a 3 dimentional rotation
-    class Orientation {
+    class Orientation : private Counter<Orientation> {
     public:
+		using Counter<Orientation>::objCount;
+
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Constructs the identity rotation
         Orientation() : mData(Eigen::Quaterniond(1,0,0,0)) {}

@@ -13,8 +13,9 @@
 namespace SpinXML {
 
     ///A class representing a spin in a spin system
-    class Spin : public SpinXMLBase<Spin> {
+    class Spin : public SpinXMLBase<Spin>, private Counter<Spin> {
     public:  
+		using Counter<Spin>::objCount;
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         Spin(Eigen::Vector3d mPosition,std::string mLabel,long atomicNumber=1,long isotope=-1);
         Spin(const Spin& s);

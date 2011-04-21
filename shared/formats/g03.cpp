@@ -250,9 +250,17 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				//Skip a line
 				fin.getline(buff,500); line=buff; //Read a line
 
-				Orientation o(MakeMatrix3d(x1,y1,z1,
-										   x2,y2,z2,
-										   x3,y3,z3));
+				Matrix3d mat3 = MakeMatrix3d(x1,y1,z1,
+											 x2,y2,z2,
+											 x3,y3,z3);
+
+				double det = mat3.determinant();
+				if(det < 0) {
+					//Sometimes gaussian produces inversions rather
+					mat3 = -mat3;
+				}
+				
+				Orientation o(mat3);
 
 				anisoHFC.push_back(Eigenvalues(eigenvalue1*MHz,eigenvalue2*MHz,eigenvalue3*MHz,o));
 			}

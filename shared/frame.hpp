@@ -75,12 +75,14 @@ namespace SpinXML {
         Eigen::Matrix4d mAffine;
         Eigen::Matrix4d mInvertedAffine;
     };
-    Eigen::Vector3d ToLabVec3d(Frame* frame,const Eigen::Vector3d& v);
-    Eigen::Vector3d FromLabVec3d(Frame* frame,const Eigen::Vector3d& v);
+    Eigen::Vector3d ToLabVec3d(const Frame* frame,const Eigen::Vector3d& v);
+    Eigen::Vector3d FromLabVec3d(const Frame* frame,const Eigen::Vector3d& v);
 
-    Eigen::Matrix3d ToLabMatrix3d(Frame* frame,const Eigen::Matrix3d& m);
-    Eigen::Matrix3d FromLabMatrix3d(Frame* frame,const Eigen::Matrix3d& m);
+    Eigen::Matrix3d ToLabMatrix3d(const Frame* frame,const Eigen::Matrix3d& m);
+    Eigen::Matrix3d FromLabMatrix3d(const Frame* frame,const Eigen::Matrix3d& m);
 
+	Orientation ToLabOrient(const Frame* frame,const Orientation& o);
+	Orientation FromLabOrient(const Frame* frame,const Orientation& o);
 };
 
 #endif

@@ -166,8 +166,11 @@ namespace SpinXML {
         Eigen::AngleAxisd  GetAsAngleAxis() const;
         Eigen::Quaterniond GetAsQuaternion() const;
 
-    private:
         typedef boost::variant<EulerAngles,Eigen::AngleAxisd,Eigen::Quaterniond,Eigen::Matrix3d> var_t;
+
+		//HACK
+		const var_t& __get_variant() const {return mData;}
+    private:
         var_t mData;
     };
 };

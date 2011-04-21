@@ -3,8 +3,13 @@
 #include <Eigen/Geometry>
 #include <shared/panic.hpp>
 
+#include <boost/variant/static_visitor.hpp>
+#include <boost/variant/apply_visitor.hpp>
+
+
 using namespace SpinXML;
 using namespace Eigen;
+using namespace boost;
 
 UnitSystem::UnitSystem()
 	: energyUnit(unit("Joules",1.0)),lengthUnit(unit("Metres",1.0)),timeUnit(unit("Seconds",1.0)) {
@@ -67,30 +72,96 @@ Matrix4d Frame::getTransformToLab() const {
 	return mInvertedAffine;
 }
 
-Vector3d SpinXML::ToLabVec3d(Frame* frame,const Vector3d& v) {
+Vector3d SpinXML::ToLabVec3d(const Frame* frame,const Vector3d& v) {
 	Vector3d vprime = Affine3d(frame->getTransformToLab()) * v;
 	NaNPANIC(vprime,"ToLabVec3D result is NaN");
 	return vprime;
 }
-Vector3d SpinXML::FromLabVec3d(Frame* frame,const Vector3d& v) {
+Vector3d SpinXML::FromLabVec3d(const Frame* frame,const Vector3d& v) {
 	Vector3d vprime = Affine3d(frame->getTransformFromLab()) * v;
 	NaNPANIC(vprime,"ToLabVec3D result is NaN");
 	return vprime;
 }
 
-Matrix3d SpinXML::ToLabMatrix3d(Frame* frame,const Matrix3d& m) {
+Matrix3d SpinXML::ToLabMatrix3d(const Frame* frame,const Matrix3d& m) {
 	Matrix3d RFromLab = Affine3d(frame->getTransformFromLab()).rotation();
 	Matrix3d RToLab   = Affine3d(frame->getTransformToLab()).rotation();
 	Matrix3d mprime   = RFromLab * m * RToLab;
 	NaNPANIC(mprime,"ToLabMatrix3d result is NaN");
 	return mprime;
 }
-Matrix3d SpinXML::FromLabMatrix3d(Frame* frame,const Matrix3d& m) {
+Matrix3d SpinXML::FromLabMatrix3d(const Frame* frame,const Matrix3d& m) {
 	Matrix3d RFromLab = Affine3d(frame->getTransformFromLab()).rotation();
 	Matrix3d RToLab   = Affine3d(frame->getTransformToLab()).rotation();
 	Matrix3d mprime   =  RToLab * m * RFromLab;
 	NaNPANIC(mprime,"ToLabMatrix3d result is NaN");
 	return mprime;
+}
+
+
+struct toLabVisitor : public static_visitor<Orientation> {
+	toLabVisitor(const Frame* frame_)
+		: frame(frame_) {
+	}
+	Orientation operator()(const EulerAngles& dat) const {
+		Matrix3d mat3 = Affine3d(frame->getTransformToLab()).rotation();
+		Quaterniond q = ConvertToQuaternion(mat3);
+		Quaterniond qdat = ConvertToQuaternion(dat);
+		return Orientation(ConvertToEuler(q*qdat*q.conjugate()));
+	}
+	Orientation operator()(const Matrix3d& dat) const    {
+		return Orientation(ToLabMatrix3d(frame,dat));
+	}
+	Orientation operator()(const Quaterniond& dat) const {
+		Matrix3d mat3 = Affine3d(frame->getTransformToLab()).rotation();
+		Quaterniond q = ConvertToQuaternion(mat3);
+		return Orientation(q*dat*q.conjugate());
+	}
+	Orientation operator()(const AngleAxisd& dat) const  {
+		Matrix3d mat3 = Affine3d(frame->getTransformToLab()).rotation();
+		Quaterniond q = ConvertToQuaternion(mat3);
+		Quaterniond qDat = ConvertToQuaternion(dat);
+		return Orientation(ConvertToAngleAxis(q*qDat*q.conjugate()));
+	}
+
+	const Frame* frame;
+};
+Orientation SpinXML::ToLabOrient(const Frame* frame,const Orientation& o) {
+    Orientation normalized=o.Normalized();
+    return apply_visitor(toLabVisitor(frame),normalized.__get_variant());
+}
+
+
+struct fromLabVisitor : public static_visitor<Orientation> {
+	fromLabVisitor(const Frame* frame_)
+		: frame(frame_) {
+	}
+	Orientation operator()(const EulerAngles& dat) const {
+		Matrix3d mat3 = Affine3d(frame->getTransformFromLab()).rotation();
+		Quaterniond q = ConvertToQuaternion(mat3);
+		Quaterniond qdat = ConvertToQuaternion(dat);
+		return Orientation(ConvertToEuler(q*qdat*q.conjugate()));
+	}
+	Orientation operator()(const Matrix3d& dat) const    {
+		return Orientation(FromLabMatrix3d(frame,dat));
+	}
+	Orientation operator()(const Quaterniond& dat) const {
+		Matrix3d mat3 = Affine3d(frame->getTransformFromLab()).rotation();
+		Quaterniond q = ConvertToQuaternion(mat3);
+		return Orientation(q*dat*q.conjugate());
+	}
+	Orientation operator()(const AngleAxisd& dat) const  {
+		Matrix3d mat3 = Affine3d(frame->getTransformFromLab()).rotation();
+		Quaterniond q = ConvertToQuaternion(mat3);
+		Quaterniond qDat = ConvertToQuaternion(dat);
+		return Orientation(ConvertToAngleAxis(q*qDat*q.conjugate()));
+	}
+
+	const Frame* frame;
+};
+Orientation SpinXML::FromLabOrient(const Frame* frame,const Orientation& o) {
+    Orientation normalized=o.Normalized();
+    return apply_visitor(fromLabVisitor(frame),normalized.__get_variant());
 }
 
 

@@ -180,7 +180,7 @@ void InterEditPanel::LoadFromInter() {
 		mTypeChoiceBook->SetSelection(0);
 	} else if(mInter->GetStorage()==Interaction::MATRIX) {
 		Matrix3d mat = mInter->AsMatrix() / GetUnitSystem()->energyUnit;
-#warning "Frame translation goes here"
+		mat = FromLabMatrix3d(GetFrame(),mat);
 
 		mMatXXCtrl->SetValue(wxString() << mat(0,0));
 		mMatXYCtrl->SetValue(wxString() << mat(0,1));
@@ -198,7 +198,7 @@ void InterEditPanel::LoadFromInter() {
 	} else if(mInter->GetStorage()==Interaction::EIGENVALUES) {
 		Eigenvalues ev = mInter->AsEigenvalues();
 		Orientation o = ev.mOrient;
-#warning "Frame translation goes here"
+		o = FromLabOrient(GetFrame(),o);
 
 		mEigenXXCtrl->SetValue(wxString() << ev.xx / GetUnitSystem()->energyUnit);
 		mEigenYYCtrl->SetValue(wxString() << ev.yy / GetUnitSystem()->energyUnit);
@@ -210,8 +210,9 @@ void InterEditPanel::LoadFromInter() {
 
 	} else if(mInter->GetStorage()==Interaction::AXRHOM) {
 		AxRhom ar = mInter->AsAxRhom();
-#warning "Frame translation goes here"
 		Orientation o = ar.mOrient;
+		o = FromLabOrient(GetFrame(),o);
+
 		mAxCtrl->       SetValue(wxString() << ar.ax  / GetUnitSystem()->energyUnit);
 		mRhomCtrl->     SetValue(wxString() << ar.rh  / GetUnitSystem()->energyUnit);
 		mAxRhomIsoCtrl->SetValue(wxString() << ar.iso / GetUnitSystem()->energyUnit);
@@ -221,8 +222,9 @@ void InterEditPanel::LoadFromInter() {
 		mTypeChoiceBook->SetSelection(3);
 	} else if(mInter->GetStorage()==Interaction::SPANSKEW) {
 		SpanSkew spanSkew = mInter->AsSpanSkew();
-#warning "Frame translation goes here"
 		Orientation o = spanSkew.mOrient;
+		o = FromLabOrient(GetFrame(),o);
+
 		mSpanCtrl->       SetValue(wxString() << spanSkew.span);
 		mSkewCtrl->       SetValue(wxString() << spanSkew.skew);
 		mSpanSkewIsoCtrl->SetValue(wxString() << spanSkew.iso);
@@ -260,10 +262,10 @@ void InterEditPanel::SaveToInter() {
 		mMatZYCtrl->GetValue().ToDouble(&zy);
 		mMatZZCtrl->GetValue().ToDouble(&zz);
 
-#warning "Frame translation goes here"
-		mInter->SetMatrix(MakeMatrix3d(xx,xy,xz,
-									   yx,yy,yz,
-									   zx,zy,zz) * GetUnitSystem()->energyUnit);
+		Matrix3d mat3 = MakeMatrix3d(xx,xy,xz,
+									 yx,yy,yz,
+									 zx,zy,zz) * GetUnitSystem()->energyUnit;
+		mInter->SetMatrix(ToLabMatrix3d(GetFrame(),mat3));
 
 	} else if(storage==Interaction::EIGENVALUES) {
 		double xx,yy,zz;
@@ -272,10 +274,10 @@ void InterEditPanel::SaveToInter() {
 		mEigenYYCtrl->GetValue().ToDouble(&yy);
 		mEigenZZCtrl->GetValue().ToDouble(&zz);
  
-#warning "Frame translation goes here"
 		mInter->SetEigenvalues(xx * GetUnitSystem()->energyUnit,
 							   yy * GetUnitSystem()->energyUnit,
-							   zz * GetUnitSystem()->energyUnit,mOrientEigenvalueCtrl->GetOrient());
+							   zz * GetUnitSystem()->energyUnit,
+							   ToLabOrient(GetFrame(),mOrientEigenvalueCtrl->GetOrient()));
 
 	} else if(storage==Interaction::AXRHOM) {
 		double ax,rhom,iso;
@@ -283,10 +285,11 @@ void InterEditPanel::SaveToInter() {
 		mAxCtrl->       GetValue().ToDouble(&ax);
 		mRhomCtrl->     GetValue().ToDouble(&rhom);
 		mAxRhomIsoCtrl->GetValue().ToDouble(&iso);
-#warning "Frame translation goes here"
+
 		mInter->SetAxRhom(iso * GetUnitSystem()->energyUnit,
 						  ax  * GetUnitSystem()->energyUnit,
-						  rhom* GetUnitSystem()->energyUnit, mOrientAxRhomCtrl->GetOrient());
+						  rhom* GetUnitSystem()->energyUnit,
+						  ToLabOrient(GetFrame(),mOrientAxRhomCtrl->GetOrient()));
 	} else if(storage==Interaction::SPANSKEW) {
 		double span,skew,iso;
 
@@ -294,10 +297,10 @@ void InterEditPanel::SaveToInter() {
 		mSkewCtrl->       GetValue().ToDouble(&skew);
 		mSpanSkewIsoCtrl->GetValue().ToDouble(&iso);
 
-#warning "Frame translation goes here"
 		mInter->SetSpanSkew(iso * GetUnitSystem()->energyUnit,
 							span * GetUnitSystem()->energyUnit,
-							skew,mOrientSpanSkewCtrl->GetOrient());
+							skew,
+							ToLabOrient(GetFrame(),mOrientSpanSkewCtrl->GetOrient()));
 	}
 	interChangeConnect.unblock();
 }

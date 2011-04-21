@@ -60,6 +60,12 @@ void SpinInterEditPanel::LoadFromSpin() {
 	}
 
 	UpdateListBox();
+	//Make sure that when we select a new spin, an interaction is
+	//loaded if possible. Reduces the amount of clicking a user needs
+	//to do.
+	if(mInterListBox->GetCount() > 0) {
+		mInterListBox->SetSelection(0);
+	}
 	InteractionChange();
 }
 

@@ -123,220 +123,220 @@ SpinachApp& wxGetApp() {
 #ifdef __LINUX__
 int main(int argc,char** argv) {
 #else
-int WINAPI WinMain(HINSTANCE hInstance,
-		   HINSTANCE hPrevInstance,
-		   LPSTR lpCmdLine,
-		   int nShowCmd) {
+	int WINAPI WinMain(HINSTANCE hInstance,
+					   HINSTANCE hPrevInstance,
+					   LPSTR lpCmdLine,
+					   int nShowCmd) {
 
 #endif
-  try {
-    gApp = new SpinachApp;
-    wxApp::SetInstance(gApp);
+		try {
+			gApp = new SpinachApp;
+			wxApp::SetInstance(gApp);
 #ifdef __LINUX__
-   wxEntry(argc,argv);
+			wxEntry(argc,argv);
 #else
-   wxEntry(hInstance,hPrevInstance,NULL,nShowCmd);
+			wxEntry(hInstance,hPrevInstance,NULL,nShowCmd);
 #endif
-  } catch (logic_error& e) {
-    cerr << "Uncaught logic_error what()=" << e.what() << endl;
-  } catch (runtime_error& e) {
-    cerr << "Uncaught runtime_error what()=" << e.what() << endl;
-  } catch (...) {
-    cerr << "Uncaught unknown exception." << endl;
-  }
-  //Print out a memory leak report
-  cout << "========================================" << endl;
-  cout << "             Leak Report" << endl;
-  cout << "========================================" << endl;
-  cout << "UnitSystem:" << UnitSystem::objCount() << endl;
-  cout << "========================================" << endl;
+		} catch (logic_error& e) {
+			cerr << "Uncaught logic_error what()=" << e.what() << endl;
+		} catch (runtime_error& e) {
+			cerr << "Uncaught runtime_error what()=" << e.what() << endl;
+		} catch (...) {
+			cerr << "Uncaught unknown exception." << endl;
+		}
+		//Print out a memory leak report
+		cout << "========================================" << endl;
+		cout << "             Leak Report" << endl;
+		cout << "========================================" << endl;
+		cout << "UnitSystem:" << UnitSystem::objCount() << endl;
+		cout << "========================================" << endl;
 
-  return 0;
-}
+		return 0;
+	}
 
-SpinachApp::~SpinachApp() {
-    for(unsigned long i=0;i<mIOFilters.size();i++) {
-        delete mIOFilters[i];
-    }
-}
-
-bool SpinachApp::OnInit() {
-	printf("%p %u\n",spinxmlSchema, spinxmlSchemaSize);
-    //Load the I/O Filters
-
-	ISpinSystemLoader* g03 = new G03Loader;
-
-    mIOFilters.push_back(g03);
-    mIOFilters.push_back(new SIMPSONLoader);
-    mIOFilters.push_back(new CASTEPLoader);
-    mIOFilters.push_back(new EasySpinLoader);
-    mIOFilters.push_back(new XMLLoader(spinxmlSchema));
-
-	//Connect up the selection manager so that when a spin is deleted
-	//it also gets unselected
-	sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
-
-	//Setup a sensible system of units
-	gUnitSystem.energyUnit = MHz;
-	gUnitSystem.lengthUnit = Angstroms;
-
-	sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
-	sigFrameChange.connect(sigc::ptr_fun(&CheesyFrameChangerHandler));
-
-    //Load the isotopes
-
-    try {
-		LoadIsotopes();
-    } catch(runtime_error e) {
-        cout << "Isotopes not loaded" << endl;
-        wxLogError(wxString() <<
-                   wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") <<
-                   wxT("Message was:") <<
-                   wxString(e.what(),wxConvUTF8));
-        return false;
-    }
-
-
-    mSS = new SpinSystem;
-	//Set the active frame as the lab frame
-	SetFrame(mSS->GetLabFrame());
-
-
-	/*
-	Spin* spin1 = new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16);
-	mSS->InsertSpin(spin1);
-
-	Spin* spin2 = new Spin(Vector3d(0,1e-10,0),"Test Spin B",1,1);
-	mSS->InsertSpin(spin2);
-
-	Spin* spin3 = new Spin(Vector3d(0,0,0)    ,"Test Spin O",1,1);
-	mSS->InsertSpin(spin3);
-
-	mSS->CalcNuclearDipoleDipole();
-
-	mSS->InsertInteraction(new Interaction(10*MHz,Interaction::SHIELDING,spin1));
-
-	mSS->InsertInteraction(new Interaction(Eigenvalues(10*MHz,20*MHz,50*MHz,Orientation()),Interaction::SHIELDING,spin2));
-
-
-	mSS->GetLabFrame()->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
-	Frame* f1 = new Frame(Vector3d(3,-2,0),Orientation(EulerAngles(1,2,0)),GetUnitSystem());
-
-	mSS->GetLabFrame()->AddChild(f1);
-
-	f1->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
-	*/
-    RootFrame* frame = new RootFrame(NULL);
-    frame->Show();
-
-    return true;
-}
-
-//============================================================//
-// Selection Manager
-
-sigc::signal<void,SpinXML::Spin*>            sigHover;
-sigc::signal<void,std::set<SpinXML::Spin*> > sigSelectChange;
-
-
-Spin* gHover;
-set<Spin*> gSelection;
-
-typedef set<Spin*>::iterator itor;
-
-//Selection Manager Invariants
-
-void AssertSelectionExists() {
-	std::vector<Spin*> spins = GetRawSS()->GetSpins();
-	for(itor i = gSelection.begin();i!=gSelection.end();++i) {
-		if(find(spins.begin(),spins.end(),*i) == spins.end()) {
-			PANIC("A spin in the selection manager was not present in the spin system");
+	SpinachApp::~SpinachApp() {
+		for(unsigned long i=0;i<mIOFilters.size();i++) {
+			delete mIOFilters[i];
 		}
 	}
-}
 
-//Selection Readers
+	bool SpinachApp::OnInit() {
+		printf("%p %u\n",spinxmlSchema, spinxmlSchemaSize);
+		//Load the I/O Filters
 
-bool IsSelected(SpinXML::Spin* spin)  {
-	AssertSelectionExists();
-	return gSelection.find(spin) != gSelection.end();
-}
+		ISpinSystemLoader* g03 = new G03Loader;
 
-unsigned int GetSelectedCount(){
-	AssertSelectionExists();
-	return gSelection.size();
-}
+		mIOFilters.push_back(g03);
+		mIOFilters.push_back(new SIMPSONLoader);
+		mIOFilters.push_back(new CASTEPLoader);
+		mIOFilters.push_back(new EasySpinLoader);
+		mIOFilters.push_back(new XMLLoader(spinxmlSchema));
 
-const set<Spin*>& GetSelection() {
-	AssertSelectionExists();
-	return gSelection;
-}
+		//Connect up the selection manager so that when a spin is deleted
+		//it also gets unselected
+		sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
 
-Spin* GetHover() {
-	return gHover;
-}
+		//Setup a sensible system of units
+		gUnitSystem.energyUnit = MHz;
+		gUnitSystem.lengthUnit = Angstroms;
 
-//Selection Writers
+		sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
+		sigFrameChange.connect(sigc::ptr_fun(&CheesyFrameChangerHandler));
 
-void ClearSelection() {
-	AssertSelectionExists();
-	gSelection.clear();
-	sigSelectChange(gSelection);
-}
+		//Load the isotopes
 
-void DeleteSelectedSpins(){
-	AssertSelectionExists();
-	for(set<Spin*>::iterator i=gSelection.begin();i!=gSelection.end();) {
-		//i is about to be invalidated, so save it and incriment before erasing
-		set<Spin*>::iterator j = i;
-		++j;
-		cout << "Calling the destructor of spin" << *i << endl;
-		delete (*i);
-		i = j;
+		try {
+			LoadIsotopes();
+		} catch(runtime_error e) {
+			cout << "Isotopes not loaded" << endl;
+			wxLogError(wxString() <<
+					   wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") <<
+					   wxT("Message was:") <<
+					   wxString(e.what(),wxConvUTF8));
+			return false;
+		}
+
+
+		mSS = new SpinSystem;
+		//Set the active frame as the lab frame
+		SetFrame(mSS->GetLabFrame());
+
+
+		/*
+		  Spin* spin1 = new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16);
+		  mSS->InsertSpin(spin1);
+
+		  Spin* spin2 = new Spin(Vector3d(0,1e-10,0),"Test Spin B",1,1);
+		  mSS->InsertSpin(spin2);
+
+		  Spin* spin3 = new Spin(Vector3d(0,0,0)    ,"Test Spin O",1,1);
+		  mSS->InsertSpin(spin3);
+
+		  mSS->CalcNuclearDipoleDipole();
+
+		  mSS->InsertInteraction(new Interaction(10*MHz,Interaction::SHIELDING,spin1));
+
+		  mSS->InsertInteraction(new Interaction(Eigenvalues(10*MHz,20*MHz,50*MHz,Orientation()),Interaction::SHIELDING,spin2));
+
+
+		  mSS->GetLabFrame()->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
+		  Frame* f1 = new Frame(Vector3d(3,-2,0),Orientation(EulerAngles(1,2,0)),GetUnitSystem());
+
+		  mSS->GetLabFrame()->AddChild(f1);
+
+		  f1->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
+		*/
+		RootFrame* frame = new RootFrame(NULL);
+		frame->Show();
+
+		return true;
 	}
-	AssertSelectionExists();
-};
 
-void SetHover(SpinXML::Spin* spin) {
-    gHover=spin;
-    sigHover(spin);
-}
+	//============================================================//
+	// Selection Manager
 
-
-void SetSelection(Spin* spin) {
-	AssertSelectionExists();
-	ClearSelection();
-
-	gSelection.insert(spin);
-    sigSelectChange(gSelection);
-	AssertSelectionExists();
-}
+	sigc::signal<void,SpinXML::Spin*>            sigHover;
+	sigc::signal<void,std::set<SpinXML::Spin*> > sigSelectChange;
 
 
-void SetSelection(set<SpinXML::Spin*>& selection) {
-	AssertSelectionExists();
-	ClearSelection();
-	gSelection = selection;
-    sigSelectChange(gSelection);
-	AssertSelectionExists();
-}
+	Spin* gHover;
+	set<Spin*> gSelection;
 
-void AddSelection(SpinXML::Spin* spinToAdd) {
-	if(spinToAdd == NULL) return;
-	AssertSelectionExists();
-	gSelection.insert(spinToAdd);
-	sigSelectChange(gSelection);
-	AssertSelectionExists();
-}
+	typedef set<Spin*>::iterator itor;
 
-void RemoveSelection(SpinXML::Spin* spin) {
-	set<Spin*>::iterator i = gSelection.find(spin);
-	if(i != gSelection.end()) {
-		gSelection.erase(i);
+	//Selection Manager Invariants
+
+	void AssertSelectionExists() {
+		std::vector<Spin*> spins = GetRawSS()->GetSpins();
+		for(itor i = gSelection.begin();i!=gSelection.end();++i) {
+			if(find(spins.begin(),spins.end(),*i) == spins.end()) {
+				PANIC("A spin in the selection manager was not present in the spin system");
+			}
+		}
+	}
+
+	//Selection Readers
+
+	bool IsSelected(SpinXML::Spin* spin)  {
+		AssertSelectionExists();
+		return gSelection.find(spin) != gSelection.end();
+	}
+
+	unsigned int GetSelectedCount(){
+		AssertSelectionExists();
+		return gSelection.size();
+	}
+
+	const set<Spin*>& GetSelection() {
+		AssertSelectionExists();
+		return gSelection;
+	}
+
+	Spin* GetHover() {
+		return gHover;
+	}
+
+	//Selection Writers
+
+	void ClearSelection() {
+		AssertSelectionExists();
+		gSelection.clear();
 		sigSelectChange(gSelection);
 	}
-	AssertSelectionExists();
-}
+
+	void DeleteSelectedSpins(){
+		AssertSelectionExists();
+		for(set<Spin*>::iterator i=gSelection.begin();i!=gSelection.end();) {
+			//i is about to be invalidated, so save it and incriment before erasing
+			set<Spin*>::iterator j = i;
+			++j;
+			cout << "Calling the destructor of spin" << *i << endl;
+			delete (*i);
+			i = j;
+		}
+		AssertSelectionExists();
+	};
+
+	void SetHover(SpinXML::Spin* spin) {
+		gHover=spin;
+		sigHover(spin);
+	}
+
+
+	void SetSelection(Spin* spin) {
+		AssertSelectionExists();
+		ClearSelection();
+
+		gSelection.insert(spin);
+		sigSelectChange(gSelection);
+		AssertSelectionExists();
+	}
+
+
+	void SetSelection(set<SpinXML::Spin*>& selection) {
+		AssertSelectionExists();
+		ClearSelection();
+		gSelection = selection;
+		sigSelectChange(gSelection);
+		AssertSelectionExists();
+	}
+
+	void AddSelection(SpinXML::Spin* spinToAdd) {
+		if(spinToAdd == NULL) return;
+		AssertSelectionExists();
+		gSelection.insert(spinToAdd);
+		sigSelectChange(gSelection);
+		AssertSelectionExists();
+	}
+
+	void RemoveSelection(SpinXML::Spin* spin) {
+		set<Spin*>::iterator i = gSelection.find(spin);
+		if(i != gSelection.end()) {
+			gSelection.erase(i);
+			sigSelectChange(gSelection);
+		}
+		AssertSelectionExists();
+	}
 
 
 

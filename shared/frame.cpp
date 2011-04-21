@@ -5,11 +5,12 @@
 
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
-
+#include <iostream>
 
 using namespace SpinXML;
 using namespace Eigen;
 using namespace boost;
+using namespace std;
 
 UnitSystem::UnitSystem()
 	: energyUnit(unit("Joules",1.0)),lengthUnit(unit("Metres",1.0)),timeUnit(unit("Seconds",1.0)) {
@@ -50,6 +51,9 @@ void Frame::SetOrientation(const Orientation orient) {
 void Frame::updateAfine() {
     Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsQuaternion());
 	Matrix4d mat = T.matrix();
+	cout << "In updateAffine, mat=" << endl;
+	cout << mat << endl;
+	cout << endl;
 	Matrix4d imat = T.inverse().matrix();
     mAffine =         (mParent==NULL) ? mat : mParent->mAffine*mat;
     mInvertedAffine = (mParent==NULL) ? imat : imat * mParent->mInvertedAffine;

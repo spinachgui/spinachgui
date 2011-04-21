@@ -269,7 +269,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 		ss->InsertInteraction(inter);
 
 	}
-
+	ss->SetupLabFrame();
 	cout << "Finished loading the g03 file, saving ss->GetSpinCount()=" << ss->GetSpinCount() << endl;
 }
 

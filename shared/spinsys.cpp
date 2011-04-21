@@ -34,6 +34,11 @@ SpinSystem::SpinSystem(const SpinSystem& system)
 }
 
 
+void SpinSystem::SetupLabFrame() {
+	delete mRootFrame;
+	mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
+}
+
 SpinSystem::~SpinSystem() {
     Clear();
 	delete mRootFrame;

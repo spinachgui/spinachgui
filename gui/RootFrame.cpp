@@ -486,6 +486,7 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
 
         }
     }
+	SetFrame(GetRawSS()->GetLabFrame());
     Chkpoint(wxT("Load File"));
     UpdateTitle();
 }

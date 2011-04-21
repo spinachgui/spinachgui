@@ -174,12 +174,14 @@ void InterEditPanel::LoadFromInter() {
 	}
 	cout << "About the start testing types" << endl;
 
+	unit energyUnit = mInter->GetType() == Interaction::G_TENSER ? Unitless : GetUnitSystem()->energyUnit;
+   
 	if(mInter->GetStorage()==Interaction::STORAGE_SCALAR) {
-		energy scalar = mInter->AsScalar() / GetUnitSystem()->energyUnit;
+		energy scalar = mInter->AsScalar() / energyUnit;
 		mScalarCtrl->SetValue(wxString() << scalar);
 		mTypeChoiceBook->SetSelection(0);
 	} else if(mInter->GetStorage()==Interaction::MATRIX) {
-		Matrix3d mat = mInter->AsMatrix() / GetUnitSystem()->energyUnit;
+		Matrix3d mat = mInter->AsMatrix() / energyUnit;
 		mat = FromLabMatrix3d(GetFrame(),mat);
 
 		mMatXXCtrl->SetValue(wxString() << mat(0,0));
@@ -200,9 +202,9 @@ void InterEditPanel::LoadFromInter() {
 		Orientation o = ev.mOrient;
 		o = FromLabOrient(GetFrame(),o);
 
-		mEigenXXCtrl->SetValue(wxString() << ev.xx / GetUnitSystem()->energyUnit);
-		mEigenYYCtrl->SetValue(wxString() << ev.yy / GetUnitSystem()->energyUnit);
-		mEigenZZCtrl->SetValue(wxString() << ev.zz / GetUnitSystem()->energyUnit);
+		mEigenXXCtrl->SetValue(wxString() << ev.xx / energyUnit);
+		mEigenYYCtrl->SetValue(wxString() << ev.yy / energyUnit);
+		mEigenZZCtrl->SetValue(wxString() << ev.zz / energyUnit);
     
 		mOrientEigenvalueCtrl->SetOrient(o);
 
@@ -213,9 +215,9 @@ void InterEditPanel::LoadFromInter() {
 		Orientation o = ar.mOrient;
 		o = FromLabOrient(GetFrame(),o);
 
-		mAxCtrl->       SetValue(wxString() << ar.ax  / GetUnitSystem()->energyUnit);
-		mRhomCtrl->     SetValue(wxString() << ar.rh  / GetUnitSystem()->energyUnit);
-		mAxRhomIsoCtrl->SetValue(wxString() << ar.iso / GetUnitSystem()->energyUnit);
+		mAxCtrl->       SetValue(wxString() << ar.ax  / energyUnit);
+		mRhomCtrl->     SetValue(wxString() << ar.rh  / energyUnit);
+		mAxRhomIsoCtrl->SetValue(wxString() << ar.iso / energyUnit);
 		cout << "Set everything but the orientation" << endl;
 		mOrientAxRhomCtrl->SetOrient(o);
 
@@ -225,9 +227,9 @@ void InterEditPanel::LoadFromInter() {
 		Orientation o = spanSkew.mOrient;
 		o = FromLabOrient(GetFrame(),o);
 
-		mSpanCtrl->       SetValue(wxString() << spanSkew.span);
+		mSpanCtrl->       SetValue(wxString() << spanSkew.span / energyUnit);
 		mSkewCtrl->       SetValue(wxString() << spanSkew.skew);
-		mSpanSkewIsoCtrl->SetValue(wxString() << spanSkew.iso);
+		mSpanSkewIsoCtrl->SetValue(wxString() << spanSkew.iso  / energyUnit);
 
 		mOrientSpanSkewCtrl->SetOrient(o);
 
@@ -242,10 +244,13 @@ void InterEditPanel::LoadFromInter() {
 void InterEditPanel::SaveToInter() {
 	interChangeConnect.block();
 	Interaction::Storage storage = StorageOrders[mTypeChoiceBook->GetSelection()];
+
+	unit energyUnit = mInter->GetType() == Interaction::G_TENSER ? Unitless : GetUnitSystem()->energyUnit;
+
 	if(storage==Interaction::STORAGE_SCALAR) {
 		double scalar;
 		mScalarCtrl->GetValue().ToDouble(&scalar);
-		mInter->SetScalar(scalar * GetUnitSystem()->energyUnit);
+		mInter->SetScalar(scalar * energyUnit);
 	} else if(storage==Interaction::MATRIX) {
 		double xx,xy,xz;
 		double yx,yy,yz;
@@ -264,7 +269,7 @@ void InterEditPanel::SaveToInter() {
 
 		Matrix3d mat3 = MakeMatrix3d(xx,xy,xz,
 									 yx,yy,yz,
-									 zx,zy,zz) * GetUnitSystem()->energyUnit;
+									 zx,zy,zz) * energyUnit;
 		mInter->SetMatrix(ToLabMatrix3d(GetFrame(),mat3));
 
 	} else if(storage==Interaction::EIGENVALUES) {
@@ -274,9 +279,9 @@ void InterEditPanel::SaveToInter() {
 		mEigenYYCtrl->GetValue().ToDouble(&yy);
 		mEigenZZCtrl->GetValue().ToDouble(&zz);
  
-		mInter->SetEigenvalues(xx * GetUnitSystem()->energyUnit,
-							   yy * GetUnitSystem()->energyUnit,
-							   zz * GetUnitSystem()->energyUnit,
+		mInter->SetEigenvalues(xx * energyUnit,
+							   yy * energyUnit,
+							   zz * energyUnit,
 							   ToLabOrient(GetFrame(),mOrientEigenvalueCtrl->GetOrient()));
 
 	} else if(storage==Interaction::AXRHOM) {
@@ -286,9 +291,9 @@ void InterEditPanel::SaveToInter() {
 		mRhomCtrl->     GetValue().ToDouble(&rhom);
 		mAxRhomIsoCtrl->GetValue().ToDouble(&iso);
 
-		mInter->SetAxRhom(iso * GetUnitSystem()->energyUnit,
-						  ax  * GetUnitSystem()->energyUnit,
-						  rhom* GetUnitSystem()->energyUnit,
+		mInter->SetAxRhom(iso * energyUnit,
+						  ax  * energyUnit,
+						  rhom* energyUnit,
 						  ToLabOrient(GetFrame(),mOrientAxRhomCtrl->GetOrient()));
 	} else if(storage==Interaction::SPANSKEW) {
 		double span,skew,iso;
@@ -297,8 +302,8 @@ void InterEditPanel::SaveToInter() {
 		mSkewCtrl->       GetValue().ToDouble(&skew);
 		mSpanSkewIsoCtrl->GetValue().ToDouble(&iso);
 
-		mInter->SetSpanSkew(iso * GetUnitSystem()->energyUnit,
-							span * GetUnitSystem()->energyUnit,
+		mInter->SetSpanSkew(iso  * energyUnit,
+							span * energyUnit,
 							skew,
 							ToLabOrient(GetFrame(),mOrientSpanSkewCtrl->GetOrient()));
 	}

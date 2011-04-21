@@ -52,7 +52,7 @@ void Frame::updateAfine() {
 	Matrix4d mat = T.matrix();
 	Matrix4d imat = T.inverse().matrix();
     mAffine =         (mParent==NULL) ? mat : mParent->mAffine*mat;
-    mInvertedAffine = (mParent==NULL) ? mat : mat * mParent->mInvertedAffine;
+    mInvertedAffine = (mParent==NULL) ? imat : imat * mParent->mInvertedAffine;
 }
 
 void Frame::AddChild(Frame* frame) {

@@ -46,7 +46,7 @@ wxString GetExtension(const wxString& filename) {
 class SpinSysDisplay3D : public Display3D {
 public:
     SpinSysDisplay3D(wxWindow* parent) 
-        : Display3D(parent),mElectronScene(GetCamera()) {
+        : Display3D(parent),mElectronScene(GetCamera()),mTestText(wxT("Hello world")) {
         GetSS().sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
     }
 protected:
@@ -86,6 +86,9 @@ protected:
 	mElectronScene.Draw();
 	glPopMatrix();
 
+	glRasterPos2f(40,40);
+	mTestText.glStamp();
+
         lighting.Off();
     }
 
@@ -120,6 +123,7 @@ private:
     SpinSysScene     mMolScene;
     InteractionScene mInteractionScene;
     ElectronScene    mElectronScene;
+    TextBitmap       mTestText;
 };
 GLLighting    SpinSysDisplay3D::lighting;
 GLTranslucent SpinSysDisplay3D::translucent;

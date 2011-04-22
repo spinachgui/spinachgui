@@ -21,8 +21,8 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	vector<Eigenvalues> anisoHFC;
 
 	ss->Clear();
-	Spin* s=new Spin(Vector3d(0,0,0),string("Unpaired Electron"),0);
-	ss->InsertSpin(s);
+	Spin* electron=new Spin(Vector3d(0,0,0),string("Unpaired Electron"),0);
+	ss->InsertSpin(electron);
 
 	ifstream fin(filename);
 	cout << "Opening a g03 file:" << filename << endl;
@@ -78,8 +78,40 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			}
 			standardOrientFound=true;
 
-		} else if(line=="g tensor (ppm):") {      
+		} else if(line=="g tensor (ppm):") {
 		} else if(line=="g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:") {
+			double XX = -1, YX = -1, ZX = -1;
+			double XY = -1, YY = -1, ZY = -1;
+			double XZ = -1, YZ = -1, ZZ = -1;
+
+			istringstream stream;
+
+			fin.getline(buff,500);
+			for(long i=0;i<500;i++) if(buff[i]=='D') buff[i]='e';   //Replace fortran's "D" with "e"
+			for(long i=0;i<500;i++) if(buff[i]=='X'||buff[i]=='Y'||buff[i]=='Z'||buff[i]=='=') buff[i]=' ';   //Get rid of the junk
+			stream.str(buff);
+			stream >> XX >> YX >> ZX;
+
+			fin.getline(buff,500);
+			for(long i=0;i<500;i++) if(buff[i]=='D') buff[i]='e';   //Replace fortran's "D" with "e"
+			for(long i=0;i<500;i++) if(buff[i]=='X'||buff[i]=='Y'||buff[i]=='Z'||buff[i]=='=') buff[i]=' ';   //Get rid of the junk
+			stream.str(buff);
+			stream >> XY >> YY >> ZY;
+
+			fin.getline(buff,500);
+			for(long i=0;i<500;i++) if(buff[i]=='D') buff[i]='e';   //Replace fortran's "D" with "e"
+			for(long i=0;i<500;i++) if(buff[i]=='X'||buff[i]=='Y'||buff[i]=='Z'||buff[i]=='=') buff[i]=' ';   //Get rid of the junk
+			stream.str(buff);
+			stream >> XZ >> YZ >> ZZ;
+			
+			Matrix3d gTensor;
+			gTensor <<
+				XX, YX, ZX,
+				XY, YY, ZY,
+				XZ, YZ, ZZ;
+
+			Interaction* inter=new Interaction(gTensor, Interaction::G_TENSER,electron); 
+			ss->InsertInteraction(inter);
 		} else if(line=="SCF GIAO Magnetic shielding tensor (ppm):") {
 			for(long i=0;i<nAtoms;i++) {
 				long centerNumber; 
@@ -179,6 +211,12 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				}
 			}
 		} else if(line=="Isotropic Fermi Contact Couplings") {
+			if (isoHFC.size() > 0) {
+				//Sometimes Gaussian seems to just feel like giving
+				//you these twice. Assume the last occurence is the
+				//one we want
+				isoHFC.clear();
+			}
 			cout << "Isotropic couplings found" << endl;
 			//Skip a line
 			fin.getline(buff,500); line=buff; //Read a line
@@ -195,6 +233,12 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			}          
 		}
 		if(line=="Anisotropic Spin Dipole Couplings in Principal Axis System") {
+			if (anisoHFC.size() > 0) {
+				//Sometimes Gaussian seems to just feel like giving
+				//you these twice. Assume the last occurence is the
+				//one we want
+				anisoHFC.clear();
+			}
 			cout << "Anisotropic couplings found" << endl;
 			//Skip 4 lines
 			fin.getline(buff,500); line=buff; //Read a line
@@ -218,9 +262,17 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				//Skip a line
 				fin.getline(buff,500); line=buff; //Read a line
 
-				Orientation o(MakeMatrix3d(x1,y1,z1,
-										   x2,y2,z2,
-										   x3,y3,z3));
+				Matrix3d mat3 = MakeMatrix3d(x1,y1,z1,
+											 x2,y2,z2,
+											 x3,y3,z3);
+
+				double det = mat3.determinant();
+				if(det < 0) {
+					//Sometimes gaussian produces inversions rather
+					mat3 = -mat3;
+				}
+				
+				Orientation o(mat3);
 
 				anisoHFC.push_back(Eigenvalues(eigenvalue1*MHz,eigenvalue2*MHz,eigenvalue3*MHz,o));
 			}
@@ -237,7 +289,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 		ss->InsertInteraction(inter);
 
 	}
-
+	ss->SetupLabFrame();
 	cout << "Finished loading the g03 file, saving ss->GetSpinCount()=" << ss->GetSpinCount() << endl;
 }
 

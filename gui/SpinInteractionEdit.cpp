@@ -11,9 +11,11 @@ using namespace SpinXML;
 SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id) 
 	: SpinInterEditPanelBase(parent,id),
 	  mEditMode(EDIT_ALL),
-	  mSpin(SpinView(NULL,GetFrame(),GetUnitSystem())),
+	  mSpin(NULL),
 	  mUpdatingListBox(false) {
 	mInterEdit=new InterEditPanel(this);
+	mInterEdit->sigChange.connect(mem_fun(this,&SpinInterEditPanel::UpdateListBox));
+
 	GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
 	Enable(false);
 };
@@ -23,7 +25,7 @@ SpinInterEditPanel::~SpinInterEditPanel() {
 }
 
 void SpinInterEditPanel::SetSpin(Spin* spin) {
-	mSpin=SpinView(spin,GetFrame(),GetUnitSystem());
+	mSpin=spin;
 	LoadFromSpin();
 }
 
@@ -32,12 +34,12 @@ void SpinInterEditPanel::Clear() {
 }
 
 void SpinInterEditPanel::OnNewButton(wxCommandEvent& e) {
-	Interaction* inter=new Interaction(0.0*Hz,Interaction::SHIELDING,mSpin.Get());
+	Interaction* inter=new Interaction(0.0*Hz,Interaction::SHIELDING,mSpin);
 	GetRawSS()->InsertInteraction(inter);
 
 	UpdateListBox();
 	mInterListBox->SetSelection(mInterListBox->GetCount()-1);
-	mInterEdit->SetInter(inter,mSpin.Get());
+	mInterEdit->SetInter(inter,mSpin);
 	InteractionChange();
 }
 
@@ -51,13 +53,19 @@ void SpinInterEditPanel::OnDeleteButton(wxCommandEvent& e) {
 
 void SpinInterEditPanel::LoadFromSpin() {
 	Clear();
-	if(mSpin.Get()==NULL) {
+	if(mSpin==NULL) {
 		return;
 	} else {
 		Enable(true);
 	}
 
 	UpdateListBox();
+	//Make sure that when we select a new spin, an interaction is
+	//loaded if possible. Reduces the amount of clicking a user needs
+	//to do.
+	if(mInterListBox->GetCount() > 0) {
+		mInterListBox->SetSelection(0);
+	}
 	InteractionChange();
 }
 
@@ -65,7 +73,7 @@ void SpinInterEditPanel::UpdateListBox() {
 	mUpdatingListBox=true;
 	mInterListBox->Clear();
 
-	std::vector<Interaction*> inters = GetRawSS()->GetInteractionsBySpin(mSpin.Get());
+	std::vector<Interaction*> inters = GetRawSS()->GetInteractionsBySpin(mSpin);
 
 	foreach(Interaction* inter,inters) {
 		if(inter->GetIsQuadratic()) {
@@ -108,7 +116,7 @@ void SpinInterEditPanel::InteractionChange() {
 	long selected=mInterListBox->GetSelection();
 	if(selected >-1) {
 		Interaction* inter = (Interaction*)mInterListBox->GetClientData(selected);
-		mInterEdit->SetInter(inter,mSpin.Get());
+		mInterEdit->SetInter(inter,mSpin);
 	} else {
 		mInterEdit->SetInter(NULL,NULL);
 	}

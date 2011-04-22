@@ -10,8 +10,6 @@
 #include <shared/orientation.hpp>
 
 namespace SpinXML {
-	class InteractionView;
-
     ///============================================================//
     struct Eigenvalues {
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -84,8 +82,9 @@ namespace SpinXML {
     SpanSkew ConvertToSpanSkew(const SpanSkew& inter);
 
 
-    class Interaction : public SpinXMLBase<Interaction,InteractionView> {
+    class Interaction : public SpinXMLBase<Interaction>, private Counter<Interaction> {
     public:
+		using Counter<Interaction>::objCount;
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Enumeration of the storage conventions used by this interaction
         enum Storage {
@@ -137,37 +136,35 @@ namespace SpinXML {
         Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const Eigen::Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const Eigenvalues& inter ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const AxRhom& inter      ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
         ///Construct from a matrix
         Interaction(const SpanSkew& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL)  {
 			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+			Invariant();
         }
 	protected:
 		void InitalSetType(Type t,Spin* spin1, Spin* spin2);
 	public:
-        ///Copy constructor
-        Interaction(const Interaction& inter);
         ///Destructor
         ~Interaction();
 
@@ -271,7 +268,7 @@ namespace SpinXML {
 		///Returns true if the interaction involves Spin spin
 		bool GetHasSpin(const Spin* spin) const {return mSpin1 == spin || mSpin2 == spin;}
     private:
-
+		void Invariant() const;
         void valid_or_throw() const;
 
 		typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
@@ -282,73 +279,6 @@ namespace SpinXML {
         sigc::connection mDyingConnect1;
         Spin* mSpin2;
         sigc::connection mDyingConnect2;
-    };
-
-
-
-
-
-    class InteractionView : public ViewBase<InteractionView,Interaction> {
-    public:
-        typedef ViewBase<InteractionView,Interaction> Base;
-
-        ///Construct from a scalar
-        InteractionView(Interaction* inter   ,const Frame* frame, const UnitSystem* unitSystem)
-			: Base(inter,frame,unitSystem) {
-        }
-
-        ///Get the storage convention being used
-        Interaction::Storage GetStorage() const                   {return mData->GetStorage();}
-        ///Get the physical source of this interaction
-        Interaction::Type GetType() const                         {return mData->GetType();}
-        ///Get the algebrake form of the interaction
-        Interaction::Form GetForm() const                         {return mData->GetForm();}
-
-        ///Set a flag indicating the physical source of this interaction.
-        void SetType(Interaction::Type st, Spin* spin1, Spin* spin2=NULL) {return mData->SetType(st,spin1,spin2);}
-        ///Returns true if the physical source of this interaction is t. The
-        ///members ST_NMR, ST_EPR and ST_ANY may be used here and will be
-        ///interpreted coorectly. For example, if inter is of SubType
-        ///ST_SCALAR then inter.IsSubType(ST_NMR) is true.
-        bool IsType(Interaction::Type t) const {return mData->IsType(t);}
-    
-        ///For a bilinear interaction, get the spin that is not spinA
-        SpinView GetOtherSpin(SpinView spinA) {return mData->GetOtherSpin(spinA.Get())->GetView(mFrame,mUnitSystem);}
-
-        ///Set the value of the interaction using the scalar covention.
-        void SetScalar(double Scalar);
-        ///Set the value of the interaction using the matrix covention.
-        void SetMatrix(const Eigen::Matrix3d& InMatrix);
-        ///Set the value of the interaction using the eigenvalue covention.
-        void SetEigenvalues(double XX,double YY,   double ZZ,  const Orientation& Orient);
-        ///Set the value of the interaction using the axiality-rhombicity covention.
-        void SetAxRhom(double iso,    double ax,   double rh,  const Orientation& Orient);
-        ///Set the value of the interaction using the span-skew covention.
-        void SetSpanSkew(double iso,  double Span, double Skew,const Orientation& Orient);
-
-        bool GetIsLinear() const    {return mData->GetIsLinear();}
-        bool GetIsBilinear() const  {return mData->GetIsBilinear();}
-        bool GetIsQuadratic() const {return mData->GetIsQuadratic();}
-
-        void ToScalar()      {mData->ToScalar();}
-        void ToMatrix()      {mData->ToMatrix();}
-        void ToEigenvalues() {mData->ToEigenvalues();}
-        void ToAxRhom()      {mData->ToAxRhom();}
-        void ToSpanSkew()    {mData->ToSpanSkew();}
-
-        double       AsScalar() const;
-        Eigen::Matrix3d     AsMatrix() const;
-        UEigenvalues AsEigenvalues() const;
-        UAxRhom      AsAxRhom() const;
-        USpanSkew    AsSpanSkew() const;
-
-
-        SpinView GetSpin1() const {return mData->GetSpin1()->GetView(mFrame,mUnitSystem);}
-        SpinView GetSpin2() const {return mData->GetSpin2()->GetView(mFrame,mUnitSystem);}
-        ///If the interaction involves two spins and this function is
-        ///given a pointer to one of those spins, return a pointer to
-        ///the other spin. In all other cases return NULL
-        SpinView GetOtherSpin(const SpinView spin) const {return mData->GetOtherSpin(spin.Get())->GetView(mFrame,mUnitSystem);}
     };
 
 	extern std::vector<Interaction::Type> Types;

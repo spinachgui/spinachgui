@@ -68,16 +68,4 @@ public:
 
 };
 
-class FileDialogCombo : public DialogCombo<wxFileDialog> {
-public:
-  FileDialogCombo(wxWindow* parent,wxWindowID id=-1) : DialogCombo<wxFileDialog>(parent,id) {}
-  virtual wxFileDialog* CreateDialog() {
-    return new wxFileDialog(this, wxT("Choose File"), wxT(""),wxT(""),wxT("All (*.*)|*.*"), wxFD_OPEN);
-  }
-  virtual wxString GetStringFromDialog(wxFileDialog* dlg) {
-    return dlg->GetPath();
-  }
-};
-
-
 #endif

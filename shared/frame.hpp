@@ -7,20 +7,21 @@
 #include <sigc++/sigc++.h>
 #include <shared/orientation.hpp>
 #include <vector>
-
+#include <shared/objcounter.hpp>
 
 namespace SpinXML {
 
-    class UnitSystem {
-	public:
+    class UnitSystem : private Counter<UnitSystem> {
+    public:
+        using Counter<UnitSystem>::objCount;
         //SI by default
         UnitSystem();
         unit energyUnit;
         unit lengthUnit;
         unit timeUnit;
-		static const UnitSystem* GetDefault() {return &singleton;}
-	private:
-		static UnitSystem singleton;
+        static const UnitSystem* GetDefault() {return &singleton;}
+    private:
+        static UnitSystem singleton;
 
     };
     ///Class representing a frame in a hiraci of nested reference
@@ -30,8 +31,8 @@ namespace SpinXML {
     ///possible.
     class Frame : public sigc::trackable {
     public:
-        Frame(Eigen::Vector3d translation, Orientation rotation, const UnitSystem* unitSystem);
-		~Frame();
+        Frame(Eigen::Vector3d translation, Orientation rotation);
+        ~Frame();
 
         void SetTranslation(const Eigen::Vector3d& vec);
         const Eigen::Vector3d& GetTranslation() const {return mTranslate;}
@@ -53,8 +54,8 @@ namespace SpinXML {
         ///Returns the parent frame of this frame
         Frame* upOne() const {return mParent;}
 
-		void AddChild(Frame* frame);
-		const std::vector<Frame*>& GetChildren() const {return mChildren;}
+        void AddChild(Frame* frame);
+        const std::vector<Frame*>& GetChildren() const {return mChildren;}
 
         ///Emited when Frame is about to be deleted
         sigc::signal<void,Frame*> sigDying;
@@ -63,52 +64,25 @@ namespace SpinXML {
         ///Emited when a ancesstor of this frame is changed.
         sigc::signal<void,Frame*> sigAncestorChange;
     private:
+        void Invariant() const;
         void updateAfine();
 
         Frame* mParent;
-		std::vector<Frame*> mChildren;
+        std::vector<Frame*> mChildren;
 
         Eigen::Vector3d mTranslate;
         Orientation mOrient;
         Eigen::Matrix4d mAffine;
         Eigen::Matrix4d mInvertedAffine;
-		const UnitSystem* mUnitSystem;
     };
+    Eigen::Vector3d ToLabVec3d(const Frame* frame,const Eigen::Vector3d& v);
+    Eigen::Vector3d FromLabVec3d(const Frame* frame,const Eigen::Vector3d& v);
 
-    template <typename Derived,typename T>
-	class ViewBase : public sigc::trackable {
-    public:
-		typedef T ViewedType;
+    Eigen::Matrix3d ToLabMatrix3d(const Frame* frame,const Eigen::Matrix3d& m);
+    Eigen::Matrix3d FromLabMatrix3d(const Frame* frame,const Eigen::Matrix3d& m);
 
-        ViewBase(T* data,const Frame* frame, const UnitSystem* unitSystem)
-            : mData(data),mFrame(frame),mUnitSystem(unitSystem) {
-			if(mData == NULL) {
-				return;
-			}
-            mData->sigDying.connect(mem_fun(this,&ViewBase::OnObjectDie));
-        }
-        void OnObjectDie(T*) {mData=NULL;}
-        void SetFrame(Frame* frame) {mFrame=frame;}
-        void SetUnitSystem(UnitSystem* unitSystem) {mUnitSystem=unitSystem;}
-
-        //T* operator ->() {return mData;}
-		T* Get() {return mData;}
-		const T* Get() const {return mData;}
-
-    protected:
-		template <typename ViewType>
-		std::vector<ViewType> MapVectorToViewVector(const std::vector<typename ViewType::ViewedType*>& v) const {
-			std::vector<ViewType> ret;
-			for(unsigned long i=0;i<v.size();i++) {
-				ret.push_back(v[i]->GetView(mFrame,mUnitSystem));
-			}
-			return ret;
-		}
-
-        T* mData;
-        const Frame* mFrame;
-        const UnitSystem* mUnitSystem;
-    };
+	Orientation ToLabOrient(const Frame* frame,const Orientation& o);
+	Orientation FromLabOrient(const Frame* frame,const Orientation& o);
 };
 
 #endif

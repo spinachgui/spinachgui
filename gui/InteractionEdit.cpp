@@ -70,7 +70,7 @@ private:
 
 InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
 	: InterEditPanelBase(parent,id),
-	  mInter(NULL,GetFrame(),GetUnitSystem()),
+	  mInter(NULL),
 	  mLoading(false),
 	  mDialogMode(true) {
 
@@ -93,10 +93,10 @@ InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
 void InterEditPanel::SetInter(Interaction* inter,Spin* withRespectTo) {
 	interChangeConnect.disconnect();
 	mWithRespectTo=withRespectTo;
-	mInter=InteractionView(inter,GetFrame(),GetUnitSystem());
+	mInter=inter;
 	Enable(inter != NULL);
 	if(inter != NULL) {
-		interChangeConnect=mInter.Get()->sigChange.connect(mem_fun(this,&InterEditPanel::OnInterChange));
+		interChangeConnect=mInter->sigChange.connect(mem_fun(this,&InterEditPanel::OnInterChange));
 		LoadFromInter();
 	}
 }
@@ -109,15 +109,15 @@ void InterEditPanel::OnPageChange(wxChoicebookEvent& e) {
 	}
 	Interaction::Storage storage=StorageOrders[e.GetSelection()];
 	if(storage==Interaction::STORAGE_SCALAR) {
-		mInter.ToScalar();
+		mInter->ToScalar();
 	} else if(storage==Interaction::MATRIX) {
-		mInter.ToMatrix();
+		mInter->ToMatrix();
 	} else if(storage==Interaction::EIGENVALUES) {
-		mInter.ToEigenvalues();
+		mInter->ToEigenvalues();
 	} else if(storage==Interaction::AXRHOM) {
-		mInter.ToAxRhom();
+		mInter->ToAxRhom();
 	} else if(storage==Interaction::SPANSKEW) {
-		mInter.ToSpanSkew();
+		mInter->ToSpanSkew();
 	}
 	LoadFromInter();
 }
@@ -126,10 +126,10 @@ void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
 	//TODO: We need to test if the spin is an election, because then
 	//slightly different options should become avaliable
 	mSubTypeCombo->Clear();
-	if(mInter.Get()==NULL) {
+	if(mInter==NULL) {
 		return;
 	}
-	Interaction::Type t = mInter.GetType();
+	Interaction::Type t = mInter->GetType();
 	if(true) {//If nucleus
 		for(long i=0;i<NuclearSTLen;i++) {
 			mSubTypeCombo->Append(wxString(Interaction::GetTypeName(NuclearT[i]),wxConvUTF8),new STClientData(NuclearT[i]));
@@ -149,9 +149,9 @@ void InterEditPanel::LoadFromInter() {
     cout << "Load from Inter()" << endl;
 	mLoading=true;
 
-	if(mInter.GetIsLinear()) {
+	if(mInter->GetIsLinear()) {
 		mSpin2Combo->Enable(false);
-	} else if(mInter.GetIsBilinear()) {
+	} else if(mInter->GetIsBilinear()) {
 		mSpin2Combo->Enable(true);
 	} else {
 		//Interaction is quadratic
@@ -162,25 +162,28 @@ void InterEditPanel::LoadFromInter() {
 	//Populate the spin 2 combobox with every other spin
 	mSpin2Combo->Clear();
   
-	long spinCount=GetSS().GetSpinCount();
+	long spinCount=GetRawSS()->GetSpinCount();
 
 	for(long i=0;i<spinCount;i++) {
-		SpinView spin=GetSS().GetSpin(i);
-		mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(spin.GetLabel(),wxConvUTF8),(void*)spin.Get());
+		Spin* spin=GetRawSS()->GetSpin(i);
+		mSpin2Combo->Append(wxString() << i << wxT(" ") << wxString(spin->GetLabel(),wxConvUTF8),(void*)spin);
 	}
-	if(mInter.GetIsBilinear()) {
-		long Spin2Number=GetRawSS()->GetSpinNumber(mInter.Get()->GetOtherSpin(mWithRespectTo));
+	if(mInter->GetIsBilinear()) {
+		long Spin2Number=GetRawSS()->GetSpinNumber(mInter->GetOtherSpin(mWithRespectTo));
 		mSpin2Combo->SetSelection(Spin2Number);
 	}
 	cout << "About the start testing types" << endl;
 
-	if(mInter.GetStorage()==Interaction::STORAGE_SCALAR) {
-		energy scalar = mInter.AsScalar();
+	unit energyUnit = mInter->GetType() == Interaction::G_TENSER ? Unitless : GetUnitSystem()->energyUnit;
+   
+	if(mInter->GetStorage()==Interaction::STORAGE_SCALAR) {
+		energy scalar = mInter->AsScalar() / energyUnit;
 		mScalarCtrl->SetValue(wxString() << scalar);
 		mTypeChoiceBook->SetSelection(0);
-	} else if(mInter.GetStorage()==Interaction::MATRIX) {
-		Matrix3d mat = mInter.AsMatrix();
-    
+	} else if(mInter->GetStorage()==Interaction::MATRIX) {
+		Matrix3d mat = mInter->AsMatrix() / energyUnit;
+		mat = FromLabMatrix3d(GetFrame(),mat);
+
 		mMatXXCtrl->SetValue(wxString() << mat(0,0));
 		mMatXYCtrl->SetValue(wxString() << mat(0,1));
 		mMatXZCtrl->SetValue(wxString() << mat(0,2));
@@ -194,35 +197,39 @@ void InterEditPanel::LoadFromInter() {
 		mMatZZCtrl->SetValue(wxString() << mat(2,2));
 
 		mTypeChoiceBook->SetSelection(1);
-	} else if(mInter.GetStorage()==Interaction::EIGENVALUES) {
-		Eigenvalues ev = mInter.AsEigenvalues();
+	} else if(mInter->GetStorage()==Interaction::EIGENVALUES) {
+		Eigenvalues ev = mInter->AsEigenvalues();
 		Orientation o = ev.mOrient;
+		o = FromLabOrient(GetFrame(),o);
 
-		mEigenXXCtrl->SetValue(wxString() << ev.xx);
-		mEigenYYCtrl->SetValue(wxString() << ev.yy);
-		mEigenZZCtrl->SetValue(wxString() << ev.zz);
+		mEigenXXCtrl->SetValue(wxString() << ev.xx / energyUnit);
+		mEigenYYCtrl->SetValue(wxString() << ev.yy / energyUnit);
+		mEigenZZCtrl->SetValue(wxString() << ev.zz / energyUnit);
     
 		mOrientEigenvalueCtrl->SetOrient(o);
 
 		mTypeChoiceBook->SetSelection(2);
 
-	} else if(mInter.GetStorage()==Interaction::AXRHOM) {
-		cout << "type==axrhom" << endl;
-		AxRhom ar = mInter.AsAxRhom();
+	} else if(mInter->GetStorage()==Interaction::AXRHOM) {
+		AxRhom ar = mInter->AsAxRhom();
 		Orientation o = ar.mOrient;
-		mAxCtrl->       SetValue(wxString() << ar.ax  );
-		mRhomCtrl->     SetValue(wxString() << ar.rh);
-		mAxRhomIsoCtrl->SetValue(wxString() << ar.iso );
+		o = FromLabOrient(GetFrame(),o);
+
+		mAxCtrl->       SetValue(wxString() << ar.ax  / energyUnit);
+		mRhomCtrl->     SetValue(wxString() << ar.rh  / energyUnit);
+		mAxRhomIsoCtrl->SetValue(wxString() << ar.iso / energyUnit);
 		cout << "Set everything but the orientation" << endl;
 		mOrientAxRhomCtrl->SetOrient(o);
 
 		mTypeChoiceBook->SetSelection(3);
-	} else if(mInter.GetStorage()==Interaction::SPANSKEW) {
-		SpanSkew spanSkew = mInter.AsSpanSkew();
+	} else if(mInter->GetStorage()==Interaction::SPANSKEW) {
+		SpanSkew spanSkew = mInter->AsSpanSkew();
 		Orientation o = spanSkew.mOrient;
-		mSpanCtrl->       SetValue(wxString() << spanSkew.span);
+		o = FromLabOrient(GetFrame(),o);
+
+		mSpanCtrl->       SetValue(wxString() << spanSkew.span / energyUnit);
 		mSkewCtrl->       SetValue(wxString() << spanSkew.skew);
-		mSpanSkewIsoCtrl->SetValue(wxString() << spanSkew.iso);
+		mSpanSkewIsoCtrl->SetValue(wxString() << spanSkew.iso  / energyUnit);
 
 		mOrientSpanSkewCtrl->SetOrient(o);
 
@@ -237,10 +244,13 @@ void InterEditPanel::LoadFromInter() {
 void InterEditPanel::SaveToInter() {
 	interChangeConnect.block();
 	Interaction::Storage storage = StorageOrders[mTypeChoiceBook->GetSelection()];
+
+	unit energyUnit = mInter->GetType() == Interaction::G_TENSER ? Unitless : GetUnitSystem()->energyUnit;
+
 	if(storage==Interaction::STORAGE_SCALAR) {
 		double scalar;
 		mScalarCtrl->GetValue().ToDouble(&scalar);
-		mInter.SetScalar(scalar);
+		mInter->SetScalar(scalar * energyUnit);
 	} else if(storage==Interaction::MATRIX) {
 		double xx,xy,xz;
 		double yx,yy,yz;
@@ -257,9 +267,10 @@ void InterEditPanel::SaveToInter() {
 		mMatZYCtrl->GetValue().ToDouble(&zy);
 		mMatZZCtrl->GetValue().ToDouble(&zz);
 
-		mInter.SetMatrix(MakeMatrix3d(xx,xy,xz,
-									  yx,yy,yz,
-									  zx,zy,zz));
+		Matrix3d mat3 = MakeMatrix3d(xx,xy,xz,
+									 yx,yy,yz,
+									 zx,zy,zz) * energyUnit;
+		mInter->SetMatrix(ToLabMatrix3d(GetFrame(),mat3));
 
 	} else if(storage==Interaction::EIGENVALUES) {
 		double xx,yy,zz;
@@ -268,7 +279,10 @@ void InterEditPanel::SaveToInter() {
 		mEigenYYCtrl->GetValue().ToDouble(&yy);
 		mEigenZZCtrl->GetValue().ToDouble(&zz);
  
-		mInter.SetEigenvalues(xx,yy,zz,mOrientEigenvalueCtrl->GetOrient());
+		mInter->SetEigenvalues(xx * energyUnit,
+							   yy * energyUnit,
+							   zz * energyUnit,
+							   ToLabOrient(GetFrame(),mOrientEigenvalueCtrl->GetOrient()));
 
 	} else if(storage==Interaction::AXRHOM) {
 		double ax,rhom,iso;
@@ -277,7 +291,10 @@ void InterEditPanel::SaveToInter() {
 		mRhomCtrl->     GetValue().ToDouble(&rhom);
 		mAxRhomIsoCtrl->GetValue().ToDouble(&iso);
 
-		mInter.SetAxRhom(iso,ax,rhom, mOrientAxRhomCtrl->GetOrient());
+		mInter->SetAxRhom(iso * energyUnit,
+						  ax  * energyUnit,
+						  rhom* energyUnit,
+						  ToLabOrient(GetFrame(),mOrientAxRhomCtrl->GetOrient()));
 	} else if(storage==Interaction::SPANSKEW) {
 		double span,skew,iso;
 
@@ -285,7 +302,10 @@ void InterEditPanel::SaveToInter() {
 		mSkewCtrl->       GetValue().ToDouble(&skew);
 		mSpanSkewIsoCtrl->GetValue().ToDouble(&iso);
 
-		mInter.SetSpanSkew(iso,span,skew,mOrientSpanSkewCtrl->GetOrient());
+		mInter->SetSpanSkew(iso  * energyUnit,
+							span * energyUnit,
+							skew,
+							ToLabOrient(GetFrame(),mOrientSpanSkewCtrl->GetOrient()));
 	}
 	interChangeConnect.unblock();
 }
@@ -296,8 +316,8 @@ void InterEditPanel::onTextChange(wxCommandEvent& e) {
 		//this event
 		return;
 	}
-	sigChange();
 	SaveToInter();
+	sigChange();
 	return;
 }
 
@@ -313,12 +333,20 @@ void InterEditPanel::OnSubTypeChange(wxCommandEvent& e) {
 	Interaction::Form f=Interaction::GetFormFromType(t);
 
 	if(f==Interaction::LINEAR || f==Interaction::QUADRATIC) {
-		mInter.SetType(t,mWithRespectTo,NULL);
+		mInter->SetType(t,mWithRespectTo,NULL);
 		cout << "setting subtype to a linear or quadratic form" << endl;
 	} else {
 		Spin* spin=(Spin*)mSpin2Combo->GetClientData(mSpin2Combo->GetSelection());
-		cout << "setting spin 2 to " << spin << endl;
-		mInter.SetType(t,mWithRespectTo,spin);
+		if(spin == NULL) {
+			//If spin is null then we are probably converting from a
+			//linear or quadratic interaction where the mSpin2Combo is
+			//greyed out and so all we can do is guess a spin to
+			//couple mWithRespectTo to. Guess the first spin.
+			
+			spin = GetRawSS()->GetSpin(0);
+		}
+
+		mInter->SetType(t,mWithRespectTo,spin);
 	}
 
 	sigChange();

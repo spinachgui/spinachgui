@@ -46,9 +46,21 @@ wxString GetExtension(const wxString& filename) {
 class SpinSysDisplay3D : public Display3D {
 public:
     SpinSysDisplay3D(wxWindow* parent) 
-        : Display3D(parent),mElectronScene(GetCamera()),mTestText(wxT("Hello world")) {
-        GetSS().sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
+	: Display3D(parent),
+	  mElectronScene(GetCamera()),
+	  mTestText(wxT("Hello world")),
+	  mElectronInterDrawer(GetCamera()) {
+        
+	GetRawSS()->sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
+		
+	//Make sure that if anything changes we redraw the scene
+	SpinSystem::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinChange));
+	Spin::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotInterChange));
+	Interaction::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinSysChange));
     }
+	void SlotSpinChange() {Refresh();}
+	void SlotInterChange() {Refresh();}
+	void SlotSpinSysChange() {Refresh();}
 protected:
     virtual void DrawScene() {
         lighting.On();
@@ -72,19 +84,32 @@ protected:
         StopPicking();
     }
     virtual void DrawForeground() {
-	int mWidth, mHeight;
-	GetClientSize(&mWidth,&mHeight);
+        int mWidth, mHeight;
+        GetClientSize(&mWidth,&mHeight);
 
-	glColor3f(0.0,0.0,0.0);
+        glColor3f(0.0,0.0,0.0);
 
         lighting.On();
 
-	glPushMatrix();
-	//Place the electron tensors along the top of the screne
-	//starting from the left
-	glTranslatef(40,mHeight-40,0);
-	mElectronScene.Draw();
-	glPopMatrix();
+        glPushMatrix();
+        //Place the electron tensors along the top of the screne
+        //starting from the left
+        glTranslatef(40,mHeight-40,0);
+        mElectronScene.Draw();
+        mInteractionScene.Draw();
+
+        translucent.On();
+		mElectronInterDrawer.Draw();
+        translucent.Off();
+
+        wire.On();
+        mElectronInterDrawer.Draw();
+        wire.Off();
+
+        lighting.Off();		
+
+        glPopMatrix();
+
 
 	glRasterPos2f(40,40);
 	mTestText.glStamp();
@@ -124,6 +149,7 @@ private:
     InteractionScene mInteractionScene;
     ElectronScene    mElectronScene;
     TextBitmap       mTestText;
+    ElectronInterDrawer mElectronInterDrawer;
 };
 GLLighting    SpinSysDisplay3D::lighting;
 GLTranslucent SpinSysDisplay3D::translucent;
@@ -158,57 +184,57 @@ struct FramePointer : public wxTreeItemData {
 class FrameTree : public wxTreeCtrl , public sigc::trackable {
 public:
 
-        FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
-                mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
+	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
+		mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
 
 
-                RefreshFromSpinSystem();
-                sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
-        }
+		RefreshFromSpinSystem();
+		sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
+	}
         
-        void RefreshFromSpinSystem() {
-                mapFrameToId.clear();
-                mapFrameToId[GetSS().GetLabFrame()] = mRoot;
+	void RefreshFromSpinSystem() {
+		mapFrameToId.clear();
+		mapFrameToId[GetRawSS()->GetLabFrame()] = mRoot;
 
-                RefreshFromSpinSystemRecursive(mRoot,GetRawSS()->GetLabFrame());
+		RefreshFromSpinSystemRecursive(mRoot,GetRawSS()->GetLabFrame());
 
-                mActive = mapFrameToId[GetFrame()];
-                SetItemBold(mActive);
-                Refresh(); //Seems like we need to explicitly ask for a
-                                   //repaint
-        }
+		mActive = mapFrameToId[GetFrame()];
+		SetItemBold(mActive);
+		Refresh(); //Seems like we need to explicitly ask for a
+		//repaint
+	}
 
-        void SlotFrameChange(Frame* frame) {
-                SetItemBold(mActive,false);
-                mActive = mapFrameToId[frame];
-                SetItemBold(mActive);
-                Refresh();
-        }
+	void SlotFrameChange(Frame* frame) {
+		SetItemBold(mActive,false);
+		mActive = mapFrameToId[frame];
+		SetItemBold(mActive);
+		Refresh();
+	}
 private:
-        void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
-                mapFrameToId[frame] = itemId;
-                vector<Frame*> children = frame->GetChildren();
-                for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
-                        wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
-                        RefreshFromSpinSystemRecursive(nextItemId,*i);
-                }
-        }
+	void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
+		mapFrameToId[frame] = itemId;
+		vector<Frame*> children = frame->GetChildren();
+		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
+			wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
+			RefreshFromSpinSystemRecursive(nextItemId,*i);
+		}
+	}
     
     void OnRightClick(wxTreeEvent& e) {
-                FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
-                RightClickMenu* menu = new RightClickMenu(this);
+		FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
+		RightClickMenu* menu = new RightClickMenu(this);
 
-                vector<RightClickAction*> actions;
-                actions.push_back(new RCActionActivateFrame(fp->frame));
+		vector<RightClickAction*> actions;
+		actions.push_back(new RCActionActivateFrame(fp->frame));
 
-                menu->Build(actions);
-                PopupMenu(menu);
-                delete menu;
+		menu->Build(actions);
+		PopupMenu(menu);
+		delete menu;
     }
     DECLARE_EVENT_TABLE();
-        wxTreeItemId mRoot;
-        wxTreeItemId mActive;
-        map<Frame*,wxTreeItemId> mapFrameToId;
+	wxTreeItemId mRoot;
+	wxTreeItemId mActive;
+	map<Frame*,wxTreeItemId> mapFrameToId;
 };
 
 
@@ -252,18 +278,18 @@ public:
 
 class InterDisplaySettingsPanel : public wxPanel,public sigc::trackable {
 public:
-        InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
-                wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
+	InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
+		wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
 
-                //HACK: Quick hack to iterate though an enum
-                for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
-                        Interaction::Type type = (Interaction::Type)i;
-                        InterDisplaySettings* widget = new InterDisplaySettings(this,type);
-                        bs->Add(widget,1,wxEXPAND);
-                }
+		//HACK: Quick hack to iterate though an enum
+		for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
+			Interaction::Type type = (Interaction::Type)i;
+			InterDisplaySettings* widget = new InterDisplaySettings(this,type);
+			bs->Add(widget,1,wxEXPAND);
+		}
 
-                this->SetSizer(bs);
-        }
+		this->SetSizer(bs);
+	}
 };
 
 
@@ -471,6 +497,7 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
 
         }
     }
+	SetFrame(GetRawSS()->GetLabFrame());
     Chkpoint(wxT("Load File"));
     UpdateTitle();
 }

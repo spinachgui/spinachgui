@@ -17,8 +17,6 @@
 
 
 namespace SpinXML {
-	class SpinSystemView;
-
     //============================================================//
     // 3D vector type
 
@@ -48,7 +46,7 @@ namespace SpinXML {
     };
 
 
-    class SpinSystem : public SpinXMLBase<SpinSystem,SpinSystemView> {
+    class SpinSystem : public SpinXMLBase<SpinSystem> {
     public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         SpinSystem();
@@ -120,73 +118,15 @@ namespace SpinXML {
 
 		///Get the lab frame, which is always an unrotated frame centred at the origin
 		Frame* GetLabFrame() const {return mRootFrame;}
+
+		///Delete all frames and create a single lab frame
+		void SetupLabFrame();
     private:
         std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;
 		Frame* mRootFrame;
     };
 
-	class SpinSystemView  : public ViewBase<SpinSystemView,SpinSystem> {
-	public:
-        typedef ViewBase<SpinSystemView,SpinSystem> Base;
-
-		SpinSystemView(SpinSystem* spinsys,const Frame* frame, const UnitSystem* unitSystem)
-            : Base(spinsys,frame,unitSystem) {
-            mData->sigNewSpin.connect(sigNewSpin);
-            mData->sigNewInter.connect(sigNewInter);
-            mData->sigReloaded.connect(sigReloaded);
-		}
-
-
-        void Clear() {mData->Clear();}
-
-        long GetSpinCount()   const {return mData->GetSpinCount();}
-        SpinView GetSpin(long n) const {return mData->GetSpin(n)->GetView(mFrame,mUnitSystem);}
-        long GetSpinNumber(SpinView spin) const {return mData->GetSpinNumber(spin.Get());}
-
-        const std::vector<SpinView> GetSpins() const {
-			return MapVectorToViewVector<SpinView>(mData->GetSpins());
-		}
-
-        void InsertSpin(SpinView _Spin,long Position=END) {mData->InsertSpin(_Spin.Get(),Position);}
-
-		void DiscardSpin(long Position) {mData->DiscardSpin(Position);}
-		void DiscardSpin(SpinView _Spin)   {mData->DiscardSpin(_Spin.Get());}
-
-        void InsertInteraction(InteractionView inter) {;}
-        InteractionView RemoveInteraction(InteractionView inter);
-        long GetInterCount() const {return mData->GetInterCount();}
-
-        //Returns all interactions involving Spin spin
-        std::vector<InteractionView> GetInteractionsBySpin(SpinView spin,Interaction::Type t=Interaction::ANY) {
-			return MapVectorToViewVector<InteractionView>(mData->GetInteractionsBySpin(spin.Get(),t));
-		}
-        //Get all the interactions involving both spin1 and spin2
-        std::vector<InteractionView> GetInteractionsBySpin(SpinView spin1, SpinView spin2,Interaction::Type t=Interaction::ANY) {
-			return MapVectorToViewVector<InteractionView>(mData->GetInteractionsBySpin(spin1.Get(),spin2.Get(),t));
-		}
-        //Returns all interactions involving Spin spin
-        std::vector<InteractionView> GetInteractionsBySpinOnce(SpinView spin,Interaction::Type t=Interaction::ANY) {
-			return MapVectorToViewVector<InteractionView>(mData->GetInteractionsBySpinOnce(spin.Get(),t));
-		}
-
-        void LoadFromFile(const char* filename,ISpinSystemLoader* loader)    {mData->LoadFromFile(filename,loader);}
-        void SaveToFile(const char* filename,ISpinSystemLoader* saver) const {mData->SaveToFile(filename,saver);}
-
-        ///Return all spins withing distance of point pos. Do not return
-        ///skip all spins below Ignore
-        std::vector<SpinView> GetNearbySpins(Eigen::Vector3d pos,double distance,SpinView Ignore=SpinView(NULL,NULL,NULL));
-
-        sigc::signal<void,Spin*,long> sigNewSpin;
-        sigc::signal<void,Interaction*> sigNewInter;
-        sigc::signal<void> sigReloaded;
-
-        ///Automacially calculate the nuclear dipole-dipole couplings
-        ///from the positions off the nuclear spins
-        void CalcNuclearDipoleDipole() {mData->CalcNuclearDipoleDipole();}
-
-		Frame* GetLabFrame() const {return mData->GetLabFrame();}
-	};
 
 }; //End Namespace
 

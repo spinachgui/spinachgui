@@ -62,8 +62,8 @@ SpinGrid::SpinGrid(wxWindow* parent)
 
 	//Signals
 
-    GetSS().sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
-    GetSS().sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
+    GetRawSS()->sigReloaded.connect(mem_fun(this,&SpinGrid::RefreshFromSpinSystem));
+    GetRawSS()->sigNewSpin.connect(mem_fun(this,&SpinGrid::OnNewSpin));
 	sigAnySpinDying.connect(mem_fun(this,&SpinGrid::SlotAnySpinDie));
 
 	sigHover.connect(mem_fun(this,&SpinGrid::SlotHover));
@@ -170,22 +170,21 @@ void SpinGrid::RefreshFromSpinSystem() {
 }
 
 void SpinGrid::UpdateRow(long rowNumber) {
-        length x,y,z;
 		cout << rowNumber << endl;
-        SpinView spin = GetSS().GetSpin(rowNumber);
-		spin.GetCoordinates(&x,&y,&z);
-
+        Spin* spin = GetRawSS()->GetSpin(rowNumber);
+		Vector3d v = spin->GetPosition();
+		Vector3d vprime = FromLabVec3d(GetFrame(),v);
         //Set the label
-        SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin.GetLabel(),wxConvUTF8));
+        SetCellValue(rowNumber,SpinGrid::COL_LABEL,wxString(spin->GetLabel(),wxConvUTF8));
 
         //Set the x,y,z coordinates
-        SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << x);
-        SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << y);
-        SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << z);
+        SetCellValue(rowNumber,SpinGrid::COL_X,wxString() << vprime.x() / GetUnitSystem()->lengthUnit);
+        SetCellValue(rowNumber,SpinGrid::COL_Y,wxString() << vprime.y() / GetUnitSystem()->lengthUnit);
+        SetCellValue(rowNumber,SpinGrid::COL_Z,wxString() << vprime.z() / GetUnitSystem()->lengthUnit);
 
         //Set the element and isotope
-        long element=spin.GetElement();
-        long isotope=spin.GetIsotope();
+        long element=spin->GetElement();
+        long isotope=spin->GetIsotope();
         wxString str(getElementSymbol(element),wxConvUTF8);
         str << wxT(" ") << wxString(getElementName(element),wxConvUTF8);
         SetCellValue(rowNumber,SpinGrid::COL_ELEMENT,str);
@@ -226,9 +225,9 @@ void SpinGrid::OnCellChange(wxGridEvent& e) {
         GetCellValue(e.GetRow(),COL_X).ToDouble(&x);
         GetCellValue(e.GetRow(),COL_Y).ToDouble(&y);
         GetCellValue(e.GetRow(),COL_Z).ToDouble(&z);
-
-        Chkpoint(wxT("Spin Coordinates"));
-        GetSS().GetSpin(e.GetRow()).SetCoordinates(x,y,z);
+		Vector3d vprime = ToLabVec3d(GetFrame(),Vector3d(x,y,z));
+		
+        GetRawSS()->GetSpin(e.GetRow())->SetPosition(vprime * GetUnitSystem()->lengthUnit);
     } else if(e.GetCol()==COL_ELEMENT) {
         wxString content=GetCellValue(e.GetRow(),e.GetCol());
         long space=content.Find(wxT(" "));

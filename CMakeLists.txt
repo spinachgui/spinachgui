@@ -16,6 +16,10 @@ enable_testing()
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
+
+#set(CMAKE_CXX_COMPILER "g++-4.5")
+#set(CMAKE_CXX_LINKER "g++-4.5")
+
 set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -DEIGEN_DONT_ALIGN")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wno-write-strings -Wall")
 

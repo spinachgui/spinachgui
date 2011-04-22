@@ -14,26 +14,16 @@ using namespace SpinXML;
 using namespace sigc;
 using namespace boost;
 
-//============================================================//
-// SpinSystemView
-
-std::vector<SpinView> SpinSystemView::GetNearbySpins(Vector3d pos,double distance,SpinView Ignore) {
-	Vector4d v=Vector4d(pos.x(),pos.y(),pos.z(),1);
-	v=mFrame->getTransformToLab()*v;
-	return MapVectorToViewVector<SpinView>(mData->GetNearbySpins(Vector3d(v.x(),v.y(),v.z()),distance * mUnitSystem->lengthUnit,Ignore.Get()));
-}
-
-
 //==============================================================================//
 // SpinSystem
 
 SpinSystem::SpinSystem()
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
 }
 
 
 SpinSystem::SpinSystem(const SpinSystem& system)
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem)) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
     long spinCount=system.mSpins.size();
 
     mSpins.resize(spinCount);
@@ -43,6 +33,11 @@ SpinSystem::SpinSystem(const SpinSystem& system)
     }
 }
 
+
+void SpinSystem::SetupLabFrame() {
+	delete mRootFrame;
+	mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
+}
 
 SpinSystem::~SpinSystem() {
     Clear();
@@ -56,7 +51,7 @@ void SpinSystem::Clear() {
     }
 
 	delete mRootFrame;
-	mRootFrame = new Frame(Vector3d(0,0,0),Orientation(Quaterniond(1,0,0,0)),new UnitSystem);
+	mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
 
     sigReloaded();
 }

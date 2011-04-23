@@ -38,10 +38,10 @@ namespace SpinXML {
             gamma=_gamma;
         }
         bool operator==(const EulerAngles& o) const {
-            return alpha == o.alpha &&	beta == o.beta && gamma == o.gamma;
+            return alpha == o.alpha &&  beta == o.beta && gamma == o.gamma;
         }
         bool operator!=(const EulerAngles& o) const {
-            return alpha != o.alpha ||	beta != o.beta || gamma != o.gamma;
+            return alpha != o.alpha ||  beta != o.beta || gamma != o.gamma;
         }
 
         void Normalize() {
@@ -84,7 +84,7 @@ namespace SpinXML {
     ///Class for storing a 3 dimentional rotation
     class Orientation : private Counter<Orientation> {
     public:
-		using Counter<Orientation>::objCount;
+        using Counter<Orientation>::objCount;
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Constructs the identity rotation
@@ -141,8 +141,8 @@ namespace SpinXML {
         const Orientation& operator=(const Eigen::Quaterniond& q)  {mData = q;  return *this;}
 
         bool operator==(const Orientation& o) const {
-			using boost::get;
-            if(o.mData.type()==typeid(EulerAngles))	return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
+            using boost::get;
+            if(o.mData.type()==typeid(EulerAngles))     return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
             if(o.mData.type()==typeid(Eigen::AngleAxisd))
                 return get<Eigen::AngleAxisd>(o.mData).angle()==get<Eigen::AngleAxisd>(mData).angle()
                     && get<Eigen::AngleAxisd>(o.mData).axis()==get<Eigen::AngleAxisd>(mData).axis();
@@ -171,8 +171,8 @@ namespace SpinXML {
 
         typedef boost::variant<EulerAngles,Eigen::AngleAxisd,Eigen::Quaterniond,Eigen::Matrix3d> var_t;
 
-		//HACK
-		const var_t& __get_variant() const {return mData;}
+        //HACK
+        const var_t& __get_variant() const {return mData;}
     private:
         var_t mData;
     };

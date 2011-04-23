@@ -13,28 +13,28 @@ DECLARE_EVENT_TYPE(EVT_ORIENT_EDIT, -1)
 
 class OrientEditPanel : public OrientEditPanelBase {
 public:
-  OrientEditPanel(wxWindow* parent,
-		  wxWindowID id = wxID_ANY,
-		  const wxPoint& pos = wxDefaultPosition,
-		  const wxSize& size = wxDefaultSize,
-		  long style = wxTAB_TRAVERSAL);
+    OrientEditPanel(wxWindow* parent,
+                    wxWindowID id = wxID_ANY,
+                    const wxPoint& pos = wxDefaultPosition,
+                    const wxSize& size = wxDefaultSize,
+                    long style = wxTAB_TRAVERSAL);
 
-  void SetOrient(const SpinXML::Orientation& orient);
-  const SpinXML::Orientation& GetOrient() {return mOrient;}  
+    void SetOrient(const SpinXML::Orientation& orient);
+    const SpinXML::Orientation& GetOrient() {return mOrient;}  
 
-  void OnTextChange(wxCommandEvent& e);
-  void OnPageChange(wxChoicebookEvent& e);
+    void OnTextChange(wxCommandEvent& e);
+    void OnPageChange(wxChoicebookEvent& e);
 
-  void LoadFromOrient();
-  void SaveToOrient();
+    void LoadFromOrient();
+    void SaveToOrient();
 
 
 protected:
-  DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 private:
-  SpinXML::Orientation mOrient;
-  bool mLoading;
-  bool mDirty;
+    SpinXML::Orientation mOrient;
+    bool mLoading;
+    bool mDirty;
 };
 
 //============================================================//
@@ -42,20 +42,20 @@ private:
 
 class OrientEditDialog : public OrientDialogBase {
 public:
-  OrientEditDialog(wxWindow* parent,wxWindowID id=-1);
+    OrientEditDialog(wxWindow* parent,wxWindowID id=-1);
 
-  int ShowModal();
+    int ShowModal();
 
-  void SetOrient(const SpinXML::Orientation& orient) {mOrientEditPanel->SetOrient(orient);}
-  const SpinXML::Orientation& GetOrient() {return mOrientEditPanel->GetOrient();}
+    void SetOrient(const SpinXML::Orientation& orient) {mOrientEditPanel->SetOrient(orient);}
+    const SpinXML::Orientation& GetOrient() {return mOrientEditPanel->GetOrient();}
 
-  void SaveToOrient() {mOrientEditPanel->SaveToOrient();}
+    void SaveToOrient() {mOrientEditPanel->SaveToOrient();}
 
-  void OnApply(wxCommandEvent& e);
+    void OnApply(wxCommandEvent& e);
 protected:
-  DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 private:
-  OrientEditPanel* mOrientEditPanel;
+    OrientEditPanel* mOrientEditPanel;
 };
 
 //============================================================//
@@ -63,20 +63,20 @@ private:
 
 class OrientDialogCombo : public DialogCombo<OrientEditDialog> {
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-	OrientDialogCombo(wxWindow* parent,wxWindowID id=-1);
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    OrientDialogCombo(wxWindow* parent,wxWindowID id=-1);
 
-	void SetOrient(const SpinXML::Orientation& orient);
-	const SpinXML::Orientation& GetOrient() {return mOrient;}
+    void SetOrient(const SpinXML::Orientation& orient);
+    const SpinXML::Orientation& GetOrient() {return mOrient;}
 
-	virtual void SetStringValue(const wxString& s);
+    virtual void SetStringValue(const wxString& s);
 
 protected:
-	virtual OrientEditDialog* CreateDialog();
-	virtual void ReadDialog(OrientEditDialog* dlg);
-	virtual wxString GetStringFromDialog(OrientEditDialog* dlg);
+    virtual OrientEditDialog* CreateDialog();
+    virtual void ReadDialog(OrientEditDialog* dlg);
+    virtual wxString GetStringFromDialog(OrientEditDialog* dlg);
 private:
-	SpinXML::Orientation mOrient;
+    SpinXML::Orientation mOrient;
 };
 
 #endif

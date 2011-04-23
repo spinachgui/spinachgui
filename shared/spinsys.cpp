@@ -18,12 +18,12 @@ using namespace boost;
 // SpinSystem
 
 SpinSystem::SpinSystem()
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
+        : mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
 }
 
 
 SpinSystem::SpinSystem(const SpinSystem& system)
-	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
+    : mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
     long spinCount=system.mSpins.size();
 
     mSpins.resize(spinCount);
@@ -35,23 +35,23 @@ SpinSystem::SpinSystem(const SpinSystem& system)
 
 
 void SpinSystem::SetupLabFrame() {
-	delete mRootFrame;
-	mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
+    delete mRootFrame;
+    mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
 }
 
 SpinSystem::~SpinSystem() {
     Clear();
-	delete mRootFrame;
+    delete mRootFrame;
 }
 
 void SpinSystem::Clear() {
     while(mSpins.size() > 0) {
-		//Caling the destructor of Spin triggers removal
+        //Caling the destructor of Spin triggers removal
         delete mSpins[0];
     }
 
-	delete mRootFrame;
-	mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
+    delete mRootFrame;
+    mRootFrame = new Frame(Vector3d(0,0,0),Orientation());
 
     sigReloaded();
 }
@@ -68,7 +68,7 @@ long SpinSystem::GetSpinCount() const {
 
 Spin* SpinSystem::GetSpin(unsigned long n) const {
     if(n+1 > mSpins.size()) {
-	//throw runtime_error("In SpinSystem::GetSpin Invalid spin number");
+        //throw runtime_error("In SpinSystem::GetSpin Invalid spin number");
     }
     return mSpins[n];
 }
@@ -101,7 +101,7 @@ vector<Spin*> SpinSystem::GetNearbySpins(Vector3d pos,length distance,Spin* Igno
         length deltaX=(x1-x2);
         length deltaY=(y1-y2);
         length deltaZ=(z1-z2);
-		length2 deltaR=deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ;
+        length2 deltaR=deltaX*deltaX+deltaY*deltaY+deltaZ*deltaZ;
         if(deltaR < dist2) {
             result.push_back(mSpins[i]);
         }
@@ -161,11 +161,11 @@ void SpinSystem::SaveToFile(const char* filename,ISpinSystemLoader* saver) const
 }
 
 void SpinSystem::CalcNuclearDipoleDipole() {
-	foreach(Interaction* inter,mInteractions) {
-		if(inter->GetType() == Interaction::DIPOLAR) {
-			RemoveInteraction(inter);
-		}
-	}
+    foreach(Interaction* inter,mInteractions) {
+        if(inter->GetType() == Interaction::DIPOLAR) {
+            RemoveInteraction(inter);
+        }
+    }
     for(unsigned long i=0;i<mSpins.size();i++) {
         Spin* spin1=mSpins[i];
         long element1=spin1->GetElement();
@@ -212,9 +212,9 @@ void SpinSystem::CalcNuclearDipoleDipole() {
 std::vector<Interaction*> SpinSystem::GetInteractionsBySpin(const Spin* spin,Interaction::Type t) const {
     vector<Interaction*> retVal;
     for(unsigned long i=0;i<mInteractions.size();i++) {
-		if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin)) { 
-			retVal.push_back(mInteractions[i]);
-		}
+        if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin)) { 
+            retVal.push_back(mInteractions[i]);
+        }
     }
     return retVal;
 }
@@ -222,9 +222,9 @@ std::vector<Interaction*> SpinSystem::GetInteractionsBySpin(const Spin* spin,Int
 std::vector<Interaction*> SpinSystem::GetInteractionsBySpin(const Spin* spin1, Spin* spin2,Interaction::Type t) const {
     vector<Interaction*> retVal;
     for(unsigned long i=0;i<mInteractions.size();i++) {
-		if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin1) && mInteractions[i]->GetHasSpin(spin2)) { 
-			retVal.push_back(mInteractions[i]);
-		}
+        if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin1) && mInteractions[i]->GetHasSpin(spin2)) { 
+            retVal.push_back(mInteractions[i]);
+        }
     }
     return retVal;
 }
@@ -232,11 +232,11 @@ std::vector<Interaction*> SpinSystem::GetInteractionsBySpin(const Spin* spin1, S
 std::vector<Interaction*> SpinSystem::GetInteractionsBySpinOnce(const Spin* spin,Interaction::Type t) const {
     vector<Interaction*> retVal;
     for(unsigned long i=0;i<mInteractions.size();i++) {
-		if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin)) { 
-			if(mInteractions[i]->GetOtherSpin(spin) < spin) {
-				retVal.push_back(mInteractions[i]);
-			}
-		}
+        if(mInteractions[i]->IsType(t) && mInteractions[i]->GetHasSpin(spin)) { 
+            if(mInteractions[i]->GetOtherSpin(spin) < spin) {
+                retVal.push_back(mInteractions[i]);
+            }
+        }
     }
     return retVal;
 }
@@ -254,53 +254,53 @@ Interaction* SpinSystem::RemoveInteraction(Interaction* inter) {
 
 
 void SpinSystem::InsertInteraction(Interaction* inter) {
-	mInteractions.push_back(inter);
-	inter->sigDying.connect(mem_fun(this,&SpinSystem::SlotInterDying));
-	sigNewInter.emit(inter);
+    mInteractions.push_back(inter);
+    inter->sigDying.connect(mem_fun(this,&SpinSystem::SlotInterDying));
+    sigNewInter.emit(inter);
 }
 
 
 void SpinSystem::OnSpinDeleted(Spin* spin) {
-	RemoveSpin(spin);
+    RemoveSpin(spin);
 }
 
 void SpinSystem::CompressDuplicateInteractions() {
-	//Do the monospin interactions
-	foreach(Spin* spin,mSpins) {
-		foreach(Interaction::Type t,MonoTypes) {
-			vector<Interaction*> toCrush = GetInteractionsBySpin(spin,t);
-			if(toCrush.size() > 1) {
-				Matrix3d total;
-				total << 
-					0, 0, 0,
-					0, 0, 0,
-					0, 0, 0;
-				foreach(Interaction* inter,toCrush) {
-					total += inter->AsMatrix();
-					delete RemoveInteraction(inter);
-				}
-				this->InsertInteraction(new Interaction(total,t,spin));
-			}
-		}
-	}
-	//Now do the binary spin interactions
-	for(vector<Spin*>::iterator i = mSpins.begin();i != mSpins.end(); ++i) {
-		for(vector<Spin*>::iterator j = i + 1; j != mSpins.end(); ++j) {
-			foreach(Interaction::Type t,BinaryTypes) {
-				vector<Interaction*> toCrush = GetInteractionsBySpin(*i,*j,t);
-				if(toCrush.size() > 1) {
-					Matrix3d total;
-					total << 
-						0, 0, 0,
-						0, 0, 0,
-						0, 0, 0;
-					foreach(Interaction* inter,toCrush) {
-						total += inter->AsMatrix();
-						delete RemoveInteraction(inter);
-					}
-					this->InsertInteraction(new Interaction(total,t,*i,*j));
-				}
-			}
-		}
-	}
+    //Do the monospin interactions
+    foreach(Spin* spin,mSpins) {
+        foreach(Interaction::Type t,MonoTypes) {
+            vector<Interaction*> toCrush = GetInteractionsBySpin(spin,t);
+            if(toCrush.size() > 1) {
+                Matrix3d total;
+                total << 
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0;
+                foreach(Interaction* inter,toCrush) {
+                    total += inter->AsMatrix();
+                    delete RemoveInteraction(inter);
+                }
+                this->InsertInteraction(new Interaction(total,t,spin));
+            }
+        }
+    }
+    //Now do the binary spin interactions
+    for(vector<Spin*>::iterator i = mSpins.begin();i != mSpins.end(); ++i) {
+        for(vector<Spin*>::iterator j = i + 1; j != mSpins.end(); ++j) {
+            foreach(Interaction::Type t,BinaryTypes) {
+                vector<Interaction*> toCrush = GetInteractionsBySpin(*i,*j,t);
+                if(toCrush.size() > 1) {
+                    Matrix3d total;
+                    total << 
+                        0, 0, 0,
+                        0, 0, 0,
+                        0, 0, 0;
+                    foreach(Interaction* inter,toCrush) {
+                        total += inter->AsMatrix();
+                        delete RemoveInteraction(inter);
+                    }
+                    this->InsertInteraction(new Interaction(total,t,*i,*j));
+                }
+            }
+        }
+    }
 }

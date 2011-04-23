@@ -46,21 +46,21 @@ wxString GetExtension(const wxString& filename) {
 class SpinSysDisplay3D : public Display3D {
 public:
     SpinSysDisplay3D(wxWindow* parent) 
-	: Display3D(parent),
-	  mElectronScene(GetCamera()),
-	  mTestText(wxT("Hello world")),
-	  mElectronInterDrawer(GetCamera()) {
+        : Display3D(parent),
+          mElectronScene(GetCamera()),
+          mTestText(wxT("Hello world")),
+          mElectronInterDrawer(GetCamera()) {
         
-	GetRawSS()->sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
-		
-	//Make sure that if anything changes we redraw the scene
-	SpinSystem::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinChange));
-	Spin::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotInterChange));
-	Interaction::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinSysChange));
+        GetRawSS()->sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
+                
+        //Make sure that if anything changes we redraw the scene
+        SpinSystem::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinChange));
+        Spin::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotInterChange));
+        Interaction::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinSysChange));
     }
-	void SlotSpinChange() {Refresh();}
-	void SlotInterChange() {Refresh();}
-	void SlotSpinSysChange() {Refresh();}
+    void SlotSpinChange() {Refresh();}
+    void SlotInterChange() {Refresh();}
+    void SlotSpinSysChange() {Refresh();}
 protected:
     virtual void DrawScene() {
         lighting.On();
@@ -99,20 +99,20 @@ protected:
         mInteractionScene.Draw();
 
         translucent.On();
-		mElectronInterDrawer.Draw();
+        mElectronInterDrawer.Draw();
         translucent.Off();
 
         wire.On();
         mElectronInterDrawer.Draw();
         wire.Off();
 
-        lighting.Off();		
+        lighting.Off();         
 
         glPopMatrix();
 
 
-	glRasterPos2f(40,40);
-	mTestText.glStamp();
+        glRasterPos2f(40,40);
+        mTestText.glStamp();
 
         lighting.Off();
     }
@@ -161,15 +161,15 @@ GLWire        SpinSysDisplay3D::wire;
 
 class RCActionActivateFrame : public RightClickAction {
 public:
-        RCActionActivateFrame(Frame* frame) 
-                : RightClickAction(wxT("Activate Frame")), mFrame(frame) {
-        }
-        bool Visible() const {return true;}
-        void Exec(wxCommandEvent& e) {
-                SetFrame(mFrame);
-        }
+    RCActionActivateFrame(Frame* frame) 
+        : RightClickAction(wxT("Activate Frame")), mFrame(frame) {
+    }
+    bool Visible() const {return true;}
+    void Exec(wxCommandEvent& e) {
+        SetFrame(mFrame);
+    }
 private:
-        Frame* mFrame;
+    Frame* mFrame;
 };
 
 //Quick class working with the wxWidgets clientData system
@@ -184,57 +184,57 @@ struct FramePointer : public wxTreeItemData {
 class FrameTree : public wxTreeCtrl , public sigc::trackable {
 public:
 
-	FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
-		mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
+    FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
+        mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
 
 
-		RefreshFromSpinSystem();
-		sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
-	}
+        RefreshFromSpinSystem();
+        sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
+    }
         
-	void RefreshFromSpinSystem() {
-		mapFrameToId.clear();
-		mapFrameToId[GetRawSS()->GetLabFrame()] = mRoot;
+    void RefreshFromSpinSystem() {
+        mapFrameToId.clear();
+        mapFrameToId[GetRawSS()->GetLabFrame()] = mRoot;
 
-		RefreshFromSpinSystemRecursive(mRoot,GetRawSS()->GetLabFrame());
+        RefreshFromSpinSystemRecursive(mRoot,GetRawSS()->GetLabFrame());
 
-		mActive = mapFrameToId[GetFrame()];
-		SetItemBold(mActive);
-		Refresh(); //Seems like we need to explicitly ask for a
-		//repaint
-	}
+        mActive = mapFrameToId[GetFrame()];
+        SetItemBold(mActive);
+        Refresh(); //Seems like we need to explicitly ask for a
+        //repaint
+    }
 
-	void SlotFrameChange(Frame* frame) {
-		SetItemBold(mActive,false);
-		mActive = mapFrameToId[frame];
-		SetItemBold(mActive);
-		Refresh();
-	}
+    void SlotFrameChange(Frame* frame) {
+        SetItemBold(mActive,false);
+        mActive = mapFrameToId[frame];
+        SetItemBold(mActive);
+        Refresh();
+    }
 private:
-	void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
-		mapFrameToId[frame] = itemId;
-		vector<Frame*> children = frame->GetChildren();
-		for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
-			wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
-			RefreshFromSpinSystemRecursive(nextItemId,*i);
-		}
-	}
+    void RefreshFromSpinSystemRecursive(wxTreeItemId itemId,Frame* frame) {
+        mapFrameToId[frame] = itemId;
+        vector<Frame*> children = frame->GetChildren();
+        for(vector<Frame*>::iterator i = children.begin();i != children.end();++i) {
+            wxTreeItemId nextItemId = AppendItem(itemId,wxT("Frame"),-1,-1,new FramePointer(*i));
+            RefreshFromSpinSystemRecursive(nextItemId,*i);
+        }
+    }
     
     void OnRightClick(wxTreeEvent& e) {
-		FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
-		RightClickMenu* menu = new RightClickMenu(this);
+        FramePointer* fp = (FramePointer*) GetItemData(e.GetItem());
+        RightClickMenu* menu = new RightClickMenu(this);
 
-		vector<RightClickAction*> actions;
-		actions.push_back(new RCActionActivateFrame(fp->frame));
+        vector<RightClickAction*> actions;
+        actions.push_back(new RCActionActivateFrame(fp->frame));
 
-		menu->Build(actions);
-		PopupMenu(menu);
-		delete menu;
+        menu->Build(actions);
+        PopupMenu(menu);
+        delete menu;
     }
     DECLARE_EVENT_TABLE();
-	wxTreeItemId mRoot;
-	wxTreeItemId mActive;
-	map<Frame*,wxTreeItemId> mapFrameToId;
+    wxTreeItemId mRoot;
+    wxTreeItemId mActive;
+    map<Frame*,wxTreeItemId> mapFrameToId;
 };
 
 
@@ -278,18 +278,18 @@ public:
 
 class InterDisplaySettingsPanel : public wxPanel,public sigc::trackable {
 public:
-	InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
-		wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
+    InterDisplaySettingsPanel(wxWindow* parent) : wxPanel(parent) {
+        wxBoxSizer* bs=new wxBoxSizer(wxVERTICAL);
 
-		//HACK: Quick hack to iterate though an enum
-		for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
-			Interaction::Type type = (Interaction::Type)i;
-			InterDisplaySettings* widget = new InterDisplaySettings(this,type);
-			bs->Add(widget,1,wxEXPAND);
-		}
+        //HACK: Quick hack to iterate though an enum
+        for(int i = Interaction::HFC;i != Interaction::TYPE_END;++i) {
+            Interaction::Type type = (Interaction::Type)i;
+            InterDisplaySettings* widget = new InterDisplaySettings(this,type);
+            bs->Add(widget,1,wxEXPAND);
+        }
 
-		this->SetSizer(bs);
-	}
+        this->SetSizer(bs);
+    }
 };
 
 
@@ -298,27 +298,27 @@ public:
 
 void RootFrame::InitFrame() {
     TextBitmap tb(wxT("hello world"));
-        //Setup the status bar
-        StatusBar* statusBar = new StatusBar(this);
-        SetStatusBar(statusBar);
+    //Setup the status bar
+    StatusBar* statusBar = new StatusBar(this);
+    SetStatusBar(statusBar);
 
-        //We start with bonds shown
+    //We start with bonds shown
     mRootToolbar->ToggleTool(ID_BOND_TOGGLE,true);
 
-        //We need to use Connect to set up an event handler for the
-        //selection->element trigger expicitly
-        wxObjectEventFunction afterCastElement = 
-                (wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnElementSelect);
-        Connect(ID_ELEMENT_START,ID_ELEMENT_END,wxEVT_COMMAND_MENU_SELECTED,afterCastElement);
+    //We need to use Connect to set up an event handler for the
+    //selection->element trigger expicitly
+    wxObjectEventFunction afterCastElement = 
+        (wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnElementSelect);
+    Connect(ID_ELEMENT_START,ID_ELEMENT_END,wxEVT_COMMAND_MENU_SELECTED,afterCastElement);
 
-        //Set up the AUI, including the view menu function
+    //Set up the AUI, including the view menu function
     mAuiManager=new wxAuiManager(this);
 
     mInterSizePanel= new InterDisplaySettingsPanel(this);
-        mSpinGrid      = new SpinGrid(this);
-        mSpinInterEdit = new SpinInterEditPanel(this);
-        mDisplay3D     = new SpinSysDisplay3D(this);
-        mFrameTree     = new FrameTree(this);
+    mSpinGrid      = new SpinGrid(this);
+    mSpinInterEdit = new SpinInterEditPanel(this);
+    mDisplay3D     = new SpinSysDisplay3D(this);
+    mFrameTree     = new FrameTree(this);
 
     // add the panes to the manager
     wxAuiPaneInfo display3dinfo;
@@ -326,93 +326,93 @@ void RootFrame::InitFrame() {
     display3dinfo.CaptionVisible(false);
     display3dinfo.CloseButton(false);
     display3dinfo.Movable(false);
-        display3dinfo.FloatingSize(wxSize(600,600)); //Workaround for http://trac.wxwidgets.org/ticket/12490
+    display3dinfo.FloatingSize(wxSize(600,600)); //Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mDisplay3D,display3dinfo);
 
-        wxAuiPaneInfo spinGridInfo;
-        spinGridInfo.Bottom();
-        spinGridInfo.Caption(wxT("Spins"));
-        spinGridInfo.FloatingSize(wxSize(600,600));//Workaround for http://trac.wxwidgets.org/ticket/12409
+    wxAuiPaneInfo spinGridInfo;
+    spinGridInfo.Bottom();
+    spinGridInfo.Caption(wxT("Spins"));
+    spinGridInfo.FloatingSize(wxSize(600,600));//Workaround for http://trac.wxwidgets.org/ticket/12409
     mAuiManager->AddPane(mSpinGrid,spinGridInfo);
 
-        wxAuiPaneInfo frameInfo;
-        frameInfo.Right();
-        frameInfo.Caption(wxT("Reference Frames"));
-        frameInfo.FloatingSize(wxSize(300,400));
-        mAuiManager->AddPane(mFrameTree,frameInfo);
+    wxAuiPaneInfo frameInfo;
+    frameInfo.Right();
+    frameInfo.Caption(wxT("Reference Frames"));
+    frameInfo.FloatingSize(wxSize(300,400));
+    mAuiManager->AddPane(mFrameTree,frameInfo);
 
     wxAuiPaneInfo tensorVisinfo;
-        tensorVisinfo.Float();
-        tensorVisinfo.Hide();
-        tensorVisinfo.Caption(wxT("Tensor Visualisation"));
-        tensorVisinfo.FloatingSize(wxSize(300,600)); //Workaround for http://trac.wxwidgets.org/ticket/12490
+    tensorVisinfo.Float();
+    tensorVisinfo.Hide();
+    tensorVisinfo.Caption(wxT("Tensor Visualisation"));
+    tensorVisinfo.FloatingSize(wxSize(300,600)); //Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mInterSizePanel,tensorVisinfo);
 
-        wxAuiPaneInfo spinInterEditInfo;
-        spinInterEditInfo.Bottom();
-        spinInterEditInfo.Caption(wxT("Interactions"));
-        spinInterEditInfo.FloatingSize(wxSize(600,400));//Workaround for http://trac.wxwidgets.org/ticket/12490
+    wxAuiPaneInfo spinInterEditInfo;
+    spinInterEditInfo.Bottom();
+    spinInterEditInfo.Caption(wxT("Interactions"));
+    spinInterEditInfo.FloatingSize(wxSize(600,400));//Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mSpinInterEdit,spinInterEditInfo);
 
-        //Setup the menu checks to reflect the default
-        mMenuItemGrid->Check(true);
-        mMenuItemTensorVis->Check(false);
-        mMenuItemIntEdit->Check(true);
-        mMenuItemFrames->Check(true);
+    //Setup the menu checks to reflect the default
+    mMenuItemGrid->Check(true);
+    mMenuItemTensorVis->Check(false);
+    mMenuItemIntEdit->Check(true);
+    mMenuItemFrames->Check(true);
 
 
     //Connect up the signals
     mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
-        sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
+    sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
 
-        //Units menu. To avoid writing an On* function for every unit
-        //(which would make making units configurable impossible) we
-        //connect them all to the same handler and setup a lookup for
-        //translating the id into a unit and physical dimension.
-        typedef pair<PhysDimension,unit> p;
+    //Units menu. To avoid writing an On* function for every unit
+    //(which would make making units configurable impossible) we
+    //connect them all to the same handler and setup a lookup for
+    //translating the id into a unit and physical dimension.
+    typedef pair<PhysDimension,unit> p;
 
-        mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
-        mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
-        mIdToUnit.push_back(p(DIM_LENGTH,BohrRadius));
+    mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
+    mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
+    mIdToUnit.push_back(p(DIM_LENGTH,BohrRadius));
 
-        mIdToUnit.push_back(p(DIM_LENGTH,metres));
+    mIdToUnit.push_back(p(DIM_LENGTH,metres));
 
-        mIdToUnit.push_back(p(DIM_ENERGY,Hz));  //Default
-        mIdToUnit.push_back(p(DIM_ENERGY,KHz));
-        mIdToUnit.push_back(p(DIM_ENERGY,MHz));
-        mIdToUnit.push_back(p(DIM_ENERGY,eV));
-        mIdToUnit.push_back(p(DIM_ENERGY,Joules));
+    mIdToUnit.push_back(p(DIM_ENERGY,Hz));  //Default
+    mIdToUnit.push_back(p(DIM_ENERGY,KHz));
+    mIdToUnit.push_back(p(DIM_ENERGY,MHz));
+    mIdToUnit.push_back(p(DIM_ENERGY,eV));
+    mIdToUnit.push_back(p(DIM_ENERGY,Joules));
 
-        for(unsigned long i = 0;i<mIdToUnit.size();i++) {
-                PhysDimension d = mIdToUnit[i].first;
-                unit u = mIdToUnit[i].second;
+    for(unsigned long i = 0;i<mIdToUnit.size();i++) {
+        PhysDimension d = mIdToUnit[i].first;
+        unit u = mIdToUnit[i].second;
 
-                wxMenu *menu = d == DIM_LENGTH ? mMenuLength : mMenuEnergy;
-                menu->AppendRadioItem(ID_UNIT_START+i,wxString(u.get_name().c_str(),wxConvUTF8));
-        }
-        wxObjectEventFunction afterCast = 
-                (wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
-        Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
+        wxMenu *menu = d == DIM_LENGTH ? mMenuLength : mMenuEnergy;
+        menu->AppendRadioItem(ID_UNIT_START+i,wxString(u.get_name().c_str(),wxConvUTF8));
+    }
+    wxObjectEventFunction afterCast = 
+        (wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
+    Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
 
 }
 
 void RootFrame::OnElementSelect(wxCommandEvent& e) {
-        cout << "OnElement" << endl;
-        int element = e.GetId() - ID_ELEMENT_START;
+    cout << "OnElement" << endl;
+    int element = e.GetId() - ID_ELEMENT_START;
     ClearSelection();
     vector<Spin*> spins = GetRawSS()->GetSpins();
     foreach(Spin* spin,spins) {
-                if(spin->GetElement() == element) {
-                        AddSelection(spin);
-                }
+        if(spin->GetElement() == element) {
+            AddSelection(spin);
+        }
     }
 }
 
 void RootFrame::OnUnitChange(wxCommandEvent& e) {
-        pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
-        PhysDimension d = thePair.first;
-        unit u = thePair.second;
-        SetUnit(d,u);
+    pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
+    PhysDimension d = thePair.first;
+    unit u = thePair.second;
+    SetUnit(d,u);
 }
 
 void RootFrame::OnNew(wxCommandEvent& e) {
@@ -497,7 +497,7 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
 
         }
     }
-	SetFrame(GetRawSS()->GetLabFrame());
+    SetFrame(GetRawSS()->GetLabFrame());
     Chkpoint(wxT("Load File"));
     UpdateTitle();
 }
@@ -604,26 +604,26 @@ void RootFrame::OnBondToggle(wxCommandEvent& e) {
              
 
 void RootFrame::OnToggleGrid(wxCommandEvent& e) {
-        AUIToggle(mSpinGrid);
+    AUIToggle(mSpinGrid);
 }
 
 void RootFrame::OnToggleTensorVis(wxCommandEvent& e) {
-        AUIToggle(mInterSizePanel);
+    AUIToggle(mInterSizePanel);
 }
 
 void RootFrame::OnToggleInterEdit(wxCommandEvent& e) {
-        AUIToggle(mSpinInterEdit);
+    AUIToggle(mSpinInterEdit);
 }
 
 void RootFrame::OnToggleFrames(wxCommandEvent& e) {
-        AUIToggle(mFrameTree);
+    AUIToggle(mFrameTree);
 }
 
 void RootFrame::AUIToggle(wxWindow* p) {
-        cout << "AUI Toggle" << endl;
+    cout << "AUI Toggle" << endl;
     wxAuiPaneInfo& info = mAuiManager->GetPane(p);
-        info.Show(!info.IsShown());
-        mAuiManager->Update();
+    info.Show(!info.IsShown());
+    mAuiManager->Update();
 }
 
 void RootFrame::OnMakeIso(wxCommandEvent& e) {
@@ -642,35 +642,35 @@ void RootFrame::OnMakeIso(wxCommandEvent& e) {
 
 
 void RootFrame::OnCalcDipoles(wxCommandEvent& e) {
-        GetRawSS()->CalcNuclearDipoleDipole();
+    GetRawSS()->CalcNuclearDipoleDipole();
 }
 
 void RootFrame::OnAxes(wxCommandEvent& e) {
-        SetMonoDrawMode(MONO_AXES);
+    SetMonoDrawMode(MONO_AXES);
 }
 
 void RootFrame::OnEllipsoid(wxCommandEvent& e) {
-        SetMonoDrawMode(MONO_ELIPSOID);
+    SetMonoDrawMode(MONO_ELIPSOID);
 }
 
 void RootFrame::OnMenu(wxMenuEvent& e) {
-        wxMenu* menu = e.GetMenu();
-        if(menu == mMenuSelection) {
-                //Destory the old menu
-                while(menu->GetMenuItemCount() >0) {
-                        menu->Destroy(menu->FindItemByPosition(0));
-                }
-                //Rebuild based on the list of elements present
-                vector<Spin*> spins = GetRawSS()->GetSpins();
-                set<int> elements;
-                foreach(Spin* spin,spins) {
-                        elements.insert(spin->GetElement());
-                }
-                foreach(int element,elements) {
-                        wxString name(getElementName(element),wxConvUTF8);
-                        menu->Append(ID_ELEMENT_START + element, name);
-                }
+    wxMenu* menu = e.GetMenu();
+    if(menu == mMenuSelection) {
+        //Destory the old menu
+        while(menu->GetMenuItemCount() >0) {
+            menu->Destroy(menu->FindItemByPosition(0));
         }
+        //Rebuild based on the list of elements present
+        vector<Spin*> spins = GetRawSS()->GetSpins();
+        set<int> elements;
+        foreach(Spin* spin,spins) {
+            elements.insert(spin->GetElement());
+        }
+        foreach(int element,elements) {
+            wxString name(getElementName(element),wxConvUTF8);
+            menu->Append(ID_ELEMENT_START + element, name);
+        }
+    }
 }
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)

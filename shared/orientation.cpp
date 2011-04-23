@@ -26,27 +26,27 @@ const double SpinXML::mu0=1.25663706e-6;
 EulerAngles SpinXML::ConvertToEuler(const EulerAngles& rot) {return rot;}
 EulerAngles SpinXML::ConvertToEuler(const Matrix3d&    rot) {return ConvertToEuler(ConvertToQuaternion(rot));}
 EulerAngles SpinXML::ConvertToEuler(const Quaterniond& rot) {
-	Vector3d z_axis=Vector3d(0,0,1);
-	Vector3d x_axis=Vector3d(1,0,0);
-	z_axis=rot*z_axis;
-	x_axis=rot*x_axis;
+    Vector3d z_axis=Vector3d(0,0,1);
+    Vector3d x_axis=Vector3d(1,0,0);
+    z_axis=rot*z_axis;
+    x_axis=rot*x_axis;
     
-	double gamma=atan2(z_axis.y(),z_axis.x());
-	double beta=atan2(sqrt(z_axis.x()*z_axis.x() + z_axis.y()*z_axis.y()),z_axis.z());
+    double gamma=atan2(z_axis.y(),z_axis.x());
+    double beta=atan2(sqrt(z_axis.x()*z_axis.x() + z_axis.y()*z_axis.y()),z_axis.z());
 
-	//Use γ and β to rotate V2 back onto the point 0,0,1
-	Quaterniond betaTwist(AngleAxisd(-beta, Vector3d(0,1,0)));
-	Quaterniond gammaTwist (AngleAxisd(-gamma,Vector3d(0,0,1)));
+    //Use γ and β to rotate V2 back onto the point 0,0,1
+    Quaterniond betaTwist(AngleAxisd(-beta, Vector3d(0,1,0)));
+    Quaterniond gammaTwist (AngleAxisd(-gamma,Vector3d(0,0,1)));
 
-	x_axis=(betaTwist*gammaTwist)*x_axis;
+    x_axis=(betaTwist*gammaTwist)*x_axis;
 
-	double alpha = atan2(x_axis.y(),x_axis.x());
-	if(alpha < 0 || alpha >= 2*PI)  alpha = alpha-2*PI*floor(alpha/(2*PI));
-	if(alpha >= 2*PI) alpha = 0;
-	if(beta < 0 || beta >= PI)    beta = beta-  PI*floor(beta/PI);
-	if(gamma < 0 || gamma >= 2*PI)  gamma = gamma-2*PI*floor(gamma/(2*PI));
-	if(gamma >= 2*PI) gamma = 0;
-	return EulerAngles(alpha,beta,gamma);
+    double alpha = atan2(x_axis.y(),x_axis.x());
+    if(alpha < 0 || alpha >= 2*PI)  alpha = alpha-2*PI*floor(alpha/(2*PI));
+    if(alpha >= 2*PI) alpha = 0;
+    if(beta < 0 || beta >= PI)    beta = beta-  PI*floor(beta/PI);
+    if(gamma < 0 || gamma >= 2*PI)  gamma = gamma-2*PI*floor(gamma/(2*PI));
+    if(gamma >= 2*PI) gamma = 0;
+    return EulerAngles(alpha,beta,gamma);
 }
 EulerAngles SpinXML::ConvertToEuler(const AngleAxisd&   rot) {return ConvertToEuler(ConvertToQuaternion(rot));}
 
@@ -56,10 +56,10 @@ Matrix3d    SpinXML::ConvertToDCM(const Quaterniond& rot) {return rot.toRotation
 Matrix3d    SpinXML::ConvertToDCM(const AngleAxisd&   rot){return ConvertToDCM(ConvertToQuaternion(rot));}
 
 Quaterniond SpinXML::ConvertToQuaternion(const EulerAngles& rot) {
-	Quaterniond q1(AngleAxisd(rot.alpha,Vector3d(0,0,1)));
-	Quaterniond q2(AngleAxisd(rot.beta, Vector3d(0,1,0)));
-	Quaterniond q3(AngleAxisd(rot.gamma,Vector3d(0,0,1)));
-	return q3*q2*q1;
+        Quaterniond q1(AngleAxisd(rot.alpha,Vector3d(0,0,1)));
+        Quaterniond q2(AngleAxisd(rot.beta, Vector3d(0,1,0)));
+        Quaterniond q3(AngleAxisd(rot.gamma,Vector3d(0,0,1)));
+        return q3*q2*q1;
 }
 Quaterniond SpinXML::ConvertToQuaternion(const Matrix3d&    rot) {return Quaterniond(rot);}
 Quaterniond SpinXML::ConvertToQuaternion(const Quaterniond& rot) {return rot;}
@@ -72,9 +72,9 @@ AngleAxisd  SpinXML::ConvertToAngleAxis(const AngleAxisd&   rot) {return rot;}
 
 //============================================================//
 // Rotation Normalizer bank
-EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Normalized();}							   
+EulerAngles SpinXML::NormalizeRotation(const EulerAngles& rot) {return rot.Normalized();}                                                          
 Matrix3d    SpinXML::NormalizeRotation(const Matrix3d& rot)    {return rot;}
-Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}							   
+Quaterniond SpinXML::NormalizeRotation(const Quaterniond& rot) {return rot.normalized();}                                                          
 AngleAxisd  SpinXML::NormalizeRotation(const AngleAxisd& rot)  {return AngleAxisd(rot.angle(),rot.axis().normalized());}
 
 
@@ -192,16 +192,16 @@ string Orientation::ToString() const {
 }
 
 void Orientation::FromString(std::string string) {
-  cerr << "Not Implimented" << endl;
+    cerr << "Not Implimented" << endl;
 }
 
-#define DEFINE_CONVERTER(name,return_type,function)		\
-	struct name : public static_visitor<return_type> {		\
-		return_type operator()(const EulerAngles& dat) const {return function(dat);} \
-		return_type operator()(const Matrix3d& dat) const    {return function(dat);} \
-		return_type operator()(const Quaterniond& dat) const {return function(dat);} \
-		return_type operator()(const AngleAxisd& dat) const  {return function(dat);} \
-	};
+#define DEFINE_CONVERTER(name,return_type,function)                     \
+    struct name : public static_visitor<return_type> {                  \
+        return_type operator()(const EulerAngles& dat) const {return function(dat);} \
+        return_type operator()(const Matrix3d& dat) const    {return function(dat);} \
+        return_type operator()(const Quaterniond& dat) const {return function(dat);} \
+        return_type operator()(const AngleAxisd& dat) const  {return function(dat);} \
+    };
 
 DEFINE_CONVERTER(AsEulerVisitor,EulerAngles,ConvertToEuler)
 EulerAngles Orientation::GetAsEuler() const {

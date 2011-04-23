@@ -9,47 +9,47 @@
 
 class SpinInterEditPanel : public SpinInterEditPanelBase, public sigc::trackable {
 public:
-	SpinInterEditPanel(wxWindow* parent,wxWindowID id= -1);
-	~SpinInterEditPanel();
+    SpinInterEditPanel(wxWindow* parent,wxWindowID id= -1);
+    ~SpinInterEditPanel();
 
-	void SetSpin(SpinXML::Spin* spin);
+    void SetSpin(SpinXML::Spin* spin);
 
-	//wx events originating from within
-	void OnNewButton(wxCommandEvent& e);
-	void OnDeleteButton(wxCommandEvent& e);
-	void OnInteractionChange(wxCommandEvent& e);
+    //wx events originating from within
+    void OnNewButton(wxCommandEvent& e);
+    void OnDeleteButton(wxCommandEvent& e);
+    void OnInteractionChange(wxCommandEvent& e);
 
-	void LoadFromSpin();
+    void LoadFromSpin();
 
-	void UpdateListBox();
-	void InteractionChange();
+    void UpdateListBox();
+    void InteractionChange();
 
-	enum EDIT_MODE {
-		EDIT_ALL,
-		EDIT_LINEAR,
-		EDIT_BILINEAR,
-		EDIT_QUAD
-	};
-	void SetEditMode(EDIT_MODE mEditMode);
+    enum EDIT_MODE {
+        EDIT_ALL,
+        EDIT_LINEAR,
+        EDIT_BILINEAR,
+        EDIT_QUAD
+    };
+    void SetEditMode(EDIT_MODE mEditMode);
 
 
 protected:
-	void Clear();
-	static wxString NameInteraction(SpinXML::Interaction* inter);
+    void Clear();
+    static wxString NameInteraction(SpinXML::Interaction* inter);
   
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 
 private:
-	//GUI Stuff
-	InterEditPanel* mInterEdit;
-	///Are we editing linear, bilinear, quadrapolar or all the
-	///interactions which apply to this spin
-	EDIT_MODE mEditMode;
+    //GUI Stuff
+    InterEditPanel* mInterEdit;
+    ///Are we editing linear, bilinear, quadrapolar or all the
+    ///interactions which apply to this spin
+    EDIT_MODE mEditMode;
 
-	//Data
-	SpinXML::Spin* mSpin;
+    //Data
+    SpinXML::Spin* mSpin;
   
-	bool mUpdatingListBox;
+    bool mUpdatingListBox;
 
 };
 

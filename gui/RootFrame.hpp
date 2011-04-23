@@ -17,7 +17,7 @@ class Display3D;
 class SpinInterEditPanel;
 
 namespace SpinXML {
-	class ISpinSystemLoader;
+        class ISpinSystemLoader;
 };
 
 class RootFrame : public RootFrameBase {
@@ -46,10 +46,10 @@ public:
 
     //Edit Menu Event handlers
     void OnMakeIso(wxCommandEvent& e);
-	void OnCalcDipoles(wxCommandEvent& e);
+    void OnCalcDipoles(wxCommandEvent& e);
 
     //Selection Menu
-	void OnElementSelect(wxCommandEvent& e);
+    void OnElementSelect(wxCommandEvent& e);
 
     //View Menu Event Hanlders
     void OnNmrEpr(wxCommandEvent& e);
@@ -57,19 +57,19 @@ public:
     void OnEpr(wxCommandEvent& e);
     void OnBondToggle(wxCommandEvent& e);
 
-	void OnToggleGrid(wxCommandEvent& e);
-	void OnToggleTensorVis(wxCommandEvent& e);
-	void OnToggleInterEdit(wxCommandEvent& e);
-	void OnToggleFrames(wxCommandEvent& e);
+    void OnToggleGrid(wxCommandEvent& e);
+    void OnToggleTensorVis(wxCommandEvent& e);
+    void OnToggleInterEdit(wxCommandEvent& e);
+    void OnToggleFrames(wxCommandEvent& e);
 
-	void OnSupress(wxCommandEvent& e);
-	void OnUnSupress(wxCommandEvent& e);
+    void OnSupress(wxCommandEvent& e);
+    void OnUnSupress(wxCommandEvent& e);
 
-	void OnAxes(wxCommandEvent& e);
-	void OnEllipsoid(wxCommandEvent& e);
+    void OnAxes(wxCommandEvent& e);
+    void OnEllipsoid(wxCommandEvent& e);
 
-	//Menu event, fired when a user opens a menu
-	void OnMenu(wxMenuEvent& e);
+    //Menu event, fired when a user opens a menu
+    void OnMenu(wxMenuEvent& e);
 
     //To prevent flicker, overide this function to do nothing
     void OnEraseBackground(wxEraseEvent& e) {e.Skip(false);}
@@ -79,8 +79,8 @@ public:
 
 
 
-	//Unit Menu
-	void OnUnitChange(wxCommandEvent& e);
+    //Unit Menu
+    void OnUnitChange(wxCommandEvent& e);
 
     DECLARE_EVENT_TABLE();
 
@@ -93,9 +93,9 @@ private:
     InterDisplaySettingsPanel* mInterSizePanel;
     SpinInterEditPanel* mSpinInterEdit;
     Display3D* mDisplay3D;
-	FrameTree* mFrameTree;
+    FrameTree* mFrameTree;
 
-	SpinXML::ISpinSystemLoader* mSaver;
+    SpinXML::ISpinSystemLoader* mSaver;
 
     ///Full path of the open file
     wxString mOpenPath;
@@ -104,9 +104,9 @@ private:
     ///Just the name of the open file
     wxString mOpenFile;
 
-	std::vector<std::pair<PhysDimension,unit> > mIdToUnit;
+    std::vector<std::pair<PhysDimension,unit> > mIdToUnit;
 
-	void AUIToggle(wxWindow* p);
+    void AUIToggle(wxWindow* p);
 };
 
 

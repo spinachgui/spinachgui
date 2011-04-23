@@ -15,10 +15,10 @@ struct Counter {
     Counter() {
         count++;
     }
-	Counter(const Counter&) {
-		count++;
-	}
-	static long objCount() {return count;}
+    Counter(const Counter&) {
+        count++;
+    }
+    static long objCount() {return count;}
 protected:
     ~Counter() {
         count--;

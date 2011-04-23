@@ -24,9 +24,9 @@ public:
 
     //sigc slots
     void OnNewSpin(SpinXML::Spin* newSpin,long number);
-	void SlotHover(SpinXML::Spin* spin);
-	void SlotSelectChange(std::set<SpinXML::Spin*> spins);
-	void SlotAnySpinDie(SpinXML::Spin* spin);
+    void SlotHover(SpinXML::Spin* spin);
+    void SlotSelectChange(std::set<SpinXML::Spin*> spins);
+    void SlotAnySpinDie(SpinXML::Spin* spin);
 
     //Overridden in order to emit a signal
     bool DeleteRows(int pos=0,int numRows=1,bool updateLables=true);
@@ -58,7 +58,7 @@ protected:
     void UpdateRowIsotopes(long row);
     void SetupRow(long rowNumber);
     void UpdateRow(long rowNumber);
-	void ColourRow(long rowNumber,const wxColor& c);
+    void ColourRow(long rowNumber,const wxColor& c);
 
 private:
     ~SpinGrid() {sigDying();}
@@ -69,7 +69,7 @@ private:
     };
     const static SpinGridColum columns[];
     bool mUpdating;
-	long mLastHover;
+    long mLastHover;
 };
 
 

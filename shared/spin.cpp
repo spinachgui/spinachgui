@@ -21,9 +21,9 @@ Spin::Spin(Vector3d Position,string Label,long atomicNumber,long isotope)
       mLabel(Label),
       mElement(atomicNumber),
       mIsotope(isotope) {
-	if(mIsotope == -1) {
-		mIsotope = getCommonIsotope(mElement);
-	}
+    if(mIsotope == -1) {
+        mIsotope = getCommonIsotope(mElement);
+    }
 }
 
 Spin::Spin(const Spin& s) :
@@ -34,7 +34,7 @@ Spin::Spin(const Spin& s) :
 }
 
 Spin::~Spin() {
-	sigAnySpinDying(this);
+    sigAnySpinDying(this);
 }
 
 Vector3d& Spin::GetPosition() {
@@ -47,16 +47,16 @@ void Spin::SetPosition(Vector3d Position) {
 }
 
 void Spin::GetCoordinates(length* _x,length* _y, length* _z) const {
-	*_x=mPosition.x();
-	*_y=mPosition.y();
-	*_z=mPosition.z();
+    *_x=mPosition.x();
+    *_y=mPosition.y();
+    *_z=mPosition.z();
 }
 
 
 void Spin::SetCoordinates(length _x,length _y, length _z) {
-	mPosition[0]=_x;
-	mPosition[1]=_y;
-	mPosition[2]=_z;
+    mPosition[0]=_x;
+    mPosition[1]=_y;
+    mPosition[2]=_z;
     sigChange();
 }
 

@@ -17,9 +17,9 @@
 
 
 namespace SpinXML {
-	class Spin;
-	class SpinSystem;
-	class ISpinSystemLoader;
+    class Spin;
+    class SpinSystem;
+    class ISpinSystemLoader;
 };
 
 

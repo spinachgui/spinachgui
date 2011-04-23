@@ -9,7 +9,7 @@ class RightClickAction {
     friend class RightClickMenu;
 public:
     RightClickAction(const wxString& text) 
-	: mText(text) {
+        : mText(text) {
     }
     virtual ~RightClickAction() {}
     virtual void Exec(wxCommandEvent& e) = 0;

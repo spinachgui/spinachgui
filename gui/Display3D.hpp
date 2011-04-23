@@ -49,7 +49,7 @@ protected:
 
     //Returns the name stack of the closest object moused over
     virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) =0;
-	
+        
     virtual void DrawScene() = 0;
     virtual void DrawForeground() = 0;
 
@@ -72,7 +72,7 @@ private:
     int mBandBoxStartX;
     int mBandBoxStartY;
 
-	bool mDraging;
+    bool mDraging;
 
     //3D Variables
     Camera* mCamera;

@@ -9,14 +9,14 @@
 #include <3d/camera.hpp>
 
 enum GLName {
-	NAME_NONE = 0,
+    NAME_NONE = 0,
     NAME_AXIS,
     NAME_SPINS,
     NAME_BONDS,
     NAME_MONO_INTERACTIONS,
     NAME_BINARY_INTERACTIONS,
-	NAME_FG,
-	NAME_FRAME
+    NAME_FG,
+    NAME_FRAME
 };
 
 ///An abstract class who's job is to visualise part of a spin system
@@ -30,7 +30,7 @@ public:
 protected:
     virtual void Geometary() const = 0;
 private:
-	int mName;
+    int mName;
 };
 
 
@@ -77,7 +77,7 @@ protected:
 
 class ElectronInterDrawer : public Renderer {
 public:
-	ElectronInterDrawer(Camera* camera);
+    ElectronInterDrawer(Camera* camera);
 protected:
     virtual void Geometary() const;
     Camera* mCamera;
@@ -106,9 +106,9 @@ protected:
 
 class FrameDrawer : public Renderer {
 public:
-	FrameDrawer();
+    FrameDrawer();
 protected:
-	virtual void Geometary() const;
+    virtual void Geometary() const;
 };
 
 //================================================================================//
@@ -117,21 +117,21 @@ class SpinSysScene : public Renderer {
 public:
     SpinSysScene();
 protected:
-	virtual void Geometary() const;
+    virtual void Geometary() const;
 private:
-	SpinDrawer          mSpinDrawer;
-	BondDrawer          mBondDrawer;
-	FrameDrawer         mFrameDrawer;
+    SpinDrawer          mSpinDrawer;
+    BondDrawer          mBondDrawer;
+    FrameDrawer         mFrameDrawer;
 };
 
 class InteractionScene : public Renderer {
 public:
-	InteractionScene();
+    InteractionScene();
 protected:
-	virtual void Geometary() const;
+    virtual void Geometary() const;
 private:
-	MonoInterDrawer     mMonoDrawer;
-	BilinearInterDrawer mBinaryDrawer;
+    MonoInterDrawer     mMonoDrawer;
+    BilinearInterDrawer mBinaryDrawer;
 
 };
 

@@ -81,8 +81,8 @@ namespace SpinXML {
     Eigen::Matrix3d ToLabMatrix3d(const Frame* frame,const Eigen::Matrix3d& m);
     Eigen::Matrix3d FromLabMatrix3d(const Frame* frame,const Eigen::Matrix3d& m);
 
-	Orientation ToLabOrient(const Frame* frame,const Orientation& o);
-	Orientation FromLabOrient(const Frame* frame,const Orientation& o);
+    Orientation ToLabOrient(const Frame* frame,const Orientation& o);
+    Orientation FromLabOrient(const Frame* frame,const Orientation& o);
 };
 
 #endif

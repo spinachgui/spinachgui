@@ -18,16 +18,16 @@ public:
     void OnColourChange(wxColourPickerEvent& e);
     void OnVisibleChange(wxCommandEvent& e);
 
-	void SlotColourChange(SpinXML::Interaction::Type t,ColourRGB c);
-	void SlotVisible(SpinXML::Interaction::Type t,bool v);
-	void SlotScaleChange(SpinXML::Interaction::Type t,double v);
+    void SlotColourChange(SpinXML::Interaction::Type t,ColourRGB c);
+    void SlotVisible(SpinXML::Interaction::Type t,bool v);
+    void SlotScaleChange(SpinXML::Interaction::Type t,double v);
 
     sigc::signal<void,bool>      sigVisible;
     sigc::signal<void,ColourRGB> sigColour;
 protected:
     DECLARE_EVENT_TABLE();
 private:
-	SpinXML::Interaction::Type mType;
+    SpinXML::Interaction::Type mType;
 };
 
 #endif

@@ -53,7 +53,7 @@ void OrientEditPanel::LoadFromOrient() {
         mOrient.GetEuler(&alpha,&beta,&gamma);
         mAlphaCtrl->SetValue(wxString() << alpha / (2*PI) * 360);
         mBetaCtrl-> SetValue(wxString() << beta  / (2*PI) * 360);
-		mGammaCtrl->SetValue(wxString() << gamma / (2*PI) * 360);
+        mGammaCtrl->SetValue(wxString() << gamma / (2*PI) * 360);
         break;
     }
     case Orientation::ANGLE_AXIS: {
@@ -82,11 +82,11 @@ void OrientEditPanel::LoadFromOrient() {
         mXXCtrl->SetValue(wxString() << mat(0,0));
         mXYCtrl->SetValue(wxString() << mat(0,1));
         mXZCtrl->SetValue(wxString() << mat(0,2));
-             	     
+                     
         mYXCtrl->SetValue(wxString() << mat(1,0));
         mYYCtrl->SetValue(wxString() << mat(1,1));
         mYZCtrl->SetValue(wxString() << mat(1,2));
-             	     
+                     
         mZXCtrl->SetValue(wxString() << mat(2,0));
         mZYCtrl->SetValue(wxString() << mat(2,1));
         mZZCtrl->SetValue(wxString() << mat(2,2));
@@ -142,18 +142,18 @@ void OrientEditPanel::SaveToOrient() {
         mXXCtrl->GetValue().ToDouble(&xx);
         mXYCtrl->GetValue().ToDouble(&xy);
         mXZCtrl->GetValue().ToDouble(&xz);
-         	     
+                     
         mYXCtrl->GetValue().ToDouble(&yx);
         mYYCtrl->GetValue().ToDouble(&yy);
         mYZCtrl->GetValue().ToDouble(&yz);
-         	     
+                     
         mZXCtrl->GetValue().ToDouble(&zx);
         mZYCtrl->GetValue().ToDouble(&zy);
         mZZCtrl->GetValue().ToDouble(&zz);
 
         mOrient = MakeMatrix3d(xx,xy,xz,
-							   yx,yy,yz,
-							   zx,zy,zz);
+                               yx,yy,yz,
+                               zx,zy,zz);
         break;
         default:
             //Uh-oh, we have an undefined orientation for some reason
@@ -194,7 +194,7 @@ void OrientEditPanel::OnPageChange(wxChoicebookEvent& e) {
     }
     }
     LoadFromOrient();
-}
+    }
 
 BEGIN_EVENT_TABLE(OrientEditPanel,wxPanel)
 

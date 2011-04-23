@@ -15,13 +15,13 @@ namespace SpinXML {
     ///A class representing a spin in a spin system
     class Spin : public SpinXMLBase<Spin>, private Counter<Spin> {
     public:  
-		using Counter<Spin>::objCount;
+        using Counter<Spin>::objCount;
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         Spin(Eigen::Vector3d mPosition,std::string mLabel,long atomicNumber=1,long isotope=-1);
         Spin(const Spin& s);
         ~Spin();
   
-		Eigen::Vector3d& GetPosition();
+        Eigen::Vector3d& GetPosition();
         void SetPosition(Eigen::Vector3d Position);
         void GetCoordinates(length* _x,length* _y, length* _z) const;
         void SetCoordinates(length _x,length _y, length _z);
@@ -40,7 +40,7 @@ namespace SpinXML {
         long mIsotope;
     };
 
-	extern sigc::signal<void,Spin*> sigAnySpinDying;
+    extern sigc::signal<void,Spin*> sigAnySpinDying;
 
 
 };

@@ -63,7 +63,7 @@ long getCommonIsotope(long p) {
 }
 
 long getElementCount() {
-  return gKnownElements;
+    return gKnownElements;
 }
 
 const char* getElementSymbol(long p) {

@@ -12,7 +12,7 @@
 namespace SpinXML {
     ///============================================================//
     struct Eigenvalues {
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         Eigenvalues(const double _XX,const double _YY,const double _ZZ, const Orientation& o) 
             : xx(_XX), yy(_YY), zz(_ZZ), mOrient(o) {
         }
@@ -21,11 +21,11 @@ namespace SpinXML {
         double zz;
         Orientation mOrient;
     };
-	typedef Eigenvalues UEigenvalues;
+    typedef Eigenvalues UEigenvalues;
 
     ///============================================================//
     struct AxRhom {
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         AxRhom(const double _iso,const double _ax,const double _rh, const Orientation& o) 
             : iso(_iso), ax(_ax), rh(_rh), mOrient(o) {
         }
@@ -34,12 +34,12 @@ namespace SpinXML {
         double rh;
         Orientation mOrient;
     };
-	typedef AxRhom UAxRhom;
-	
+    typedef AxRhom UAxRhom;
+        
 
     ///============================================================//
     struct SpanSkew {
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         SpanSkew(const double _iso,const double _span,const double _skew, const Orientation& o) 
             : iso(_iso), span(_span), skew(_skew), mOrient(o) {
         }
@@ -48,7 +48,7 @@ namespace SpinXML {
         double skew;
         Orientation mOrient;
     };
-	typedef SpanSkew USpanSkew;
+    typedef SpanSkew USpanSkew;
 
     //Interaction converstions
     energy ConvertToScalar(const energy& inter);
@@ -58,7 +58,7 @@ namespace SpinXML {
     energy ConvertToScalar(const SpanSkew& inter);
 
     Eigen::Matrix3d ConvertToMatrix(const energy& inter);
-	Eigen::Matrix3d ConvertToMatrix(const Eigen::Matrix3d& inter);
+    Eigen::Matrix3d ConvertToMatrix(const Eigen::Matrix3d& inter);
     Eigen::Matrix3d ConvertToMatrix(const Eigenvalues& inter);
     Eigen::Matrix3d ConvertToMatrix(const AxRhom& inter);
     Eigen::Matrix3d ConvertToMatrix(const SpanSkew& inter);
@@ -84,7 +84,7 @@ namespace SpinXML {
 
     class Interaction : public SpinXMLBase<Interaction>, private Counter<Interaction> {
     public:
-		using Counter<Interaction>::objCount;
+        using Counter<Interaction>::objCount;
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Enumeration of the storage conventions used by this interaction
         enum Storage {
@@ -124,47 +124,47 @@ namespace SpinXML {
             //Interactions relevent to both nmr and epr
             QUADRUPOLAR,
             DIPOLAR,
-            CUSTOM_LINEAR,	 
+            CUSTOM_LINEAR,       
             CUSTOM_BILINEAR,
             CUSTOM_QUADRATIC,
-			
-			TYPE_END
+                        
+            TYPE_END
         };
-		
+                
 
         ///Construct from a scalar
         Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-			Invariant();
+            InitalSetType(t,spin1,spin2);
+            Invariant();
         }
         ///Construct from a matrix
         Interaction(const Eigen::Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-			Invariant();
+            InitalSetType(t,spin1,spin2);
+            Invariant();
         }
         ///Construct from a matrix
         Interaction(const Eigenvalues& inter ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-			Invariant();
+            InitalSetType(t,spin1,spin2);
+            Invariant();
         }
         ///Construct from a matrix
         Interaction(const AxRhom& inter      ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-			Invariant();
+            InitalSetType(t,spin1,spin2);
+            Invariant();
         }
         ///Construct from a matrix
         Interaction(const SpanSkew& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
             : mData(inter), mSpin1(NULL), mSpin2(NULL)  {
-			InitalSetType(t,spin1,spin2);
-			Invariant();
+            InitalSetType(t,spin1,spin2);
+            Invariant();
         }
-	protected:
-		void InitalSetType(Type t,Spin* spin1, Spin* spin2);
-	public:
+    protected:
+        void InitalSetType(Type t,Spin* spin1, Spin* spin2);
+    public:
         ///Destructor
         ~Interaction();
 
@@ -265,14 +265,14 @@ namespace SpinXML {
         ///the other spin. In all other cases return NULL
         Spin* GetOtherSpin(const Spin* spin) const {return (mSpin1==spin ? mSpin2 : 
                                                             (mSpin2==spin ? mSpin1 : NULL));}
-		///Returns true if the interaction involves Spin spin
-		bool GetHasSpin(const Spin* spin) const {return mSpin1 == spin || mSpin2 == spin;}
+        ///Returns true if the interaction involves Spin spin
+        bool GetHasSpin(const Spin* spin) const {return mSpin1 == spin || mSpin2 == spin;}
     private:
-		void Invariant() const;
+        void Invariant() const;
         void valid_or_throw() const;
 
-		typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
-		var_t mData;
+        typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
+        var_t mData;
         Type mType;
 
         Spin* mSpin1;
@@ -281,16 +281,16 @@ namespace SpinXML {
         sigc::connection mDyingConnect2;
     };
 
-	extern std::vector<Interaction::Type> Types;
-	extern std::vector<Interaction::Type> MonoTypes;
-	extern std::vector<Interaction::Type> BinaryTypes;
+    extern std::vector<Interaction::Type> Types;
+    extern std::vector<Interaction::Type> MonoTypes;
+    extern std::vector<Interaction::Type> BinaryTypes;
 
 };
 
 //Private
 
 struct __InterInit {
-	__InterInit();
+        __InterInit();
 };
 
 #endif

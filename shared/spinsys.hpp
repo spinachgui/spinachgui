@@ -48,7 +48,7 @@ namespace SpinXML {
 
     class SpinSystem : public SpinXMLBase<SpinSystem> {
     public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         SpinSystem();
         SpinSystem(const SpinSystem& system);
         ~SpinSystem();
@@ -70,18 +70,18 @@ namespace SpinXML {
         Spin* RemoveSpin(Spin* _Spin);
 
         ///Remove a spin from the spin system.
-		void DiscardSpin(long Position) {delete RemoveSpin(Position);}
+        void DiscardSpin(long Position) {delete RemoveSpin(Position);}
         ///Remove a spin from the spin system.
-		void DiscardSpin(Spin* _Spin)   {delete RemoveSpin(_Spin);}
+        void DiscardSpin(Spin* _Spin)   {delete RemoveSpin(_Spin);}
 
 
         void OnSpinDeleted(Spin* spin);
 
         void InsertInteraction(Interaction* inter);
         Interaction* RemoveInteraction(Interaction* inter);
-		void SlotInterDying(Interaction* inter) {RemoveInteraction(inter);}
+        void SlotInterDying(Interaction* inter) {RemoveInteraction(inter);}
 
-		void DiscardInteraction(Interaction* inter) {delete RemoveInteraction(inter);}
+        void DiscardInteraction(Interaction* inter) {delete RemoveInteraction(inter);}
 
         long GetInterCount() const {return mInteractions.size();}
 
@@ -91,8 +91,8 @@ namespace SpinXML {
         std::vector<Interaction*> GetInteractionsBySpin(const Spin* spin1, Spin* spin2,Interaction::Type t=Interaction::ANY) const;
         //Returns all interactions involving Spin spin
         std::vector<Interaction*> GetInteractionsBySpinOnce(const Spin* spin,Interaction::Type t=Interaction::ANY) const;
-		//Returns all interactions. Good for writing output filters
-		std::vector<Interaction*> GetAllInteractions() const {return mInteractions;}
+        //Returns all interactions. Good for writing output filters
+        std::vector<Interaction*> GetAllInteractions() const {return mInteractions;}
 
         void LoadFromFile(const char* filename,ISpinSystemLoader* loader);
         void SaveToFile(const char* filename,ISpinSystemLoader* saver) const;
@@ -109,22 +109,22 @@ namespace SpinXML {
         ///from the positions off the nuclear spins
         void CalcNuclearDipoleDipole();
 
-		///If two interactions act on the same spin or spin pair,
-		///crush them into one, large, equivilent interaction. This
-		///treatment is needed, for example, after loading from a
-		///gaussian file (gaussian gives the isotropic and anisotropic
-		///parts seperatly)
-		void CompressDuplicateInteractions();
+        ///If two interactions act on the same spin or spin pair,
+        ///crush them into one, large, equivilent interaction. This
+        ///treatment is needed, for example, after loading from a
+        ///gaussian file (gaussian gives the isotropic and anisotropic
+        ///parts seperatly)
+        void CompressDuplicateInteractions();
 
-		///Get the lab frame, which is always an unrotated frame centred at the origin
-		Frame* GetLabFrame() const {return mRootFrame;}
+        ///Get the lab frame, which is always an unrotated frame centred at the origin
+        Frame* GetLabFrame() const {return mRootFrame;}
 
-		///Delete all frames and create a single lab frame
-		void SetupLabFrame();
+        ///Delete all frames and create a single lab frame
+        void SetupLabFrame();
     private:
         std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;
-		Frame* mRootFrame;
+        Frame* mRootFrame;
     };
 
 

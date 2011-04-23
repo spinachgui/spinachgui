@@ -33,7 +33,7 @@ Display3D::Display3D(wxWindow* parent)
     mCamera = new Camera;
     mPicking = new GLPicking(2000);
 
-	mDraging = false;
+    mDraging = false;
 
     mBandBoxOn = false;
     mBandBoxStartX = -1;
@@ -49,17 +49,17 @@ Display3D::Display3D(wxWindow* parent)
 }
 
 void Display3D::ResetView() {
-	cout << "Not implimented Display3D::ResetView()" << endl;
+    cout << "Not implimented Display3D::ResetView()" << endl;
     Refresh();
 }
 
 Display3D::~Display3D() {
-	if(mCamera) {
-		delete mCamera;
-	}
-	if(mPicking) {
-		delete mPicking;
-	}
+    if(mCamera) {
+	delete mCamera;
+    }
+    if(mPicking) {
+	delete mPicking;
+    }
 }
 
 
@@ -74,7 +74,7 @@ void Display3D::EnableGL() {
 
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glClearDepth(1.0);
-	glEnable (GL_DEPTH_TEST);
+    glEnable (GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
 
     glShadeModel(GL_SMOOTH);
@@ -86,14 +86,14 @@ void Display3D::EnableGL() {
     //Create a dictionary of colours
     glMatrixMode(GL_MODELVIEW);
 
-	SetQuadric(QUAD_SOLID);
+    SetQuadric(QUAD_SOLID);
 
     //Generate a texture for saving the depth buffer to
     //glGenTextures(1,&mTexDepth);
     //Generate a texture for saving the depth buffer to
     //glGenFramebuffers(1,&mFB);
 
-	glEnable(GL_NORMALIZE);
+    glEnable(GL_NORMALIZE);
 }
 
 void Display3D::ChangeViewport() {
@@ -104,25 +104,25 @@ void Display3D::ChangeViewport() {
 
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
-	if(e.Dragging()) {
-		mDraging = true;
-	} else {
-		mDraging = false;
-	}
+    if(e.Dragging()) {
+	mDraging = true;
+    } else {
+	mDraging = false;
+    }
     if(e.Dragging() && e.RightIsDown()) {
-		mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+	mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
-		if(e.ShiftDown()) {
-			//Band box select
-			if(!mBandBoxOn) {
-				mBandBoxOn = true;
-				mBandBoxStartX = mMouseX;
-				mBandBoxStartY = mMouseY;
-			}
-		} else {
-			//Ajust camera angle
-			mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
-		}
+	if(e.ShiftDown()) {
+	    //Band box select
+	    if(!mBandBoxOn) {
+		mBandBoxOn = true;
+		mBandBoxStartX = mMouseX;
+		mBandBoxStartY = mMouseY;
+	    }
+	} else {
+	    //Ajust camera angle
+	    mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+	}
     } 
     mMouseX=e.GetX();
     mMouseY=e.GetY();
@@ -131,45 +131,45 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
 
 
 void Display3D::OnWheel(wxMouseEvent& e) {
-	mCamera->DeltaZoom(-(0.001)*e.GetWheelRotation()/e.GetWheelDelta());
+    mCamera->DeltaZoom(-(0.001)*e.GetWheelRotation()/e.GetWheelDelta());
     Refresh();
 }
 
 void Display3D::OnRightClick(wxMouseEvent& e) {
     if(!mDraging) {
-		if(GetHover()!=NULL) {
-			RightClickMenu* menu = new RightClickMenu(this);
-			menu->Build();
-			PopupMenu(menu);
-			delete menu;
-		}
+	if(GetHover()!=NULL) {
+	    RightClickMenu* menu = new RightClickMenu(this);
+	    menu->Build();
+	    PopupMenu(menu);
+	    delete menu;
+	}
     }
 }
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(mBandBoxOn) {
-		cout << "Band Box Up" << endl;
-		mBandBoxOn = false;
-		return;
+	cout << "Band Box Up" << endl;
+	mBandBoxOn = false;
+	return;
     }
-	if(mDraging) {
-		return;
-	}
+    if(mDraging) {
+	return;
+    }
 
-	if(GetHover() == NULL) {
-		ClearSelection();
-		return;
-	}
+    if(GetHover() == NULL) {
+	ClearSelection();
+	return;
+    }
 
-	if(!e.ShiftDown()) {
-		SetSelection(GetHover());
+    if(!e.ShiftDown()) {
+	SetSelection(GetHover());
+    } else {
+	if(GetSelection().find(GetHover()) == GetSelection().end()) {
+	    AddSelection(GetHover());
 	} else {
-		if(GetSelection().find(GetHover()) == GetSelection().end()) {
-			AddSelection(GetHover());
-		} else {
-			RemoveSelection(GetHover());
-		}
+	    RemoveSelection(GetHover());
 	}
+    }
 
 }
 
@@ -215,41 +215,41 @@ void Display3D::OnPaint(wxPaintEvent& e) {
     Set2DView();
     DrawForeground();
     if(mBandBoxOn) {
-	//Draw any 2D components
-	glColor3f(0.0,0.0,0.0);
+        //Draw any 2D components
+        glColor3f(0.0,0.0,0.0);
 
 
-	glBegin(GL_LINE);
-	glVertex2i(mBandBoxStartX,height-mBandBoxStartY);
-	glVertex2i(mMouseX       ,height-mBandBoxStartY);
+        glBegin(GL_LINE);
+        glVertex2i(mBandBoxStartX,height-mBandBoxStartY);
+        glVertex2i(mMouseX       ,height-mBandBoxStartY);
 
-	glVertex2i(mMouseX       ,height-mBandBoxStartY);
-	glVertex2i(mMouseX       ,height-mMouseY       );
+        glVertex2i(mMouseX       ,height-mBandBoxStartY);
+        glVertex2i(mMouseX       ,height-mMouseY       );
 
-	glVertex2i(mMouseX       ,height-mMouseY       );
-	glVertex2i(mBandBoxStartX,height-mMouseY       );
+        glVertex2i(mMouseX       ,height-mMouseY       );
+        glVertex2i(mBandBoxStartX,height-mMouseY       );
 
-	glVertex2i(mBandBoxStartX,height-mMouseY       );
-	glVertex2i(mBandBoxStartX,height-mBandBoxStartY);
-	glEnd();
-	
+        glVertex2i(mBandBoxStartX,height-mMouseY       );
+        glVertex2i(mBandBoxStartX,height-mBandBoxStartY);
+        glEnd();
+        
     }
 
     SwapBuffers();
     while (true) {
-	GLenum x = glGetError() ;
+        GLenum x = glGetError() ;
 
-	if ( x == GL_NO_ERROR )
-	    break;
-	cout << "OpenGL error:" << gluErrorString(x) << endl;
+        if ( x == GL_NO_ERROR )
+            break;
+        cout << "OpenGL error:" << gluErrorString(x) << endl;
     }
 }
 
 void Display3D::StartPicking() {
     if(mBandBoxOn) {
-	mPicking->SetBox(mMouseX,mMouseY,mBandBoxStartX-mMouseX,mBandBoxStartY-mMouseX);
+        mPicking->SetBox(mMouseX,mMouseY,mBandBoxStartX-mMouseX,mBandBoxStartY-mMouseX);
     } else {
-	mPicking->SetBox(mMouseX,mMouseY,3,3);
+        mPicking->SetBox(mMouseX,mMouseY,3,3);
     }
     mPicking->On();
 }
@@ -266,22 +266,22 @@ void Display3D::StopPicking() {
     GLuint* closestNames=NULL;
     GLuint closestNameCount=0;
     if(hits <= 0) {
-		OnMouseOver3D(0,NULL);
-		return;
+	OnMouseOver3D(0,NULL);
+	return;
     }
 
     for(long i=0;i<hits;i++) {
-		GLuint name_count = *(buff++);
-		float d1=float(*(buff++))/0x7fffffff;
-		float d2=float(*(buff++))/0x7fffffff;
-		float thisDistance=d1<d2 ? d1 : d2;
-		if(closestDistance > thisDistance) {
-			closestDistance=thisDistance;
-			closestNames=buff;
-			closestNameCount=name_count;
-		}
-		buff+=name_count;
-		cout << endl;
+	GLuint name_count = *(buff++);
+	float d1=float(*(buff++))/0x7fffffff;
+	float d2=float(*(buff++))/0x7fffffff;
+	float thisDistance=d1<d2 ? d1 : d2;
+	if(closestDistance > thisDistance) {
+	    closestDistance=thisDistance;
+	    closestNames=buff;
+	    closestNameCount=name_count;
+	}
+	buff+=name_count;
+	cout << endl;
     }
     OnMouseOver3D(closestNameCount,closestNames);
 }

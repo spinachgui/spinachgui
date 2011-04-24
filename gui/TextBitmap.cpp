@@ -18,7 +18,8 @@ TextBitmap::TextBitmap(const wxString& text)
     wxMemoryDC textDC;
 
     wxSize size = textDC.GetTextExtent(mText);
-    Create(size.GetWidth(),size.GetHeight(),1);
+    cout << "(" << size.GetWidth()+1 << "," << size.GetHeight()+1 << ")" << endl;
+    Create(size.GetWidth()+1,size.GetHeight()+1,1);
 
     textDC.SelectObject(*this);
 
@@ -38,10 +39,11 @@ TextBitmap::TextBitmap(const wxString& text)
     long w = image.GetWidth();
     long h = image.GetHeight();
 
-    for(long i=0;i<w*h*3;i++) {
-	cout << long(data[i]) << " "; 
-	if(i % 40 == 0) cout << endl;
+    for(long i=0;i<w*h*3;i+=3) {
+	if(i % (w*3) == 0) cout << endl;
+	cout << (!isWhite(data+i) ? "1" : " "); 
     }
+    cout << endl;
 
     //If w*h is a multipul of 8 the bits fit exeactly into w*h bytes
     //otherwise we need an extra byte.
@@ -52,14 +54,14 @@ TextBitmap::TextBitmap(const wxString& text)
 	//that pure white is 0 otherwise 1
 	long rgbPos = i*24;
 	unsigned char byte = 0;
-	if(!isWhite(data+rgbPos     )) byte |=0x01;
-	if(!isWhite(data+rgbPos + 3 )) byte |=0x02;
-	if(!isWhite(data+rgbPos + 6 )) byte |=0x04;
-	if(!isWhite(data+rgbPos + 9 )) byte |=0x08;
-	if(!isWhite(data+rgbPos + 12)) byte |=0x10;
-	if(!isWhite(data+rgbPos + 15)) byte |=0x20;
-	if(!isWhite(data+rgbPos + 18)) byte |=0x40;
-	if(!isWhite(data+rgbPos + 21)) byte |=0x80;
+	if(!isWhite(data+rgbPos     )) byte |=0x80;
+	if(!isWhite(data+rgbPos + 3 )) byte |=0x40;
+	if(!isWhite(data+rgbPos + 6 )) byte |=0x20;
+	if(!isWhite(data+rgbPos + 9 )) byte |=0x10;
+	if(!isWhite(data+rgbPos + 12)) byte |=0x08;
+	if(!isWhite(data+rgbPos + 15)) byte |=0x04;
+	if(!isWhite(data+rgbPos + 18)) byte |=0x02;
+	if(!isWhite(data+rgbPos + 21)) byte |=0x01;
 	mBitmap[i] = byte;
     }
     //TODO Last 1-7 bits, if applicable

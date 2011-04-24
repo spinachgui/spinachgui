@@ -6,7 +6,6 @@
 #include <3d/displaySettings.hpp>
 #include <gui/Display3D.hpp>
 #include <gui/SpinachApp.hpp>
-#include <gui/MolSceneGraph.hpp>
 #include <gui/SpinGrid.hpp>
 #include <gui/SpinInteractionEdit.hpp>
 
@@ -297,7 +296,6 @@ public:
 // RootFrame
 
 void RootFrame::InitFrame() {
-    TextBitmap tb(wxT("hello world"));
     //Setup the status bar
     StatusBar* statusBar = new StatusBar(this);
     SetStatusBar(statusBar);

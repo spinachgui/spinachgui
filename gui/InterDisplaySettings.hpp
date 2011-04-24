@@ -4,7 +4,6 @@
 
 #include <auto/SpinachGUI.h>
 #include <shared/spinsys.hpp>
-#include <gui/MolSceneGraph.hpp>
 #include <3d/displaySettings.hpp>
 
 class InterDisplaySettings : public InterDisplaySettingsBase {

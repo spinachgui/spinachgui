@@ -18,7 +18,9 @@ TextBitmap::TextBitmap(const wxString& text)
     wxMemoryDC textDC;
 
     wxSize size = textDC.GetTextExtent(mText);
-    long w = size.GetWidth();
+    long w = size.GetWidth() * 2; //The *2 is to fix an apparent bug
+				  //where GetTextExtend doesn't seem
+				  //to return a big enough value
     long h = size.GetHeight();
     //Make sure the width is a multipul of eight
     w = w + 8 - (w % 8);
@@ -88,17 +90,21 @@ TextBitmap::TextBitmap(const wxString& text)
     cout << "mBitmap Contents:" << endl;
     for(long i = 0; i< bitmapLen; i++) {
 	if(i*8 % w ==0) cout << endl;
-        cout << ((mBitmap[i]&0x01) == 0x00 ? " " : "1");
-        cout << ((mBitmap[i]&0x02) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x04) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x08) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x10) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x20) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x40) == 0x00 ? " " : "1");
 	cout << ((mBitmap[i]&0x80) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x40) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x20) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x10) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x08) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x04) == 0x00 ? " " : "1");
+        cout << ((mBitmap[i]&0x02) == 0x00 ? " " : "1");
+        cout << ((mBitmap[i]&0x01) == 0x00 ? " " : "1");
     }
     cout << endl;
     //TODO Last 1-7 bits, if applicable
+}
+
+TextBitmap::~TextBitmap() {
+    delete [] mBitmap;
 }
 
 void TextBitmap::glStamp() {

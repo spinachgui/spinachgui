@@ -7,6 +7,7 @@
 class TextBitmap : public wxBitmap {
 public:
     TextBitmap(const wxString& text);
+    ~TextBitmap();
     void glStamp();
 private:
     wxString mText;

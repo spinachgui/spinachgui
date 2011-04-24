@@ -18,8 +18,11 @@ TextBitmap::TextBitmap(const wxString& text)
     wxMemoryDC textDC;
 
     wxSize size = textDC.GetTextExtent(mText);
-    cout << "(" << size.GetWidth()+1 << "," << size.GetHeight()+1 << ")" << endl;
-    Create(size.GetWidth()+1,size.GetHeight()+1,1);
+    long w = size.GetWidth();
+    long h = size.GetHeight();
+    //Make sure the width is a multipul of eight
+    w = w + 8 - (w % 8);
+    Create(w,h,1);
 
     textDC.SelectObject(*this);
 
@@ -36,34 +39,65 @@ TextBitmap::TextBitmap(const wxString& text)
     //Data now contains an height*width*3 array of colours in RGB
     //format.
     const unsigned char* data = image.GetData();
-    long w = image.GetWidth();
-    long h = image.GetHeight();
 
+    cout << "wxImage:" << endl;
     for(long i=0;i<w*h*3;i+=3) {
-	if(i % (w*3) == 0) cout << endl;
-	cout << (!isWhite(data+i) ? "1" : " "); 
+        if(i % (w*3) == 0) cout << endl;
+        cout << (!isWhite(data+i) ? "1" : " "); 
     }
     cout << endl;
 
     //If w*h is a multipul of 8 the bits fit exeactly into w*h bytes
     //otherwise we need an extra byte.
-    long bitmapLen = w*h / 8 + (w*h % 8 == 0 ? 0 : 1);
+    long bitmapLen = w*h / 8;
     mBitmap = new unsigned char[bitmapLen];
-    for(long i = 0; i < bitmapLen; i++){
-	//Summarize each RGB pixel into a single bit using the rule
-	//that pure white is 0 otherwise 1
-	long rgbPos = i*24;
-	unsigned char byte = 0;
-	if(!isWhite(data+rgbPos     )) byte |=0x80;
-	if(!isWhite(data+rgbPos + 3 )) byte |=0x40;
-	if(!isWhite(data+rgbPos + 6 )) byte |=0x20;
-	if(!isWhite(data+rgbPos + 9 )) byte |=0x10;
-	if(!isWhite(data+rgbPos + 12)) byte |=0x08;
-	if(!isWhite(data+rgbPos + 15)) byte |=0x04;
-	if(!isWhite(data+rgbPos + 18)) byte |=0x02;
-	if(!isWhite(data+rgbPos + 21)) byte |=0x01;
-	mBitmap[i] = byte;
+
+    //Summarize each RGB pixel into a single bit using the rule
+    //that pure white is 0 otherwise 1
+
+    //The loop indexes represent the x-y coordinates of a pixel in the
+    //wxImage
+    for(long rgbRow = 0; rgbRow < h; rgbRow++){
+        for(long rgbCol = 0; rgbCol < w; rgbCol+=8) {
+            long rgbPos = 3*(w*rgbRow + rgbCol);
+
+            unsigned char byte = 0;
+
+            cout << (!isWhite(data+rgbPos     ) ? "1" : " "); 
+            cout << (!isWhite(data+rgbPos + 3 ) ? "1" : " "); 
+            cout << (!isWhite(data+rgbPos + 6 ) ? "1" : " "); 
+            cout << (!isWhite(data+rgbPos + 9 ) ? "1" : " "); 
+            cout << (!isWhite(data+rgbPos + 12) ? "1" : " "); 
+            cout << (!isWhite(data+rgbPos + 15) ? "1" : " "); 
+            cout << (!isWhite(data+rgbPos + 18) ? "1" : " "); 
+            cout << (!isWhite(data+rgbPos + 21) ? "1" : " "); 
+            
+            if(!isWhite(data+rgbPos     )) byte |=0x80;
+            if(!isWhite(data+rgbPos + 3 )) byte |=0x40;
+            if(!isWhite(data+rgbPos + 6 )) byte |=0x20;
+            if(!isWhite(data+rgbPos + 9 )) byte |=0x10;
+            if(!isWhite(data+rgbPos + 12)) byte |=0x08;
+            if(!isWhite(data+rgbPos + 15)) byte |=0x04;
+            if(!isWhite(data+rgbPos + 18)) byte |=0x02;
+            if(!isWhite(data+rgbPos + 21)) byte |=0x01;
+            mBitmap[(h - rgbRow - 1)*w/8 + rgbCol/8] = byte;
+        }
+        cout << endl;
     }
+
+    cout << "mBitmap Contents:" << endl;
+    for(long i = 0; i< bitmapLen; i++) {
+	if(i*8 % w ==0) cout << endl;
+        cout << ((mBitmap[i]&0x01) == 0x00 ? " " : "1");
+        cout << ((mBitmap[i]&0x02) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x04) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x08) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x10) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x20) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x40) == 0x00 ? " " : "1");
+	cout << ((mBitmap[i]&0x80) == 0x00 ? " " : "1");
+    }
+    cout << endl;
     //TODO Last 1-7 bits, if applicable
 }
 
@@ -72,5 +106,9 @@ void TextBitmap::glStamp() {
     GLfloat yorig = 0.0;
     GLfloat xmove = 0.0;
     GLfloat ymove = 0.0;
+
+    //Set the packing alignment. Here each row ends on a byte
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
     glBitmap(GetWidth(),GetHeight(),xorig,yorig,xmove,ymove,mBitmap);
 }

@@ -17,6 +17,7 @@
 
 #include <shared/spinsys.hpp>
 
+
 using namespace std;
 using namespace SpinXML;
 using namespace Eigen;
@@ -455,11 +456,12 @@ void BilinearInterDrawer::Geometary() const {
 
 //============================================================//
 
+
 FrameDrawer::FrameDrawer() 
-        : Renderer(NAME_FRAME) {
+    : Renderer(NAME_FRAME),mX(wxT("X")),mY(wxT("Y")),mZ(wxT("Z")) {
 }
 
-void DrawFrameRecursive(Frame* frame) {
+void FrameDrawer::DrawFrameRecursive(const Frame* frame) const {
     glPushMatrix();
     double A = Angstroms.get_from_si();
     const double* d = frame->getTransformFromLab().data();
@@ -501,6 +503,14 @@ void DrawFrameRecursive(Frame* frame) {
         glVertex3f(0,0,0);
         glVertex3f(0,0,5);
     } glEnd();
+
+    //Lable them
+    glRasterPos3f(5,0,0);
+    mX.glStamp();
+    glRasterPos3f(0,5,0);
+    mY.glStamp();
+    glRasterPos3f(0,0,5);
+    mZ.glStamp();
 
     const vector<Frame*>& children = frame->GetChildren();
     for(vector<Frame*>::const_iterator i = children.begin();i != children.end();++i) {

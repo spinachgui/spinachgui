@@ -18,7 +18,6 @@
 #include <wx/aui/aui.h>
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
-#include <gui/TextBitmap.hpp>
 
 //Input and output filters
 #define ID_UNIT_START 12345
@@ -47,7 +46,6 @@ public:
     SpinSysDisplay3D(wxWindow* parent) 
         : Display3D(parent),
           mElectronScene(GetCamera()),
-          mTestText(wxT("Hello world")),
           mElectronInterDrawer(GetCamera()) {
         
         GetRawSS()->sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
@@ -109,10 +107,6 @@ protected:
 
         glPopMatrix();
 
-
-        glRasterPos2f(40,40);
-        mTestText.glStamp();
-
         lighting.Off();
     }
 
@@ -147,7 +141,6 @@ private:
     SpinSysScene     mMolScene;
     InteractionScene mInteractionScene;
     ElectronScene    mElectronScene;
-    TextBitmap       mTestText;
     ElectronInterDrawer mElectronInterDrawer;
 };
 GLLighting    SpinSysDisplay3D::lighting;

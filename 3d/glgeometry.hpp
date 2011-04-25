@@ -8,6 +8,8 @@
 #include <3d/opengl.hpp>
 #include <3d/camera.hpp>
 
+#include <gui/TextBitmap.hpp>
+
 enum GLName {
     NAME_NONE = 0,
     NAME_AXIS,
@@ -109,6 +111,11 @@ public:
     FrameDrawer();
 protected:
     virtual void Geometary() const;
+    const TextBitmap mX;
+    const TextBitmap mY;
+    const TextBitmap mZ;
+private:
+    void DrawFrameRecursive(const SpinXML::Frame* frame) const;
 };
 
 //================================================================================//

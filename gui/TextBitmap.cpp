@@ -107,7 +107,7 @@ TextBitmap::~TextBitmap() {
     delete [] mBitmap;
 }
 
-void TextBitmap::glStamp() {
+void TextBitmap::glStamp() const {
     GLfloat xorig = 0.0;
     GLfloat yorig = 0.0;
     GLfloat xmove = 0.0;

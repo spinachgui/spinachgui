@@ -88,6 +88,10 @@ InterEditPanel::InterEditPanel(wxWindow* parent,wxWindowID id)
     mSpin2Combo->SetId(SPIN2_COMBO);
 
     UpdateSubTypeCombo();
+
+    mOrientEigenvalueCtrl->sigChange.connect(mem_fun(this,&InterEditPanel::OnOrientChange));
+    mOrientAxRhomCtrl->sigChange.connect(mem_fun(this,&InterEditPanel::OnOrientChange));;
+    mOrientSpanSkewCtrl->sigChange.connect(mem_fun(this,&InterEditPanel::OnOrientChange));;
 }                                                            
                                                              
 void InterEditPanel::SetInter(Interaction* inter,Spin* withRespectTo) {
@@ -361,7 +365,7 @@ void InterEditPanel::SetTypeSelection(SpinXML::Interaction::Type t) {
     }
 }
 
-void InterEditPanel::OnOrientChange(wxCommandEvent& e){
+void InterEditPanel::OnOrientChange(){
     SaveToInter();
 }
 
@@ -372,7 +376,6 @@ EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,     InterEditPanel::OnPageChange)
 EVT_CHOICE                 (TYPE_COMBO,InterEditPanel::OnSubTypeChange)
 EVT_CHOICE                 (SPIN2_COMBO,  InterEditPanel::OnSubTypeChange)
 EVT_TEXT                   (wxID_ANY,     InterEditPanel::onTextChange)
-EVT_COMMAND                (wxID_ANY,EVT_ORIENT_EDIT,InterEditPanel::OnOrientChange)
 
 END_EVENT_TABLE()
 

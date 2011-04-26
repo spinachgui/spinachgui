@@ -4,7 +4,7 @@
 
 #include <auto/SpinachGUI.h>
 #include <shared/spinsys.hpp>
-#include <gui/DialogCombo.hpp>
+#include <sigc++/sigc++.h>
 
 DECLARE_EVENT_TYPE(EVT_ORIENT_EDIT, -1)
 
@@ -61,20 +61,22 @@ private:
 //============================================================//
 // OrientDialogCombo
 
-class OrientDialogCombo : public DialogCombo<OrientEditDialog> {
+class OrientDialogCombo : public wxButton {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     OrientDialogCombo(wxWindow* parent,wxWindowID id=-1);
 
     void SetOrient(const SpinXML::Orientation& orient);
     const SpinXML::Orientation& GetOrient() {return mOrient;}
+    
+    //Events
+    void OnClick(wxCommandEvent& e);
 
-    virtual void SetStringValue(const wxString& s);
-
+    sigc::signal<void> sigChange;
 protected:
-    virtual OrientEditDialog* CreateDialog();
-    virtual void ReadDialog(OrientEditDialog* dlg);
-    virtual wxString GetStringFromDialog(OrientEditDialog* dlg);
+    void ReadFromOrient();
+    DECLARE_EVENT_TABLE();
+
 private:
     SpinXML::Orientation mOrient;
 };

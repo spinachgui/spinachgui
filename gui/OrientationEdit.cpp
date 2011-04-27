@@ -235,37 +235,49 @@ END_EVENT_TABLE()
 //==========================================================//
 
 OrientDialogCombo::OrientDialogCombo(wxWindow* parent,wxWindowID id) 
-: DialogCombo<OrientEditDialog>(parent,id),mOrient(Quaterniond(1,0,0,0)) {
-  
+: wxButton(parent,id,wxT("")) {
 }
 
 void OrientDialogCombo::SetOrient(const Orientation& orient) {
     mOrient=orient;
-    SetText(wxString(mOrient.ToString().c_str(),wxConvUTF8));
+    ReadFromOrient();
 }
 
-OrientEditDialog* OrientDialogCombo::CreateDialog() {
+void OrientDialogCombo::ReadFromOrient() {
+    switch(mOrient.GetType()) {
+    case Orientation::EULER:
+	SetLabel(wxString(wxT("Euler Angles (ZYZ)")));
+	break;
+    case Orientation::ANGLE_AXIS:
+	SetLabel(wxString(wxT("Angle Axis")));
+	break;
+    case Orientation::QUATERNION:
+	SetLabel(wxString(wxT("Quaternion")));
+	break;
+    case Orientation::DCM:
+	SetLabel(wxString(wxT("DCM")));
+	break;
+    };
+
+}
+
+void OrientDialogCombo::OnClick(wxCommandEvent& e) {
     OrientEditDialog* dlg=new OrientEditDialog(this);
     dlg->SetOrient(mOrient);
-    return dlg;
+
+    if (dlg->ShowModal() == wxID_OK) {
+	mOrient = dlg->GetOrient();
+	ReadFromOrient();
+    }
+    dlg->Destroy();
+    SetFocus();
+    sigChange();
 }
 
-void OrientDialogCombo::ReadDialog(OrientEditDialog* dlg) {
-    mOrient=dlg->GetOrient();
-}
 
-void OrientDialogCombo::SetStringValue(const wxString& s) {
-  
-    return;
-}
+BEGIN_EVENT_TABLE(OrientDialogCombo,wxButton)
 
-wxString OrientDialogCombo::GetStringFromDialog(OrientEditDialog* dlg) {
-    mOrient=dlg->GetOrient();
+EVT_BUTTON(wxID_ANY,OrientDialogCombo::OnClick)
 
-    wxCommandEvent event(EVT_ORIENT_EDIT,GetId());
-    event.SetEventObject(this);
-    GetEventHandler()->ProcessEvent(event);
+END_EVENT_TABLE()
 
-    cout << "Getting the string " << mOrient.ToString() << endl;
-    return wxString(mOrient.ToString().c_str(),wxConvUTF8);
-}

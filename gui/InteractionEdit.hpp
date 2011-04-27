@@ -10,7 +10,7 @@
 #include <gui/DialogCombo.hpp>
 #include <sigc++/sigc++.h>
 
-class InterEditPanel : public InterEditPanelBase {
+class InterEditPanel : public InterEditPanelBase, public sigc::trackable {
 public:
     InterEditPanel(wxWindow* parent, wxWindowID id=-1);
   
@@ -23,7 +23,7 @@ public:
     void onTextChange(wxCommandEvent& e);
     void OnSubTypeChange(wxCommandEvent& e);
     void OnSpin2Change(wxCommandEvent& e);
-    void OnOrientChange(wxCommandEvent& e);
+    void OnOrientChange();
 
     void OnInterChange() {LoadFromInter();}
 

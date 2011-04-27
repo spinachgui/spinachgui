@@ -22,7 +22,7 @@
 #include <gui/SpinachApp.hpp>
 
 #include <cstdlib>
-
+#include <wx/msgdlg.h>
 #ifndef __LINUX__
 #include <windows.h>
 #endif
@@ -47,6 +47,17 @@ public:
 private:
     const T* m;
 };
+
+//------------------------------------------------------------//
+// Panic handler
+
+bool panicHandler(const string& s) {
+    wxString str(s.c_str(),wxConvUTF8);
+    wxString message;
+    message << wxT("An error occured, try to continue? The error was:\n") << str;
+    int result = wxMessageBox(message,wxT("Non-fatal Error"),wxYES_NO);
+    return result != wxYES;
+}
 
 //------------------------------------------------------------//
 // Unit Systems
@@ -123,7 +134,7 @@ SpinachApp& wxGetApp() {
 }
 
 #ifdef __LINUX__
-int main(int argc,char** argv) 
+int main(int argc,char** argv)
 #else
     int WINAPI WinMain(HINSTANCE hInstance,
                        HINSTANCE hPrevInstance,
@@ -133,6 +144,7 @@ int main(int argc,char** argv)
 #endif
 {
     atexit(&leakReport);
+    SetPanicHandler(&panicHandler);
     try {
         gApp = new SpinachApp;
         wxApp::SetInstance(gApp);
@@ -148,6 +160,7 @@ int main(int argc,char** argv)
     } catch (...) {
         cerr << "Uncaught unknown exception." << endl;
     }
+    return 0;
 }
 
 

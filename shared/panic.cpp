@@ -5,13 +5,25 @@
 
 using namespace std;
 
+bool (*gPanicHandler)(const string& s) = NULL;
+
+void SetPanicHandler(bool (*handler)(const string& s)) {
+    gPanicHandler = handler;
+}
+
 void PANIC(const string& s) {
+    bool abandon = false;
+    if(gPanicHandler != NULL) {
+        abandon = gPanicHandler(s);
+    }
     cout << "Panicking, " << s << endl;
     int* x = NULL;
     x++;
     x--;
     //Make use we use x with a side effect
-    cout << (*x) << endl;
+    if(abandon) {
+        cout << (*x) << endl;
+    }
 }
 
 void NaNPANIC(double n, const std::string& s) {
@@ -39,3 +51,5 @@ void NaNPANIC(const Eigen::Matrix3d& m, const std::string& s) {
     NaNPANIC(m(2,1),s);
     NaNPANIC(m(2,2),s);
 }
+
+

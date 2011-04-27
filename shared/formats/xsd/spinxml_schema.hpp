@@ -46,8 +46,10 @@
 
 #include <xsd/cxx/config.hxx>
 
+#ifndef __WINDOWS__
 #if (XSD_INT_VERSION != 3020000L)
 #error XSD runtime version mismatch
+#endif
 #endif
 
 #include <xsd/cxx/pre.hxx>
@@ -888,7 +890,7 @@ class vector: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~vector ();
 
   // Implementation.
@@ -1453,7 +1455,7 @@ class matrix: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~matrix ();
 
   // Implementation.
@@ -1545,7 +1547,7 @@ class orientation: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -1621,7 +1623,7 @@ class orientation: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -1697,7 +1699,7 @@ class orientation: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -1773,7 +1775,7 @@ class orientation: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -1849,7 +1851,7 @@ class orientation: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~orientation ();
 
   // Implementation.
@@ -1935,7 +1937,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -2011,7 +2013,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -2087,7 +2089,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -2163,7 +2165,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -2239,7 +2241,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -2315,7 +2317,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -2554,7 +2556,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the attribute.
    * Otherwise the attribute container is set the 'not present' state.
    */
@@ -2619,7 +2621,7 @@ class interaction: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the attribute.
    * Otherwise the attribute container is set the 'not present' state.
    */
@@ -2697,7 +2699,7 @@ class interaction: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~interaction ();
 
   // Implementation.
@@ -2981,7 +2983,7 @@ class euler_angles: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~euler_angles ();
 
   // Implementation.
@@ -3184,7 +3186,7 @@ class angle_axis: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~angle_axis ();
 
   // Implementation.
@@ -3507,7 +3509,7 @@ class quaternion: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~quaternion ();
 
   // Implementation.
@@ -3620,7 +3622,7 @@ class scalar: public ::xsd::cxx::tree::fundamental_base< ::xml_schema::double_, 
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~scalar ();
 };
 
@@ -3697,7 +3699,7 @@ class tensor: public ::matrix
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~tensor ();
 };
 
@@ -3908,7 +3910,7 @@ class eigenvalues: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~eigenvalues ();
 
   // Implementation.
@@ -4136,7 +4138,7 @@ class axiality_rhombicity: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~axiality_rhombicity ();
 
   // Implementation.
@@ -4364,7 +4366,7 @@ class span_skew: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~span_skew ();
 
   // Implementation.
@@ -4600,8 +4602,8 @@ class spin_system: public ::xml_schema::type
    *
    * @param s A sequence to copy elements from.
    *
-   * For each element in @a s this function makes a copy and adds it 
-   * to the sequence. Note that this operation completely changes the 
+   * For each element in @a s this function makes a copy and adds it
+   * to the sequence. Note that this operation completely changes the
    * sequence and all old elements will be lost.
    */
   void
@@ -4664,8 +4666,8 @@ class spin_system: public ::xml_schema::type
    *
    * @param s A sequence to copy elements from.
    *
-   * For each element in @a s this function makes a copy and adds it 
-   * to the sequence. Note that this operation completely changes the 
+   * For each element in @a s this function makes a copy and adds it
+   * to the sequence. Note that this operation completely changes the
    * sequence and all old elements will be lost.
    */
   void
@@ -4728,8 +4730,8 @@ class spin_system: public ::xml_schema::type
    *
    * @param s A sequence to copy elements from.
    *
-   * For each element in @a s this function makes a copy and adds it 
-   * to the sequence. Note that this operation completely changes the 
+   * For each element in @a s this function makes a copy and adds it
+   * to the sequence. Note that this operation completely changes the
    * sequence and all old elements will be lost.
    */
   void
@@ -4793,7 +4795,7 @@ class spin_system: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~spin_system ();
 
   // Implementation.
@@ -4878,7 +4880,7 @@ class spin: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the element.
    * Otherwise the element container is set the 'not present' state.
    */
@@ -5059,7 +5061,7 @@ class spin: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the attribute.
    * Otherwise the attribute container is set the 'not present' state.
    */
@@ -5136,7 +5138,7 @@ class spin: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~spin ();
 
   // Implementation.
@@ -5224,7 +5226,7 @@ class interaction1: public ::interaction
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~interaction1 ();
 };
 
@@ -5455,7 +5457,7 @@ class reference_frame: public ::xml_schema::type
    *
    * @param x An optional container with the new value to set.
    *
-   * If the value is present in @a x then this function makes a copy 
+   * If the value is present in @a x then this function makes a copy
    * of this value and sets it as the new value of the attribute.
    * Otherwise the attribute container is set the 'not present' state.
    */
@@ -5545,7 +5547,7 @@ class reference_frame: public ::xml_schema::type
   /**
    * @brief Destructor.
    */
-  virtual 
+  virtual
   ~reference_frame ();
 
   // Implementation.
@@ -5583,7 +5585,7 @@ class reference_frame: public ::xml_schema::type
  *
  * @param uri A URI or a local file name.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function uses exceptions to report parsing errors.
@@ -5599,7 +5601,7 @@ spin_system_ (const ::std::string& uri,
  * @param uri A URI or a local file name.
  * @param eh An error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function reports parsing errors by calling the error handler.
@@ -5617,7 +5619,7 @@ spin_system_ (const ::std::string& uri,
  * @param uri A URI or a local file name.
  * @param eh A Xerces-C++ DOM error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function reports parsing errors by calling the error handler.
@@ -5633,7 +5635,7 @@ spin_system_ (const ::std::string& uri,
  *
  * @param is A standrad input stream.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function uses exceptions to report parsing errors.
@@ -5649,7 +5651,7 @@ spin_system_ (::std::istream& is,
  * @param is A standrad input stream.
  * @param eh An error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function reports parsing errors by calling the error handler.
@@ -5667,7 +5669,7 @@ spin_system_ (::std::istream& is,
  * @param is A standrad input stream.
  * @param eh A Xerces-C++ DOM error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function reports parsing errors by calling the error handler.
@@ -5684,7 +5686,7 @@ spin_system_ (::std::istream& is,
  * @param is A standrad input stream.
  * @param id A resource id.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * The resource id is used to identify the document being parsed in
@@ -5706,7 +5708,7 @@ spin_system_ (::std::istream& is,
  * @param id A resource id.
  * @param eh An error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * The resource id is used to identify the document being parsed in
@@ -5729,7 +5731,7 @@ spin_system_ (::std::istream& is,
  * @param id A resource id.
  * @param eh A Xerces-C++ DOM error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * The resource id is used to identify the document being parsed in
@@ -5749,7 +5751,7 @@ spin_system_ (::std::istream& is,
  *
  * @param is A Xerces-C++ input source.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function uses exceptions to report parsing errors.
@@ -5765,7 +5767,7 @@ spin_system_ (::xercesc::InputSource& is,
  * @param is A Xerces-C++ input source.
  * @param eh An error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function reports parsing errors by calling the error handler.
@@ -5783,7 +5785,7 @@ spin_system_ (::xercesc::InputSource& is,
  * @param is A Xerces-C++ input source.
  * @param eh A Xerces-C++ DOM error handler.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function reports parsing errors by calling the error handler.
@@ -5799,7 +5801,7 @@ spin_system_ (::xercesc::InputSource& is,
  *
  * @param d A Xerces-C++ DOM document.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  */
 ::std::auto_ptr< ::spin_system >
@@ -5812,7 +5814,7 @@ spin_system_ (const ::xercesc::DOMDocument& d,
  *
  * @param d A pointer to the Xerces-C++ DOM document.
  * @param f Parsing flags.
- * @param p Parsing properties. 
+ * @param p Parsing properties.
  * @return A pointer to the root of the object model.
  *
  * This function is normally used together with the keep_dom and
@@ -5864,7 +5866,7 @@ operator<< (::xercesc::DOMElement&, const interaction&);
  */
 void
 spin_system_ (::std::ostream& os,
-              const ::spin_system& x, 
+              const ::spin_system& x,
               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
               const ::std::string& e = "UTF-8",
               ::xml_schema::flags f = 0);
@@ -5884,7 +5886,7 @@ spin_system_ (::std::ostream& os,
  */
 void
 spin_system_ (::std::ostream& os,
-              const ::spin_system& x, 
+              const ::spin_system& x,
               ::xml_schema::error_handler& eh,
               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
               const ::std::string& e = "UTF-8",
@@ -5906,7 +5908,7 @@ spin_system_ (::std::ostream& os,
  */
 void
 spin_system_ (::std::ostream& os,
-              const ::spin_system& x, 
+              const ::spin_system& x,
               ::xercesc::DOMErrorHandler& eh,
               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
               const ::std::string& e = "UTF-8",
@@ -5925,7 +5927,7 @@ spin_system_ (::std::ostream& os,
  */
 void
 spin_system_ (::xercesc::XMLFormatTarget& ft,
-              const ::spin_system& x, 
+              const ::spin_system& x,
               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
               const ::std::string& e = "UTF-8",
               ::xml_schema::flags f = 0);
@@ -5946,7 +5948,7 @@ spin_system_ (::xercesc::XMLFormatTarget& ft,
  */
 void
 spin_system_ (::xercesc::XMLFormatTarget& ft,
-              const ::spin_system& x, 
+              const ::spin_system& x,
               ::xml_schema::error_handler& eh,
               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
               const ::std::string& e = "UTF-8",
@@ -5968,7 +5970,7 @@ spin_system_ (::xercesc::XMLFormatTarget& ft,
  */
 void
 spin_system_ (::xercesc::XMLFormatTarget& ft,
-              const ::spin_system& x, 
+              const ::spin_system& x,
               ::xercesc::DOMErrorHandler& eh,
               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
               const ::std::string& e = "UTF-8",
@@ -5999,7 +6001,7 @@ spin_system_ (::xercesc::DOMDocument& d,
  * @return A pointer to the new Xerces-C++ DOM document.
  */
 ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
-spin_system_ (const ::spin_system& x, 
+spin_system_ (const ::spin_system& x,
               const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
               ::xml_schema::flags f = 0);
 

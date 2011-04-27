@@ -62,7 +62,10 @@ file(GLOB threeDeeSources 3d/*.cpp)
 
 set(guiSources ${guiSources} ${threeDeeSources} gui/schema_import.s)
 set(wxformbuilderSources ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp)
-set(xmlSources           shared/formats/xsd/spinxml_schema.cpp)
+set(xmlSources
+  shared/formats/tinyxml/tinyxml.cpp 
+  shared/formats/tinyxml/tinyxmlerror.cpp
+  shared/formats/tinyxml/tinyxmlparser.cpp)
 
 ############################################################
 # Link and include directories
@@ -86,7 +89,7 @@ add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
-target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml xerces-c sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
 # Tests specified here

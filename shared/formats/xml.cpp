@@ -1,469 +1,259 @@
 
+#include <shared/formats/tinyxml/tinyxml.h>
+#include <shared/spinsys.hpp>
+#include <shared/interaction.hpp>
 #include <shared/formats/xml.hpp>
-#include <shared/formats/xsd/spinxml_schema.hpp>
-#include <shared/nuclear_data.hpp>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <iostream>
-#include <shared/basic_math.hpp>
+#include <shared/foreach.hpp>
+#include <map>
 
 using namespace SpinXML;
-using namespace xml_schema;
-
-using std::endl;
-using std::cout;
-using std::cerr;
+using namespace std;
+using namespace Eigen;
 
 #define LAB_FRAME 0
 
-kind::value GetXSDTypeFromSpinXMLType(SpinXML::Interaction::Type subtype) {
-  switch(subtype) {
-  case SpinXML::Interaction::HFC:
-    return kind::hfc;
-  case SpinXML::Interaction::G_TENSER:
-    return kind::g_tenser;
-  case SpinXML::Interaction::ZFS:
-    return kind::zfs;
-  case SpinXML::Interaction::EXCHANGE:
-    return kind::exchange;
-  case SpinXML::Interaction::SHIELDING:
-    return kind::shielding;
-  case SpinXML::Interaction::SCALAR:
-    return kind::scalar;
-  case SpinXML::Interaction::QUADRUPOLAR:
-    return kind::quadrupolar;
-  case SpinXML::Interaction::DIPOLAR:
-    return kind::dipolar;
-  case SpinXML::Interaction::CUSTOM_LINEAR:
-  case SpinXML::Interaction::CUSTOM_BILINEAR:
-  case SpinXML::Interaction::CUSTOM_QUADRATIC:
-    return kind::custem;
-  default:
-    throw std::runtime_error("Unknown sub type when outputing to an XML file");
-  }
-}
+//================================================================================//
+//                                     INIT                                       //
+//================================================================================//
 
-SpinXML::Interaction::Type GetSpinXMLTypeFromXSDType(kind::value subtype) {
-  switch(subtype) {
-  case kind::hfc:
-    return SpinXML::Interaction::HFC;
-  case kind::g_tenser:
-    return SpinXML::Interaction::G_TENSER;
-  case kind::zfs:
-    return SpinXML::Interaction::ZFS;
-  case kind::exchange:
-    return SpinXML::Interaction::EXCHANGE;
-  case kind::shielding:
-    return SpinXML::Interaction::SHIELDING;
-  case kind::scalar:
-    return SpinXML::Interaction::SCALAR;
-  case kind::quadrupolar:
-    return SpinXML::Interaction::QUADRUPOLAR;
-  case kind::dipolar:
-    return SpinXML::Interaction::DIPOLAR;
-  case kind::custem:
-    return SpinXML::Interaction::CUSTOM_LINEAR;
-  default:
-    throw std::runtime_error("Unknown sub type when when reading an XML file. Is the right schema loaded?");
-  }
-}
+map<Interaction::Type,string> gType2XMLKind;
 
-long GetReferenceFrameNumber(const orientation o) {
-	if(o.euler_angles().present()) {
-		return o.euler_angles().get().reference_frame();
-	} else if(o.angle_axis().present()) {
-		return o.angle_axis().get().axis().reference_frame();
-	} else if(o.quaternion().present()) {
-		return o.quaternion().get().reference_frame();
-	} else if(o.dcm().present()) {
-		return o.dcm().get().reference_frame();
-	}
-	//This should never happen, but it does, fail noisly. Also shuts up a compiler warning.
-	throw std::logic_error("GetReferenceFrameNumber() was unable to determin the reference frame of an orientation");
-}
-
-void SetReferenceFrameNumber(orientation& o,long n) {
-	if(o.euler_angles().present()) {
-		o.euler_angles().get().reference_frame(n);
-	} else if(o.angle_axis().present()) {
-		o.angle_axis().get().axis().reference_frame(n);
-	} else if(o.quaternion().present()) {
-		o.quaternion().get().reference_frame(n);
-	} else if(o.dcm().present()) {
-		o.dcm().get().reference_frame(n);
-	}
+__XMLInit::__XMLInit() {
+	gType2XMLKind[Interaction::HFC]              = "hfc";
+	gType2XMLKind[Interaction::G_TENSER]	     = "g-tenser";
+	gType2XMLKind[Interaction::ZFS]     	     = "zfs";
+	gType2XMLKind[Interaction::EXCHANGE]	     = "exchange";
+	gType2XMLKind[Interaction::SHIELDING]        = "shielding";
+	gType2XMLKind[Interaction::SCALAR]           = "scalar";
+	gType2XMLKind[Interaction::QUADRUPOLAR]      = "quadrupolar";
+	gType2XMLKind[Interaction::DIPOLAR]          = "dipolar";
+	gType2XMLKind[Interaction::CUSTOM_LINEAR]    = "custem";
+	gType2XMLKind[Interaction::CUSTOM_BILINEAR]  = "custem";
+	gType2XMLKind[Interaction::CUSTOM_QUADRATIC] = "custem";
 }
 
 
-orientation ConvertOrientationToXML(const SpinXML::Orientation& o) {
-  SpinXML::Orientation::Type type=o.GetType();
-  orientation oout;
-  switch(type) {
-  case SpinXML::Orientation::EULER:{
-    EulerAngles ea=o.GetAsEuler();
-    euler_angles xsd_ea(ea.alpha,ea.beta,ea.gamma,LAB_FRAME);
-    oout.euler_angles(xsd_ea);
-    break;
-  }
-  case SpinXML::Orientation::ANGLE_AXIS: {
-    Vector3d axis;
-    AngleAxisd aa=o.GetAsAngleAxis();
-    vector axis_prime(double(aa.axis().x()),
-					  double(aa.axis().y()),
-					  double(aa.axis().z()),LAB_FRAME);
-    angle_axis xsd_aa(aa.angle(),axis_prime);
-    oout.angle_axis(xsd_aa);
-    break;
-  }
-  case SpinXML::Orientation::QUATERNION: {
-    Quaterniond q=o.GetAsQuaternion();
-    quaternion xsd_q(q.w(),q.x(),q.y(),q.z(),LAB_FRAME);
-    oout.quaternion(xsd_q);
-    break;
-  }
-  case SpinXML::Orientation::DCM: {
-	  Matrix3d dcm = o.GetAsDCM();
-	  matrix mat(dcm(0,0),dcm(0,1),dcm(0,2),
-				 dcm(1,0),dcm(1,1),dcm(1,2),
-				 dcm(2,0),dcm(2,1),dcm(2,2),LAB_FRAME);
-	  oout.dcm(mat);
-	  break;
-  }
-  default:
-    throw std::runtime_error("Unknown orientation type encounted");
-  }
-  return oout;
+__XMLInit::~__XMLInit() {
+
 }
 
-SpinXML::Orientation ConvertXMLToOrientation(const orientation& o) {
-	SpinXML::Orientation ret(Quaterniond(1,0,0,0));
-	if(o.euler_angles().present()) {
-		double alpha,beta,gamma;
-		euler_angles ea = o.euler_angles().get();
-		alpha=ea.alpha();
-		beta=ea.beta();
-		gamma=ea.gamma();
-		ret = EulerAngles(alpha,beta,gamma);
-	} else if(o.angle_axis().present()) {
-		angle_axis aa = o.angle_axis().get();
-		vector axis=aa.axis();
-		double angle=aa.angle();
-		ret = AngleAxisd(angle,Vector3d(axis.x(),axis.y(),axis.z()));
-	} else if(o.quaternion().present()) {
-		double re,i,j,k;
-		quaternion q = o.quaternion().get();
-		re=q.re();
-		i=q.i();
-		j=q.j();
-		k=q.k();
-		ret = Quaterniond(re,i,j,k);
-	} else if(o.dcm().present()) {
-		matrix xsd_dcm = o.dcm().get();
-		ret = MakeMatrix3d(xsd_dcm.xx(),xsd_dcm.xy(),xsd_dcm.xz(),
-						   xsd_dcm.yx(),xsd_dcm.yy(),xsd_dcm.yz(),
-						   xsd_dcm.zx(),xsd_dcm.zy(),xsd_dcm.zz());
+//================================================================================//
+//                                     UTILS                                      //
+//================================================================================//
 
-	} else {
-		throw std::runtime_error("Unknown orientation form encounted. Is the XSD schema corrupt?");
-	}
-	return ret;
+string dbleToStr(double d) {
+	ostringstream s;
+	s << d;
+	return s.str();
 }
 
-void SpinXML::XMLLoader::LoadFile(SpinSystem* libss,const char* filename) const {
-    //libss => "library spin system" as apposed to the xml spin system ss
-    std::auto_ptr<spin_system> ss;
-    try {
-	xml_schema::properties p;
-	p.no_namespace_schema_location(mSchemaLocation);
-	ss=spin_system_(filename,0,p);
-    } catch(const xml_schema::exception& e) {
-	std::cerr << e << std::endl;
-	std::ostringstream errStream;
-	errStream << e << std::endl;
-	throw std::runtime_error(errStream.str());
-    }
 
-    libss->Clear();
+//================================================================================//
+//                                     LOADING                                    //
+//================================================================================//
 
-    //Load the reference frames.
-    spin_system::reference_frame_sequence frames=ss->reference_frame();
-    long frameCount=frames.size();
 
-    //We can't assume they appear in order so we need to make two
-    //passes. On the first pass we allocate memory and store the
-    //pointers in a integer->frame map.
-    std::map<long,Frame*> frameMap;
-
-    for(long i=0;i<frameCount;i++) {
-	vector r=frames[i].origin();
-	if(frames[i].number() == 0) {
-	    throw std::runtime_error("Reference frame 0 is reserved as the lab frame");
+void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
+	TiXmlDocument doc(filename);
+	bool loadOkay = doc.LoadFile();
+	if(!loadOkay) {
+		throw runtime_error("Couldn't parse XML");
 	}
-	Frame* frame = new Frame(Vector3d(r.x(),r.y(),r.z()),
-				 ConvertXMLToOrientation(frames[i].orientation()));
-	frameMap.insert(std::pair<long,Frame*>(frames[i].number(),frame));
-    }
-    Frame* labFrame = libss->GetLabFrame();
-    for(long i=0;i<frameCount;i++) {
-	long parent = frames[i].origin().reference_frame();
-	long parent2 = GetReferenceFrameNumber(frames[i].orientation());
+}
 
-	if(parent != parent2) {
-	    throw std::runtime_error("Reference frame parents mismatch");
-	}
+//================================================================================//
+//                                     SAVING                                     //
+//================================================================================//
 
-	if(parent == 0) { //This is in the lab frame
-	    labFrame->AddChild(frameMap[frames[i].number()]);
-	    continue;
-	}
-	frameMap[parent]->AddChild(frameMap[frames[i].number()]);
-    }
+void encodeMatrix(Matrix3d mat,TiXmlElement* el) {
+	el->SetAttribute("xx",mat(0,0));
+    el->SetAttribute("xy",mat(0,1));
+	el->SetAttribute("xz",mat(0,2));
 
+	el->SetAttribute("yx",mat(1,0));
+    el->SetAttribute("yy",mat(1,1));
+	el->SetAttribute("yz",mat(1,2));
 
-    //Load the spins
-    spin_system::spin_sequence spins=ss->spin();
-    long spinCount=spins.size();
-    for(long i=0;i<spinCount;i++) {
-	spin xsdSpin=spins[i];
+	el->SetAttribute("zx",mat(2,0));
+    el->SetAttribute("zy",mat(2,1));
+	el->SetAttribute("zz",mat(2,2));
+}
 
-	length x,y,z;
-	vector coords=xsdSpin.coordinates().present() ? xsdSpin.coordinates().get() : vector(0,0,0,LAB_FRAME);
-	x=coords.x();
-	y=coords.y();
-	z=coords.z();
-
-	SpinXML::Spin* newSpin = new Spin(Vector3d(x,y,z),
-					  xsdSpin.label().present() ? xsdSpin.label().get() : "",
-					  getElementBySymbol(xsdSpin.isotope().c_str()),
-					  getIsotopeBySymbol(xsdSpin.isotope().c_str()));
-	libss->InsertSpin(newSpin);
-    }
-
-    //Load the interactions
-    spin_system::interaction_sequence inters=ss->interaction();
-    long interactionCount=inters.size();
-
-    for(long i=0;i<interactionCount;i++) {
-	SpinXML::Interaction* thisInter = NULL;
-	interaction xsdInter=inters[i];
-
-	SpinXML::Interaction::Type type=GetSpinXMLTypeFromXSDType(xsdInter.kind());
-
-	//TODO: Decide how to handle units
-	long spinNumber=xsdInter.spin_1();
-	long spinNumber2=-1;
-	if(spinNumber <0 || spinNumber >= spinCount) {
-	    throw std::runtime_error("Spin index in interaction out of range");
-	}
-
-	if(xsdInter.spin_2().present()) {
-	    spinNumber2=xsdInter.spin_2().get();
-	    if(spinNumber2 < 0 || spinNumber2 > spinCount) {
-		throw std::runtime_error("Spin index in interaction out of range");
-	    }
-	}
-
-	//Now check the subtype is valid given the form
-	if(spinNumber2==-1) {
-	    //Interaction must be linear
-	    switch(type) {
-	    case SpinXML::Interaction::G_TENSER:
-	    case SpinXML::Interaction::SHIELDING:
-	    case SpinXML::Interaction::CUSTOM_LINEAR:
-		thisInter = new SpinXML::Interaction(0.0,type,libss->GetSpin(spinNumber));
+void encodeOrient(const Orientation& orient,TiXmlElement* el) {
+	switch(orient.GetType()) {
+	case Orientation::EULER: {
+		TiXmlElement* eaEl = new TiXmlElement("euler_angles");
+		EulerAngles ea = orient.GetAsEuler();
+		eaEl->SetAttribute("alpha",ea.alpha);
+		eaEl->SetAttribute("beta" ,ea.beta);
+		eaEl->SetAttribute("gamma",ea.gamma);
+		el->LinkEndChild(eaEl);
 		break;
-	    default:
-		throw std::runtime_error("Linear interaction was of a non linear subtype");
-	    }
-	} else if(spinNumber2==spinNumber2) {
-	    //Interaction must be quadratic
-	    switch(type) {
-	    case SpinXML::Interaction::QUADRUPOLAR:
-	    case SpinXML::Interaction::ZFS:
-	    case SpinXML::Interaction::CUSTOM_QUADRATIC:
-		thisInter = new SpinXML::Interaction(0.0,type,libss->GetSpin(spinNumber));
-		break;
-	    default:
-		throw std::runtime_error("Quadrupolar interaction was of a non linear subtype");
-	    }
-	} else {
-	    switch(type) {
-	    case SpinXML::Interaction::EXCHANGE:
-	    case SpinXML::Interaction::DIPOLAR:
-	    case SpinXML::Interaction::SCALAR:
-	    case SpinXML::Interaction::CUSTOM_BILINEAR:
-		thisInter = new SpinXML::Interaction(0.0,type,libss->GetSpin(spinNumber),libss->GetSpin(spinNumber2));
-		break;
-	    default:
-		throw std::runtime_error("Quadrupolar interaction was of a non linear subtype");
-	    }
 	}
-
-
-	//Get the numerical value of the teser
-	if(xsdInter.scalar().present()) {
-	    double scalar;
-	    scalar=xsdInter.scalar().get();
-	    thisInter->SetScalar(scalar);
-	} else if(xsdInter.tensor().present()) {
-	    tensor xml_matrx = xsdInter.tensor().get();
-	    Matrix3d mat = MakeMatrix3d(xml_matrx.xx(),xml_matrx.xy(),xml_matrx.xz(),
-					xml_matrx.yx(),xml_matrx.yy(),xml_matrx.yz(),
-					xml_matrx.zx(),xml_matrx.zy(),xml_matrx.zz());
-	    thisInter->SetMatrix(mat);
-	} else if(xsdInter.eigenvalues().present()) {
-	    SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
-	    eigenvalues eigv=xsdInter.eigenvalues().get();
-	    thisInter->SetEigenvalues(eigv.XX(),eigv.YY(),eigv.ZZ(),o);
-	} else if(xsdInter.axiality_rhombicity().present()) {
-	    SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
-	    axiality_rhombicity ar=xsdInter.axiality_rhombicity().get();
-	    thisInter->SetAxRhom(ar.ax(),ar.rh(),ar.iso(),o);
-	} else if(xsdInter.span_skew().present()) {
-	    SpinXML::Orientation o(ConvertXMLToOrientation(xsdInter.orientation().get()));
-	    span_skew spanskew=xsdInter.span_skew().get();
-	    thisInter->SetSpanSkew(spanskew.span(),spanskew.skew(),spanskew.iso(),o);
-	} else {
-	    throw std::runtime_error("Interaction appeared to not be specified (is the xsd schema corrupt?)");
+	case Orientation::DCM: {
+		TiXmlElement* matrixEl = new TiXmlElement("dcm");
+		encodeMatrix(orient.GetAsMatrix(),matrixEl);
+		el->LinkEndChild(matrixEl);
+		break;
 	}
-	//Save the interation
-	libss->InsertInteraction(thisInter);
-    }
+	case Orientation::QUATERNION: {
+		TiXmlElement* qEl = new TiXmlElement("quaternion");
+		Quaterniond q = orient.GetAsQuaternion();
+		qEl->SetAttribute("re",q.w());
+		qEl->SetAttribute("i",q.x());
+		qEl->SetAttribute("j",q.y());
+		qEl->SetAttribute("k",q.z());
+
+		el->LinkEndChild(qEl);
+		break;
+	}
+	case Orientation::ANGLE_AXIS: {
+		TiXmlElement* aaEl = new TiXmlElement("Angle-Axis");
+		AngleAxisd aa = orient.GetAsAngleAxis();
+
+		TiXmlElement* angleEl = new TiXmlElement("angle");
+		angleEl->SetValue(dbleToStr(aa.angle()));
+		aaEl->LinkEndChild(angleEl);
+		
+		TiXmlElement* axisEl = new TiXmlElement("axis");
+		axisEl->SetAttribute("x",aa.axis().x());
+		axisEl->SetAttribute("y",aa.axis().y());
+		axisEl->SetAttribute("z",aa.axis().z());
+		aaEl->LinkEndChild(axisEl);
+
+		el->LinkEndChild(aaEl);
+		break;
+	}
+	}
+	el->SetAttribute("reference_frame",LAB_FRAME);
 }
 
-void SpinXML::XMLLoader::SaveFile(const SpinSystem* libss,const char* filename) const {
-    spin_system ss;
+TiXmlElement* saveFrameRecusion(Frame* frame) {
+	TiXmlElement* frameEl = new TiXmlElement("reference_frame");
+	foreach(Frame* childFrame,frame->GetChildren()) {
+		TiXmlElement* childEl = saveFrameRecusion(childFrame);
+		childEl->SetAttribute("label","FRAME");
 
-    spin_system::spin_sequence spins;
-    for(long i=0;i<libss->GetSpinCount();i++) {
-	SpinXML::Spin* thisSpin=libss->GetSpin(i);
+		TiXmlElement* originEl = new TiXmlElement("origin");
+		originEl->SetAttribute("x",frame->GetTranslation().x());
+		originEl->SetAttribute("y",frame->GetTranslation().y());
+		originEl->SetAttribute("z",frame->GetTranslation().z());
+		childEl->LinkEndChild(originEl);
+		
+		TiXmlElement* orientEl = new TiXmlElement("orientation");
+		encodeOrient(frame->GetOrientation(),orientEl);
+		childEl->LinkEndChild(orientEl);
 
-	double x,y,z;
-	thisSpin->GetCoordinates(&x,&y,&z);
-	std::string label(thisSpin->GetLabel());
-
-
-	spin outSpin(i,"");
-	outSpin.coordinates(vector(x,y,z,LAB_FRAME));
-	outSpin.label(label);
-	outSpin.isotope(getElementSymbol(thisSpin->GetElement()));
-	spins.push_back(outSpin);
-    }
-    ss.spin(spins);
-
-    spin_system::interaction_sequence inters;
-    std::vector<Interaction*> interactions = libss->GetAllInteractions();
-    long InterCount = interactions.size();
-
-    for(long i=0;i<InterCount;i++) {
-	SpinXML::Interaction* thisInter=interactions[i];
-	interaction1 inter(GetXSDTypeFromSpinXMLType(thisInter->GetType()),
-			   "MHz",
-			   libss->GetSpinNumber(thisInter->GetSpin1()));
-
-	if(thisInter->GetSpin2() != NULL) {
-	    inter.spin_2(libss->GetSpinNumber(thisInter->GetSpin2()));
+		frameEl->LinkEndChild(childEl);
 	}
+	return frameEl;
+}
 
-	switch(thisInter->GetStorage()) {
-	case SpinXML::Interaction::STORAGE_SCALAR: {
-	    double scalar;
-	    thisInter->GetScalar(&scalar);
-	    inter.scalar(scalar);
-	    break;
+
+
+void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) {
+	Orientation o;
+	switch(inter->GetStorage()) {
+	case Interaction::STORAGE_SCALAR: {
+		TiXmlElement* scalarEl = new TiXmlElement("scalar");
+		scalarEl->SetValue(dbleToStr(inter->AsScalar()));
+		interEl->LinkEndChild(scalarEl);
+		break;
 	}
-	case SpinXML::Interaction::MATRIX: {
-	    Matrix3d mat;
-	    thisInter->GetMatrix(&mat);
-	    tensor xml_matrix(mat(0,0),mat(1,0),mat(2,0),
-			      mat(0,1),mat(1,1),mat(2,1),
-			      mat(0,2),mat(1,2),mat(2,2),LAB_FRAME);
-	    inter.tensor(xml_matrix);
-	    break;
+	case Interaction::MATRIX: {
+		TiXmlElement* matrixEl = new TiXmlElement("tensor");
+		encodeMatrix(inter->AsMatrix(),matrixEl);
+		matrixEl->SetAttribute("reference_frame",0);
+		interEl->LinkEndChild(matrixEl);
+		break;
 	}
-	case SpinXML::Interaction::EIGENVALUES: {
-	    SpinXML::Orientation o(Quaterniond(1,0,0,0));
-	    double xx,yy,zz;
-	    thisInter->GetEigenvalues(&xx,&yy,&zz,&o);
-	    eigenvalues eigv(xx,yy,zz);
-	    inter.orientation(ConvertOrientationToXML(o));
-	    inter.eigenvalues(eigv);
-	    break;
+	case Interaction::EIGENVALUES: {
+		TiXmlElement* evEl = new TiXmlElement("eigenvalues");
+		Eigenvalues ev = inter->AsEigenvalues();
+		evEl->SetAttribute("XX",ev.xx);
+		evEl->SetAttribute("YY",ev.yy);
+		evEl->SetAttribute("ZZ",ev.zz);
+		interEl->LinkEndChild(evEl);
+
+		o = ev.mOrient;
+		break;
 	}
-	case SpinXML::Interaction::AXRHOM: {
-	    SpinXML::Orientation o(Quaterniond(1,0,0,0));
-	    double ax,rhom,iso;
-	    thisInter->GetAxRhom(&ax,&rhom,&iso,&o);
-	    axiality_rhombicity ar(iso,ax,rhom);
-	    inter.orientation(ConvertOrientationToXML(o));
-	    inter.axiality_rhombicity(ar);
-	    break;
+	case Interaction::AXRHOM: {
+		TiXmlElement* arEl = new TiXmlElement("axiality_rhombicity");
+		AxRhom ar = inter->AsAxRhom();
+		arEl->SetAttribute("rh",ar.rh);
+		arEl->SetAttribute("iso",ar.iso);
+		arEl->SetAttribute("ax",ar.ax);
+		interEl->LinkEndChild(arEl);
+
+		o = ar.mOrient;
+		break;
 	}
-	case SpinXML::Interaction::SPANSKEW: {
-	    SpinXML::Orientation o(Quaterniond(1,0,0,0));
-	    double span,skew,iso;
-	    thisInter->GetSpanSkew(&span,&skew,&iso,&o);
-	    span_skew spsk(iso,span,skew);
-	    inter.orientation(ConvertOrientationToXML(o));
-	    inter.span_skew(spsk);
-	    break;
+	case Interaction::SPANSKEW: {
+		TiXmlElement* ssEl = new TiXmlElement("eigenvalues");
+		SpanSkew ss = inter->AsSpanSkew();
+		ssEl->SetAttribute("span",ss.span);
+		ssEl->SetAttribute("skew",ss.skew);
+		ssEl->SetAttribute("iso", ss.iso);
+		interEl->LinkEndChild(ssEl);
+
+		o = ss.mOrient;
+		break;
 	}
-	default:
-	    throw std::runtime_error("Interaction is of an unknown form");
-	};
-	inters.push_back(inter);
-    }
-    ss.interaction(inters);
-
-    //Hack to get a nested function
-    struct walkFrameTree {
-	static void Walk(Frame* frame,spin_system::reference_frame_sequence* XMLFrameSequence,long* counter,long parent) {
-	    //Write out this reference frame
-	    Vector3d T = frame->GetTranslation();
-	    orientation o = ConvertOrientationToXML(frame->GetOrientation());
-	    SetReferenceFrameNumber(o,parent);
-	    reference_frame xmlFrame = reference_frame(vector(T.x(),T.y(),T.z(),parent),o,++(*counter));
-	    xmlFrame.label("Reference Frame Labels in implimented yet.");
-	    XMLFrameSequence->push_back(xmlFrame);
-
-	    //Recuse down the reference frames
-	    std::vector<Frame*> children = frame->GetChildren();
-	    unsigned long length = children.size();
-	    for(unsigned long i = 0; i < length; i++) {
-		Walk(children[i],XMLFrameSequence,counter,*counter);
-	    }
 	}
-    };
-    spin_system::reference_frame_sequence XMLFrameSequence;
-    std::vector<Frame*> frames = libss->GetLabFrame()->GetChildren();
-    //Lab frame is implied
-    unsigned long length = frames.size();
-    long counter=0;
-    for(unsigned long i; i<length; i++) {
-	walkFrameTree::Walk(frames[i],&XMLFrameSequence,&counter,0);
-    }
-    ss.reference_frame(XMLFrameSequence);
+	if(inter->GetStorage() == Interaction::EIGENVALUES ||
+	   inter->GetStorage() == Interaction::AXRHOM ||
+	   inter->GetStorage() == Interaction::SPANSKEW) {
+		TiXmlElement* orientEl = new TiXmlElement("orientation");
+		encodeOrient(o,orientEl);
+		interEl->LinkEndChild(orientEl);
+	}
+}
 
-    //Write to disk
 
-    xml_schema::namespace_infomap map;
-    map[""].name = "";
-    map[""].schema = mSchemaLocation;
+void SpinXML::XMLLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
+    TiXmlDocument doc;
+	TiXmlElement* root = new TiXmlElement("spin_system");
+	doc.LinkEndChild(root);
 
-    std::ofstream fout(filename);
-    if(!fout.is_open()) {
-	std::cerr << "Could not open " << filename << std::endl;
-	return;
-    }
+	long counter = 0;
+	foreach(Spin* spin,ss->GetSpins()) {
+		TiXmlElement* spinEl = new TiXmlElement("spin");
+		spinEl->SetAttribute("number",counter);
+		spinEl->SetAttribute("element",spin->GetElement());
+		spinEl->SetAttribute("isotope",spin->GetIsotope());
+		spinEl->SetAttribute("label",spin->GetLabel());
 
-    try {
-	spin_system_(fout, ss, map);
-    } catch (const xml_schema::exception& e) {
-	std::cerr << e << std::endl;
-	std::ostringstream errStream;
-	errStream << e << std::endl;
-	throw std::runtime_error(errStream.str());
-    }
+		TiXmlElement* coordEl = new TiXmlElement("coordinates");
+		coordEl->SetAttribute("x",spin->GetPosition().x());
+		coordEl->SetAttribute("y",spin->GetPosition().y());
+		coordEl->SetAttribute("z",spin->GetPosition().z());
+		coordEl->SetAttribute("reference_frame",LAB_FRAME);
+
+		spinEl->LinkEndChild(coordEl);
+
+		root->LinkEndChild(spinEl);
+		counter++;
+	}
+	foreach(Interaction* inter,ss->GetAllInteractions()) {
+		TiXmlElement* interEl = new TiXmlElement("interaction");
+
+		long spin1n = ss->GetSpinNumber(inter->GetSpin1());
+		long spin2n = ss->GetSpinNumber(inter->GetSpin2());
+
+		interEl->SetAttribute("kind" ,gType2XMLKind[inter->GetType()]);
+		interEl->SetAttribute("units","MHz");
+		interEl->SetAttribute("spin_1",spin1n);
+		interEl->SetAttribute("spin_2",spin2n);
+
+		encodeInterStorage(inter,interEl);
+
+		root->LinkEndChild(interEl);
+	}
+	TiXmlElement* labFrameEl = new TiXmlElement("reference_frame");
+	labFrameEl->LinkEndChild(saveFrameRecusion(ss->GetLabFrame()));
+	root->LinkEndChild(labFrameEl);
+	
+	doc.SaveFile(filename);
 }
 

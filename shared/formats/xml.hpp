@@ -19,5 +19,14 @@ namespace SpinXML {
   };
 }
 
+//Private
+
+class __XMLInit  {
+public:
+    __XMLInit();
+    ~__XMLInit();
+};
+
+
 #endif
 

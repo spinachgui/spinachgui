@@ -38,6 +38,45 @@ __XMLInit::~__XMLInit() {
 }
 
 //================================================================================//
+//                                proto-structures                                //
+//================================================================================//
+
+struct ProtoSpin {
+	int number;
+
+	double x;
+	double y;
+	double z;
+
+	int element;
+	int isotope;
+	string label;
+
+	int frame;
+};
+
+struct ProtoInteraction {
+	int spin1;
+	int spin2;
+	
+	unit _unit;
+
+	Interaction::Type type;
+	InteractionPayload payload;
+};
+
+struct ProtoFrame {
+	int number;
+
+	double x;
+	double y;
+	double z;
+
+	Orientation o;
+};
+
+
+//================================================================================//
 //                                     UTILS                                      //
 //================================================================================//
 
@@ -48,17 +87,109 @@ string dbleToStr(double d) {
 }
 
 
+//Some element names as std::strings (prevents typos)
+string _spin_system_ = "spin_system";
+string _spin_ = "spin";
+string _interaction_ = "interaction";
+string _reference_frame_ = "reference_frame";
+
 //================================================================================//
 //                                     LOADING                                    //
 //================================================================================//
 
+void Assemble(SpinSystem* ss,
+			  const vector<ProtoSpin>& spins,
+			  const vector<ProtoInteraction>& interactions,
+			  const vector<ProtoFrame>& frames) {
+	map<long,Spin*> number2spin;
+	foreach(ProtoSpin protoSpin,spins) {
+		Vector3d position(protoSpin.x,protoSpin.y,protoSpin.z);
+		Spin* spin = new Spin(position,protoSpin.label,protoSpin.element,protoSpin.isotope);
+		number2spin[protoSpin.number] = spin;
+		ss->InsertSpin(spin);
+	}
+}
+
+void Guard(int returnCode,const char* error) {
+	switch(returnCode) {
+	case TIXML_SUCCESS:
+		break;
+	case TIXML_WRONG_TYPE:
+		throw runtime_error(error);
+		break;
+	case TIXML_NO_ATTRIBUTE:
+		throw runtime_error(error);
+		break;
+	default:
+		throw runtime_error("TinyXML::Query*Attribute retunred an unknown error code");
+	}
+}
+
+TiXmlElement* Guard(TiXmlNode* node,const char* error) {
+	if(!node) {
+		throw runtime_error(error);
+	}
+	TiXmlElement* e = node->ToElement();
+	if(!e) {
+		throw runtime_error(error);
+	}
+	return e;
+}
 
 void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 	TiXmlDocument doc(filename);
-	bool loadOkay = doc.LoadFile();
+	bool loadOkay = doc.LoadFile(TIXML_ENCODING_UTF8);
 	if(!loadOkay) {
 		throw runtime_error("Couldn't parse XML");
 	}
+
+	TiXmlElement* root = doc.RootElement();
+	if(!root) {
+		throw runtime_error("Couldn't find the root spin_system node");
+	}
+
+	//Okay, we have the <spin_system> bit. The order that entities
+	//should appear in the fire according to the spec is spin*
+	//interaction* reference_frame* but we the reference_frames
+	//frist. We might as well be agnostic about the order we recieve
+	//the elements
+
+	//Also, since we'll be throwing exceptions about like they're
+	//going out of fassion, new or anything else that needs explicit
+	//cleanup is banned in this next section
+
+	vector<ProtoSpin> protoSpins;
+	vector<ProtoInteraction> protoInteractions;
+	vector<ProtoFrame> protoFrames;
+
+	TiXmlNode* child = NULL;
+	while(child = root->IterateChildren(child) ) {
+		TiXmlElement* e = child->ToElement();
+		if(!e) {
+			continue;
+		}
+		if(e->Value() == _reference_frame_) {
+		} else if(e->Value() == _spin_) {
+			ProtoSpin spin;
+			Guard(e->QueryIntAttribute("number",&spin.number),  "missing spin number  attribute");
+			Guard(e->QueryIntAttribute("element",&spin.element),"missing spin element attribute");
+			Guard(e->QueryIntAttribute("isotope",&spin.isotope),"missing spin isotope attribute");
+			Guard(e->QueryStringAttribute("label",&spin.label), "missing label attribute");
+
+			TiXmlElement* coords = Guard(e->FirstChild("coordinates"),"missing or malformed coordinate");
+
+			Guard(coords->QueryDoubleAttribute("x",&spin.x),"missing x attribute");
+			Guard(coords->QueryDoubleAttribute("y",&spin.x),"missing y attribute");
+			Guard(coords->QueryDoubleAttribute("z",&spin.x),"missing z attribute");
+			Guard(coords->QueryIntAttribute("z",&spin.frame),"missing reference frame");
+
+			protoSpins.push_back(spin);
+		} else if(e->Value() == _interaction_) {
+		} else {
+			//We have something else, perhaps emit a warning?
+		}
+	}
+	Assemble(ss,protoSpins,protoInteractions,protoFrames);
 }
 
 //================================================================================//

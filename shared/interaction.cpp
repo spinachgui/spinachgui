@@ -206,7 +206,7 @@ const char* Interaction::GetTypeName(Type t) {
     }
 }
 
-Interaction::Storage Interaction::GetStorage() const {
+InteractionPayload::Storage InteractionPayload::GetStorage() const {
     if(get<energy>(&mData)!=NULL) {
         return STORAGE_SCALAR;
     } else if(get<Matrix3d>(&mData)!=NULL) {
@@ -222,16 +222,16 @@ Interaction::Storage Interaction::GetStorage() const {
 
 
 
-void Interaction::GetScalar(energy* Scalar) const {
+void InteractionPayload::GetScalar(energy* Scalar) const {
     *Scalar=get<energy>(mData);
 }
 
-void Interaction::GetMatrix(Matrix3d* OutMatrix) const {
+void InteractionPayload::GetMatrix(Matrix3d* OutMatrix) const {
     *OutMatrix=get<Matrix3d>(mData);
     return;
 }
 
-void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
+void InteractionPayload::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
     *XX=get<Eigenvalues>(mData).xx;
     *YY=get<Eigenvalues>(mData).yy;
     *ZZ=get<Eigenvalues>(mData).zz;
@@ -239,7 +239,7 @@ void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation*
     return;
 }
 
-void Interaction::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const {
+void InteractionPayload::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const {
     *iso=get<AxRhom>(mData).iso;
     *ax= get<AxRhom>(mData).ax;
     *rh= get<AxRhom>(mData).rh;
@@ -247,7 +247,7 @@ void Interaction::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* Ori
     return;
 }
 
-void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const {
+void InteractionPayload::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const {
     *iso= get<SpanSkew> (mData).iso;
     *Span=get<SpanSkew> (mData).span;
     *Skew=get<SpanSkew> (mData).skew;
@@ -255,34 +255,29 @@ void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientatio
     return;
 }
 
-void Interaction::SetScalar(energy Scalar) {
+void InteractionPayload::SetScalar(energy Scalar) {
     mData=Scalar;
-    sigChange();
-    Invariant();
+	changed();
 }
 
-void Interaction::SetMatrix(const Matrix3d& Matrix) {
+void InteractionPayload::SetMatrix(const Matrix3d& Matrix) {
     mData=Matrix3d(Matrix);
-        Invariant();
-    sigChange();
+	changed();
 }
 
-void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
+void InteractionPayload::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
     mData=Eigenvalues(XX,YY,ZZ,Orient);
-    Invariant();
-    sigChange();
+	changed();
 }
 
-void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
+void InteractionPayload::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
     mData=AxRhom(iso,ax,rh,Orient);
-    Invariant();
-    sigChange();
+	changed();
 }
 
-void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
-    sigChange();
+void InteractionPayload::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
     mData=SpanSkew(iso,Span,Skew,Orient);
-    Invariant();
+	changed();
 }
 
 

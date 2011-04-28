@@ -7,10 +7,12 @@
 #include <shared/basic_math.hpp>
 #include <map>
 #include <set>
+#include <boost/optional.hpp>
 
 using namespace SpinXML;
 using namespace std;
 using namespace Eigen;
+using namespace boost;
 
 #define LAB_FRAME 0
 #define INAPPLICABLE_FRAME -1  //Use when writing out a
@@ -81,12 +83,13 @@ struct ProtoSpin {
 	string label;
 
 	int frame;
+	
 };
 
 struct ProtoInteraction {
 	ProtoInteraction() : payload(0.0) {}
-	int spin1;
-	int spin2;
+	optional<int> spin1;
+	optional<int> spin2;
 	
 	Interaction::Type type;
 	InteractionPayload payload;
@@ -149,64 +152,117 @@ void Assemble(SpinSystem* ss,
 			  const vector<ProtoSpin>& spins,
 			  const vector<ProtoInteraction>& interactions,
 			  const vector<ProtoFrame>& frames) {
+
+	//Assemble a spin system from the "parts" provided by the
+	//context free step
+
+	//Step 1, every proto-object should run it's own self checks
+
+	//Step 2, check that the number attribute in every protoSpin
+	//and protoFrame is unique
+	set<int> spinNumbers;
+	foreach(ProtoSpin spin,spins) {
+		if(spinNumbers.find(spin.number) != spinNumbers.end()) {
+			throw runtime_error("Two spins contained duplicate numbers");
+		}
+		spinNumbers.insert(spin.number);
+	}
+	set<int> frameNumbers;
+	foreach(ProtoFrame frame,frames) {
+		if(frameNumbers.find(frame.number) != frameNumbers.end()) {
+			throw runtime_error("Two reference frames contained duplicate numbers");
+		}
+		frameNumbers.insert(frame.number);
+	}
+
+	//Step 3, The frame number in each spin should point to a
+	//valid spin
+
+	foreach(ProtoSpin spin,spins) {
+		if(spin.frame != 0 && frameNumbers.find(spin.frame) == frameNumbers.end()) {
+			throw runtime_error("Spin refers to a missing reference frame");
+		}
+	}
+
+	//Step 4, Dito the interaction
+
+	foreach(ProtoInteraction interaction,interactions) {
+		if(interaction.frame !=0 && frameNumbers.find(interaction.frame) == frameNumbers.end()) {
+			throw runtime_error("Interaction refers to a missing reference frame");
+		}
+	}
+
+	//Step 5, spin1 and spin2 should point to a valid spin, at
+	//least, if they are present. After doing this test we can be
+	//sure that if they are present they are valid
+
+	foreach(ProtoInteraction interaction,interactions) {
+		if(interaction.spin1) {
+			if(spinNumbers.find(interaction.spin1.get()) == spinNumbers.end()) {
+				throw runtime_error("Interaction refers to a missing spin");					
+			}
+		}
+		if(interaction.spin2) {
+			if(spinNumbers.find(interaction.spin2.get()) == spinNumbers.end()) {
+				throw runtime_error("Interaction refers to a missing spin");					
+			}
+		}
+	}
+
+	//By this point all errors should be accounted for. We can
+	//start assembling the spin system and allocating memory. Code
+	//beyond this point should not throw
 	map<long,Spin*> number2spin;
+
 	foreach(ProtoSpin protoSpin,spins) {
-
-		//Assemble a spin system from the "parts" provided by the
-		//context free step
-
-		//Step 1, every proto-object should run it's own self checks
-
-		//Step 2, check that the number attribute in every protoSpin
-		//and protoFrame is unique
-		set<int> spinNumbers;
-		foreach(ProtoSpin spin,spins) {
-			if(spinNumbers.find(spin.number) != spinNumbers.end()) {
-				throw runtime_error("Two spins contained duplicate numbers");
-			}
-			spinNumbers.insert(spin.number);
-		}
-		set<int> frameNumbers;
-		foreach(ProtoFrame frame,frames) {
-			if(frameNumbers.find(frame.number) != frameNumbers.end()) {
-				throw runtime_error("Two reference frames contained duplicate numbers");
-			}
-			frameNumbers.insert(frame.number);
-		}
-
-		//Step 3, The frame number in each spin should point to a
-		//valid spin
-
-		foreach(ProtoSpin spin,spins) {
-			if(spin.frame != 0 && frameNumbers.find(spin.frame) == frameNumbers.end()) {
-				throw runtime_error("Spin refers to a missing reference frame");
-			}
-		}
-
-		//Step 4, Dito the interaction
-
-		foreach(ProtoInteraction interaction,interactions) {
-			if(interaction.frame !=0 && frameNumbers.find(interaction.frame) == frameNumbers.end()) {
-				throw runtime_error("Interaction refers to a missing reference frame");
-			}
-		}
-
-		//Step 5, spin1 and spin2 should point to a valid spin
-
-		foreach(ProtoInteraction interaction,interactions) {
-			if(spinNumbers.find(interaction.spin1) == spinNumbers.end() ||
-			   spinNumbers.find(interaction.spin2) == spinNumbers.end()) {
-				throw runtime_error("Interaction refers to a missing spin");
-			}
-		}
-
-
 		Vector3d position(protoSpin.x,protoSpin.y,protoSpin.z);
 		Spin* spin = new Spin(position,protoSpin.label,protoSpin.element,protoSpin.isotope);
 		number2spin[protoSpin.number] = spin;
 		ss->InsertSpin(spin);
 	}
+
+	foreach(ProtoInteraction protoInteraction,interactions) {
+		Spin* spin1 = protoInteraction.spin1 ? number2spin[protoInteraction.spin1.get()] : NULL;
+		Spin* spin2 = protoInteraction.spin2 ? number2spin[protoInteraction.spin2.get()] : NULL;
+		Interaction* interaction = new Interaction(protoInteraction.payload,protoInteraction.type,spin1,spin2);
+		ss->InsertInteraction(interaction);
+	}
 }
+
+optional<string> OptionalString(const TiXmlElement* el,const string& name) {
+	if(el->Attribute(name) == NULL) {
+		return optional<string>();
+	}
+	string value;
+	if(el->QueryStringAttribute(name.c_str(),&value) != TIXML_SUCCESS) {
+		throw runtime_error("Error reading an attribute (wrong type?)");
+	}
+	return value;
+}
+
+optional<int> OptionalInt(const TiXmlElement* el,const string& name) {
+	optional<int> ovalue;
+	if(el->Attribute(name) == NULL) {
+		return ovalue;
+	}
+	int value;
+	if(el->QueryIntAttribute(name,&value) != TIXML_SUCCESS) {
+		throw runtime_error("Error reading an attribute (wrong type?)");
+	}
+	ovalue = value;
+	return ovalue;
+}
+optional<double> OptionalDouble(const TiXmlElement* el,const string& name) {
+	if(el->Attribute(name) == NULL) {
+		return optional<double>();
+	}
+	double value;
+	if(el->QueryDoubleAttribute(name,&value) != TIXML_SUCCESS) {
+		throw runtime_error("Error reading an attribute (wrong type?)");
+	}
+	return value;
+}
+
 
 void Guard(int returnCode,const char* error) {
 	switch(returnCode) {
@@ -310,10 +366,10 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 	} else {
 		throw runtime_error("malformed kind attribute");
 	}
-	Guard(e->QueryIntAttribute("spin_1",&protoInteraction.spin1),"missing spin1 attribute");
-	//TODO: This really *needs* to be optional
-	Guard(e->QueryIntAttribute("spin_2",&protoInteraction.spin2),"missing spin2 attribute");
-	
+
+	protoInteraction.spin1 = OptionalInt(e,"spin_1");
+	protoInteraction.spin2 = OptionalInt(e,"spin_2");
+
 	string unitStr;
 	Guard(e->QueryStringAttribute("units",&unitStr),"missing units in interaction");
 	if(protoInteraction.type!=Interaction::G_TENSER && unitStr != _MHz_) {
@@ -321,23 +377,26 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 	} else if(protoInteraction.type==Interaction::G_TENSER && unitStr != _unitless_) {
 		throw runtime_error("Invalid unit in interaction");
 	}
-
+	unit u = protoInteraction.type!=Interaction::G_TENSER ? MHz : Unitless;
 
 	//Be leinient about mixing up the order of eigenvalues etc. and
 	//orientation
 	const TiXmlNode* mag = NULL; //One of scalar|tensor|eigenvalues|axiality_rhombicity|span_skew
 	if((mag = e->FirstChild(_scalar_))) {
-		const TiXmlElement* scalar = Guard(mag,"Malformed scalar element");
+		const TiXmlElement* scalarEl = Guard(mag,"Malformed scalar element");
 
 		//TODO,HACK atof does not report failuar, just 0.0
-		protoInteraction.payload = atof(scalar->GetText());
+		double scalar = atof(scalarEl->GetText());
+		protoInteraction.payload = (scalar * u);
+		
 		protoInteraction.frame = 0;
 	} else if((mag = e->FirstChild(_tensor_))) {
-		const TiXmlElement* matrix = Guard(mag,"Malformed tensor element");
+		const TiXmlElement* matrixEl = Guard(mag,"Malformed tensor element");
 
 		//TODO,HACK atof does not report failuar, just 0.0
-		protoInteraction.payload = decodeMatrix(matrix);
-		Guard(matrix->QueryIntAttribute(_reference_frame_,&protoInteraction.frame),"No reference frame for matrix");
+		Matrix3d matrix = decodeMatrix(matrixEl);
+		protoInteraction.payload = (matrix * u);
+		Guard(matrixEl->QueryIntAttribute(_reference_frame_,&protoInteraction.frame),"No reference frame for matrix");
 	} else if((mag = e->FirstChild(_eigenvalues_))) {
 		const TiXmlElement* evEl = Guard(mag,"Malformed eigenvalue element");
 
@@ -345,6 +404,10 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 		Guard(evEl->QueryDoubleAttribute("XX",&ev.xx),"No xx attribute for eigenvalues");
 		Guard(evEl->QueryDoubleAttribute("YY",&ev.yy),"No yy attribute for eigenvalues");
 		Guard(evEl->QueryDoubleAttribute("ZZ",&ev.zz),"No zz attribute for eigenvalues");
+
+		ev.xx = ev.xx * u;
+		ev.yy = ev.yy * u;
+		ev.zz = ev.zz * u;
 
 		const TiXmlElement* orientEl = Guard(e->FirstChild(_orientation_),"eigenvalue specification requires an orientation");
 		int frame;
@@ -360,6 +423,10 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 		Guard(axRhEl->QueryDoubleAttribute("ax", &ar.ax) ,"No ax attribute for axiality_rhombicity");
 		Guard(axRhEl->QueryDoubleAttribute("rh", &ar.rh) ,"No rh attribute for axiality_rhombicity");
 
+		ar.iso = ar.iso * u;
+		ar.ax  = ar.ax *  u;
+		ar.rh  = ar.rh *  u;
+
 		const TiXmlElement* orientEl = Guard(e->FirstChild(_orientation_),"axiality-rhombicity specification requires an orientation");
 		int frame;
 		decodeOrientation(orientEl,ar.mOrient,frame);
@@ -373,6 +440,9 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 		Guard(spanSkewEl->QueryDoubleAttribute("iso",&spanSkew.iso),  "No iso  attribute for span_skew");
 		Guard(spanSkewEl->QueryDoubleAttribute("ax", &spanSkew.span) ,"No span attribute for span_skew");
 		Guard(spanSkewEl->QueryDoubleAttribute("rh", &spanSkew.skew) ,"No skew attribute for span_skew");
+
+		spanSkew.iso  = spanSkew.iso  * u;
+		spanSkew.span = spanSkew.skew * u;
 
 		const TiXmlElement* orientEl = Guard(e->FirstChild(_orientation_),"span-skew specification requires an orientation");
 		int frame;
@@ -710,6 +780,10 @@ public:
 			long spin1n = ss->GetSpinNumber(inter->GetSpin1());
 			long spin2n = ss->GetSpinNumber(inter->GetSpin2());
 
+			if(spin1n == -1) {
+				spin1n = spin2n; spin2n = -1;
+			}
+
 			interEl->SetAttribute("kind" ,gType2XMLKind[inter->GetType()]);
 			if(inter->GetType() == Interaction::G_TENSER) {
 				interEl->SetAttribute("units",_unitless_);
@@ -717,7 +791,9 @@ public:
 				interEl->SetAttribute("units",_MHz_);
 			}
 			interEl->SetAttribute("spin_1",spin1n);
-			interEl->SetAttribute("spin_2",spin2n);
+			if(spin2n != -1) {
+				interEl->SetAttribute("spin_2",spin2n);
+			}
 
 			encodeInterStorage(inter,interEl);
 

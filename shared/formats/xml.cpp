@@ -4,6 +4,7 @@
 #include <shared/interaction.hpp>
 #include <shared/formats/xml.hpp>
 #include <shared/foreach.hpp>
+#include <shared/basic_math.hpp>
 #include <map>
 
 using namespace SpinXML;
@@ -17,6 +18,7 @@ using namespace Eigen;
 //================================================================================//
 
 map<Interaction::Type,string> gType2XMLKind;
+map<string,Interaction::Type> gXMLKind2Type;
 
 __XMLInit::__XMLInit() {
 	gType2XMLKind[Interaction::HFC]              = "hfc";
@@ -30,6 +32,16 @@ __XMLInit::__XMLInit() {
 	gType2XMLKind[Interaction::CUSTOM_LINEAR]    = "custem";
 	gType2XMLKind[Interaction::CUSTOM_BILINEAR]  = "custem";
 	gType2XMLKind[Interaction::CUSTOM_QUADRATIC] = "custem";
+
+	gXMLKind2Type["hfc"]         = Interaction::HFC;
+	gXMLKind2Type["g-tenser"]    = Interaction::G_TENSER;
+	gXMLKind2Type["zfs"]         = Interaction::ZFS; 
+	gXMLKind2Type["exchange"]    = Interaction::EXCHANGE ;
+	gXMLKind2Type["shielding"]   = Interaction::SHIELDING;
+	gXMLKind2Type["scalar"]      = Interaction::SCALAR; 
+	gXMLKind2Type["quadrupolar"] = Interaction::QUADRUPOLAR;
+	gXMLKind2Type["dipolar"]     = Interaction::DIPOLAR;
+	gXMLKind2Type["custem"]		 = Interaction::CUSTOM_LINEAR;
 }
 
 
@@ -63,6 +75,9 @@ struct ProtoInteraction {
 
 	Interaction::Type type;
 	InteractionPayload payload;
+
+	int payloadFrame;
+	int orientFrame;
 };
 
 struct ProtoFrame {
@@ -92,6 +107,22 @@ string _spin_system_ = "spin_system";
 string _spin_ = "spin";
 string _interaction_ = "interaction";
 string _reference_frame_ = "reference_frame";
+
+string _scalar_ = "scalar";
+string _tensor_ = "tensor";
+string _eigenvalues_ = "eigenvalues";
+string _axrhom_ = "axiality_rhombicity";
+string _spanskew_ = "span_skew";
+
+string _orientation_ = "orientation";
+
+string _angle_ = "angle";
+string _axis_ = "axis";
+
+string _euler_ = "euler_angles";
+string _dcm_ = "dcm";
+string _quaternion_ = "quaternion";
+string _angle_axis_ = "angle_axis";
 
 //================================================================================//
 //                                     LOADING                                    //
@@ -125,15 +156,152 @@ void Guard(int returnCode,const char* error) {
 	}
 }
 
-TiXmlElement* Guard(TiXmlNode* node,const char* error) {
+const TiXmlElement* Guard(const TiXmlNode* node,const char* error) {
 	if(!node) {
 		throw runtime_error(error);
 	}
-	TiXmlElement* e = node->ToElement();
+	const TiXmlElement* e = node->ToElement();
 	if(!e) {
 		throw runtime_error(error);
 	}
 	return e;
+}
+
+Matrix3d decodeMatrix(const TiXmlElement* e) {
+	double
+		xx,xy,xz,
+		yx,yy,yz,
+		zx,zy,zz;
+	Guard(e->QueryDoubleAttribute("xx",&xx),"No xx attribute for matrix");
+    Guard(e->QueryDoubleAttribute("xy",&xy),"No xy attribute for matrix");
+	Guard(e->QueryDoubleAttribute("xz",&xz),"No xz attribute for matrix");
+		   				          			  
+	Guard(e->QueryDoubleAttribute("yx",&yx),"No yx attribute for matrix");
+	Guard(e->QueryDoubleAttribute("yy",&yy),"No yy attribute for matrix");
+	Guard(e->QueryDoubleAttribute("yz",&yz),"No yz attribute for matrix");
+		   				          			  
+	Guard(e->QueryDoubleAttribute("zx",&zx),"No zx attribute for matrix");
+	Guard(e->QueryDoubleAttribute("zy",&zy),"No zy attribute for matrix");
+	Guard(e->QueryDoubleAttribute("zz",&zz),"No zz attribute for matrix");
+
+	return MakeMatrix3d(xx,xy,xz,
+						yx,yy,yz,
+						zx,zy,zz);
+}
+
+void decodeOrientation(const TiXmlElement* e,Orientation& o,int& frame) {
+	Guard(e->QueryIntAttribute(_reference_frame_,&frame),"Not reference frame in orientation");
+	const TiXmlNode* payloadNode = NULL;
+	if((payloadNode = e->FirstChild(_euler_))) {
+		const TiXmlElement* eulerEl = Guard(payloadNode,"Malformed euler angles element");
+		EulerAngles ea(0,0,0);
+		Guard(eulerEl->QueryDoubleAttribute("alpha",&ea.alpha),"No alpha attribute for euler angles");
+		Guard(eulerEl->QueryDoubleAttribute("beta", &ea.beta ),"No beta  attribute for euler angles");
+		Guard(eulerEl->QueryDoubleAttribute("gamma",&ea.gamma),"No gamma attribute for euler angles");
+		o = ea;
+	} else if((payloadNode = e->FirstChild(_dcm_))) {
+		const TiXmlElement* matrixEl = Guard(payloadNode,"Malformed DCM element");
+		Matrix3d mat = decodeMatrix(matrixEl);
+		o = mat;
+	} else if((payloadNode = e->FirstChild(_quaternion_))) {
+		const TiXmlElement* quaternionEl = Guard(payloadNode,"Malformed quaternion element");
+		double x,y,z,w;
+		Guard(quaternionEl->QueryDoubleAttribute("x" ,&x),"No x attribute for quaternion");
+		Guard(quaternionEl->QueryDoubleAttribute("y" ,&y),"No y attribute for quaternion");
+		Guard(quaternionEl->QueryDoubleAttribute("z" ,&z),"No z attribute for quaternion");
+		Guard(quaternionEl->QueryDoubleAttribute("re",&w),"No re attribute for quaternion");
+
+		o = Quaterniond(x,y,z,w);
+	} else if((payloadNode = e->FirstChild(_angle_axis_))) {
+		const TiXmlElement* angleAxisEl = Guard(payloadNode,"Malformed angle axis element");
+		
+		const TiXmlElement* angleEl = Guard(angleAxisEl->FirstChild(_angle_),"Malformed or missing angle element for angle axis");
+		//TODO, HACK, use of atof
+		double angle = atof(angleEl->GetText());
+		
+		const TiXmlElement* axisEl  = Guard(angleAxisEl->FirstChild(_axis_) ,"Malformed or missing axis element for angle axis");
+		double x,y,z;
+		Guard(axisEl->QueryDoubleAttribute("x" ,&x),"No x attribute for angle-axis");
+		Guard(axisEl->QueryDoubleAttribute("y" ,&y),"No y attribute for angle-axis");
+		Guard(axisEl->QueryDoubleAttribute("z" ,&z),"No z attribute for angle-axis");
+		o = AngleAxisd(angle,Vector3d(x,y,z));
+	} else {
+		throw runtime_error("No euler angles or DCM or quaternion or angle axis element for orientation");
+	}
+}
+
+void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction) {
+	string xmlKind;
+	Guard(e->QueryStringAttribute("kind",&xmlKind),  "missing kind attribute");
+	map<string,Interaction::Type>::iterator it = gXMLKind2Type.find(xmlKind);
+	if(it != gXMLKind2Type.end()) {
+		protoInteraction.type = (*it).second;
+	} else {
+		throw runtime_error("malformed kind attribute");
+	}
+	Guard(e->QueryIntAttribute("spin_1",&protoInteraction.spin1),"missing spin1 attribute");
+	//TODO: This really *needs* to be optional
+	Guard(e->QueryIntAttribute("spin_2",&protoInteraction.spin2),"missing spin2 attribute");
+	
+	//Be leinient about mixing up the order of eigenvalues etc. and
+	//orientation
+	const TiXmlNode* mag = NULL; //One of scalar|tensor|eigenvalues|axiality_rhombicity|span_skew
+	if((mag = e->FirstChild(_scalar_))) {
+		const TiXmlElement* scalar = Guard(mag,"Malformed scalar element");
+
+		//TODO,HACK atof does not report failuar, just 0.0
+		protoInteraction.payload = atof(scalar->GetText());
+	} else if((mag = e->FirstChild(_tensor_))) {
+		const TiXmlElement* matrix = Guard(mag,"Malformed tensor element");
+
+		//TODO,HACK atof does not report failuar, just 0.0
+		protoInteraction.payload = decodeMatrix(matrix);
+		Guard(matrix->QueryIntAttribute(_reference_frame_,&protoInteraction.payloadFrame),"No reference frame for matrix");
+	} else if((mag = e->FirstChild(_eigenvalues_))) {
+		const TiXmlElement* evEl = Guard(mag,"Malformed eigenvalue element");
+
+		Eigenvalues ev(0,0,0,EulerAngles(0,0,0));
+		Guard(evEl->QueryDoubleAttribute("XX",&ev.xx),"No xx attribute for eigenvalues");
+		Guard(evEl->QueryDoubleAttribute("YY",&ev.yy),"No yy attribute for eigenvalues");
+		Guard(evEl->QueryDoubleAttribute("ZZ",&ev.zz),"No zz attribute for eigenvalues");
+
+		const TiXmlElement* orientEl = Guard(e->FirstChild(_orientation_),"eigenvalue specification requires an orientation");
+		int frame;
+		decodeOrientation(orientEl,ev.mOrient,frame);
+		protoInteraction.payload = ev;
+		protoInteraction.orientFrame = frame;
+		
+	} else if((mag = e->FirstChild(_axrhom_))) {
+		const TiXmlElement* axRhEl = Guard(mag,"Malformed axiality-rhombicity element");
+		
+		AxRhom ar(0,0,0,EulerAngles(0,0,0));
+		Guard(axRhEl->QueryDoubleAttribute("iso",&ar.iso),"No iso attribute for axiality_rhombicity");
+		Guard(axRhEl->QueryDoubleAttribute("ax", &ar.ax) ,"No ax attribute for axiality_rhombicity");
+		Guard(axRhEl->QueryDoubleAttribute("rh", &ar.rh) ,"No rh attribute for axiality_rhombicity");
+
+		const TiXmlElement* orientEl = Guard(e->FirstChild(_orientation_),"axiality-rhombicity specification requires an orientation");
+		int frame;
+		decodeOrientation(orientEl,ar.mOrient,frame);
+		protoInteraction.payload = ar;
+		protoInteraction.orientFrame = frame;
+
+	} else if((mag = e->FirstChild(_spanskew_))) {
+		const TiXmlElement* spanSkewEl = Guard(mag,"Malformed span-skew element");
+
+		SpanSkew spanSkew(0,0,0,EulerAngles(0,0,0));
+		Guard(spanSkewEl->QueryDoubleAttribute("iso",&spanSkew.iso),  "No iso  attribute for span_skew");
+		Guard(spanSkewEl->QueryDoubleAttribute("ax", &spanSkew.span) ,"No span attribute for span_skew");
+		Guard(spanSkewEl->QueryDoubleAttribute("rh", &spanSkew.skew) ,"No skew attribute for span_skew");
+
+		const TiXmlElement* orientEl = Guard(e->FirstChild(_orientation_),"span-skew specification requires an orientation");
+		int frame;
+		decodeOrientation(orientEl,spanSkew.mOrient,frame);
+		protoInteraction.payload = spanSkew;
+		protoInteraction.orientFrame = frame;
+
+	} else {
+		throw runtime_error("interaction missing it's definition in terms of one of scalar,tensor,eigenvalues,axiality_rhombicity,span_skew");
+	}
 }
 
 void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
@@ -163,7 +331,7 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 	vector<ProtoFrame> protoFrames;
 
 	TiXmlNode* child = NULL;
-	while(child = root->IterateChildren(child) ) {
+	while((child = root->IterateChildren(child))) {
 		TiXmlElement* e = child->ToElement();
 		if(!e) {
 			continue;
@@ -176,7 +344,7 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 			Guard(e->QueryIntAttribute("isotope",&spin.isotope),"missing spin isotope attribute");
 			Guard(e->QueryStringAttribute("label",&spin.label), "missing label attribute");
 
-			TiXmlElement* coords = Guard(e->FirstChild("coordinates"),"missing or malformed coordinate");
+			const TiXmlElement* coords = Guard(e->FirstChild("coordinates"),"missing or malformed coordinate");
 
 			Guard(coords->QueryDoubleAttribute("x",&spin.x),"missing x attribute");
 			Guard(coords->QueryDoubleAttribute("y",&spin.x),"missing y attribute");
@@ -213,7 +381,7 @@ void encodeMatrix(Matrix3d mat,TiXmlElement* el) {
 void encodeOrient(const Orientation& orient,TiXmlElement* el) {
 	switch(orient.GetType()) {
 	case Orientation::EULER: {
-		TiXmlElement* eaEl = new TiXmlElement("euler_angles");
+		TiXmlElement* eaEl = new TiXmlElement(_euler_);
 		EulerAngles ea = orient.GetAsEuler();
 		eaEl->SetAttribute("alpha",ea.alpha);
 		eaEl->SetAttribute("beta" ,ea.beta);
@@ -222,13 +390,13 @@ void encodeOrient(const Orientation& orient,TiXmlElement* el) {
 		break;
 	}
 	case Orientation::DCM: {
-		TiXmlElement* matrixEl = new TiXmlElement("dcm");
+		TiXmlElement* matrixEl = new TiXmlElement(_dcm_);
 		encodeMatrix(orient.GetAsMatrix(),matrixEl);
 		el->LinkEndChild(matrixEl);
 		break;
 	}
 	case Orientation::QUATERNION: {
-		TiXmlElement* qEl = new TiXmlElement("quaternion");
+		TiXmlElement* qEl = new TiXmlElement(_quaternion_);
 		Quaterniond q = orient.GetAsQuaternion();
 		qEl->SetAttribute("re",q.w());
 		qEl->SetAttribute("i",q.x());
@@ -239,14 +407,14 @@ void encodeOrient(const Orientation& orient,TiXmlElement* el) {
 		break;
 	}
 	case Orientation::ANGLE_AXIS: {
-		TiXmlElement* aaEl = new TiXmlElement("Angle-Axis");
+		TiXmlElement* aaEl = new TiXmlElement(_angle_axis_);
 		AngleAxisd aa = orient.GetAsAngleAxis();
 
-		TiXmlElement* angleEl = new TiXmlElement("angle");
+		TiXmlElement* angleEl = new TiXmlElement(_angle_);
 		angleEl->SetValue(dbleToStr(aa.angle()));
 		aaEl->LinkEndChild(angleEl);
 		
-		TiXmlElement* axisEl = new TiXmlElement("axis");
+		TiXmlElement* axisEl = new TiXmlElement(_axis_);
 		axisEl->SetAttribute("x",aa.axis().x());
 		axisEl->SetAttribute("y",aa.axis().y());
 		axisEl->SetAttribute("z",aa.axis().z());
@@ -286,20 +454,20 @@ void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) {
 	Orientation o;
 	switch(inter->GetStorage()) {
 	case Interaction::STORAGE_SCALAR: {
-		TiXmlElement* scalarEl = new TiXmlElement("scalar");
+		TiXmlElement* scalarEl = new TiXmlElement(_scalar_);
 		scalarEl->SetValue(dbleToStr(inter->AsScalar()));
 		interEl->LinkEndChild(scalarEl);
 		break;
 	}
 	case Interaction::MATRIX: {
-		TiXmlElement* matrixEl = new TiXmlElement("tensor");
+		TiXmlElement* matrixEl = new TiXmlElement(_tensor_);
 		encodeMatrix(inter->AsMatrix(),matrixEl);
 		matrixEl->SetAttribute("reference_frame",0);
 		interEl->LinkEndChild(matrixEl);
 		break;
 	}
 	case Interaction::EIGENVALUES: {
-		TiXmlElement* evEl = new TiXmlElement("eigenvalues");
+		TiXmlElement* evEl = new TiXmlElement(_eigenvalues_);
 		Eigenvalues ev = inter->AsEigenvalues();
 		evEl->SetAttribute("XX",ev.xx);
 		evEl->SetAttribute("YY",ev.yy);
@@ -310,7 +478,7 @@ void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) {
 		break;
 	}
 	case Interaction::AXRHOM: {
-		TiXmlElement* arEl = new TiXmlElement("axiality_rhombicity");
+		TiXmlElement* arEl = new TiXmlElement(_axrhom_);
 		AxRhom ar = inter->AsAxRhom();
 		arEl->SetAttribute("rh",ar.rh);
 		arEl->SetAttribute("iso",ar.iso);
@@ -321,7 +489,7 @@ void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) {
 		break;
 	}
 	case Interaction::SPANSKEW: {
-		TiXmlElement* ssEl = new TiXmlElement("eigenvalues");
+		TiXmlElement* ssEl = new TiXmlElement(_spanskew_);
 		SpanSkew ss = inter->AsSpanSkew();
 		ssEl->SetAttribute("span",ss.span);
 		ssEl->SetAttribute("skew",ss.skew);
@@ -335,7 +503,7 @@ void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) {
 	if(inter->GetStorage() == Interaction::EIGENVALUES ||
 	   inter->GetStorage() == Interaction::AXRHOM ||
 	   inter->GetStorage() == Interaction::SPANSKEW) {
-		TiXmlElement* orientEl = new TiXmlElement("orientation");
+		TiXmlElement* orientEl = new TiXmlElement(_orientation_);
 		encodeOrient(o,orientEl);
 		interEl->LinkEndChild(orientEl);
 	}

@@ -386,227 +386,247 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 //================================================================================//
 // For simplicitly we will save everything in angstroms and MHz                   //
 //================================================================================//
-void encodeMatrix(Matrix3d mat,TiXmlElement* el) {
-	el->SetAttribute("xx",mat(0,0));
-    el->SetAttribute("xy",mat(0,1));
-	el->SetAttribute("xz",mat(0,2));
 
-	el->SetAttribute("yx",mat(1,0));
-    el->SetAttribute("yy",mat(1,1));
-	el->SetAttribute("yz",mat(1,2));
+///Simple module-private class to manage the shared state. Don't
+///expect any far flung OO ideas here, this could easily be a buch of
+///plain old functions with a few more paramiters passed about (in
+///fact, that's how it started)
 
-	el->SetAttribute("zx",mat(2,0));
-    el->SetAttribute("zy",mat(2,1));
-	el->SetAttribute("zz",mat(2,2));
-}
+class XMLSaver {
+public:
+	void encodeMatrix(Matrix3d mat,TiXmlElement* el) const {
+		el->SetAttribute("xx",mat(0,0));
+		el->SetAttribute("xy",mat(0,1));
+		el->SetAttribute("xz",mat(0,2));
 
-void encodeOrient(const Orientation& orient,TiXmlElement* el) {
-	switch(orient.GetType()) {
-	case Orientation::EULER: {
-		TiXmlElement* eaEl = new TiXmlElement(_euler_);
-		EulerAngles ea = orient.GetAsEuler();
-		eaEl->SetAttribute("alpha",ea.alpha);
-		eaEl->SetAttribute("beta" ,ea.beta);
-		eaEl->SetAttribute("gamma",ea.gamma);
-		el->LinkEndChild(eaEl);
-		break;
-	}
-	case Orientation::DCM: {
-		TiXmlElement* matrixEl = new TiXmlElement(_dcm_);
-		encodeMatrix(orient.GetAsMatrix(),matrixEl);
-		el->LinkEndChild(matrixEl);
-		break;
-	}
-	case Orientation::QUATERNION: {
-		TiXmlElement* qEl = new TiXmlElement(_quaternion_);
-		Quaterniond q = orient.GetAsQuaternion();
-		qEl->SetAttribute("re",q.w());
-		qEl->SetAttribute("i",q.x());
-		qEl->SetAttribute("j",q.y());
-		qEl->SetAttribute("k",q.z());
+		el->SetAttribute("yx",mat(1,0));
+		el->SetAttribute("yy",mat(1,1));
+		el->SetAttribute("yz",mat(1,2));
 
-		el->LinkEndChild(qEl);
-		break;
-	}
-	case Orientation::ANGLE_AXIS: {
-		TiXmlElement* aaEl = new TiXmlElement(_angle_axis_);
-		AngleAxisd aa = orient.GetAsAngleAxis();
-
-		TiXmlElement* angleEl = new TiXmlElement(_angle_);
-		angleEl->LinkEndChild(new TiXmlText(dbleToStr(aa.angle())));
-		aaEl->LinkEndChild(angleEl);
-		
-		TiXmlElement* axisEl = new TiXmlElement(_axis_);
-		axisEl->SetAttribute("x",aa.axis().x());
-		axisEl->SetAttribute("y",aa.axis().y());
-		axisEl->SetAttribute("z",aa.axis().z());
-		aaEl->LinkEndChild(axisEl);
-
-		el->LinkEndChild(aaEl);
-		break;
-	}
-	}
-	el->SetAttribute("reference_frame",LAB_FRAME);
-}
-
-
-int lookupFrame(const SpinSystem* ss,const map<Frame*,int>& frame2Number,Frame* frame) {
-	Frame* lab = ss->GetLabFrame();
-
-	if(frame == lab || frame == NULL) {
-		return LAB_FRAME;
-	} else {
-		return (*frame2Number.find(frame)).second;
-	}
-}
-
-void saveFrameRecusion(Frame* frame,TiXmlElement* frameEl,const map<Frame*,int>& frame2Number) {
-	foreach(Frame* childFrame,frame->GetChildren()) {
-		TiXmlElement* childEl = new TiXmlElement("reference_frame");
-		childEl->SetAttribute("number",(*frame2Number.find(childFrame)).second);
-		childEl->SetAttribute("label","FRAME");
-
-		TiXmlElement* originEl = new TiXmlElement("origin");
-		originEl->SetAttribute("x",frame->GetTranslation().x() / Angstroms);
-		originEl->SetAttribute("y",frame->GetTranslation().y() / Angstroms);
-		originEl->SetAttribute("z",frame->GetTranslation().z() / Angstroms);
-		childEl->LinkEndChild(originEl);
-		
-		TiXmlElement* orientEl = new TiXmlElement("orientation");
-		encodeOrient(frame->GetOrientation(),orientEl);
-		childEl->LinkEndChild(orientEl);
-
-		frameEl->LinkEndChild(childEl);
-		saveFrameRecusion(childFrame,childEl,frame2Number);
-	}
-}
-
-int enumerateFrameRecusion(Frame* frame,map<Frame*,int>& frame2Number,int counter = 1) {
-	foreach(Frame* childFrame,frame->GetChildren()) {
-		counter++;
-		frame2Number.insert(pair<Frame*,int>(childFrame,counter));
-		counter = enumerateFrameRecusion(childFrame,frame2Number,counter);
-	}
-	return counter;
-}
-
-
-void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) {
-	Orientation o;
-	unit u = inter->GetType() == Interaction::G_TENSER ? Unitless : MHz;
-	switch(inter->GetStorage()) {
-	case Interaction::STORAGE_SCALAR: {
-		TiXmlElement* scalarEl = new TiXmlElement(_scalar_);
-		scalarEl->SetValue(dbleToStr(inter->AsScalar() * u));
-		interEl->LinkEndChild(scalarEl);
-		break;
-	}
-	case Interaction::MATRIX: {
-		TiXmlElement* matrixEl = new TiXmlElement(_tensor_);
-		encodeMatrix(inter->AsMatrix() * u,matrixEl);
-		matrixEl->SetAttribute("reference_frame",0);
-		interEl->LinkEndChild(matrixEl);
-		break;
-	}
-	case Interaction::EIGENVALUES: {
-		TiXmlElement* evEl = new TiXmlElement(_eigenvalues_);
-		Eigenvalues ev = inter->AsEigenvalues();
-		evEl->SetAttribute("XX",ev.xx / u);
-		evEl->SetAttribute("YY",ev.yy / u);
-		evEl->SetAttribute("ZZ",ev.zz / u);
-		interEl->LinkEndChild(evEl);
-
-		o = ev.mOrient;
-		break;
-	}
-	case Interaction::AXRHOM: {
-		TiXmlElement* arEl = new TiXmlElement(_axrhom_);
-		AxRhom ar = inter->AsAxRhom();
-		arEl->SetAttribute("rh",ar.rh   / u);
-		arEl->SetAttribute("iso",ar.iso / u);
-		arEl->SetAttribute("ax",ar.ax   / u);
-		interEl->LinkEndChild(arEl);
-
-		o = ar.mOrient;
-		break;
-	}
-	case Interaction::SPANSKEW: {
-		TiXmlElement* ssEl = new TiXmlElement(_spanskew_);
-		SpanSkew ss = inter->AsSpanSkew();
-		ssEl->SetAttribute("span",ss.span  / u);
-		ssEl->SetAttribute("skew",ss.skew);
-		ssEl->SetAttribute("iso", ss.iso   / u);
-		interEl->LinkEndChild(ssEl);
-
-		o = ss.mOrient;
-		break;
-	}
-	}
-	if(inter->GetStorage() == Interaction::EIGENVALUES ||
-	   inter->GetStorage() == Interaction::AXRHOM ||
-	   inter->GetStorage() == Interaction::SPANSKEW) {
-		TiXmlElement* orientEl = new TiXmlElement(_orientation_);
-		encodeOrient(o,orientEl);
-		interEl->LinkEndChild(orientEl);
-	}
-}
-
-
-void SpinXML::XMLLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
-    TiXmlDocument doc;
-	TiXmlElement* root = new TiXmlElement("spin_system");
-	doc.LinkEndChild(root);
-
-	//Before we do anything, we need to assign a number to every frame
-	map<Frame*,int> frame2Number;
-	enumerateFrameRecusion(ss->GetLabFrame(),frame2Number);
-
-	//Save spins
-	long counter = 0;
-	foreach(Spin* spin,ss->GetSpins()) {
-		int frameNumber = lookupFrame(ss,frame2Number,spin->GetPreferedFrame());
-
-		TiXmlElement* spinEl = new TiXmlElement("spin");
-		spinEl->SetAttribute("number",counter);
-		spinEl->SetAttribute("element",spin->GetElement());
-		spinEl->SetAttribute("isotope",spin->GetIsotope());
-		spinEl->SetAttribute("label",spin->GetLabel());
-
-		TiXmlElement* coordEl = new TiXmlElement("coordinates");
-		coordEl->SetAttribute("x",spin->GetPosition().x() / Angstroms);
-		coordEl->SetAttribute("y",spin->GetPosition().y() / Angstroms);
-		coordEl->SetAttribute("z",spin->GetPosition().z() / Angstroms);
-		coordEl->SetAttribute("reference_frame",frameNumber);
-
-		spinEl->LinkEndChild(coordEl);
-
-		root->LinkEndChild(spinEl);
-		counter++;
+		el->SetAttribute("zx",mat(2,0));
+		el->SetAttribute("zy",mat(2,1));
+		el->SetAttribute("zz",mat(2,2));
 	}
 
-	//Save Interactions
-	foreach(Interaction* inter,ss->GetAllInteractions()) {
-		TiXmlElement* interEl = new TiXmlElement("interaction");
-
-		long spin1n = ss->GetSpinNumber(inter->GetSpin1());
-		long spin2n = ss->GetSpinNumber(inter->GetSpin2());
-
-		interEl->SetAttribute("kind" ,gType2XMLKind[inter->GetType()]);
-		if(inter->GetType() == Interaction::G_TENSER) {
-			interEl->SetAttribute("units",_MHz_);
-		} else {
-			interEl->SetAttribute("units",_unitless_);
+	void encodeOrient(const Orientation& orient,TiXmlElement* el) const {
+		switch(orient.GetType()) {
+		case Orientation::EULER: {
+			TiXmlElement* eaEl = new TiXmlElement(_euler_);
+			EulerAngles ea = orient.GetAsEuler();
+			eaEl->SetAttribute("alpha",ea.alpha);
+			eaEl->SetAttribute("beta" ,ea.beta);
+			eaEl->SetAttribute("gamma",ea.gamma);
+			el->LinkEndChild(eaEl);
+			break;
 		}
-		interEl->SetAttribute("spin_1",spin1n);
-		interEl->SetAttribute("spin_2",spin2n);
+		case Orientation::DCM: {
+			TiXmlElement* matrixEl = new TiXmlElement(_dcm_);
+			encodeMatrix(orient.GetAsMatrix(),matrixEl);
+			el->LinkEndChild(matrixEl);
+			break;
+		}
+		case Orientation::QUATERNION: {
+			TiXmlElement* qEl = new TiXmlElement(_quaternion_);
+			Quaterniond q = orient.GetAsQuaternion();
+			qEl->SetAttribute("re",q.w());
+			qEl->SetAttribute("i",q.x());
+			qEl->SetAttribute("j",q.y());
+			qEl->SetAttribute("k",q.z());
 
-		encodeInterStorage(inter,interEl);
+			el->LinkEndChild(qEl);
+			break;
+		}
+		case Orientation::ANGLE_AXIS: {
+			TiXmlElement* aaEl = new TiXmlElement(_angle_axis_);
+			AngleAxisd aa = orient.GetAsAngleAxis();
 
-		root->LinkEndChild(interEl);
+			TiXmlElement* angleEl = new TiXmlElement(_angle_);
+			angleEl->LinkEndChild(new TiXmlText(dbleToStr(aa.angle())));
+			aaEl->LinkEndChild(angleEl);
+		
+			TiXmlElement* axisEl = new TiXmlElement(_axis_);
+			axisEl->SetAttribute("x",aa.axis().x());
+			axisEl->SetAttribute("y",aa.axis().y());
+			axisEl->SetAttribute("z",aa.axis().z());
+			aaEl->LinkEndChild(axisEl);
+
+			el->LinkEndChild(aaEl);
+			break;
+		}
+		}
+		el->SetAttribute("reference_frame",LAB_FRAME);
 	}
-	saveFrameRecusion(ss->GetLabFrame(),root,frame2Number);
+
+
+	int lookupFrame(Frame* frame) const {
+		Frame* lab = ss->GetLabFrame();
+
+		if(frame == lab || frame == NULL) {
+			return LAB_FRAME;
+		} else {
+			return (*frame2Number.find(frame)).second;
+		}
+	}
+
+	void saveFrameRecusion(Frame* frame,TiXmlElement* frameEl) const {
+		foreach(Frame* childFrame,frame->GetChildren()) {
+			TiXmlElement* childEl = new TiXmlElement("reference_frame");
+			childEl->SetAttribute("number",(*frame2Number.find(childFrame)).second);
+			childEl->SetAttribute("label","FRAME");
+
+			TiXmlElement* originEl = new TiXmlElement("origin");
+			originEl->SetAttribute("x",frame->GetTranslation().x() / Angstroms);
+			originEl->SetAttribute("y",frame->GetTranslation().y() / Angstroms);
+			originEl->SetAttribute("z",frame->GetTranslation().z() / Angstroms);
+			childEl->LinkEndChild(originEl);
+		
+			TiXmlElement* orientEl = new TiXmlElement("orientation");
+			encodeOrient(frame->GetOrientation(),orientEl);
+			childEl->LinkEndChild(orientEl);
+
+			frameEl->LinkEndChild(childEl);
+			saveFrameRecusion(childFrame,childEl);
+		}
+	}
+
+	int enumerateFrameRecusion(Frame* frame,int counter = 1) {
+		foreach(Frame* childFrame,frame->GetChildren()) {
+			counter++;
+			frame2Number.insert(pair<Frame*,int>(childFrame,counter));
+			counter = enumerateFrameRecusion(childFrame,counter);
+		}
+		return counter;
+	}
+
+
+	void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) const {
+		Orientation o;
+		unit u = inter->GetType() == Interaction::G_TENSER ? Unitless : MHz;
+		switch(inter->GetStorage()) {
+		case Interaction::STORAGE_SCALAR: {
+			TiXmlElement* scalarEl = new TiXmlElement(_scalar_);
+			scalarEl->SetValue(dbleToStr(inter->AsScalar() * u));
+			interEl->LinkEndChild(scalarEl);
+			break;
+		}
+		case Interaction::MATRIX: {
+			TiXmlElement* matrixEl = new TiXmlElement(_tensor_);
+			encodeMatrix(inter->AsMatrix() * u,matrixEl);
+			matrixEl->SetAttribute("reference_frame",0);
+			interEl->LinkEndChild(matrixEl);
+			break;
+		}
+		case Interaction::EIGENVALUES: {
+			TiXmlElement* evEl = new TiXmlElement(_eigenvalues_);
+			Eigenvalues ev = inter->AsEigenvalues();
+			evEl->SetAttribute("XX",ev.xx / u);
+			evEl->SetAttribute("YY",ev.yy / u);
+			evEl->SetAttribute("ZZ",ev.zz / u);
+			interEl->LinkEndChild(evEl);
+
+			o = ev.mOrient;
+			break;
+		}
+		case Interaction::AXRHOM: {
+			TiXmlElement* arEl = new TiXmlElement(_axrhom_);
+			AxRhom ar = inter->AsAxRhom();
+			arEl->SetAttribute("rh",ar.rh   / u);
+			arEl->SetAttribute("iso",ar.iso / u);
+			arEl->SetAttribute("ax",ar.ax   / u);
+			interEl->LinkEndChild(arEl);
+
+			o = ar.mOrient;
+			break;
+		}
+		case Interaction::SPANSKEW: {
+			TiXmlElement* ssEl = new TiXmlElement(_spanskew_);
+			SpanSkew ss = inter->AsSpanSkew();
+			ssEl->SetAttribute("span",ss.span  / u);
+			ssEl->SetAttribute("skew",ss.skew);
+			ssEl->SetAttribute("iso", ss.iso   / u);
+			interEl->LinkEndChild(ssEl);
+
+			o = ss.mOrient;
+			break;
+		}
+		}
+		if(inter->GetStorage() == Interaction::EIGENVALUES ||
+		   inter->GetStorage() == Interaction::AXRHOM ||
+		   inter->GetStorage() == Interaction::SPANSKEW) {
+			TiXmlElement* orientEl = new TiXmlElement(_orientation_);
+			encodeOrient(o,orientEl);
+			interEl->LinkEndChild(orientEl);
+		}
+	}
+
+
+	void doIt(const char* filename) {
+		//Setup the XML document
+		TiXmlDocument doc;
+		TiXmlElement* root = new TiXmlElement("spin_system");
+		doc.LinkEndChild(root);
+
+		//Before we do anything, we need to assign a number to every frame
+		enumerateFrameRecusion(ss->GetLabFrame());
+
+		//Save spins
+		long counter = 0;
+		foreach(Spin* spin,ss->GetSpins()) {
+			int frameNumber = lookupFrame(spin->GetPreferedFrame());
+
+			TiXmlElement* spinEl = new TiXmlElement("spin");
+			spinEl->SetAttribute("number",counter);
+			spinEl->SetAttribute("element",spin->GetElement());
+			spinEl->SetAttribute("isotope",spin->GetIsotope());
+			spinEl->SetAttribute("label",spin->GetLabel());
+
+			TiXmlElement* coordEl = new TiXmlElement("coordinates");
+			coordEl->SetAttribute("x",spin->GetPosition().x() / Angstroms);
+			coordEl->SetAttribute("y",spin->GetPosition().y() / Angstroms);
+			coordEl->SetAttribute("z",spin->GetPosition().z() / Angstroms);
+			coordEl->SetAttribute("reference_frame",frameNumber);
+
+			spinEl->LinkEndChild(coordEl);
+
+			root->LinkEndChild(spinEl);
+			counter++;
+		}
+
+		//Save Interactions
+		foreach(Interaction* inter,ss->GetAllInteractions()) {
+			TiXmlElement* interEl = new TiXmlElement("interaction");
+
+			long spin1n = ss->GetSpinNumber(inter->GetSpin1());
+			long spin2n = ss->GetSpinNumber(inter->GetSpin2());
+
+			interEl->SetAttribute("kind" ,gType2XMLKind[inter->GetType()]);
+			if(inter->GetType() == Interaction::G_TENSER) {
+				interEl->SetAttribute("units",_MHz_);
+			} else {
+				interEl->SetAttribute("units",_unitless_);
+			}
+			interEl->SetAttribute("spin_1",spin1n);
+			interEl->SetAttribute("spin_2",spin2n);
+
+			encodeInterStorage(inter,interEl);
+
+			root->LinkEndChild(interEl);
+		}
+		saveFrameRecusion(ss->GetLabFrame(),root);
 
 	
-	doc.SaveFile(filename);
+		doc.SaveFile(filename);
+
+	}
+	XMLSaver(const SpinSystem* _ss) : ss(_ss) {
+	}
+private:
+	map<Frame*,int> frame2Number;
+	const SpinSystem* ss;
+};
+
+void SpinXML::XMLLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
+	XMLSaver o(ss);
+	o.doIt(filename);
 }
 

@@ -91,13 +91,13 @@ BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
 	Spin* spiny=new Spin(Vector3d(0    ,3e-10,0	   ),"0,1,0",7);
 	Spin* spinz=new Spin(Vector3d(0    ,0    ,3e-10),"0,0,1",8);
 	
-	Interaction* inter0=new Interaction(Eigenvalues(10e-6*eV,1e-6*eV,1e-6*eV  ,Orientation(AngleAxisd(0   ,Vector3d(1  ,0  ,0)))),
+	Interaction* inter0=new Interaction(Eigenvalues(1*MHz,1*MHz,1*MHz   ,Orientation(AngleAxisd(0   ,Vector3d(1  ,0  ,0)))),
 										Interaction::SHIELDING,spin0);
-	Interaction* inter1=new Interaction(Eigenvalues(10e-6*eV,1e-6*eV,1e-6*eV  ,Orientation(AngleAxisd(PI/4,Vector3d(1  ,0  ,0)))),
+	Interaction* inter1=new Interaction(Eigenvalues(10*MHz,1*MHz,1*MHz  ,Orientation(AngleAxisd(PI/4,Vector3d(1  ,0  ,0)))),
 										Interaction::SHIELDING,spinx);
-	Interaction* inter2=new Interaction(Eigenvalues(10e-6*eV,1e-6*eV,1e-6*eV  ,Orientation(AngleAxisd(PI/4,Vector3d(0.5,0.5,0)))),
+	Interaction* inter2=new Interaction(Eigenvalues(1*MHz,10*MHz,1*MHz  ,Orientation(AngleAxisd(PI/4,Vector3d(0.5,0.5,0)))),
 										Interaction::SHIELDING,spiny);
-	Interaction* inter3=new Interaction(Eigenvalues(10e-6*eV,1.1e-6*eV,1e-6*eV,Orientation(AngleAxisd(PI/4,Vector3d(0  ,0  ,1)))),
+	Interaction* inter3=new Interaction(Eigenvalues(1*MHz,1*MHz,10*MHz  ,Orientation(AngleAxisd(PI/4,Vector3d(0  ,0  ,1)))),
 										Interaction::SHIELDING,spinz);
 	ss->InsertSpin(spin0);
 	ss->InsertSpin(spinx);

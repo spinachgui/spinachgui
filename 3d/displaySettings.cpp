@@ -180,4 +180,3 @@ __ModInit::~__ModInit() {
     gluDeleteQuadric(gWireQuadric);
 }
 
-static __ModInit __init;

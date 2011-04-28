@@ -416,12 +416,14 @@ public:
 			eaEl->SetAttribute("alpha",ea.alpha);
 			eaEl->SetAttribute("beta" ,ea.beta);
 			eaEl->SetAttribute("gamma",ea.gamma);
+			eaEl->SetAttribute(_reference_frame_,LAB_FRAME);
 			el->LinkEndChild(eaEl);
 			break;
 		}
 		case Orientation::DCM: {
 			TiXmlElement* matrixEl = new TiXmlElement(_dcm_);
 			encodeMatrix(orient.GetAsMatrix(),matrixEl);
+			matrixEl->SetAttribute(_reference_frame_,LAB_FRAME);
 			el->LinkEndChild(matrixEl);
 			break;
 		}
@@ -432,6 +434,7 @@ public:
 			qEl->SetAttribute("i",q.x());
 			qEl->SetAttribute("j",q.y());
 			qEl->SetAttribute("k",q.z());
+			qEl->SetAttribute(_reference_frame_,LAB_FRAME);
 
 			el->LinkEndChild(qEl);
 			break;
@@ -448,13 +451,13 @@ public:
 			axisEl->SetAttribute("x",aa.axis().x());
 			axisEl->SetAttribute("y",aa.axis().y());
 			axisEl->SetAttribute("z",aa.axis().z());
+			axisEl->SetAttribute(_reference_frame_,LAB_FRAME);
 			aaEl->LinkEndChild(axisEl);
 
 			el->LinkEndChild(aaEl);
 			break;
 		}
 		}
-		el->SetAttribute("reference_frame",LAB_FRAME);
 	}
 
 
@@ -478,6 +481,7 @@ public:
 			originEl->SetAttribute("x",frame->GetTranslation().x() / Angstroms);
 			originEl->SetAttribute("y",frame->GetTranslation().y() / Angstroms);
 			originEl->SetAttribute("z",frame->GetTranslation().z() / Angstroms);
+			originEl->SetAttribute(_reference_frame_,LAB_FRAME);
 			childEl->LinkEndChild(originEl);
 		
 			TiXmlElement* orientEl = new TiXmlElement("orientation");

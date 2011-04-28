@@ -12,6 +12,9 @@ using namespace std;
 using namespace Eigen;
 
 #define LAB_FRAME 0
+#define INAPPLICABLE_FRAME -1  //Use when writing out a
+                               //reference_frame that should be
+							   //ignored when reading
 
 //================================================================================//
 //                                     Units                                      //
@@ -408,7 +411,7 @@ public:
 		el->SetAttribute("zz",mat(2,2));
 	}
 
-	void encodeOrient(const Orientation& orient,TiXmlElement* el) const {
+	void encodeOrient(const Orientation& orient,TiXmlElement* el,int frameNumber) const {
 		switch(orient.GetType()) {
 		case Orientation::EULER: {
 			TiXmlElement* eaEl = new TiXmlElement(_euler_);
@@ -416,14 +419,14 @@ public:
 			eaEl->SetAttribute("alpha",ea.alpha);
 			eaEl->SetAttribute("beta" ,ea.beta);
 			eaEl->SetAttribute("gamma",ea.gamma);
-			eaEl->SetAttribute(_reference_frame_,LAB_FRAME);
+			eaEl->SetAttribute(_reference_frame_,frameNumber);
 			el->LinkEndChild(eaEl);
 			break;
 		}
 		case Orientation::DCM: {
 			TiXmlElement* matrixEl = new TiXmlElement(_dcm_);
 			encodeMatrix(orient.GetAsMatrix(),matrixEl);
-			matrixEl->SetAttribute(_reference_frame_,LAB_FRAME);
+			matrixEl->SetAttribute(_reference_frame_,frameNumber);
 			el->LinkEndChild(matrixEl);
 			break;
 		}
@@ -434,7 +437,7 @@ public:
 			qEl->SetAttribute("i",q.x());
 			qEl->SetAttribute("j",q.y());
 			qEl->SetAttribute("k",q.z());
-			qEl->SetAttribute(_reference_frame_,LAB_FRAME);
+			qEl->SetAttribute(_reference_frame_,frameNumber);
 
 			el->LinkEndChild(qEl);
 			break;
@@ -451,7 +454,7 @@ public:
 			axisEl->SetAttribute("x",aa.axis().x());
 			axisEl->SetAttribute("y",aa.axis().y());
 			axisEl->SetAttribute("z",aa.axis().z());
-			axisEl->SetAttribute(_reference_frame_,LAB_FRAME);
+			axisEl->SetAttribute(_reference_frame_,frameNumber);
 			aaEl->LinkEndChild(axisEl);
 
 			el->LinkEndChild(aaEl);
@@ -478,14 +481,14 @@ public:
 			childEl->SetAttribute("label","FRAME");
 
 			TiXmlElement* originEl = new TiXmlElement("origin");
-			originEl->SetAttribute("x",frame->GetTranslation().x() / Angstroms);
-			originEl->SetAttribute("y",frame->GetTranslation().y() / Angstroms);
-			originEl->SetAttribute("z",frame->GetTranslation().z() / Angstroms);
+			originEl->SetAttribute("x",childFrame->GetTranslation().x() / Angstroms);
+			originEl->SetAttribute("y",childFrame->GetTranslation().y() / Angstroms);
+			originEl->SetAttribute("z",childFrame->GetTranslation().z() / Angstroms);
 			originEl->SetAttribute(_reference_frame_,LAB_FRAME);
 			childEl->LinkEndChild(originEl);
 		
 			TiXmlElement* orientEl = new TiXmlElement("orientation");
-			encodeOrient(frame->GetOrientation(),orientEl);
+			encodeOrient(frame->GetOrientation(),orientEl,INAPPLICABLE_FRAME);
 			childEl->LinkEndChild(orientEl);
 
 			frameEl->LinkEndChild(childEl);
@@ -506,6 +509,9 @@ public:
 	void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) const {
 		Orientation o;
 		unit u = inter->GetType() == Interaction::G_TENSER ? Unitless : MHz;
+		Frame* frame = inter->GetPreferedFrame();
+		int frameNumber = lookupFrame(frame);
+
 		switch(inter->GetStorage()) {
 		case Interaction::STORAGE_SCALAR: {
 			TiXmlElement* scalarEl = new TiXmlElement(_scalar_);
@@ -515,8 +521,12 @@ public:
 		}
 		case Interaction::MATRIX: {
 			TiXmlElement* matrixEl = new TiXmlElement(_tensor_);
-			encodeMatrix(inter->AsMatrix() * u,matrixEl);
-			matrixEl->SetAttribute("reference_frame",0);
+			Matrix3d mat3 = inter->AsMatrix();
+			if(frame != NULL) {
+				mat3 = FromLabMatrix3d(frame,mat3);
+			}
+			encodeMatrix(mat3 * u,matrixEl);
+			matrixEl->SetAttribute("reference_frame",frameNumber);
 			interEl->LinkEndChild(matrixEl);
 			break;
 		}
@@ -558,7 +568,10 @@ public:
 		   inter->GetStorage() == Interaction::AXRHOM ||
 		   inter->GetStorage() == Interaction::SPANSKEW) {
 			TiXmlElement* orientEl = new TiXmlElement(_orientation_);
-			encodeOrient(o,orientEl);
+			if(frame != NULL) {
+				o = FromLabOrient(frame,o);
+			}
+			encodeOrient(o,orientEl,frameNumber);
 			interEl->LinkEndChild(orientEl);
 		}
 	}
@@ -585,9 +598,13 @@ public:
 			spinEl->SetAttribute("label",spin->GetLabel());
 
 			TiXmlElement* coordEl = new TiXmlElement("coordinates");
-			coordEl->SetAttribute("x",spin->GetPosition().x() / Angstroms);
-			coordEl->SetAttribute("y",spin->GetPosition().y() / Angstroms);
-			coordEl->SetAttribute("z",spin->GetPosition().z() / Angstroms);
+			Vector3d position = spin->GetPosition();
+			if(spin->GetPreferedFrame() != NULL) {
+				position = FromLabVec3d(spin->GetPreferedFrame(),position);
+			}
+			coordEl->SetAttribute("x",position.x() / Angstroms);
+			coordEl->SetAttribute("y",position.y() / Angstroms);
+			coordEl->SetAttribute("z",position.z() / Angstroms);
 			coordEl->SetAttribute("reference_frame",frameNumber);
 
 			spinEl->LinkEndChild(coordEl);

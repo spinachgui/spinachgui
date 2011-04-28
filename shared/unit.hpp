@@ -95,8 +95,8 @@ const unit BohrRadius("Bohr Radius",52.9177e-12);
 // Define an enum of physical dimensions that we care about
 
 enum PhysDimension {
-        DIM_LENGTH,
-        DIM_ENERGY
+	DIM_LENGTH,
+	DIM_ENERGY
 };
 
 

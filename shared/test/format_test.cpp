@@ -110,10 +110,10 @@ BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
 	ss->InsertInteraction(inter3);
 
 	Frame* rootFrame  = ss->GetLabFrame();
-    rootFrame->AddChild(new Frame(Vector3d(1,0,0),Orientation()));
+    rootFrame->AddChild(new Frame(Vector3d(1*Angstroms,0,0),Orientation()));
 	//Rotation about the x axis
 
-	Frame* withChildrenAndParent = new Frame(Vector3d(1,0,0),Orientation(Quaterniond(sqrt(0.5),sqrt(0.5),0,0)));
+	Frame* withChildrenAndParent = new Frame(Vector3d(1*Angstroms,0,0),Orientation(Quaterniond(sqrt(0.5),sqrt(0.5),0,0)));
 
 	spin0->SetPreferedFrame(withChildrenAndParent);
 	spiny->SetPreferedFrame(withChildrenAndParent);
@@ -121,7 +121,7 @@ BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
 	inter2->SetPreferedFrame(withChildrenAndParent);
 
 	rootFrame->AddChild(withChildrenAndParent);
-	withChildrenAndParent->AddChild(new Frame(Vector3d(4,4,0),Orientation(EulerAngles(1,0.2,0.5))));
+	withChildrenAndParent->AddChild(new Frame(Vector3d(4*Angstroms,4*Angstroms,0),Orientation(EulerAngles(1,0.2,0.5))));
 
 	ss->SaveToFile("test_out/synthetic.xml",mXMLLoader);
 

@@ -6,6 +6,7 @@
 #include <shared/foreach.hpp>
 #include <shared/basic_math.hpp>
 #include <map>
+#include <set>
 
 using namespace SpinXML;
 using namespace std;
@@ -83,20 +84,19 @@ struct ProtoSpin {
 };
 
 struct ProtoInteraction {
+	ProtoInteraction() : payload(0.0) {}
 	int spin1;
 	int spin2;
 	
-	unit _unit;
-
 	Interaction::Type type;
 	InteractionPayload payload;
 
-	int payloadFrame;
-	int orientFrame;
+	int frame;
 };
 
 struct ProtoFrame {
 	int number;
+	string label;
 
 	double x;
 	double y;
@@ -139,6 +139,8 @@ string _dcm_ = "dcm";
 string _quaternion_ = "quaternion";
 string _angle_axis_ = "angle_axis";
 
+string _origin_ = "origin";
+
 //================================================================================//
 //                                     LOADING                                    //
 //================================================================================//
@@ -149,6 +151,56 @@ void Assemble(SpinSystem* ss,
 			  const vector<ProtoFrame>& frames) {
 	map<long,Spin*> number2spin;
 	foreach(ProtoSpin protoSpin,spins) {
+
+		//Assemble a spin system from the "parts" provided by the
+		//context free step
+
+		//Step 1, every proto-object should run it's own self checks
+
+		//Step 2, check that the number attribute in every protoSpin
+		//and protoFrame is unique
+		set<int> spinNumbers;
+		foreach(ProtoSpin spin,spins) {
+			if(spinNumbers.find(spin.number) != spinNumbers.end()) {
+				throw runtime_error("Two spins contained duplicate numbers");
+			}
+			spinNumbers.insert(spin.number);
+		}
+		set<int> frameNumbers;
+		foreach(ProtoFrame frame,frames) {
+			if(frameNumbers.find(frame.number) != frameNumbers.end()) {
+				throw runtime_error("Two reference frames contained duplicate numbers");
+			}
+			frameNumbers.insert(frame.number);
+		}
+
+		//Step 3, The frame number in each spin should point to a
+		//valid spin
+
+		foreach(ProtoSpin spin,spins) {
+			if(spin.frame != 0 && frameNumbers.find(spin.frame) == frameNumbers.end()) {
+				throw runtime_error("Spin refers to a missing reference frame");
+			}
+		}
+
+		//Step 4, Dito the interaction
+
+		foreach(ProtoInteraction interaction,interactions) {
+			if(interaction.frame !=0 && frameNumbers.find(interaction.frame) == frameNumbers.end()) {
+				throw runtime_error("Interaction refers to a missing reference frame");
+			}
+		}
+
+		//Step 5, spin1 and spin2 should point to a valid spin
+
+		foreach(ProtoInteraction interaction,interactions) {
+			if(spinNumbers.find(interaction.spin1) == spinNumbers.end() ||
+			   spinNumbers.find(interaction.spin2) == spinNumbers.end()) {
+				throw runtime_error("Interaction refers to a missing spin");
+			}
+		}
+
+
 		Vector3d position(protoSpin.x,protoSpin.y,protoSpin.z);
 		Spin* spin = new Spin(position,protoSpin.label,protoSpin.element,protoSpin.isotope);
 		number2spin[protoSpin.number] = spin;
@@ -205,7 +257,6 @@ Matrix3d decodeMatrix(const TiXmlElement* e) {
 }
 
 void decodeOrientation(const TiXmlElement* e,Orientation& o,int& frame) {
-	Guard(e->QueryIntAttribute(_reference_frame_,&frame),"Not reference frame in orientation");
 	const TiXmlNode* payloadNode = NULL;
 	if((payloadNode = e->FirstChild(_euler_))) {
 		const TiXmlElement* eulerEl = Guard(payloadNode,"Malformed euler angles element");
@@ -213,18 +264,21 @@ void decodeOrientation(const TiXmlElement* e,Orientation& o,int& frame) {
 		Guard(eulerEl->QueryDoubleAttribute("alpha",&ea.alpha),"No alpha attribute for euler angles");
 		Guard(eulerEl->QueryDoubleAttribute("beta", &ea.beta ),"No beta  attribute for euler angles");
 		Guard(eulerEl->QueryDoubleAttribute("gamma",&ea.gamma),"No gamma attribute for euler angles");
+		Guard(eulerEl->QueryIntAttribute(_reference_frame_,&frame),"No reference frame in euler angles");
 		o = ea;
 	} else if((payloadNode = e->FirstChild(_dcm_))) {
 		const TiXmlElement* matrixEl = Guard(payloadNode,"Malformed DCM element");
+		Guard(matrixEl->QueryIntAttribute(_reference_frame_,&frame),"No reference frame in matrix");
 		Matrix3d mat = decodeMatrix(matrixEl);
 		o = mat;
 	} else if((payloadNode = e->FirstChild(_quaternion_))) {
 		const TiXmlElement* quaternionEl = Guard(payloadNode,"Malformed quaternion element");
 		double x,y,z,w;
-		Guard(quaternionEl->QueryDoubleAttribute("x" ,&x),"No x attribute for quaternion");
-		Guard(quaternionEl->QueryDoubleAttribute("y" ,&y),"No y attribute for quaternion");
-		Guard(quaternionEl->QueryDoubleAttribute("z" ,&z),"No z attribute for quaternion");
+		Guard(quaternionEl->QueryDoubleAttribute("i" ,&x),"No x attribute for quaternion");
+		Guard(quaternionEl->QueryDoubleAttribute("j" ,&y),"No y attribute for quaternion");
+		Guard(quaternionEl->QueryDoubleAttribute("k" ,&z),"No z attribute for quaternion");
 		Guard(quaternionEl->QueryDoubleAttribute("re",&w),"No re attribute for quaternion");
+		Guard(quaternionEl->QueryIntAttribute(_reference_frame_,&frame),"No reference frame in quaternion");
 
 		o = Quaterniond(x,y,z,w);
 	} else if((payloadNode = e->FirstChild(_angle_axis_))) {
@@ -239,6 +293,8 @@ void decodeOrientation(const TiXmlElement* e,Orientation& o,int& frame) {
 		Guard(axisEl->QueryDoubleAttribute("x" ,&x),"No x attribute for angle-axis");
 		Guard(axisEl->QueryDoubleAttribute("y" ,&y),"No y attribute for angle-axis");
 		Guard(axisEl->QueryDoubleAttribute("z" ,&z),"No z attribute for angle-axis");
+		Guard(axisEl->QueryIntAttribute(_reference_frame_,&frame),"No reference frame in axis");
+
 		o = AngleAxisd(angle,Vector3d(x,y,z));
 	} else {
 		throw runtime_error("No euler angles or DCM or quaternion or angle axis element for orientation");
@@ -275,12 +331,13 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 
 		//TODO,HACK atof does not report failuar, just 0.0
 		protoInteraction.payload = atof(scalar->GetText());
+		protoInteraction.frame = 0;
 	} else if((mag = e->FirstChild(_tensor_))) {
 		const TiXmlElement* matrix = Guard(mag,"Malformed tensor element");
 
 		//TODO,HACK atof does not report failuar, just 0.0
 		protoInteraction.payload = decodeMatrix(matrix);
-		Guard(matrix->QueryIntAttribute(_reference_frame_,&protoInteraction.payloadFrame),"No reference frame for matrix");
+		Guard(matrix->QueryIntAttribute(_reference_frame_,&protoInteraction.frame),"No reference frame for matrix");
 	} else if((mag = e->FirstChild(_eigenvalues_))) {
 		const TiXmlElement* evEl = Guard(mag,"Malformed eigenvalue element");
 
@@ -293,7 +350,7 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 		int frame;
 		decodeOrientation(orientEl,ev.mOrient,frame);
 		protoInteraction.payload = ev;
-		protoInteraction.orientFrame = frame;
+		protoInteraction.frame = frame;
 		
 	} else if((mag = e->FirstChild(_axrhom_))) {
 		const TiXmlElement* axRhEl = Guard(mag,"Malformed axiality-rhombicity element");
@@ -307,7 +364,7 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 		int frame;
 		decodeOrientation(orientEl,ar.mOrient,frame);
 		protoInteraction.payload = ar;
-		protoInteraction.orientFrame = frame;
+		protoInteraction.frame = frame;
 
 	} else if((mag = e->FirstChild(_spanskew_))) {
 		const TiXmlElement* spanSkewEl = Guard(mag,"Malformed span-skew element");
@@ -321,11 +378,40 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 		int frame;
 		decodeOrientation(orientEl,spanSkew.mOrient,frame);
 		protoInteraction.payload = spanSkew;
-		protoInteraction.orientFrame = frame;
+		protoInteraction.frame = frame;
 
 	} else {
 		throw runtime_error("interaction missing it's definition in terms of one of scalar,tensor,eigenvalues,axiality_rhombicity,span_skew");
 	}
+}
+
+void decodeFrame(const TiXmlElement* e,vector<ProtoFrame>& protoFrames) {
+	ProtoFrame frame;
+	Guard(e->QueryIntAttribute("number",  &frame.number),  "No number attribute for frame");
+	Guard(e->QueryStringAttribute("label",&frame.label) ,  "To label attribute for frame");
+
+	const TiXmlElement* originEl = Guard(e->FirstChild(_origin_),"Reference frame missing an origin");
+	Guard(originEl->QueryDoubleAttribute("x",  &frame.x),  "Missing x attribute of origin");
+	Guard(originEl->QueryDoubleAttribute("y",  &frame.y),  "Missing y attribute of origin");
+	Guard(originEl->QueryDoubleAttribute("z",  &frame.z),  "Missing z attribute of origin");
+
+	const TiXmlElement* orientationEl = Guard(e->FirstChild(_orientation_),"Reference frame missing an orientation");
+	int dummy;
+	decodeOrientation(orientationEl,frame.o,dummy);
+
+	protoFrames.push_back(frame);
+
+	const TiXmlNode* child = NULL;
+	while((child = e->IterateChildren(child))) {
+		const TiXmlElement* childEl = child->ToElement();
+		if(!childEl) {
+			continue;
+		}
+		if(childEl->Value() == _reference_frame_) {
+			decodeFrame(childEl,protoFrames);
+		}
+	}
+	return;
 }
 
 void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
@@ -360,8 +446,7 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 		if(!e) {
 			continue;
 		}
-		if(e->Value() == _reference_frame_) {
-		} else if(e->Value() == _spin_) {
+		if(e->Value() == _spin_) {
 			ProtoSpin spin;
 			Guard(e->QueryIntAttribute("number",&spin.number),  "missing spin number  attribute");
 			Guard(e->QueryIntAttribute("element",&spin.element),"missing spin element attribute");
@@ -377,6 +462,11 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 
 			protoSpins.push_back(spin);
 		} else if(e->Value() == _interaction_) {
+			ProtoInteraction inter;
+			decodeInteraction(e,inter);
+			protoInteractions.push_back(inter);
+		} else if(e->Value() == _reference_frame_) {
+			decodeFrame(e,protoFrames);
 		} else {
 			//We have something else, perhaps emit a warning?
 		}
@@ -622,9 +712,9 @@ public:
 
 			interEl->SetAttribute("kind" ,gType2XMLKind[inter->GetType()]);
 			if(inter->GetType() == Interaction::G_TENSER) {
-				interEl->SetAttribute("units",_MHz_);
-			} else {
 				interEl->SetAttribute("units",_unitless_);
+			} else {
+				interEl->SetAttribute("units",_MHz_);
 			}
 			interEl->SetAttribute("spin_1",spin1n);
 			interEl->SetAttribute("spin_2",spin2n);

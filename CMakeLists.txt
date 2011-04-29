@@ -115,7 +115,7 @@ target_link_libraries(FrameTest spinxml ${Boost_LIBRARIES}  sigc-2.0)
 add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/SpinSystemTest)
 
 add_executable(FormatTest "shared/test/format_test.cpp" )
-target_link_libraries(FormatTest spinxml ${Boost_LIBRARIES} sigc-2.0 xerces-c)
+target_link_libraries(FormatTest spinxml ${Boost_LIBRARIES} sigc-2.0)
 add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/FormatTest)
 
 

@@ -7,6 +7,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <Eigen/Dense>
+#include <shared/panic.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -89,9 +90,12 @@ Orientation::Type Orientation::GetType() const {
         return ANGLE_AXIS;
     } else if(get<Matrix3d>(&mData)!=NULL) {
         return DCM;
-    } else  {
+    } else if(get<Quaterniond>(&mData)!=NULL) {
         return QUATERNION;
-    }
+    } else {
+		PANIC("In Orientation::GetType() interaction had unknown type");
+		return EULER;
+	}
 }
 
 
@@ -235,6 +239,7 @@ struct NormalizeVisitor : public static_visitor<> {
 };
 void Orientation::Normalize() {
     apply_visitor(NormalizeVisitor(),mData);
+	Invariant();
 }
 
 struct NormalisedVisitor : public static_visitor<Orientation> {
@@ -248,3 +253,17 @@ Orientation Orientation::Normalized() const {
 }
 
 
+void Orientation::Invariant() const {
+    if(get<AngleAxisd>(&mData)!=NULL) {
+		Vector3d axis = get<AngleAxisd>(mData).axis();
+		if(axis.x() == 0 && axis.y() == 0 && axis.z() == 0) {
+			PANIC("An orientation in angle-axis notation has (0,0,0) as it's axis vector");
+		}
+    } else if(get<Quaterniond>(&mData)!=NULL) {
+		Quaterniond q = get<Quaterniond>(mData);
+		if(q.x() == 0 && q.y() == 0 && q.z() == 0 && q.w() == 0) {
+			PANIC("An orientation in quaternion notation is (0,0,0,0)");
+		}
+	}
+	
+}

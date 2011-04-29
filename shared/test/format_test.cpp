@@ -15,35 +15,21 @@
 #include <shared/formats/pdb.hpp>
 
 #include <shared/nuclear_data.hpp>
-
-
-#include <iostream>
-
-#include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include <iostream>               // for std::cout
 
 
 using namespace std;
 using namespace SpinXML;
-using namespace boost::filesystem;  
 
 
 class setup {
 public:
 	setup() : ss(new SpinSystem) {
-		FindFullPath(boost::unit_test::framework::master_test_suite().argv[0]);
-
 		mG03Loader     = new G03Loader;
 		mSIMPSONLoader = new SIMPSONLoader;
 		mPDBLoader     = new PDBLoader;
 		
-		path schema_path = full_path;
-		schema_path.remove_filename();
-		schema_path/="data";
-		schema_path/="spinxml_schema.xsd";
-		string str = schema_path.string();
-		str = "file://" + str;
-		mXMLLoader = new XMLLoader(str.c_str());
+		mXMLLoader = new XMLLoader("");
 
 		try {
 			LoadIsotopes();
@@ -62,15 +48,11 @@ public:
 		SAFE_DELETE(mXMLLoader);
 		SAFE_DELETE(mPDBLoader);
 	}
-	void FindFullPath(const char* argv0) {
-		full_path = system_complete( path( argv0 ));
-	}
 
 	SpinXML::ISpinSystemLoader* mG03Loader;	   
 	SpinXML::ISpinSystemLoader* mSIMPSONLoader;
 	SpinXML::ISpinSystemLoader* mPDBLoader;
 	SpinXML::ISpinSystemLoader* mXMLLoader;    
-	path full_path;
 
 	SpinSystem* ss;
 
@@ -110,10 +92,10 @@ BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
 	ss->InsertInteraction(inter3);
 
 	Frame* rootFrame  = ss->GetLabFrame();
-    rootFrame->AddChild(new Frame(Vector3d(1*Angstroms,0,0),Orientation()));
+    rootFrame->AddChild(new Frame(Vector3d(1*Angstroms,0,0),Orientation(AngleAxisd(2.0,Vector3d(1,2,3)))));
 	//Rotation about the x axis
 
-	Frame* withChildrenAndParent = new Frame(Vector3d(1*Angstroms,0,0),Orientation(Quaterniond(sqrt(0.5),sqrt(0.5),0,0)));
+	Frame* withChildrenAndParent = new Frame(Vector3d(1*Angstroms,0,0),Orientation(EulerAngles(sqrt(0.5),sqrt(0.5),0)));
 
 	spin0->SetPreferedFrame(withChildrenAndParent);
 	spiny->SetPreferedFrame(withChildrenAndParent);

@@ -5,6 +5,7 @@
 #include <shared/formats/xml.hpp>
 #include <shared/foreach.hpp>
 #include <shared/basic_math.hpp>
+#include <shared/panic.hpp>
 #include <map>
 #include <set>
 #include <boost/optional.hpp>
@@ -83,22 +84,69 @@ struct ProtoSpin {
 	string label;
 
 	int frame;
-	
+	void selfCheck() const {
+		//Check for NAN
+		if(x != x) {
+			throw runtime_error("x was NaN");
+		}
+		if(y != y) {
+			throw runtime_error("y was NaN");
+		}
+		if(z != z) {
+			throw runtime_error("z was NaN");
+		}
+		
+		if(element < 0) {
+			throw runtime_error("Spin cannot have a negative number of protons");
+		}
+		if(isotope < element) {
+			throw runtime_error("Spin cannot have a negative number of neutrons");
+		}
+	}
 };
 
 struct ProtoInteraction {
 	ProtoInteraction() : payload(0.0) {}
-	optional<int> spin1;
+	int spin1;
 	optional<int> spin2;
 	
 	Interaction::Type type;
 	InteractionPayload payload;
 
 	int frame;
+
+	void selfCheck() const {
+		switch(type) {
+		case Interaction::HFC:
+		case Interaction::EXCHANGE:
+		case Interaction::CUSTOM_BILINEAR:
+		case Interaction::DIPOLAR:
+        case Interaction::SCALAR:
+			if(!spin2) {
+				throw runtime_error("Only one spin specified for a two spin interaction");
+			}
+			break;
+		case Interaction::CUSTOM_LINEAR:
+		case Interaction::CUSTOM_QUADRATIC:
+		case Interaction::QUADRUPOLAR:
+		case Interaction::SHIELDING:
+		case Interaction::ZFS:
+		case Interaction::G_TENSER:
+			if(spin2) {
+				throw runtime_error("Two spins specified for a one spin interaction");
+			}
+			break;
+		default:
+			//This should never happen because we should have already
+			//caught this. This is just some defense in depth.
+			throw logic_error("Internal error, unknown Interaction::Type encountered in ProtoInteraction::selfCheck");
+		}
+	}
 };
 
 struct ProtoFrame {
 	int number;
+	int parent;
 	string label;
 
 	double x;
@@ -106,6 +154,21 @@ struct ProtoFrame {
 	double z;
 
 	Orientation o;
+
+	void selfCheck() const {
+		if(x != x) {
+			throw runtime_error("x was NaN");
+		}
+		if(y != y) {
+			throw runtime_error("y was NaN");
+		}
+		if(z != z) {
+			throw runtime_error("z was NaN");
+		}
+		if(number == 0) {
+			throw runtime_error("reference_frame 0 is the implicit molecular frame but was explicitly specifed");
+		}
+	}
 };
 
 
@@ -157,6 +220,16 @@ void Assemble(SpinSystem* ss,
 	//context free step
 
 	//Step 1, every proto-object should run it's own self checks
+	foreach(ProtoSpin spin,spins) {
+		spin.selfCheck();
+	}
+	foreach(ProtoInteraction inter,interactions) {
+		inter.selfCheck();
+	}
+	foreach(ProtoFrame frame,frames) {
+		frame.selfCheck();
+	}
+
 
 	//Step 2, check that the number attribute in every protoSpin
 	//and protoFrame is unique
@@ -165,6 +238,7 @@ void Assemble(SpinSystem* ss,
 		if(spinNumbers.find(spin.number) != spinNumbers.end()) {
 			throw runtime_error("Two spins contained duplicate numbers");
 		}
+		cout << "Inserted " << spin.number << endl;
 		spinNumbers.insert(spin.number);
 	}
 	set<int> frameNumbers;
@@ -176,7 +250,7 @@ void Assemble(SpinSystem* ss,
 	}
 
 	//Step 3, The frame number in each spin should point to a
-	//valid spin
+	//valid frame
 
 	foreach(ProtoSpin spin,spins) {
 		if(spin.frame != 0 && frameNumbers.find(spin.frame) == frameNumbers.end()) {
@@ -192,19 +266,27 @@ void Assemble(SpinSystem* ss,
 		}
 	}
 
-	//Step 5, spin1 and spin2 should point to a valid spin, at
+	//Step 5, Dito the parent frame of every frame
+	foreach(ProtoFrame frame,frames) {
+		if(frame.parent != 0 && frameNumbers.find(frame.parent) == frameNumbers.end()) {
+			//Because of the way frames appear in the XML file this
+			//shouldn't happen. This is defense in depth.
+			throw logic_error("Internal error, frame refers to a non-existant parent frame");
+		}
+	}
+
+	//Step 6, spin1 and spin2 should point to a valid spin, at
 	//least, if they are present. After doing this test we can be
 	//sure that if they are present they are valid
 
 	foreach(ProtoInteraction interaction,interactions) {
-		if(interaction.spin1) {
-			if(spinNumbers.find(interaction.spin1.get()) == spinNumbers.end()) {
-				throw runtime_error("Interaction refers to a missing spin");					
-			}
+		if(spinNumbers.find(interaction.spin1) == spinNumbers.end()) {
+			cout << "interaction.spin1 = " << interaction.spin1 << endl;
+			throw runtime_error("Interaction spin_1 attribute refers to a missing spin");					
 		}
 		if(interaction.spin2) {
 			if(spinNumbers.find(interaction.spin2.get()) == spinNumbers.end()) {
-				throw runtime_error("Interaction refers to a missing spin");					
+				throw runtime_error("Interaction spin_2 attribute refers to a missing spin");					
 			}
 		}
 	}
@@ -213,20 +295,51 @@ void Assemble(SpinSystem* ss,
 	//start assembling the spin system and allocating memory. Code
 	//beyond this point should not throw
 	map<long,Spin*> number2spin;
+	//Map a index to a (parent index,frame) pair
+	typedef pair<long,pair<long,Frame*> > number2Frame_t;
+	map<long,pair<long,Frame*> > number2Frame;
 
+	//As we aren't assuming anything about the order we are reciving
+	//the frames here, instanciate the frames then link them up.
+	foreach(ProtoFrame protoFrame,frames) {
+		Frame* frame = new Frame(Vector3d(protoFrame.x,protoFrame.y,protoFrame.z),protoFrame.o);
+		number2Frame[protoFrame.number] = pair<long,Frame*>(protoFrame.parent,frame);
+	}
+	Frame* lab = ss->GetLabFrame();
+
+	foreach(number2Frame_t p,number2Frame) {
+		long parentN = p.second.first;
+		Frame* frame = p.second.second;
+		Frame* parent = parentN == 0 ? lab : number2Frame[parentN].second;
+		parent->AddChild(frame);
+	}
+
+	//Instanciate the spins
 	foreach(ProtoSpin protoSpin,spins) {
 		Vector3d position(protoSpin.x,protoSpin.y,protoSpin.z);
+
+		position = ToLabVec3d(number2Frame[protoSpin.frame].second,position);
+
 		Spin* spin = new Spin(position,protoSpin.label,protoSpin.element,protoSpin.isotope);
 		number2spin[protoSpin.number] = spin;
 		ss->InsertSpin(spin);
 	}
 
+	//Instanciate the interactions
 	foreach(ProtoInteraction protoInteraction,interactions) {
-		Spin* spin1 = protoInteraction.spin1 ? number2spin[protoInteraction.spin1.get()] : NULL;
+		Frame* frame = number2Frame[protoInteraction.frame].second;
+
+		/*
+		  TODO: Transform to lab goes here
+		 */
+
+		Spin* spin1 = number2spin[protoInteraction.spin1];
 		Spin* spin2 = protoInteraction.spin2 ? number2spin[protoInteraction.spin2.get()] : NULL;
 		Interaction* interaction = new Interaction(protoInteraction.payload,protoInteraction.type,spin1,spin2);
 		ss->InsertInteraction(interaction);
 	}
+
+
 }
 
 optional<string> OptionalString(const TiXmlElement* el,const string& name) {
@@ -334,6 +447,11 @@ void decodeOrientation(const TiXmlElement* e,Orientation& o,int& frame) {
 		Guard(quaternionEl->QueryDoubleAttribute("j" ,&y),"No y attribute for quaternion");
 		Guard(quaternionEl->QueryDoubleAttribute("k" ,&z),"No z attribute for quaternion");
 		Guard(quaternionEl->QueryDoubleAttribute("re",&w),"No re attribute for quaternion");
+		
+		if(x == 0 && y == 0 && z == 0 && w == 0) {
+			throw runtime_error("All for elements of a quaternions were 0, cannot be normalised");
+		}
+		
 		Guard(quaternionEl->QueryIntAttribute(_reference_frame_,&frame),"No reference frame in quaternion");
 
 		o = Quaterniond(x,y,z,w);
@@ -351,6 +469,10 @@ void decodeOrientation(const TiXmlElement* e,Orientation& o,int& frame) {
 		Guard(axisEl->QueryDoubleAttribute("z" ,&z),"No z attribute for angle-axis");
 		Guard(axisEl->QueryIntAttribute(_reference_frame_,&frame),"No reference frame in axis");
 
+		if(x == 0 && y == 0 && z == 0) {
+			throw runtime_error("Vector for an angle-axis rotation is the zero vector, cannot normalise");
+		}
+
 		o = AngleAxisd(angle,Vector3d(x,y,z));
 	} else {
 		throw runtime_error("No euler angles or DCM or quaternion or angle axis element for orientation");
@@ -367,7 +489,7 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 		throw runtime_error("malformed kind attribute");
 	}
 
-	protoInteraction.spin1 = OptionalInt(e,"spin_1");
+	Guard(e->QueryIntAttribute("spin_1",&protoInteraction.spin1),"Missing spin_1 attribute, only spin_2 is optional");
 	protoInteraction.spin2 = OptionalInt(e,"spin_2");
 
 	string unitStr;
@@ -455,15 +577,21 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 	}
 }
 
-void decodeFrame(const TiXmlElement* e,vector<ProtoFrame>& protoFrames) {
+void decodeFrame(const TiXmlElement* e,vector<ProtoFrame>& protoFrames,int parent = 0) {
 	ProtoFrame frame;
+	frame.parent = parent;
 	Guard(e->QueryIntAttribute("number",  &frame.number),  "No number attribute for frame");
 	Guard(e->QueryStringAttribute("label",&frame.label) ,  "To label attribute for frame");
 
 	const TiXmlElement* originEl = Guard(e->FirstChild(_origin_),"Reference frame missing an origin");
-	Guard(originEl->QueryDoubleAttribute("x",  &frame.x),  "Missing x attribute of origin");
-	Guard(originEl->QueryDoubleAttribute("y",  &frame.y),  "Missing y attribute of origin");
-	Guard(originEl->QueryDoubleAttribute("z",  &frame.z),  "Missing z attribute of origin");
+	double x,y,z;
+	Guard(originEl->QueryDoubleAttribute("x",  &x),  "Missing x attribute of origin");
+	Guard(originEl->QueryDoubleAttribute("y",  &y),  "Missing y attribute of origin");
+	Guard(originEl->QueryDoubleAttribute("z",  &z),  "Missing z attribute of origin");
+
+	frame.x = x * Angstroms;
+	frame.y = y * Angstroms;
+	frame.z = z * Angstroms;
 
 	const TiXmlElement* orientationEl = Guard(e->FirstChild(_orientation_),"Reference frame missing an orientation");
 	int dummy;
@@ -478,7 +606,7 @@ void decodeFrame(const TiXmlElement* e,vector<ProtoFrame>& protoFrames) {
 			continue;
 		}
 		if(childEl->Value() == _reference_frame_) {
-			decodeFrame(childEl,protoFrames);
+			decodeFrame(childEl,protoFrames,frame.number);
 		}
 	}
 	return;
@@ -558,17 +686,17 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 class XMLSaver {
 public:
 	void encodeMatrix(Matrix3d mat,TiXmlElement* el) const {
-		el->SetAttribute("xx",mat(0,0));
-		el->SetAttribute("xy",mat(0,1));
-		el->SetAttribute("xz",mat(0,2));
+		el->SetDoubleAttribute("xx",mat(0,0));
+		el->SetDoubleAttribute("xy",mat(0,1));
+		el->SetDoubleAttribute("xz",mat(0,2));
 
-		el->SetAttribute("yx",mat(1,0));
-		el->SetAttribute("yy",mat(1,1));
-		el->SetAttribute("yz",mat(1,2));
+		el->SetDoubleAttribute("yx",mat(1,0));
+		el->SetDoubleAttribute("yy",mat(1,1));
+		el->SetDoubleAttribute("yz",mat(1,2));
 
-		el->SetAttribute("zx",mat(2,0));
-		el->SetAttribute("zy",mat(2,1));
-		el->SetAttribute("zz",mat(2,2));
+		el->SetDoubleAttribute("zx",mat(2,0));
+		el->SetDoubleAttribute("zy",mat(2,1));
+		el->SetDoubleAttribute("zz",mat(2,2));
 	}
 
 	void encodeOrient(const Orientation& orient,TiXmlElement* el,int frameNumber) const {
@@ -576,9 +704,9 @@ public:
 		case Orientation::EULER: {
 			TiXmlElement* eaEl = new TiXmlElement(_euler_);
 			EulerAngles ea = orient.GetAsEuler();
-			eaEl->SetAttribute("alpha",ea.alpha);
-			eaEl->SetAttribute("beta" ,ea.beta);
-			eaEl->SetAttribute("gamma",ea.gamma);
+			eaEl->SetDoubleAttribute("alpha",ea.alpha);
+			eaEl->SetDoubleAttribute("beta" ,ea.beta);
+			eaEl->SetDoubleAttribute("gamma",ea.gamma);
 			eaEl->SetAttribute(_reference_frame_,frameNumber);
 			el->LinkEndChild(eaEl);
 			break;
@@ -593,10 +721,15 @@ public:
 		case Orientation::QUATERNION: {
 			TiXmlElement* qEl = new TiXmlElement(_quaternion_);
 			Quaterniond q = orient.GetAsQuaternion();
-			qEl->SetAttribute("re",q.w());
-			qEl->SetAttribute("i",q.x());
-			qEl->SetAttribute("j",q.y());
-			qEl->SetAttribute("k",q.z());
+
+			if(q.x() == 0 && q.y() == 0 && q.z() == 0 && q.w() == 0) {
+				PANIC("About to write out the zero quaternion (0,0,0,0)");
+			}
+
+			qEl->SetDoubleAttribute("re",q.w());
+			qEl->SetDoubleAttribute("i",q.x());
+			qEl->SetDoubleAttribute("j",q.y());
+			qEl->SetDoubleAttribute("k",q.z());
 			qEl->SetAttribute(_reference_frame_,frameNumber);
 
 			el->LinkEndChild(qEl);
@@ -611,9 +744,15 @@ public:
 			aaEl->LinkEndChild(angleEl);
 		
 			TiXmlElement* axisEl = new TiXmlElement(_axis_);
-			axisEl->SetAttribute("x",aa.axis().x());
-			axisEl->SetAttribute("y",aa.axis().y());
-			axisEl->SetAttribute("z",aa.axis().z());
+			Vector3d axis = aa.axis();
+
+			if(axis.x() == 0 && axis.y() == 0 && axis.z() == 0) {
+				PANIC("About to write out an angle-axis axis that is the zero vector");
+			}
+
+			axisEl->SetDoubleAttribute("x",axis.x());
+			axisEl->SetDoubleAttribute("y",axis.y());
+			axisEl->SetDoubleAttribute("z",axis.z());
 			axisEl->SetAttribute(_reference_frame_,frameNumber);
 			aaEl->LinkEndChild(axisEl);
 
@@ -641,14 +780,14 @@ public:
 			childEl->SetAttribute("label","FRAME");
 
 			TiXmlElement* originEl = new TiXmlElement("origin");
-			originEl->SetAttribute("x",childFrame->GetTranslation().x() / Angstroms);
-			originEl->SetAttribute("y",childFrame->GetTranslation().y() / Angstroms);
-			originEl->SetAttribute("z",childFrame->GetTranslation().z() / Angstroms);
+			originEl->SetDoubleAttribute("x",childFrame->GetTranslation().x() / Angstroms);
+			originEl->SetDoubleAttribute("y",childFrame->GetTranslation().y() / Angstroms);
+			originEl->SetDoubleAttribute("z",childFrame->GetTranslation().z() / Angstroms);
 			originEl->SetAttribute(_reference_frame_,LAB_FRAME);
 			childEl->LinkEndChild(originEl);
 		
 			TiXmlElement* orientEl = new TiXmlElement("orientation");
-			encodeOrient(frame->GetOrientation(),orientEl,INAPPLICABLE_FRAME);
+			encodeOrient(childFrame->GetOrientation(),orientEl,INAPPLICABLE_FRAME);
 			childEl->LinkEndChild(orientEl);
 
 			frameEl->LinkEndChild(childEl);
@@ -693,9 +832,9 @@ public:
 		case Interaction::EIGENVALUES: {
 			TiXmlElement* evEl = new TiXmlElement(_eigenvalues_);
 			Eigenvalues ev = inter->AsEigenvalues();
-			evEl->SetAttribute("XX",ev.xx / u);
-			evEl->SetAttribute("YY",ev.yy / u);
-			evEl->SetAttribute("ZZ",ev.zz / u);
+			evEl->SetDoubleAttribute("XX",ev.xx / u);
+			evEl->SetDoubleAttribute("YY",ev.yy / u);
+			evEl->SetDoubleAttribute("ZZ",ev.zz / u);
 			interEl->LinkEndChild(evEl);
 
 			o = ev.mOrient;
@@ -704,9 +843,9 @@ public:
 		case Interaction::AXRHOM: {
 			TiXmlElement* arEl = new TiXmlElement(_axrhom_);
 			AxRhom ar = inter->AsAxRhom();
-			arEl->SetAttribute("rh",ar.rh   / u);
-			arEl->SetAttribute("iso",ar.iso / u);
-			arEl->SetAttribute("ax",ar.ax   / u);
+			arEl->SetDoubleAttribute("rh",ar.rh   / u);
+			arEl->SetDoubleAttribute("iso",ar.iso / u);
+			arEl->SetDoubleAttribute("ax",ar.ax   / u);
 			interEl->LinkEndChild(arEl);
 
 			o = ar.mOrient;
@@ -715,9 +854,9 @@ public:
 		case Interaction::SPANSKEW: {
 			TiXmlElement* ssEl = new TiXmlElement(_spanskew_);
 			SpanSkew ss = inter->AsSpanSkew();
-			ssEl->SetAttribute("span",ss.span  / u);
-			ssEl->SetAttribute("skew",ss.skew);
-			ssEl->SetAttribute("iso", ss.iso   / u);
+			ssEl->SetDoubleAttribute("span",ss.span  / u);
+			ssEl->SetDoubleAttribute("skew",ss.skew);
+			ssEl->SetDoubleAttribute("iso", ss.iso   / u);
 			interEl->LinkEndChild(ssEl);
 
 			o = ss.mOrient;
@@ -754,7 +893,7 @@ public:
 			TiXmlElement* spinEl = new TiXmlElement("spin");
 			spinEl->SetAttribute("number",counter);
 			spinEl->SetAttribute("element",spin->GetElement());
-			spinEl->SetAttribute("isotope",spin->GetIsotope());
+			spinEl->SetAttribute("isotope",spin->GetIsotope()+spin->GetElement());
 			spinEl->SetAttribute("label",spin->GetLabel());
 
 			TiXmlElement* coordEl = new TiXmlElement("coordinates");
@@ -762,9 +901,9 @@ public:
 			if(spin->GetPreferedFrame() != NULL) {
 				position = FromLabVec3d(spin->GetPreferedFrame(),position);
 			}
-			coordEl->SetAttribute("x",position.x() / Angstroms);
-			coordEl->SetAttribute("y",position.y() / Angstroms);
-			coordEl->SetAttribute("z",position.z() / Angstroms);
+			coordEl->SetDoubleAttribute("x",position.x() / Angstroms);
+			coordEl->SetDoubleAttribute("y",position.y() / Angstroms);
+			coordEl->SetDoubleAttribute("z",position.z() / Angstroms);
 			coordEl->SetAttribute("reference_frame",frameNumber);
 
 			spinEl->LinkEndChild(coordEl);

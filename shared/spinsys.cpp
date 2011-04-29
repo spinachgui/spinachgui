@@ -18,7 +18,7 @@ using namespace boost;
 // SpinSystem
 
 SpinSystem::SpinSystem()
-        : mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
+	: mRootFrame(new Frame(Vector3d(0,0,0),Orientation())) {
 }
 
 

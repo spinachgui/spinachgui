@@ -88,15 +88,15 @@ namespace SpinXML {
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Constructs the identity rotation
-        Orientation() : mData(Eigen::Quaterniond(1,0,0,0)) {}
+        Orientation() : mData(Eigen::Quaterniond(1,0,0,0)) {Invariant();}
         ///Constructs an orientation from euler angles
-        Orientation(const EulerAngles& ea) : mData(ea) {}
+        Orientation(const EulerAngles& ea) : mData(ea) {Invariant();}
         ///Constructs an orientation from a matrix
-        Orientation(const Eigen::Matrix3d& m) : mData(m) {}
+        Orientation(const Eigen::Matrix3d& m) : mData(m) {Invariant();}
         ///Constructs an orientation from a quaternion
-        Orientation(const Eigen::Quaterniond& q) : mData(q) {}
+        Orientation(const Eigen::Quaterniond& q) : mData(q) {Invariant();}
         ///Constructs an orientation from an AngleAxis
-        Orientation(const Eigen::AngleAxisd& aa) : mData(aa) {}
+        Orientation(const Eigen::AngleAxisd& aa) : mData(aa) {Invariant();}
         ///Destructor
         ~Orientation() {};
 
@@ -142,16 +142,20 @@ namespace SpinXML {
 
         bool operator==(const Orientation& o) const {
             using boost::get;
-            if(o.mData.type()==typeid(EulerAngles))     return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
-            if(o.mData.type()==typeid(Eigen::AngleAxisd))
+            if(mData.type()==typeid(EulerAngles) && o.mData.type()==typeid(EulerAngles))
+				return get<EulerAngles>(o.mData)==get<EulerAngles>(mData);
+            if(mData.type()==typeid(Eigen::AngleAxisd) && o.mData.type()==typeid(Eigen::AngleAxisd))
                 return get<Eigen::AngleAxisd>(o.mData).angle()==get<Eigen::AngleAxisd>(mData).angle()
                     && get<Eigen::AngleAxisd>(o.mData).axis()==get<Eigen::AngleAxisd>(mData).axis();
-            if(o.mData.type()==typeid(Eigen::Quaterniond))
+            if(mData.type()==typeid(Eigen::Quaterniond) && o.mData.type()==typeid(Eigen::Quaterniond))
                 return get<Eigen::Quaterniond>(o.mData).w()==get<Eigen::Quaterniond>(mData).w()
                     && get<Eigen::Quaterniond>(o.mData).x()==get<Eigen::Quaterniond>(mData).x()
                     && get<Eigen::Quaterniond>(o.mData).y()==get<Eigen::Quaterniond>(mData).y()
                     && get<Eigen::Quaterniond>(o.mData).z()==get<Eigen::Quaterniond>(mData).z();
-            if(o.mData.type()==typeid(Eigen::Matrix3d))    return get<Eigen::Matrix3d>   (o.mData)==get<Eigen::Matrix3d>   (mData);
+            if(mData.type()==typeid(Eigen::Matrix3d) && o.mData.type()==typeid(Eigen::Matrix3d))
+				return get<Eigen::Matrix3d>   (o.mData)==get<Eigen::Matrix3d>   (mData);
+
+			return false;
         }
 
         ///Converts to a rotation matrix
@@ -174,6 +178,7 @@ namespace SpinXML {
         //HACK
         const var_t& __get_variant() const {return mData;}
     private:
+		void Invariant() const;
         var_t mData;
     };
 };

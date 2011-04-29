@@ -22,6 +22,7 @@ Frame::Frame(Vector3d translation, Orientation rotation)
     : mParent(NULL),
       mTranslate(translation),
       mOrient(rotation) {
+
     updateAfine();
     Invariant();
 }
@@ -49,7 +50,7 @@ void Frame::SetOrientation(const Orientation orient) {
 
 
 void Frame::updateAfine() {
-    Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsQuaternion());
+    Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsDCM());
     Matrix4d mat = T.matrix();
     cout << "In updateAffine, mat=" << endl;
     cout << mat << endl;
@@ -62,6 +63,7 @@ void Frame::updateAfine() {
 void Frame::AddChild(Frame* frame) {
     mChildren.push_back(frame);
     frame->mParent = frame;
+	frame->updateAfine();
     sigChange(this);
     frame->sigChange(frame);
     Invariant();

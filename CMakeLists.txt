@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 project(popi)
 
 #SET(CMAKE_CXX_COMPILER "gcc-4.4")
-
-ENABLE_LANGUAGE(ASM)
-
 ############################################################
 # Enable Testing
 
@@ -60,7 +57,7 @@ file(GLOB formatSources shared/formats/*.cpp)
 file(GLOB guiSources gui/*.cpp)
 file(GLOB threeDeeSources 3d/*.cpp)
 
-set(guiSources ${guiSources} ${threeDeeSources} gui/schema_import.s)
+set(guiSources ${guiSources} ${threeDeeSources})
 set(wxformbuilderSources ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp)
 set(xmlSources
   shared/formats/tinyxml/tinyxml.cpp 

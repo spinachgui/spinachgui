@@ -29,7 +29,7 @@ public:
 		mSIMPSONLoader = new SIMPSONLoader;
 		mPDBLoader     = new PDBLoader;
 		
-		mXMLLoader = new XMLLoader("");
+		mXMLLoader = new XMLLoader;
 
 		try {
 			LoadIsotopes();

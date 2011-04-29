@@ -114,6 +114,7 @@ struct ProtoInteraction {
     InteractionPayload payload;
 
     int frame;
+    string label;
 
     void selfCheck() const {
         switch(type) {
@@ -581,7 +582,11 @@ void decodeFrame(const TiXmlElement* e,vector<ProtoFrame>& protoFrames,int paren
     ProtoFrame frame;
     frame.parent = parent;
     Guard(e->QueryIntAttribute("number",  &frame.number),  "No number attribute for frame");
-    Guard(e->QueryStringAttribute("label",&frame.label) ,  "To label attribute for frame");
+    optional<string> label = OptionalString(e,"label");
+    if(!label) {
+        label = "";
+    }
+    frame.label = label.get();
 
     const TiXmlElement* originEl = Guard(e->FirstChild(_origin_),"Reference frame missing an origin");
     double x,y,z;
@@ -649,7 +654,11 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
             Guard(e->QueryIntAttribute("number",&spin.number),  "missing spin number  attribute");
             Guard(e->QueryIntAttribute("element",&spin.element),"missing spin element attribute");
             Guard(e->QueryIntAttribute("isotope",&spin.isotope),"missing spin isotope attribute");
-            Guard(e->QueryStringAttribute("label",&spin.label), "missing label attribute");
+            optional<string> label = OptionalString(e,"label");
+            if(!label) {
+                label = "";
+            }
+            spin.label = label.get();
 
             const TiXmlElement* coords = Guard(e->FirstChild("coordinates"),"missing or malformed coordinate");
 

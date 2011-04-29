@@ -319,7 +319,8 @@ void Assemble(SpinSystem* ss,
     foreach(ProtoSpin protoSpin,spins) {
         Vector3d position(protoSpin.x,protoSpin.y,protoSpin.z);
 
-        position = ToLabVec3d(number2Frame[protoSpin.frame].second,position);
+        Frame* frame = protoSpin.frame == 0 ? lab : number2Frame[protoSpin.frame].second;
+        position = ToLabVec3d(frame,position);
 
         Spin* spin = new Spin(position,protoSpin.label,protoSpin.element,protoSpin.isotope);
         number2spin[protoSpin.number] = spin;

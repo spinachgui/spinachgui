@@ -141,12 +141,27 @@ namespace SpinXML {
 		///Set the value of the interaction using the span-skew covention.
 		void SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient);
 
+        void ToScalar();
+        void ToMatrix();
+        void ToEigenvalues();
+        void ToAxRhom();
+        void ToSpanSkew();
+
+        energy      AsScalar() const;
+        Eigen::Matrix3d    AsMatrix() const;
+        Eigenvalues AsEigenvalues() const;
+        AxRhom      AsAxRhom() const;
+        SpanSkew    AsSpanSkew() const;
+
+        InteractionPayload ToLabFrame(const Frame* frame) const;
+
 	protected:
 		///Ment to be overridden. SHould be called at the end of every
 		///non-const function
 		virtual void changed() const {}
         typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
         var_t mData;
+        void Invariant() const;
 	};
 
 
@@ -252,17 +267,6 @@ namespace SpinXML {
         ///spin
         sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
 
-        void ToScalar();
-        void ToMatrix();
-        void ToEigenvalues();
-        void ToAxRhom();
-        void ToSpanSkew();
-
-        energy      AsScalar() const;
-        Eigen::Matrix3d    AsMatrix() const;
-        Eigenvalues AsEigenvalues() const;
-        AxRhom      AsAxRhom() const;
-        SpanSkew    AsSpanSkew() const;
 
 
         Spin* GetSpin1() const {return mSpin1;}

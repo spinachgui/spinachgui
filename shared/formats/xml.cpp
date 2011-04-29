@@ -183,6 +183,15 @@ string dbleToStr(double d) {
     return s.str();
 }
 
+double strToDble(string str) {
+    istringstream s(str);
+    double d;
+    if(!(s >> d)) {
+        throw runtime_error(string("Couldn't parse ") + str + string(" as a floating point number"));
+    }
+    return d;
+}
+
 
 //Some element names as std::strings (prevents typos)
 string _spin_system_ = "spin_system";
@@ -322,22 +331,25 @@ void Assemble(SpinSystem* ss,
         Frame* frame = protoSpin.frame == 0 ? lab : number2Frame[protoSpin.frame].second;
         position = ToLabVec3d(frame,position);
 
-        Spin* spin = new Spin(position,protoSpin.label,protoSpin.element,protoSpin.isotope);
+        Spin* spin = new Spin(position,protoSpin.label,protoSpin.element,protoSpin.isotope-protoSpin.element);
         number2spin[protoSpin.number] = spin;
+        spin->SetPreferedFrame(frame);
         ss->InsertSpin(spin);
     }
 
     //Instanciate the interactions
     foreach(ProtoInteraction protoInteraction,interactions) {
-        Frame* frame = number2Frame[protoInteraction.frame].second;
+        //NB: Eventually we could put protoSpin.frame == 0 in an if
+        //statement and skip the transform altogether. But I want the
+        //transform code path stressed as much as possible
+        Frame* frame = protoInteraction.frame == 0 ? lab : number2Frame[protoInteraction.frame].second;
 
-        /*
-          TODO: Transform to lab goes here
-         */
-
+        protoInteraction.payload = protoInteraction.payload.ToLabFrame(frame);
+        
         Spin* spin1 = number2spin[protoInteraction.spin1];
         Spin* spin2 = protoInteraction.spin2 ? number2spin[protoInteraction.spin2.get()] : NULL;
         Interaction* interaction = new Interaction(protoInteraction.payload,protoInteraction.type,spin1,spin2);
+        interaction->SetPreferedFrame(frame);
         ss->InsertInteraction(interaction);
     }
 
@@ -461,8 +473,7 @@ void decodeOrientation(const TiXmlElement* e,Orientation& o,int& frame) {
         const TiXmlElement* angleAxisEl = Guard(payloadNode,"Malformed angle axis element");
         
         const TiXmlElement* angleEl = Guard(angleAxisEl->FirstChild(_angle_),"Malformed or missing angle element for angle axis");
-        //TODO, HACK, use of atof
-        double angle = atof(angleEl->GetText());
+        double angle = strToDble(angleEl->GetText());
         
         const TiXmlElement* axisEl  = Guard(angleAxisEl->FirstChild(_axis_) ,"Malformed or missing axis element for angle axis");
         double x,y,z;
@@ -509,15 +520,13 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
     if((mag = e->FirstChild(_scalar_))) {
         const TiXmlElement* scalarEl = Guard(mag,"Malformed scalar element");
 
-        //TODO,HACK atof does not report failuar, just 0.0
-        double scalar = atof(scalarEl->GetText());
+        double scalar = strToDble(scalarEl->GetText());
         protoInteraction.payload = (scalar * u);
         
         protoInteraction.frame = 0;
     } else if((mag = e->FirstChild(_tensor_))) {
         const TiXmlElement* matrixEl = Guard(mag,"Malformed tensor element");
 
-        //TODO,HACK atof does not report failuar, just 0.0
         Matrix3d matrix = decodeMatrix(matrixEl);
         protoInteraction.payload = (matrix * u);
         Guard(matrixEl->QueryIntAttribute(_reference_frame_,&protoInteraction.frame),"No reference frame for matrix");
@@ -663,10 +672,15 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
 
             const TiXmlElement* coords = Guard(e->FirstChild("coordinates"),"missing or malformed coordinate");
 
-            Guard(coords->QueryDoubleAttribute("x",&spin.x),"missing x attribute");
-            Guard(coords->QueryDoubleAttribute("y",&spin.x),"missing y attribute");
-            Guard(coords->QueryDoubleAttribute("z",&spin.x),"missing z attribute");
+            double x,y,z;
+            Guard(coords->QueryDoubleAttribute("x",&x),"missing x attribute");
+            Guard(coords->QueryDoubleAttribute("y",&y),"missing y attribute");
+            Guard(coords->QueryDoubleAttribute("z",&z),"missing z attribute");
             Guard(coords->QueryIntAttribute("z",&spin.frame),"missing reference frame");
+
+            spin.x = x * Angstroms;
+            spin.y = y * Angstroms;
+            spin.z = z * Angstroms;
 
             protoSpins.push_back(spin);
         } else if(e->Value() == _interaction_) {

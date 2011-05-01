@@ -529,7 +529,7 @@ void Interaction::valid_or_throw() const {
     case CUSTOM_BILINEAR:
     case DIPOLAR:
         if(mSpin1 == NULL || mSpin2 == NULL)
-            throw runtime_error("Bilinar Interactions but one of mSpin1 or mSpin2 is null!");
+            throw runtime_error("Bilinear interactions but one of mSpin1 or mSpin2 is null!");
         break;
     case CUSTOM_LINEAR:
     case SHIELDING:

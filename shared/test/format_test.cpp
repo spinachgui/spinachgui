@@ -52,8 +52,6 @@ public:
 };
 
 BOOST_FIXTURE_TEST_CASE( g03Load, setup) {
-	
-
 	path testOut("test_out/g03ToXMD");
     path testDir("examples/Gaussian/testing/");
 

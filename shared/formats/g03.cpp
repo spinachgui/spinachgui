@@ -6,6 +6,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <shared/nuclear_data.hpp>
 
+#include <shared/panic.hpp>
 #include <shared/basic_math.hpp>
 
 using namespace std;
@@ -13,9 +14,15 @@ using namespace SpinXML;
 
 void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	/*
-	  This function really needs some work done on in, as it's not using C++
-	  streams properly. This is due to it being adapted from matlab code (which uses
-	  c style I/O
+	  This function really needs some work done on in as it is
+	  basically adapted from matlab code
+
+	  Probably the best thing to do would be to split the problem a
+	  large scale regogniser that reads the file line by line and
+	  simpliy identifies interesting parts of the file that are
+	  interesting. They are then passed to parser modules that process
+	  their local properties. We can then use assemble() from the XML
+	  code to assemble the complete spin system
 	*/
 	vector<double>      isoHFC;
 	vector<Eigenvalues> anisoHFC;

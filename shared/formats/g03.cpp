@@ -8,9 +8,162 @@
 
 #include <shared/panic.hpp>
 #include <shared/basic_math.hpp>
+#include <boost/optional.hpp>
 
 using namespace std;
+using namespace boost;
 using namespace SpinXML;
+
+typedef vector<string> Lines;
+
+struct G03File {
+	/*
+	  Structure that stores the various interesting parts of a g03
+	  file
+	 */
+
+	optional<Lines> stdOrientation;
+	optional<Lines> gTensor;
+	optional<Lines> shielding;
+	optional<Lines> jCoupling;
+	optional<Lines> isoHFC;
+	optional<Lines> anisoHFC;
+};
+
+string safeGetLine(istream& fin) {
+	string line;
+	if(!getline(fin, line)) {
+		throw runtime_error("Unexpected End of File");
+	}
+	return line;
+}
+
+G03File g03Recogniser(const char* filename) {
+	ifstream fin(filename);
+	cout << "Opening a g03 file:" << filename << endl;
+	if(!fin.is_open()) {
+		//Throw some sort of error here
+		cerr << "Couldn't open file" << endl;
+		throw runtime_error("Couldn't Open File");
+	}
+
+	G03File g03File;
+
+	string line;
+	if(!getline(fin, line)) {
+		throw runtime_error("file is empty");
+	}
+	while(true) {
+		/*
+		  We're going to use goto (yes, I know) at the end of some of
+		  the regognisers to jump back up to the top of the loop. This
+		  is because if a regognisers consumes some input and then
+		  decides that a particular line is not it's resposibility
+		  (that is, the second has ended) we need to test the line to
+		  see if it's the begining of any other section we might be
+		  interested it, otherwise we would miss that section. If we
+		  don't skip back to the top we would end up only testing the
+		  line against regognisers further down the loop
+		 */
+		if(!getline(fin, line)) {
+			break;
+		}
+	loopStart:
+		boost::algorithm::trim(line); //Remove whitespace
+		if(line == "Standard orientation:") {
+			//We need to skip 4 lines here
+			safeGetLine(fin);
+			safeGetLine(fin);
+			safeGetLine(fin);
+			safeGetLine(fin);
+			g03File.stdOrientation = Lines();
+			//The std orientation second ends with line of hyphans
+			while(!(line = safeGetLine(fin)).find("----")) {
+				g03File.stdOrientation.get().push_back(line);
+			}
+		} else if(line == "g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:"){
+			g03File.gTensor = Lines();
+			//Really easy, it's 4 lines long
+			line = safeGetLine(fin);
+			g03File.gTensor.get().push_back(line);
+			line = safeGetLine(fin);
+			g03File.gTensor.get().push_back(line);
+			line = safeGetLine(fin);
+			g03File.gTensor.get().push_back(line);
+		} else if(line == "SCF GIAO Magnetic shielding tensor (ppm):"){
+			/*
+			  This section always looks like this:
+
+			  SCF GIAO Magnetic shielding tensor (ppm):
+			  1  C    Isotropic =   153.0648   Anisotropy =    35.1132
+			  XX=   153.5147   YX=     1.4099   ZX=   -15.8194
+			  XY=     6.4190   YY=   141.7114   ZY=   -10.9938
+			  XZ=    -8.3913   YZ=   -13.7749   ZZ=   163.9681
+
+			  With the last for lines repeated many times. If we
+			  recognise the "1 C Isotropic = 153.0648 Anisotropy =
+			  35.1132" line we can assume the next three lines and
+			  then check again
+			*/
+			g03File.shielding = Lines();
+			while(!(line = safeGetLine(fin)).find("Isotropic")) {
+				line = safeGetLine(fin); //We don't need the top line anymore
+				g03File.shielding.get().push_back(line);
+				line = safeGetLine(fin);
+				g03File.shielding.get().push_back(line);
+				line = safeGetLine(fin);
+				g03File.shielding.get().push_back(line);
+			}
+			goto loopStart;
+		} else if(line == "Total nuclear spin-spin coupling J (Hz):"){
+			
+		} else if(line == "Isotropic Fermi Contact Couplings") {
+			//We need to skip 4 lines here
+			safeGetLine(fin); // Atom                 a.u.       MegaHertz       Gauss      10(-4) cm-1
+			line = safeGetLine(fin); //1  C(13)              0.07610      85.54716      30.52535      28.53546
+			/*
+			  This section is the following type of line repeated with no end marker
+			  1  C(13)              0.07610      85.54716      30.52535      28.53546
+			 */
+			g03File.isoHFC = Lines();
+
+			//TODO
+
+			goto loopStart;
+		} else if(line == "Anisotropic Spin Dipole Couplings in Principal Axis System") {
+			g03File.anisoHFC = Lines();
+			//We need to skip 4 lines here
+			safeGetLine(fin); // ------
+			safeGetLine(fin); // <<blank>>
+			safeGetLine(fin); // Atom             a.u.   MegaHertz   Gauss  10(-4) cm-1        Axes
+			safeGetLine(fin); // <<blank>>
+			line = safeGetLine(fin); // Baa    -0.5540   -74.335   -26.525   -24.796 -0.2607  0.9654  0.0000
+
+			/*
+			  This section of the file looks like thse four lines repeated:
+
+			           Baa    -0.5540   -74.335   -26.525   -24.796 -0.2607  0.9654  0.0000
+			  1 C(13)  Bbb    -0.5540   -74.335   -26.525   -24.796  0.9654  0.2607  0.0000
+			           Bcc     1.1079   148.671    53.049    49.591  0.0000  0.0000  1.0000
+			  <<blank>>
+
+			  And ends with a double blank line
+			 */
+
+			while(line != "") {
+				g03File.anisoHFC.get().push_back(line);
+				line = safeGetLine(fin);
+				g03File.anisoHFC.get().push_back(line);
+				line = safeGetLine(fin);
+				g03File.anisoHFC.get().push_back(line);
+				safeGetLine(fin);        //expected blank line, don't do anything with it
+				line = safeGetLine(fin); //Might be blank
+				boost::algorithm::trim(line); //Remove whitespace so we can test the next line against ""
+			}
+		}
+	}
+	return g03File;
+}
 
 void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	/*
@@ -24,6 +177,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	  their local properties. We can then use assemble() from the XML
 	  code to assemble the complete spin system
 	*/
+	g03Recogniser(filename);
+	return;
+
 	vector<double>      isoHFC;
 	vector<Eigenvalues> anisoHFC;
 

@@ -21,42 +21,25 @@
 using namespace std;
 using namespace SpinXML;
 
+G03Loader gG03Loader;
+SIMPSONLoader gSIMPSONLoader;
+PDBLoader gPDBLoader;
+XMLLoader gXMLLoader;
 
 class setup {
 public:
 	setup() : ss(new SpinSystem) {
-		mG03Loader     = new G03Loader;
-		mSIMPSONLoader = new SIMPSONLoader;
-		mPDBLoader     = new PDBLoader;
-		
-		mXMLLoader = new XMLLoader;
-
 		try {
 			LoadIsotopes();
 		} catch(runtime_error e) {
 			cerr << "Isotopes not loaded" << endl;
 			throw e;
 		}
-		unitSystem = new UnitSystem;
 	}
 	~setup() {
 		SAFE_DELETE(ss);
-		SAFE_DELETE(unitSystem);
-
-		SAFE_DELETE(mG03Loader);
-		SAFE_DELETE(mSIMPSONLoader);
-		SAFE_DELETE(mXMLLoader);
-		SAFE_DELETE(mPDBLoader);
 	}
-
-	SpinXML::ISpinSystemLoader* mG03Loader;	   
-	SpinXML::ISpinSystemLoader* mSIMPSONLoader;
-	SpinXML::ISpinSystemLoader* mPDBLoader;
-	SpinXML::ISpinSystemLoader* mXMLLoader;    
-
 	SpinSystem* ss;
-
-	UnitSystem* unitSystem;
 };
 
 BOOST_FIXTURE_TEST_CASE( g03Load, setup) {
@@ -105,11 +88,11 @@ BOOST_FIXTURE_TEST_CASE( synthetic, setup) {
 	rootFrame->AddChild(withChildrenAndParent);
 	withChildrenAndParent->AddChild(new Frame(Vector3d(4*Angstroms,4*Angstroms,0),Orientation(EulerAngles(1,0.2,0.5))));
 
-	ss->SaveToFile("test_out/synthetic.xml",mXMLLoader);
+	ss->SaveToFile("test_out/synthetic.xml",&gXMLLoader);
 
 	SpinSystem* LoadedSpinSystem = new SpinSystem;
-	LoadedSpinSystem->LoadFromFile("test_out/synthetic.xml",mXMLLoader);
-	LoadedSpinSystem->SaveToFile("test_out/synthetic2.xml",mXMLLoader);
+	LoadedSpinSystem->LoadFromFile("test_out/synthetic.xml",&gXMLLoader);
+	LoadedSpinSystem->SaveToFile("test_out/synthetic2.xml",&gXMLLoader);
 	
 
 	SAFE_DELETE(LoadedSpinSystem);

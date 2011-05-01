@@ -52,9 +52,6 @@ void Frame::SetOrientation(const Orientation orient) {
 void Frame::updateAfine() {
     Affine3d T=Translation3d(mTranslate)*Affine3d(mOrient.GetAsDCM());
     Matrix4d mat = T.matrix();
-    cout << "In updateAffine, mat=" << endl;
-    cout << mat << endl;
-    cout << endl;
     Matrix4d imat = T.inverse().matrix();
     mAffine =         (mParent==NULL) ? mat : mParent->mAffine*mat;
     mInvertedAffine = (mParent==NULL) ? imat : imat * mParent->mInvertedAffine;

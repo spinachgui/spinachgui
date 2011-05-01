@@ -17,6 +17,9 @@
 #include <shared/nuclear_data.hpp>
 #include <iostream>               // for std::cout
 
+#include <boost/filesystem.hpp>
+
+using namespace boost::filesystem;
 
 using namespace std;
 using namespace SpinXML;
@@ -25,6 +28,12 @@ G03Loader gG03Loader;
 SIMPSONLoader gSIMPSONLoader;
 PDBLoader gPDBLoader;
 XMLLoader gXMLLoader;
+
+void makeDir (path p) {
+	if(!exists(p)) {
+		create_directory(p);
+	}
+}
 
 class setup {
 public:
@@ -43,7 +52,28 @@ public:
 };
 
 BOOST_FIXTURE_TEST_CASE( g03Load, setup) {
-	//ss->LoadFromFile("examples/Gaussian/ESR spectroscopy/cpdyad_cation.log",mG03Loader);
+	
+
+	path testOut("test_out/g03ToXMD");
+    path testDir("examples/Gaussian/testing/");
+
+	remove_all(testOut);
+    if (!exists(testDir)) {
+        cerr << "Couldn't find any test data" << endl;
+        BOOST_CHECK(false);
+    }
+	makeDir(testOut);
+    directory_iterator end_itr; // default construction yields past-the-end
+    for (directory_iterator itr(testDir); itr != end_itr; ++itr ) {
+        if (!is_directory(itr->status())) {
+			cout << "Test-converting " << itr->path().filename() << endl;
+			string inPath  = itr->path().string();
+			string outPath = (testOut / itr->path()).string();
+
+			ss->LoadFromFile(inPath.c_str(),&gG03Loader);
+			ss->SaveToFile((outPath + ".xml").c_str(),&gXMLLoader);
+        }
+    }
 }
 
 BOOST_FIXTURE_TEST_CASE( pdbLoad, setup) {

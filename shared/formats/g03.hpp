@@ -17,5 +17,13 @@ namespace SpinXML {
 
 }
 
+//Private
+
+class __G03Init  {
+public:
+    __G03Init();
+    ~__G03Init();
+};
+
 #endif
 

@@ -14,6 +14,7 @@
 #include <shared/formats/spirit_common.hpp>
 #include <vector>
 #include <boost/filesystem.hpp>
+#include <shared/formats/proto.hpp>
 
 using namespace std;
 using namespace boost;
@@ -23,6 +24,44 @@ using namespace SpinXML;
 namespace qi = boost::spirit::qi;
 
 typedef vector<string> Lines;
+
+//================================================================================//
+//                             Utilities                                          //
+//================================================================================//
+
+template <typename Expr>
+void guardParse(string str, Expr const& expr,string error) {
+	if(!qi::phrase_parse(str.begin(),str.end(),expr,qi::space)) {
+		throw runtime_error(error + "\n Failed line was:\n" + str);
+	}
+}
+
+
+string fortranToC(const string& str) {
+	string out = str;
+	//Quick hack, but it works just fine here. Convert all "D"
+	//characters to "e"
+	for(unsigned long i = 0;i < out.length();i++) {
+		if(out[i] == 'D') {
+			out[i] = 'e';
+		}
+	}
+	return out;
+}
+
+//================================================================================//
+//                            Initalisation                                       //
+//================================================================================//
+
+__G03Init::__G03Init() {
+	
+}
+ 
+__G03Init::~__G03Init() {
+
+}
+
+
 
 struct G03File {
 	/*
@@ -93,7 +132,7 @@ G03File g03Recognise(const char* filename) {
 		}
 	loopStart:
 		boost::algorithm::trim(line); //Remove whitespace
-		if(line == "Standard orientation:") {
+		if(line == "Standard orientation:" || line == "Input orientation:") {
 			g03File.stdOrientation = Lines();
 			//We need to skip 4 lines here
 			safeGetLine(fin); //  ---------------------------------------------------------------------
@@ -146,28 +185,20 @@ G03File g03Recognise(const char* filename) {
 			g03File.jCoupling = Lines();
 			
 			/*
-			  Lines look like either 5 integers or an integer and
+			  Lines look like either 1 to 5 integers or an integer and
 			  between 1 and 5 FORTRAN doubles
 			*/
-			//Quick hack, but it works just fine here. Convert all "D"
-			//characters to "e"
-			for(unsigned long i = 0;i < line.length();i++) {
-				if(line[i] == 'D') {
-					line[i] = 'e';
-				}
-			}
-
+			line = fortranToC(line);
 			while(true) {
 				line = safeGetLine(fin);
 				// The - operator is interpreted by boost::spirit as
 				// "match zero or one times"
 				if(qi::phrase_parse(line.begin(),line.end(),
-									(qi::int_ >> qi::int_ >> qi::int_ >> qi::int_ >> qi::int_) |
+									(qi::int_ >> -(qi::int_ >> -(qi::int_ >> -(qi::int_ >> -qi::int_)))) |
 									(qi::int_ >> qi::double_ >> -(qi::double_ >> -(qi::double_ >> -(qi::double_ >> -qi::double_)))),
 									qi::space)) {
 					g03File.jCoupling.get().push_back(line);
 				} else {
-					cout << "rejected " << line << endl;
 					goto loopStart;
 				}
 			}
@@ -264,7 +295,72 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	//============================================================//
 	// Now parse each section of the file seperately if it's present
 
-	
+	vector<ProtoSpin> spins;
+
+	//============================================================//
+	// Standard orientation
+
+	//If we don't have at least one spin, we might as well give up
+	if(!g03File.stdOrientation) {
+		throw runtime_error("Couldn't find any nuceli in the file!");
+	}
+
+	foreach(string line,g03File.stdOrientation.get()) {
+		guardParse(line,qi::int_ >> qi::int_ >> qi::int_ >> qi::double_ >> qi::double_ >> qi::double_,"Failed to parse standard orientation section");
+	}
+
+	//============================================================//
+	// gTensor
+	if(g03File.gTensor) {
+		if(g03File.gTensor.get().size() != 3) {
+			throw runtime_error("Unexpected end of g tensor section");
+		}
+		string gTensorError = "Failed to parse g-Tensor section";
+		string line0 = fortranToC(g03File.gTensor.get()[0]);
+		string line1 = fortranToC(g03File.gTensor.get()[1]);
+		string line2 = fortranToC(g03File.gTensor.get()[2]);
+		guardParse(line0,qi::lit("XX=") >> qi::double_ >> qi::lit("YX=") >> qi::double_ >> qi::lit("ZX=") >> qi::double_,gTensorError);
+		guardParse(line1,qi::lit("XY=") >> qi::double_ >> qi::lit("YY=") >> qi::double_ >> qi::lit("ZY=") >> qi::double_,gTensorError);
+		guardParse(line2,qi::lit("XZ=") >> qi::double_ >> qi::lit("YZ=") >> qi::double_ >> qi::lit("ZZ=") >> qi::double_,gTensorError);
+	}
+	//============================================================//
+	// shielding
+	string shieldingError = "Failed to parse shielding section";
+	if(g03File.shielding) {
+		Lines shieldLines = g03File.shielding.get();
+		for(unsigned long i = 0;i < shieldLines.size();i+=4) {
+			guardParse(shieldLines[i  ],qi::lit("XX=") >> qi::double_ >> qi::lit("YX=") >> qi::double_ >> qi::lit("ZX=") >> qi::double_,shieldingError);
+			guardParse(shieldLines[i+1],qi::lit("XY=") >> qi::double_ >> qi::lit("YY=") >> qi::double_ >> qi::lit("ZY=") >> qi::double_,shieldingError);
+			guardParse(shieldLines[i+2],qi::lit("XZ=") >> qi::double_ >> qi::lit("YZ=") >> qi::double_ >> qi::lit("ZZ=") >> qi::double_,shieldingError);
+			guardParse(shieldLines[i+3],qi::lit("Eigenvalues:") >> qi::double_ >> qi::double_ >>qi::double_,shieldingError);
+		}
+	}
+
+	//============================================================//
+	// isoHFC
+	string isoHFCError = "Failed to parse Fermi Contact section";
+	if(g03File.isoHFC) {
+		foreach(string line,g03File.isoHFC.get()) {
+			guardParse(line, qi::int_ >> (qi::alpha >> - qi::alpha) >> qi::char_('(') >> qi::int_ >> qi::char_(')')
+					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,isoHFCError);
+		}
+	}
+
+	//============================================================//
+	// anisoHFC
+	string anisoError = "Failed to parse anisotropic HFC";
+	qi::rule<string::iterator> elementRule = (qi::alpha >> - qi::alpha) >> qi::char_('(') >> qi::int_ >> qi::char_(')');
+	if(g03File.anisoHFC) {
+		Lines ansioLines = g03File.anisoHFC.get();
+		for(unsigned long i = 0;i < ansioLines.size();i+=3) {
+			guardParse(ansioLines[i  ],qi::lit("Baa")
+					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,anisoError);
+			guardParse(ansioLines[i+1], qi::int_ >> elementRule >> qi::lit("Bbb") 
+					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,anisoError);
+			guardParse(ansioLines[i+2],qi::lit("Bcc")
+					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,anisoError);
+		}
+	}
 
 	return;
 

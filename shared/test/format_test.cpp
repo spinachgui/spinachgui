@@ -29,6 +29,16 @@ SIMPSONLoader gSIMPSONLoader;
 PDBLoader gPDBLoader;
 XMLLoader gXMLLoader;
 
+
+
+struct Init {
+	Init() {
+		cout << "Loading Isotopes" << endl;
+		void LoadIsotopes();
+	}
+};
+Init init;
+
 void makeDir (path p) {
 	if(!exists(p)) {
 		create_directory(p);
@@ -66,7 +76,7 @@ BOOST_FIXTURE_TEST_CASE( g03Load, setup) {
         if (!is_directory(itr->status())) {
 			cout << "Test-converting " << itr->path().filename() << endl;
 			string inPath  = itr->path().string();
-			string outPath = (testOut / itr->path()).string();
+			string outPath = (testOut / itr->path().filename()).string();
 
 			ss->LoadFromFile(inPath.c_str(),&gG03Loader);
 			ss->SaveToFile((outPath + ".xml").c_str(),&gXMLLoader);

@@ -16,6 +16,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <vector>
+#include <map>
 #include <boost/filesystem.hpp>
 #include <shared/formats/proto.hpp>
 
@@ -23,7 +24,6 @@ using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 using namespace SpinXML;
-using namespace boost::phoenix;
 
 namespace qi=boost::spirit::qi;
 
@@ -35,9 +35,13 @@ using boost::spirit::qi::lit;
 using boost::spirit::qi::phrase_parse;
 using boost::spirit::qi::rule;
 using boost::spirit::qi::space;
+using boost::spirit::qi::_1;
 
 
 typedef vector<string> Lines;
+
+#define readDbl(x) double_[boost::phoenix::ref((x))=_1]
+#define readInt(x) int_[boost::phoenix::ref((x))=_1]
 
 //================================================================================//
 //                             Utilities                                          //
@@ -89,7 +93,7 @@ struct G03File {
 	optional<Lines> jCoupling;
 	optional<Lines> isoHFC;
 	optional<Lines> anisoHFC;
-
+	optional<int>    multiplicity;
 };
 void dumpLinesToFile(optional<Lines> lines,string filename) {
 	if(lines) {
@@ -146,7 +150,12 @@ G03File g03Recognise(const char* filename) {
 		}
 	loopStart:
 		boost::algorithm::trim(line); //Remove whitespace
-		if(line == "Standard orientation:" || line == "Input orientation:") {
+		int mult;
+		if(phrase_parse(line.begin(),line.end(),
+						lit("Charge =") >> int_ >> lit("Multiplicity =") >> readInt(mult),qi::space)) {
+			g03File.multiplicity = mult;
+			continue;
+		} else if(line == "Standard orientation:" || line == "Input orientation:") {
 			g03File.stdOrientation = Lines();
 			//We need to skip 4 lines here
 			safeGetLine(fin); //  ---------------------------------------------------------------------
@@ -271,17 +280,7 @@ G03File g03Recognise(const char* filename) {
 }
 
 void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
-	/*
-	  This function really needs some work done on in as it is
-	  basically adapted from matlab code
-
-	  Probably the best thing to do would be to split the problem a
-	  large scale regogniser that reads the file line by line and
-	  simpliy identifies interesting parts of the file that are
-	  interesting. They are then passed to parser modules that process
-	  their local properties. We can then use assemble() from the XML
-	  code to assemble the complete spin system
-	*/	
+	ss->Clear();
 	G03File g03File = g03Recognise(filename);
 
 
@@ -307,7 +306,33 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	// Now parse each section of the file seperately if it's present
 
 	vector<ProtoSpin> spins;
+	vector<ProtoInteraction> interactions;
+	map<int,ProtoInteraction> number2isoHFC;
+	map<int,ProtoInteraction> number2anisoHFC;
 
+	//============================================================//
+	// Free electron
+
+	int nElectrons = 0; 	//If we didn't find a multiplcity, assume it was 1
+	if(g03File.multiplicity) {
+		//Invert the 2S+1 rule
+		nElectrons = g03File.multiplicity.get() - 1;
+		if(nElectrons < 0) {
+			cout << "g03File.multiplicity = " << g03File.multiplicity.get() << endl;
+			throw runtime_error("Negative multiplicity");
+		}
+		nElectrons = nElectrons;
+	} 
+	for(long i = 0; i < nElectrons; i++) {
+		ProtoSpin e;
+		e.x = 0;  e.y = 0;  e.z = 0;
+		e.label = "Unpaired electron";
+		e.number = - i - 1;
+		e.isotope = 0;
+		e.element = 0;
+		e.frame = 0;
+		spins.push_back(e);
+	}
 	//============================================================//
 	// Standard orientation
 
@@ -317,15 +342,26 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	}
 
 	foreach(string line,g03File.stdOrientation.get()) {
-		double x,y,z;
-		guardParse(line,int_ >> int_ >> int_
-				   >> double_[ref(x) = _1] >> double_[ref(y) = _1] >> double_[ref(z) = _1],
+		ProtoSpin spin;
+		guardParse(line,readInt(spin.number) >> readInt(spin.element) >> int_ >> readDbl(spin.x) >> readDbl(spin.y) >> readDbl(spin.z),
 				   "Failed to parse standard orientation section");
+		spin.x = spin.x * Angstroms;
+		spin.y = spin.y * Angstroms;
+		spin.z = spin.z * Angstroms;
+		spin.isotope = getCommonIsotope(spin.element) + spin.element;
+		spin.label = getElementSymbol(spin.element);
+		spin.frame = 0;
+		spins.push_back(spin);
 	}
 
 	//============================================================//
 	// gTensor
 	if(g03File.gTensor) {
+		ProtoInteraction gT;
+		double
+			xx,yx,zx,
+			xy,yy,zy,
+			xz,yz,zz;			
 		if(g03File.gTensor.get().size() != 3) {
 			throw runtime_error("Unexpected end of g tensor section");
 		}
@@ -333,20 +369,46 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 		string line0 = fortranToC(g03File.gTensor.get()[0]);
 		string line1 = fortranToC(g03File.gTensor.get()[1]);
 		string line2 = fortranToC(g03File.gTensor.get()[2]);
-		guardParse(line0,lit("XX=") >> double_ >> lit("YX=") >> double_ >> lit("ZX=") >> double_,gTensorError);
-		guardParse(line1,lit("XY=") >> double_ >> lit("YY=") >> double_ >> lit("ZY=") >> double_,gTensorError);
-		guardParse(line2,lit("XZ=") >> double_ >> lit("YZ=") >> double_ >> lit("ZZ=") >> double_,gTensorError);
+		guardParse(line0,lit("XX=") >> readDbl(xx) >> lit("YX=") >> readDbl(yx) >> lit("ZX=") >> readDbl(zx) ,gTensorError);
+		guardParse(line1,lit("XY=") >> readDbl(xy) >> lit("YY=") >> readDbl(yy) >> lit("ZY=") >> readDbl(zy) ,gTensorError);
+		guardParse(line2,lit("XZ=") >> readDbl(xz) >> lit("YZ=") >> readDbl(yz) >> lit("ZZ=") >> readDbl(zz) ,gTensorError);
+		gT.payload = MakeMatrix3d(xx,yx,zx,
+								  xy,yy,zy,
+								  xz,yz,zz);
+		gT.type = Interaction::G_TENSER;
+		gT.frame = 0;
+		gT.label = "";
+		gT.spin1 = -1; //Attached to the first unpaired electron
+					   //(which hopefully exists).
+		interactions.push_back(gT);
 	}
 	//============================================================//
 	// shielding
 	string shieldingError = "Failed to parse shielding section";
 	if(g03File.shielding) {
+		int counter = 1;
 		Lines shieldLines = g03File.shielding.get();
 		for(unsigned long i = 0;i < shieldLines.size();i+=4) {
-			guardParse(shieldLines[i  ],lit("XX=") >> double_ >> lit("YX=") >> double_ >> lit("ZX=") >> double_,shieldingError);
-			guardParse(shieldLines[i+1],lit("XY=") >> double_ >> lit("YY=") >> double_ >> lit("ZY=") >> double_,shieldingError);
-			guardParse(shieldLines[i+2],lit("XZ=") >> double_ >> lit("YZ=") >> double_ >> lit("ZZ=") >> double_,shieldingError);
-			guardParse(shieldLines[i+3],lit("Eigenvalues:") >> double_ >> double_ >>double_,shieldingError);
+			ProtoInteraction inter;
+			double
+				xx,yx,zx,
+				xy,yy,zy,
+				xz,yz,zz;
+			double XX,YY,ZZ;
+			guardParse(shieldLines[i  ],lit("XX=") >> readDbl(xx) >> lit("YX=") >> readDbl(yx) >> lit("ZX=") >> readDbl(zx),shieldingError);
+			guardParse(shieldLines[i+1],lit("XY=") >> readDbl(xy) >> lit("YY=") >> readDbl(yy) >> lit("ZY=") >> readDbl(zy),shieldingError);
+			guardParse(shieldLines[i+2],lit("XZ=") >> readDbl(xz) >> lit("YZ=") >> readDbl(yz) >> lit("ZZ=") >> readDbl(zz),shieldingError);
+			guardParse(shieldLines[i+3],lit("Eigenvalues:") >> readDbl(XX) >> readDbl(YY) >> readDbl(ZZ) ,shieldingError);
+			Orientation o = MakeMatrix3d(xx,yx,zx,
+										 xy,yy,zy,
+										 xz,yz,zz);
+			inter.payload = Eigenvalues(XX,YY,ZZ,o);
+			inter.spin1 = counter;
+			inter.type = Interaction::SHIELDING;
+			inter.label = "";
+			inter.frame = 0;
+			counter++;
+			interactions.push_back(inter);
 		}
 	}
 
@@ -375,6 +437,11 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 					   >> double_ >> double_ >> double_ >> double_ >> double_ >> double_ >> double_,anisoError);
 		}
 	}
+
+	//============================================================//
+	// Assmbly
+
+	Assemble(ss,spins,interactions,vector<ProtoFrame>());
 
 	return;
 

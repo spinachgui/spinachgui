@@ -37,7 +37,7 @@ vector<map<long,Isotope> > gIsotopes;
 
 
 //List of elements indexed by proton number
-const long gKnownElements=11;
+const long gKnownElements=17;
 const Element gElements[]={
     {"E","Electron",   0.0,0.0,1.0,  0},
     {"H","Hydrogen",   0.5,0.5,0.5,  0},
@@ -50,14 +50,19 @@ const Element gElements[]={
     {"O","Oxygen",     0.3,0.0,0.0,  8},
     {"F","Fluorine",   1.0,1.0,1.0,  10},
     {"Ne","Neon",      1.0,1.0,1.0,  10},
+	{"Na","Sodium",    1.0,1.0,1.0,  12},
+	{"Mg","Magnesium", 1.0,1.0,1.0,  13},
+	{"Al","Aluminum",  1.0,1.0,1.0,  14},
+	{"Si","Silicon",   1.0,1.0,1.0,  15},
+	{"P", "Phosphorus",1.0,1.0,1.0,  16},
+	{"S", "Sulfur",    1.0,1.0,1.0,  17}
 };
-
 
 //Elemental functions
 
 long getCommonIsotope(long p) {
     if(p>=gKnownElements) {
-        return -1.0;
+        return -1;
     }
     return gElements[p].commonIsotope;
 }

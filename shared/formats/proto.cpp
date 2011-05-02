@@ -9,6 +9,8 @@ using namespace SpinXML;
 using namespace std;
 using namespace Eigen;
 
+
+
 void ProtoSpin::selfCheck() const {
 	//Check for NAN
 	if(x != x) {
@@ -25,7 +27,10 @@ void ProtoSpin::selfCheck() const {
 		throw runtime_error("Spin cannot have a negative number of protons");
 	}
 	if(isotope < element) {
-		throw runtime_error("Spin cannot have a negative number of neutrons");
+		stringstream ss;
+		ss << "Spin cannot have a negative number of neutrons (spin had mass number " << isotope
+		   << " and atomic number " << element;
+		throw runtime_error(ss.str());
 	}
 }
 

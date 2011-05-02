@@ -12,6 +12,9 @@
 #include <boost/optional.hpp>
 
 #include <shared/formats/spirit_common.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+
 #include <vector>
 #include <boost/filesystem.hpp>
 #include <shared/formats/proto.hpp>
@@ -20,6 +23,7 @@ using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 using namespace SpinXML;
+using namespace boost::phoenix;
 
 namespace qi=boost::spirit::qi;
 
@@ -313,7 +317,10 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	}
 
 	foreach(string line,g03File.stdOrientation.get()) {
-		guardParse(line,int_ >> int_ >> int_ >> double_ >> double_ >> double_,"Failed to parse standard orientation section");
+		double x,y,z;
+		guardParse(line,int_ >> int_ >> int_
+				   >> double_[ref(x) = _1] >> double_[ref(y) = _1] >> double_[ref(z) = _1],
+				   "Failed to parse standard orientation section");
 	}
 
 	//============================================================//

@@ -21,7 +21,17 @@ using namespace boost;
 using namespace boost::filesystem;
 using namespace SpinXML;
 
-namespace qi = boost::spirit::qi;
+namespace qi=boost::spirit::qi;
+
+using boost::spirit::qi::char_;
+using boost::spirit::qi::int_;
+using boost::spirit::qi::alpha;
+using boost::spirit::qi::double_;
+using boost::spirit::qi::lit;
+using boost::spirit::qi::phrase_parse;
+using boost::spirit::qi::rule;
+using boost::spirit::qi::space;
+
 
 typedef vector<string> Lines;
 
@@ -31,7 +41,7 @@ typedef vector<string> Lines;
 
 template <typename Expr>
 void guardParse(string str, Expr const& expr,string error) {
-	if(!qi::phrase_parse(str.begin(),str.end(),expr,qi::space)) {
+	if(!phrase_parse(str.begin(),str.end(),expr,qi::space)) {
 		throw runtime_error(error + "\n Failed line was:\n" + str);
 	}
 }
@@ -193,10 +203,10 @@ G03File g03Recognise(const char* filename) {
 				line = safeGetLine(fin);
 				// The - operator is interpreted by boost::spirit as
 				// "match zero or one times"
-				if(qi::phrase_parse(line.begin(),line.end(),
-									(qi::int_ >> -(qi::int_ >> -(qi::int_ >> -(qi::int_ >> -qi::int_)))) |
-									(qi::int_ >> qi::double_ >> -(qi::double_ >> -(qi::double_ >> -(qi::double_ >> -qi::double_)))),
-									qi::space)) {
+				if(phrase_parse(line.begin(),line.end(),
+								(int_ >> -(int_ >> -(int_ >> -(int_ >> -int_)))) |
+								(int_ >> double_ >> -(double_ >> -(double_ >> -(double_ >> -double_)))),
+								qi::space)) {
 					g03File.jCoupling.get().push_back(line);
 				} else {
 					goto loopStart;
@@ -212,13 +222,10 @@ G03File g03Recognise(const char* filename) {
 			g03File.isoHFC = Lines();
 			while(true) {
 				line = safeGetLine(fin);//1  C(13)              0.07610      85.54716      30.52535      28.53546
-				istringstream stream(line);
-				spirit::istream_iterator begin(stream);
-				spirit::istream_iterator end;
-				if(qi::phrase_parse(begin,end,
-									qi::int_ >> (qi::alpha >> -qi::alpha) >> qi::char_('(') >> qi::int_ >> qi::char_(')') >>
-									qi::double_ >> qi::double_ >> qi::double_,
-									qi::space)) {
+				if(phrase_parse(line.begin(),line.end(),
+								int_ >> (alpha >> -alpha) >> char_('(') >> int_ >> char_(')') >>
+								double_ >> double_ >> double_,
+								qi::space)) {
 					g03File.isoHFC.get().push_back(line);
 				} else {
 					goto loopStart;
@@ -306,7 +313,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	}
 
 	foreach(string line,g03File.stdOrientation.get()) {
-		guardParse(line,qi::int_ >> qi::int_ >> qi::int_ >> qi::double_ >> qi::double_ >> qi::double_,"Failed to parse standard orientation section");
+		guardParse(line,int_ >> int_ >> int_ >> double_ >> double_ >> double_,"Failed to parse standard orientation section");
 	}
 
 	//============================================================//
@@ -319,9 +326,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 		string line0 = fortranToC(g03File.gTensor.get()[0]);
 		string line1 = fortranToC(g03File.gTensor.get()[1]);
 		string line2 = fortranToC(g03File.gTensor.get()[2]);
-		guardParse(line0,qi::lit("XX=") >> qi::double_ >> qi::lit("YX=") >> qi::double_ >> qi::lit("ZX=") >> qi::double_,gTensorError);
-		guardParse(line1,qi::lit("XY=") >> qi::double_ >> qi::lit("YY=") >> qi::double_ >> qi::lit("ZY=") >> qi::double_,gTensorError);
-		guardParse(line2,qi::lit("XZ=") >> qi::double_ >> qi::lit("YZ=") >> qi::double_ >> qi::lit("ZZ=") >> qi::double_,gTensorError);
+		guardParse(line0,lit("XX=") >> double_ >> lit("YX=") >> double_ >> lit("ZX=") >> double_,gTensorError);
+		guardParse(line1,lit("XY=") >> double_ >> lit("YY=") >> double_ >> lit("ZY=") >> double_,gTensorError);
+		guardParse(line2,lit("XZ=") >> double_ >> lit("YZ=") >> double_ >> lit("ZZ=") >> double_,gTensorError);
 	}
 	//============================================================//
 	// shielding
@@ -329,10 +336,10 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	if(g03File.shielding) {
 		Lines shieldLines = g03File.shielding.get();
 		for(unsigned long i = 0;i < shieldLines.size();i+=4) {
-			guardParse(shieldLines[i  ],qi::lit("XX=") >> qi::double_ >> qi::lit("YX=") >> qi::double_ >> qi::lit("ZX=") >> qi::double_,shieldingError);
-			guardParse(shieldLines[i+1],qi::lit("XY=") >> qi::double_ >> qi::lit("YY=") >> qi::double_ >> qi::lit("ZY=") >> qi::double_,shieldingError);
-			guardParse(shieldLines[i+2],qi::lit("XZ=") >> qi::double_ >> qi::lit("YZ=") >> qi::double_ >> qi::lit("ZZ=") >> qi::double_,shieldingError);
-			guardParse(shieldLines[i+3],qi::lit("Eigenvalues:") >> qi::double_ >> qi::double_ >>qi::double_,shieldingError);
+			guardParse(shieldLines[i  ],lit("XX=") >> double_ >> lit("YX=") >> double_ >> lit("ZX=") >> double_,shieldingError);
+			guardParse(shieldLines[i+1],lit("XY=") >> double_ >> lit("YY=") >> double_ >> lit("ZY=") >> double_,shieldingError);
+			guardParse(shieldLines[i+2],lit("XZ=") >> double_ >> lit("YZ=") >> double_ >> lit("ZZ=") >> double_,shieldingError);
+			guardParse(shieldLines[i+3],lit("Eigenvalues:") >> double_ >> double_ >>double_,shieldingError);
 		}
 	}
 
@@ -341,24 +348,24 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	string isoHFCError = "Failed to parse Fermi Contact section";
 	if(g03File.isoHFC) {
 		foreach(string line,g03File.isoHFC.get()) {
-			guardParse(line, qi::int_ >> (qi::alpha >> - qi::alpha) >> qi::char_('(') >> qi::int_ >> qi::char_(')')
-					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,isoHFCError);
+			guardParse(line, int_ >> (alpha >> - alpha) >> char_('(') >> int_ >> char_(')')
+					   >> double_ >> double_ >> double_ >> double_,isoHFCError);
 		}
 	}
 
 	//============================================================//
 	// anisoHFC
 	string anisoError = "Failed to parse anisotropic HFC";
-	qi::rule<string::iterator> elementRule = (qi::alpha >> - qi::alpha) >> qi::char_('(') >> qi::int_ >> qi::char_(')');
+	rule<string::iterator> elementRule = (alpha >> - alpha) >> char_('(') >> int_ >> char_(')');
 	if(g03File.anisoHFC) {
 		Lines ansioLines = g03File.anisoHFC.get();
 		for(unsigned long i = 0;i < ansioLines.size();i+=3) {
-			guardParse(ansioLines[i  ],qi::lit("Baa")
-					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,anisoError);
-			guardParse(ansioLines[i+1], qi::int_ >> elementRule >> qi::lit("Bbb") 
-					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,anisoError);
-			guardParse(ansioLines[i+2],qi::lit("Bcc")
-					   >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_ >> qi::double_,anisoError);
+			guardParse(ansioLines[i  ],lit("Baa")
+					   >> double_ >> double_ >> double_ >> double_ >> double_ >> double_ >> double_,anisoError);
+			guardParse(ansioLines[i+1], int_ >> elementRule >> lit("Bbb") 
+					   >> double_ >> double_ >> double_ >> double_ >> double_ >> double_ >> double_,anisoError);
+			guardParse(ansioLines[i+2],lit("Bcc")
+					   >> double_ >> double_ >> double_ >> double_ >> double_ >> double_ >> double_,anisoError);
 		}
 	}
 

@@ -8,11 +8,19 @@
 
 #include <shared/panic.hpp>
 #include <shared/basic_math.hpp>
+#include <shared/foreach.hpp>
 #include <boost/optional.hpp>
+
+#include <shared/formats/spirit_common.hpp>
+#include <vector>
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::filesystem;
 using namespace SpinXML;
+
+namespace qi = boost::spirit::qi;
 
 typedef vector<string> Lines;
 
@@ -28,7 +36,22 @@ struct G03File {
 	optional<Lines> jCoupling;
 	optional<Lines> isoHFC;
 	optional<Lines> anisoHFC;
+
 };
+void dumpLinesToFile(optional<Lines> lines,string filename) {
+	if(lines) {
+		cout << filename << endl;
+		Lines lines_ = lines.get();
+		ofstream fout(filename.c_str());
+		if(!fout.is_open()) {
+			cerr << "Warning, couldn't open " << filename << endl;
+			return;
+		}
+		foreach(string line,lines_) {
+			fout << line << endl;
+		}
+	}
+}
 
 string safeGetLine(istream& fin) {
 	string line;
@@ -38,7 +61,7 @@ string safeGetLine(istream& fin) {
 	return line;
 }
 
-G03File g03Recogniser(const char* filename) {
+G03File g03Recognise(const char* filename) {
 	ifstream fin(filename);
 	cout << "Opening a g03 file:" << filename << endl;
 	if(!fin.is_open()) {
@@ -64,21 +87,22 @@ G03File g03Recogniser(const char* filename) {
 		  interested it, otherwise we would miss that section. If we
 		  don't skip back to the top we would end up only testing the
 		  line against regognisers further down the loop
-		 */
+		*/
 		if(!getline(fin, line)) {
 			break;
 		}
 	loopStart:
 		boost::algorithm::trim(line); //Remove whitespace
 		if(line == "Standard orientation:") {
-			//We need to skip 4 lines here
-			safeGetLine(fin);
-			safeGetLine(fin);
-			safeGetLine(fin);
-			safeGetLine(fin);
 			g03File.stdOrientation = Lines();
+			//We need to skip 4 lines here
+			safeGetLine(fin); //  ---------------------------------------------------------------------
+			safeGetLine(fin); //  Center     Atomic     Atomic              Coordinates (Angstroms)
+			safeGetLine(fin); //  Number     Number      Type              X           Y           Z
+			safeGetLine(fin); // ---------------------------------------------------------------------
+
 			//The std orientation second ends with line of hyphans
-			while(!(line = safeGetLine(fin)).find("----")) {
+			while((line = safeGetLine(fin)).find("----") == string::npos) {
 				g03File.stdOrientation.get().push_back(line);
 			}
 		} else if(line == "g tensor [g = g_e + g_RMC + g_DC + g_OZ/SOC]:"){
@@ -99,6 +123,7 @@ G03File g03Recogniser(const char* filename) {
 			  XX=   153.5147   YX=     1.4099   ZX=   -15.8194
 			  XY=     6.4190   YY=   141.7114   ZY=   -10.9938
 			  XZ=    -8.3913   YZ=   -13.7749   ZZ=   163.9681
+			  Eigenvalues:     9.9934    13.9913    99.2020
 
 			  With the last for lines repeated many times. If we
 			  recognise the "1 C Isotropic = 153.0648 Anisotropy =
@@ -106,8 +131,10 @@ G03File g03Recogniser(const char* filename) {
 			  then check again
 			*/
 			g03File.shielding = Lines();
-			while(!(line = safeGetLine(fin)).find("Isotropic")) {
+			while((line = safeGetLine(fin)).find("Isotropic") != string::npos) {
 				line = safeGetLine(fin); //We don't need the top line anymore
+				g03File.shielding.get().push_back(line);
+				line = safeGetLine(fin);
 				g03File.shielding.get().push_back(line);
 				line = safeGetLine(fin);
 				g03File.shielding.get().push_back(line);
@@ -116,20 +143,56 @@ G03File g03Recogniser(const char* filename) {
 			}
 			goto loopStart;
 		} else if(line == "Total nuclear spin-spin coupling J (Hz):"){
+			g03File.jCoupling = Lines();
 			
+			/*
+			  Lines look like either 5 integers or an integer and
+			  between 1 and 5 FORTRAN doubles
+			*/
+			//Quick hack, but it works just fine here. Convert all "D"
+			//characters to "e"
+			for(unsigned long i = 0;i < line.length();i++) {
+				if(line[i] == 'D') {
+					line[i] = 'e';
+				}
+			}
+
+			while(true) {
+				line = safeGetLine(fin);
+				// The - operator is interpreted by boost::spirit as
+				// "match zero or one times"
+				if(qi::phrase_parse(line.begin(),line.end(),
+									(qi::int_ >> qi::int_ >> qi::int_ >> qi::int_ >> qi::int_) |
+									(qi::int_ >> qi::double_ >> -(qi::double_ >> -(qi::double_ >> -(qi::double_ >> -qi::double_)))),
+									qi::space)) {
+					g03File.jCoupling.get().push_back(line);
+				} else {
+					cout << "rejected " << line << endl;
+					goto loopStart;
+				}
+			}
 		} else if(line == "Isotropic Fermi Contact Couplings") {
 			//We need to skip 4 lines here
 			safeGetLine(fin); // Atom                 a.u.       MegaHertz       Gauss      10(-4) cm-1
-			line = safeGetLine(fin); //1  C(13)              0.07610      85.54716      30.52535      28.53546
 			/*
 			  This section is the following type of line repeated with no end marker
 			  1  C(13)              0.07610      85.54716      30.52535      28.53546
-			 */
+			*/
 			g03File.isoHFC = Lines();
-
-			//TODO
-
-			goto loopStart;
+			while(true) {
+				line = safeGetLine(fin);//1  C(13)              0.07610      85.54716      30.52535      28.53546
+				istringstream stream(line);
+				spirit::istream_iterator begin(stream);
+				spirit::istream_iterator end;
+				if(qi::phrase_parse(begin,end,
+									qi::int_ >> (qi::alpha >> -qi::alpha) >> qi::char_('(') >> qi::int_ >> qi::char_(')') >>
+									qi::double_ >> qi::double_ >> qi::double_,
+									qi::space)) {
+					g03File.isoHFC.get().push_back(line);
+				} else {
+					goto loopStart;
+				}
+			}
 		} else if(line == "Anisotropic Spin Dipole Couplings in Principal Axis System") {
 			g03File.anisoHFC = Lines();
 			//We need to skip 4 lines here
@@ -142,13 +205,13 @@ G03File g03Recogniser(const char* filename) {
 			/*
 			  This section of the file looks like thse four lines repeated:
 
-			           Baa    -0.5540   -74.335   -26.525   -24.796 -0.2607  0.9654  0.0000
+			  Baa    -0.5540   -74.335   -26.525   -24.796 -0.2607  0.9654  0.0000
 			  1 C(13)  Bbb    -0.5540   -74.335   -26.525   -24.796  0.9654  0.2607  0.0000
-			           Bcc     1.1079   148.671    53.049    49.591  0.0000  0.0000  1.0000
+			  Bcc     1.1079   148.671    53.049    49.591  0.0000  0.0000  1.0000
 			  <<blank>>
 
 			  And ends with a double blank line
-			 */
+			*/
 
 			while(line != "") {
 				g03File.anisoHFC.get().push_back(line);
@@ -176,8 +239,33 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	  interesting. They are then passed to parser modules that process
 	  their local properties. We can then use assemble() from the XML
 	  code to assemble the complete spin system
-	*/
-	g03Recogniser(filename);
+	*/	
+	G03File g03File = g03Recognise(filename);
+
+
+	//============================================================//
+	// Debug Stuff
+	path filepath(filename);
+	path dirname(filepath.root_directory() /path("parts") / path(path(filename).filename()));
+	remove_all(dirname);
+	create_directory(dirname);
+
+	path newpath = dirname / path(filename).filename();
+
+	dumpLinesToFile(g03File.stdOrientation	,newpath.string() + "stdOrientation.part");
+	dumpLinesToFile(g03File.gTensor		    ,newpath.string() + "gTensor.part");
+	dumpLinesToFile(g03File.shielding		,newpath.string() + "shielding.part");
+	dumpLinesToFile(g03File.jCoupling		,newpath.string() + "jCoupling.part");
+	dumpLinesToFile(g03File.isoHFC			,newpath.string() + "isoHFC.part");
+	dumpLinesToFile(g03File.anisoHFC        ,newpath.string() + "anisoHFC.part");
+
+	cout << endl;
+
+	//============================================================//
+	// Now parse each section of the file seperately if it's present
+
+	
+
 	return;
 
 	vector<double>      isoHFC;

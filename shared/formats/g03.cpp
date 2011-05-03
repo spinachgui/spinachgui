@@ -46,6 +46,10 @@ typedef string::iterator stritor;
 
 typedef vector<string> Lines;
 
+//Define this to put the filter into debuging mode. Intermediate bits
+//will be writen out for inspection
+#define G03_DEBUG
+
 #define readDbl(x) double_[boost::phoenix::ref((x))=_1]
 #define readInt(x) int_[boost::phoenix::ref((x))=_1]
 
@@ -99,6 +103,7 @@ struct G03File {
 	optional<Lines> anisoHFC;
 	optional<int>    multiplicity;
 };
+#ifdef G03_DEBUG
 void dumpLinesToFile(optional<Lines> lines,string filename) {
 	if(lines) {
 		cout << filename << endl;
@@ -113,6 +118,7 @@ void dumpLinesToFile(optional<Lines> lines,string filename) {
 		}
 	}
 }
+#endif
 
 string safeGetLine(istream& fin) {
 	string line;
@@ -290,9 +296,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	ss->Clear();
 	G03File g03File = g03Recognise(filename);
 
-
 	//============================================================//
 	// Debug Stuff
+#ifdef G03_DEBUG
 	path filepath(filename);
 	path dirname(filepath.root_directory() /path("parts") / path(path(filename).filename()));
 	remove_all(dirname);
@@ -308,6 +314,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	dumpLinesToFile(g03File.anisoHFC        ,newpath.string() + "anisoHFC.part");
 
 	cout << endl;
+#endif
 
 	//============================================================//
 	// Now parse each section of the file seperately if it's present

@@ -193,8 +193,8 @@ void SpinSystem::CalcNuclearDipoleDipole() {
             Matrix3d dipole=MakeMatrix3d(r2-3.0*rx*rx, 3.0*rx*ry,      3.0*rx*rz,
                                          3.0*rx*ry,       r2-3.0*ry*ry,3.0*ry*rz,
                                          3.0*rx*rz,       3.0*ry*rz,   r2-3.0*rz*rz);
-            static const double four_pi=12.5663706;
-            double coeff=(mu0*hbar*g1*g2/(r5*four_pi));
+            static const double mu0_over_four_pi=1e-7;
+            double coeff=mu0_over_four_pi*hbar*g1*g2/r5;
 
             Matrix3d dipole_inter=coeff*dipole;
             Interaction* inter=new Interaction(dipole_inter,Interaction::DIPOLAR,spin1,spin2);

@@ -328,14 +328,14 @@ void RootFrame::InitFrame() {
 
     wxAuiPaneInfo frameInfo;
     frameInfo.Right();
+    frameInfo.Hide();
     frameInfo.Caption(wxT("Reference Frames"));
     frameInfo.FloatingSize(wxSize(300,400));
     mAuiManager->AddPane(mFrameTree,frameInfo);
 
     wxAuiPaneInfo tensorVisinfo;
-    tensorVisinfo.Float();
-    tensorVisinfo.Hide();
     tensorVisinfo.Caption(wxT("Tensor Visualisation"));
+	tensorVisinfo.BestSize(wxSize(300,600));
     tensorVisinfo.FloatingSize(wxSize(300,600)); //Workaround for http://trac.wxwidgets.org/ticket/12490
     mAuiManager->AddPane(mInterSizePanel,tensorVisinfo);
 
@@ -677,7 +677,7 @@ EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
 
 //Edit Menu
 EVT_MENU(ID_EDIT_ISO,RootFrame::OnMakeIso)
-EVT_MENU(ID_CALC_DIPOLE,RootFrame::OnCalcDipoles)
+//EVT_MENU(ID_CALC_DIPOLE,RootFrame::OnCalcDipoles)
 
 //View Menu
 EVT_MENU(ID_NMR_EPR,RootFrame::OnNmrEpr)

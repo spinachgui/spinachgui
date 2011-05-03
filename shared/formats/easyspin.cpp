@@ -108,7 +108,7 @@ void EasySpinLoader::SaveFile(const SpinSystem* ss,const char* filename) const {
 			//We have a nucleus
 			nucSpins.push_back(spin);
 			if(!first) NucsStream << ",";
-			NucsStream << spin->GetIsotope() << getElementSymbol(spin->GetElement());
+			NucsStream << (spin->GetIsotope()+spin->GetElement()) << getElementSymbol(spin->GetElement());
 			first = false;
 		}
 	}

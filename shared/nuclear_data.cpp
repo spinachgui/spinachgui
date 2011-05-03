@@ -158,6 +158,7 @@ void LoadIsotopes() {
             if(p >= gIsotopes.size()) {
                 gIsotopes.resize(p+1);
             }
+			gyro = gyro * 1e6  / (2*M_PI);
             gIsotopes[p][m-p]=Isotope(m-p,multiplicity-1,gyro);
         }
     }

@@ -118,9 +118,6 @@ namespace SpinXML {
 
         ///Get the lab frame, which is always an unrotated frame centred at the origin
         Frame* GetLabFrame() const {return mRootFrame;}
-
-        ///Delete all frames and create a single lab frame
-        void SetupLabFrame();
     private:
         std::vector<Interaction*> mInteractions;
         std::vector<Spin*> mSpins;

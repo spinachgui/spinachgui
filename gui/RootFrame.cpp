@@ -677,7 +677,7 @@ EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
 
 //Edit Menu
 EVT_MENU(ID_EDIT_ISO,RootFrame::OnMakeIso)
-EVT_MENU(ID_CALC_DIPOLE,RootFrame::OnCalcDipoles)
+//EVT_MENU(ID_CALC_DIPOLE,RootFrame::OnCalcDipoles)
 
 //View Menu
 EVT_MENU(ID_NMR_EPR,RootFrame::OnNmrEpr)

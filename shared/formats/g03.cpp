@@ -17,6 +17,11 @@
 
 #include <vector>
 #include <map>
+
+// Seems to fix compile error in some versions of boost.
+// http://lists.boost.org/boost-users/2009/09/52337.php
+#undef BOOST_SYSTEM_NO_DEPRECATED
+
 #include <boost/filesystem.hpp>
 #include <shared/formats/proto.hpp>
 
@@ -37,6 +42,7 @@ using boost::spirit::qi::rule;
 using boost::spirit::qi::space;
 using boost::spirit::qi::_1;
 
+typedef string::iterator stritor;
 
 typedef vector<string> Lines;
 
@@ -49,7 +55,8 @@ typedef vector<string> Lines;
 
 template <typename Expr>
 void guardParse(string str, Expr const& expr,string error) {
-	if(!phrase_parse(str.begin(),str.end(),expr,qi::space)) {
+	stritor begin = str.begin();
+	if(!phrase_parse(begin,str.end(),expr,qi::space)) {
 		throw runtime_error(error + "\n Failed line was:\n" + str);
 	}
 }
@@ -148,7 +155,8 @@ G03File g03Recognise(const char* filename) {
 	loopStart:
 		boost::algorithm::trim(line); //Remove whitespace
 		int mult;
-		if(phrase_parse(line.begin(),line.end(),
+		stritor begin = line.begin();
+		if(phrase_parse(begin,line.end(),
 						lit("Charge =") >> int_ >> lit("Multiplicity =") >> readInt(mult),qi::space)) {
 			g03File.multiplicity = mult;
 			continue;
@@ -213,7 +221,8 @@ G03File g03Recognise(const char* filename) {
 				line = safeGetLine(fin);
 				// The - operator is interpreted by boost::spirit as
 				// "match zero or one times"
-				if(phrase_parse(line.begin(),line.end(),
+				stritor lbegin = line.begin();
+				if(phrase_parse(lbegin,line.end(),
 								(int_ >> -(int_ >> -(int_ >> -(int_ >> -int_)))) |
 								(int_ >> double_ >> -(double_ >> -(double_ >> -(double_ >> -double_)))),
 								qi::space)) {
@@ -232,7 +241,8 @@ G03File g03Recognise(const char* filename) {
 			g03File.isoHFC = Lines();
 			while(true) {
 				line = safeGetLine(fin);//1  C(13)              0.07610      85.54716      30.52535      28.53546
-				if(phrase_parse(line.begin(),line.end(),
+				stritor lbegin = line.begin();
+				if(phrase_parse(lbegin,line.end(),
 								int_ >> (alpha >> -alpha) >> char_('(') >> int_ >> char_(')') >>
 								double_ >> double_ >> double_,
 								qi::space)) {

@@ -14,6 +14,7 @@
 #include <shared/formats/simpson.hpp>
 #include <shared/formats/easyspin.hpp>
 #include <shared/panic.hpp>
+#include <shared/assert.hpp>
 
 #include <wx/filename.h>
 

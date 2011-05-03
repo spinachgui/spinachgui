@@ -4,23 +4,20 @@
 #include <iostream>
 #include <cmath>
 #include <stdexcept>
+#include <shared/assert.hpp>
 
 using namespace std;
 
 LogSlider::LogSlider(wxWindow* parent,double value)
     : wxControl(parent,wxID_ANY) {
-    if(value<=0) {
-        throw std::runtime_error("In LogSlider value<=0");
-    }
+	spinxml_assert(value > 0);
     mLogValue=log10(value);
     mLogWidth=4;
     mLogValueDelta=0;
 }
 
 void LogSlider::SetValue(double value) {
-    if(value<=0) {
-        throw std::runtime_error("In LogSlider value<=0");
-    }
+	spinxml_assert(value > 0);
     mLogValue=log10(value);
     wxClientDC dc(this);
     RealPaint(dc);

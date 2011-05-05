@@ -454,7 +454,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				xy,yy,zy,
 				xz,yz,zz;
 			double XX,YY,ZZ;
-			rule<string::iterator> elementRule = (alpha >> - alpha) >> char_('(') >> readInt(anisoHFC.massNumber) >> char_(')');
+			rule<string::iterator,qi::space_type> elementRule = (alpha >> - alpha) >> char_('(') >> readInt(anisoHFC.massNumber) >> char_(')');
 			guardParse(ansioLines[i  ],lit("Baa") 
 					   >> double_ >> readDbl(XX) >> double_ >> double_ >> readDbl(xx) >> readDbl(yx) >> readDbl(zx),anisoError);
 			guardParse(ansioLines[i+1], readInt(number) >> elementRule >> lit("Bbb")

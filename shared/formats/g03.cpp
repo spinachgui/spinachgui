@@ -64,6 +64,18 @@ void guardParse(string str, Expr const& expr,string error) {
 	}
 }
 
+template <typename Expr>
+bool maybeParse(string str, Expr const& expr) {
+	stritor begin = str.begin();
+	if(phrase_parse(begin,str.end(),expr,qi::space)) {
+		//Check we have fully matched the patten
+		if(begin == str.end()) {
+			return true;
+		}
+	}
+	return false;
+}
+
 
 string fortranToC(const string& str) {
 	string out = str;
@@ -325,6 +337,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 	map<int,ProtoIsoHFC> number2isoHFC;
 	map<int,ProtoAnisoHFC> number2anisoHFC;
 
+
+	
+
 	//============================================================//
 	// Free electron
 
@@ -367,6 +382,47 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 		spin.label = getElementSymbol(spin.element);
 		spin.frame = 0;
 		spins.push_back(spin);
+	}
+
+	//============================================================//
+	// J Coupling
+
+	if(g03File.jCoupling) {
+		Lines lines = g03File.jCoupling.get();
+		bool columLabelsFound = false;
+		vector<int> columbs;
+		foreach(string line,lines) {
+			fortranToC(line);
+			vector<double> values;
+			int row;
+			if(maybeParse(line,+int_)) {
+				guardParse(line,(+int_)[phoenix::ref(columbs) = _1],"This should really never happen");
+				columLabelsFound = true;
+				continue;
+			}
+			if(!columLabelsFound) {
+				throw runtime_error("Missing columb lables from j coupling section");
+			}
+			guardParse(line,readInt(row) >> (+double_)[phoenix::ref(values) = _1],"Error parsing j coupling line");
+
+			if(columbs.size() < values.size()) {
+				throw runtime_error("More floating point numbers on a row in the j coupling section than labeled columbs");
+			}
+			foreach(int col,columbs) {
+				if(row == col) {
+					//Skip it, these are always 0.00000D+00
+					continue;
+				}
+				ProtoInteraction inter;
+				inter.type = Interaction::SCALAR;
+				inter.payload = values[col];
+				inter.frame = 0;
+				inter.label = "";
+				inter.spin1 = row;
+				inter.spin2 = col;
+				interactions.push_back(inter);
+			}
+		}
 	}
 
 	//============================================================//

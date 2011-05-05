@@ -1,4 +1,3 @@
-
 #include <shared/formats/g03.hpp>
 #include <fstream>
 #include <iostream>
@@ -158,8 +157,8 @@ G03File g03Recognise(const char* filename) {
 		if(!getline(fin, line)) {
 			break;
 		}
-	loopStart:
 		boost::algorithm::trim(line); //Remove whitespace
+	loopStart:
 		int mult;
 		stritor begin = line.begin();
 		if(phrase_parse(begin,line.end(),

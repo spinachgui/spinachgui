@@ -2,6 +2,10 @@
 #include <shared/assert.hpp>
 #include <iostream>
 
+#ifdef __LINUX__
+#include <execinfo.h>
+#endif
+
 using namespace std;
 using namespace boost;
 

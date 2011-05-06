@@ -114,6 +114,7 @@ Orientation ToFromLabOrient(const Frame* frame,const Orientation& o,bool ToLab) 
 			return Orientation(ConvertToAngleAxis(qdat));
 		} else {
 			spinxml_assert(false);
+			return Orientation();
 		}
 	}
 }

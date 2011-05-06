@@ -601,7 +601,9 @@ public:
         switch(inter->GetStorage()) {
         case Interaction::STORAGE_SCALAR: {
             TiXmlElement* scalarEl = new TiXmlElement(_scalar_);
-            scalarEl->SetValue(dbleToStr(inter->AsScalar() * u));
+			scalarEl->SetValue("scalar");
+            scalarEl->LinkEndChild(new TiXmlText(dbleToStr(inter->AsScalar() / u)));
+
             interEl->LinkEndChild(scalarEl);
             break;
         }

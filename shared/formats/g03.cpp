@@ -415,7 +415,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 				}
 				ProtoInteraction inter;
 				inter.type = Interaction::SCALAR;
-				inter.payload = values[col];
+				inter.payload = values[col] * Hz;
 				inter.frame = 0;
 				inter.label = "";
 				inter.spin1 = row;
@@ -492,6 +492,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			int number;
 			guardParse(line, readInt(number) >> (alpha >> - alpha) >> char_('(') >> readInt(isoHFC.massNumber) >> char_(')')
 					   >> double_ >> readDbl(isoHFC.scalar) >> double_ >> double_,isoHFCError);
+			isoHFC.scalar = isoHFC.scalar * MHz;
 			number2isoHFC[number] = isoHFC;
 		}
 	}
@@ -519,7 +520,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			Orientation o;/* = MakeMatrix3d(xx,yx,zx,// ***MEMORY CORRUPTION***
 										 xy,yy,zy,
 										 xz,yz,zz);*/
-			anisoHFC.ev = Eigenvalues(XX,YY,ZZ,o);
+			anisoHFC.ev = Eigenvalues(XX * MHz,YY * MHz,ZZ * MHz,o);
 			number2anisoHFC[number] = anisoHFC;
 
 		}

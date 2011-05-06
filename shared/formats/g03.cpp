@@ -47,7 +47,7 @@ typedef vector<string> Lines;
 
 //Define this to put the filter into debuging mode. Intermediate bits
 //will be writen out for inspection
-#define G03_DEBUG
+//#define G03_DEBUG
 
 #define readDbl(x) double_[boost::phoenix::ref((x))=_1]
 #define readInt(x) int_[boost::phoenix::ref((x))=_1]
@@ -470,10 +470,10 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			guardParse(shieldLines[i+1],lit("XY=") >> readDbl(xy) >> lit("YY=") >> readDbl(yy) >> lit("ZY=") >> readDbl(zy),shieldingError);
 			guardParse(shieldLines[i+2],lit("XZ=") >> readDbl(xz) >> lit("YZ=") >> readDbl(yz) >> lit("ZZ=") >> readDbl(zz),shieldingError);
 			guardParse(shieldLines[i+3],lit("Eigenvalues:") >> readDbl(XX) >> readDbl(YY) >> readDbl(ZZ) ,shieldingError);
-			/*Orientation o(MakeMatrix3d(xx,yx,zx,  ***MEMORY CORRUPTION***
+			Orientation o(MakeMatrix3d(xx,yx,zx,  
 									   xy,yy,zy,
-									   xz,yz,zz));*/
-			inter.payload = 0.0;//Eigenvalues(XX,YY,ZZ,o);
+									   xz,yz,zz));
+			inter.payload = Eigenvalues(XX,YY,ZZ,o);
 			inter.spin1 = counter;
 			inter.type = Interaction::SHIELDING;
 			inter.label = "";
@@ -517,9 +517,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 					   >> double_ >> readDbl(YY) >> double_ >> double_ >> readDbl(xy) >> readDbl(yy) >> readDbl(zy),anisoError);
 			guardParse(ansioLines[i+2],lit("Bcc")
 					   >> double_ >> readDbl(ZZ) >> double_ >> double_ >> readDbl(xz) >> readDbl(yz) >> readDbl(zz),anisoError);
-			Orientation o;/* = MakeMatrix3d(xx,yx,zx,// ***MEMORY CORRUPTION***
+			Orientation o = MakeMatrix3d(xx,yx,zx,
 										 xy,yy,zy,
-										 xz,yz,zz);*/
+										 xz,yz,zz);
 			anisoHFC.ev = Eigenvalues(XX * MHz,YY * MHz,ZZ * MHz,o);
 			number2anisoHFC[number] = anisoHFC;
 

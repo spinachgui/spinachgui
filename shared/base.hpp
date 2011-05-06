@@ -16,7 +16,7 @@ namespace SpinXML {
             sigDying(static_cast<Derived*>(this));
         }
 
-        Frame* GetPreferedFrame() {return mFrame;}
+        Frame* GetPreferedFrame() const {return mFrame;}
         void   SetPreferedFrame(Frame* frame) {mFrame = frame;}
 
         sigc::signal<void,Derived*> sigDying;

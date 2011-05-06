@@ -2,6 +2,8 @@
 BDIR=`pwd`
 SDIR=$(dirname $0)
 
+cp -r $SDIR/examples/ $BDIR/examples/
+
 mkdir $BDIR/auto
 
 wxformbuilder -g $SDIR/spinach.fbp

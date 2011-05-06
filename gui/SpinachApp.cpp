@@ -14,6 +14,7 @@
 #include <shared/formats/simpson.hpp>
 #include <shared/formats/easyspin.hpp>
 #include <shared/panic.hpp>
+#include <shared/assert.hpp>
 
 #include <wx/filename.h>
 
@@ -30,9 +31,6 @@
 using namespace SpinXML;
 using namespace std;
 using namespace Eigen;
-
-extern char spinxmlSchema[];
-extern unsigned int spinxmlSchemaSize;
 
 
 template<typename T>
@@ -185,7 +183,6 @@ SpinachApp::~SpinachApp() {
 
 bool SpinachApp::OnInit() {
     wxInitAllImageHandlers();
-    printf("%p %u\n",spinxmlSchema, spinxmlSchemaSize);
     //Load the I/O Filters
 
     ISpinSystemLoader* g03 = new G03Loader;
@@ -194,7 +191,7 @@ bool SpinachApp::OnInit() {
     mIOFilters.push_back(new SIMPSONLoader);
     mIOFilters.push_back(new CASTEPLoader);
     mIOFilters.push_back(new EasySpinLoader);
-    mIOFilters.push_back(new XMLLoader(spinxmlSchema));
+    mIOFilters.push_back(new XMLLoader());
 
     //Connect up the selection manager so that when a spin is deleted
     //it also gets unselected

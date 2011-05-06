@@ -8,16 +8,22 @@ namespace SpinXML {
 
   class XMLLoader : public ISpinSystemLoader {
   public:
-    XMLLoader(const char* loc) : mSchemaLocation(loc) {};
     virtual FilterType GetFilterType() const {return LOADSAVE;}
     virtual const char* GetFilter() const {return "xml";}
     virtual const char* GetFormatName() const {return "SpinXML file";}
     virtual void SaveFile(const SpinSystem* ss,const char* filename) const;
     virtual void LoadFile(SpinSystem* ss,      const char* filename) const;
-  private:
-    std::string mSchemaLocation;
   };
 }
+
+//Private
+
+class __XMLInit  {
+public:
+    __XMLInit();
+    ~__XMLInit();
+};
+
 
 #endif
 

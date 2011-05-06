@@ -206,7 +206,7 @@ const char* Interaction::GetTypeName(Type t) {
     }
 }
 
-Interaction::Storage Interaction::GetStorage() const {
+InteractionPayload::Storage InteractionPayload::GetStorage() const {
     if(get<energy>(&mData)!=NULL) {
         return STORAGE_SCALAR;
     } else if(get<Matrix3d>(&mData)!=NULL) {
@@ -222,16 +222,16 @@ Interaction::Storage Interaction::GetStorage() const {
 
 
 
-void Interaction::GetScalar(energy* Scalar) const {
+void InteractionPayload::GetScalar(energy* Scalar) const {
     *Scalar=get<energy>(mData);
 }
 
-void Interaction::GetMatrix(Matrix3d* OutMatrix) const {
+void InteractionPayload::GetMatrix(Matrix3d* OutMatrix) const {
     *OutMatrix=get<Matrix3d>(mData);
     return;
 }
 
-void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
+void InteractionPayload::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const {
     *XX=get<Eigenvalues>(mData).xx;
     *YY=get<Eigenvalues>(mData).yy;
     *ZZ=get<Eigenvalues>(mData).zz;
@@ -239,7 +239,7 @@ void Interaction::GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation*
     return;
 }
 
-void Interaction::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const {
+void InteractionPayload::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const {
     *iso=get<AxRhom>(mData).iso;
     *ax= get<AxRhom>(mData).ax;
     *rh= get<AxRhom>(mData).rh;
@@ -247,7 +247,7 @@ void Interaction::GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* Ori
     return;
 }
 
-void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const {
+void InteractionPayload::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const {
     *iso= get<SpanSkew> (mData).iso;
     *Span=get<SpanSkew> (mData).span;
     *Skew=get<SpanSkew> (mData).skew;
@@ -255,34 +255,29 @@ void Interaction::GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientatio
     return;
 }
 
-void Interaction::SetScalar(energy Scalar) {
+void InteractionPayload::SetScalar(energy Scalar) {
     mData=Scalar;
-    sigChange();
-    Invariant();
+	changed();
 }
 
-void Interaction::SetMatrix(const Matrix3d& Matrix) {
+void InteractionPayload::SetMatrix(const Matrix3d& Matrix) {
     mData=Matrix3d(Matrix);
-        Invariant();
-    sigChange();
+	changed();
 }
 
-void Interaction::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
+void InteractionPayload::SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient) {
     mData=Eigenvalues(XX,YY,ZZ,Orient);
-    Invariant();
-    sigChange();
+	changed();
 }
 
-void Interaction::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
+void InteractionPayload::SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient) {
     mData=AxRhom(iso,ax,rh,Orient);
-    Invariant();
-    sigChange();
+	changed();
 }
 
-void Interaction::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
-    sigChange();
+void InteractionPayload::SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient) {
     mData=SpanSkew(iso,Span,Skew,Orient);
-    Invariant();
+	changed();
 }
 
 
@@ -475,49 +470,49 @@ bool Interaction::GetIsQuadratic() const {
     };
 
 DEFINE_CONVERTER(getAsScalarVisitor,energy,ConvertToScalar);
-void Interaction::ToScalar() {
+void InteractionPayload::ToScalar() {
     mData=apply_visitor(getAsScalarVisitor(),mData);
     Invariant();
 }
-energy Interaction::AsScalar() const {
+energy InteractionPayload::AsScalar() const {
     return apply_visitor(getAsScalarVisitor(),mData);
 }
 
 DEFINE_CONVERTER(getAsMatrixVisitor,Matrix3d,ConvertToMatrix);
-void Interaction::ToMatrix() {
+void InteractionPayload::ToMatrix() {
     mData=apply_visitor(getAsMatrixVisitor(),mData);
     Invariant();
 }
-Matrix3d Interaction::AsMatrix() const {
+Matrix3d InteractionPayload::AsMatrix() const {
     return apply_visitor(getAsMatrixVisitor(),mData);
 }
 
 DEFINE_CONVERTER(getAsEigenvaluesVisitor,Eigenvalues,ConvertToEigenvalues);
-void Interaction::ToEigenvalues() {
+void InteractionPayload::ToEigenvalues() {
     mData=apply_visitor(getAsEigenvaluesVisitor(),mData);
     Invariant();
 }
-Eigenvalues Interaction::AsEigenvalues() const {
+Eigenvalues InteractionPayload::AsEigenvalues() const {
     return apply_visitor(getAsEigenvaluesVisitor(),mData);
 }
 
 DEFINE_CONVERTER(getAsAxRhomVisitor,AxRhom,ConvertToAxRhom);
-void Interaction::ToAxRhom() {
+void InteractionPayload::ToAxRhom() {
     cout << "ToAxRhom" << endl;
     mData=apply_visitor(getAsAxRhomVisitor(),mData);
     Invariant();
 }
-AxRhom Interaction::AsAxRhom() const {
+AxRhom InteractionPayload::AsAxRhom() const {
     cout << "AsAxRhom" << endl;
     return apply_visitor(getAsAxRhomVisitor(),mData);
 }
 
 DEFINE_CONVERTER(getAsSpanSkewVisitor,SpanSkew,ConvertToSpanSkew);
-void Interaction::ToSpanSkew() {
+void InteractionPayload::ToSpanSkew() {
     mData=apply_visitor(getAsSpanSkewVisitor(),mData);
     Invariant();
 }
-SpanSkew Interaction::AsSpanSkew() const {
+SpanSkew InteractionPayload::AsSpanSkew() const {
     return apply_visitor(getAsSpanSkewVisitor(),mData);
 }
 
@@ -534,7 +529,7 @@ void Interaction::valid_or_throw() const {
     case CUSTOM_BILINEAR:
     case DIPOLAR:
         if(mSpin1 == NULL || mSpin2 == NULL)
-            throw runtime_error("Bilinar Interactions but one of mSpin1 or mSpin2 is null!");
+            throw runtime_error("Bilinear interactions but one of mSpin1 or mSpin2 is null!");
         break;
     case CUSTOM_LINEAR:
     case SHIELDING:
@@ -574,9 +569,14 @@ public:
         NaNPANIC(dat.iso,  "Interaction(SpanSkew).iso   has a NaN");
     }
 };
-void Interaction::Invariant() const {
+
+void InteractionPayload::Invariant() const {
     //Check the data for NaNs
     apply_visitor(InvariantVisitor(),mData);
+}
+
+void Interaction::Invariant() const {
+    InteractionPayload::Invariant();
     //Make sure the type makes sense
     switch(mType) {
     case ANY:
@@ -606,6 +606,37 @@ void Interaction::Invariant() const {
     }
 }
 
+
+struct toLabVisitor : public static_visitor<InteractionPayload> {
+    toLabVisitor(const Frame* frame)
+        : mFrame(frame) {
+    }
+    InteractionPayload operator()(const energy& dat) const {
+        return dat;
+    }
+    InteractionPayload operator()(const Matrix3d& dat) const {
+        return ToLabMatrix3d(mFrame,dat);
+    }
+    InteractionPayload operator()(const Eigenvalues& dat) const {
+        Eigenvalues ev = dat;
+        ev.mOrient = ToLabOrient(mFrame,ev.mOrient);
+        return ev;
+    }
+    InteractionPayload operator()(const AxRhom& dat) const {
+        AxRhom ar = dat;
+        ar.mOrient = ToLabOrient(mFrame,ar.mOrient);
+        return ar;
+    }
+    InteractionPayload operator()(const SpanSkew& dat) const {
+        SpanSkew ss = dat;
+        ss.mOrient = ToLabOrient(mFrame,ss.mOrient);
+        return ss;
+    }
+    const Frame* mFrame;
+};
+InteractionPayload InteractionPayload::ToLabFrame(const Frame* frame) const {
+    return apply_visitor(toLabVisitor(frame),mData);
+}
 
 std::vector<Interaction::Type> SpinXML::Types;
 std::vector<Interaction::Type> SpinXML::MonoTypes;

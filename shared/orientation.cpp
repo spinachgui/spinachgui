@@ -119,21 +119,25 @@ Orientation::~Orientation() {};
 
 const Orientation& Orientation::operator=(const EulerAngles& ea)        {
 	mType = EULER;
+	mEuler = ea;
 	Invariant();
 	return *this;
 }
 const Orientation& Orientation::operator=(const Eigen::AngleAxisd& aa)  {
 	mType = ANGLE_AXIS;
+	mAngleAxis = aa;
 	Invariant();
 	return *this;
 }
 const Orientation& Orientation::operator=(const Eigen::Matrix3d& m)     {
 	mType = DCM;
+	mMatrix = m;
 	Invariant();
 	return *this;
 }
 const Orientation& Orientation::operator=(const Eigen::Quaterniond& q)  {
 	mType = QUATERNION;
+	mQuaternion = q;
 	Invariant();
 	return *this;
 }

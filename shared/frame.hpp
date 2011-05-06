@@ -31,7 +31,7 @@ namespace SpinXML {
     ///possible.
     class Frame : public sigc::trackable {
     public:
-        Frame(Eigen::Vector3d translation, Orientation rotation);
+        Frame(const Eigen::Vector3d& translation, const Orientation& rotation);
         ~Frame();
 
         void SetTranslation(const Eigen::Vector3d& vec);

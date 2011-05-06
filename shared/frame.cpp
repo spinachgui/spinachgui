@@ -17,7 +17,7 @@ UnitSystem::UnitSystem()
 
 //============================================================//
 
-Frame::Frame(Vector3d translation, Orientation rotation) 
+Frame::Frame(const Vector3d& translation, const Orientation& rotation) 
     : mParent(NULL),
       mTranslate(translation),
       mOrient(rotation) {

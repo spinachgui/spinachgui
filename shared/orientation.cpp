@@ -7,6 +7,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <Eigen/Dense>
+#include <shared/assert.hpp>
 #include <shared/panic.hpp>
 
 using namespace std;
@@ -82,117 +83,185 @@ AngleAxisd  SpinXML::NormalizeRotation(const AngleAxisd& rot)  {return AngleAxis
 
 //==============================================================================//
 // Orientation
+		EulerAngles mEuler;
+		Eigen::AngleAxisd mAngleAxis;
+		Eigen::Quaterniond mQuaternion;
+		Eigen::Matrix3d mMatrix;
 
-Orientation::Type Orientation::GetType() const {
-    if(get<EulerAngles>(&mData)!=NULL) {
-        return EULER;
-    } else if(get<AngleAxisd>(&mData)!=NULL) {
-        return ANGLE_AXIS;
-    } else if(get<Matrix3d>(&mData)!=NULL) {
-        return DCM;
-    } else if(get<Quaterniond>(&mData)!=NULL) {
-        return QUATERNION;
-    } else {
-		PANIC("In Orientation::GetType() interaction had unknown type");
-		return EULER;
+
+
+Orientation::Orientation()
+	: mType(QUATERNION), mQuaternion(Quaterniond(1,0,0,0)) {
+	Invariant();
+}
+///Constructs an orientation from euler angles
+Orientation::Orientation(const EulerAngles& ea) 
+	: mType(EULER),mEuler(ea) {
+	Invariant();
+}
+///Constructs an orientation from a matrix
+Orientation::Orientation(const Eigen::Matrix3d& m) 
+	: mType(DCM),mMatrix(m) {
+	Invariant();
+}
+///Constructs an orientation from a quaternion
+Orientation::Orientation(const Eigen::Quaterniond& q)
+	: mType(QUATERNION), mQuaternion(q) {
+	Invariant();
+}
+///Constructs an orientation from an AngleAxis
+Orientation::Orientation(const Eigen::AngleAxisd& aa)
+	: mType(ANGLE_AXIS), mAngleAxis(aa) {
+	Invariant();
+}
+///Destructor
+Orientation::~Orientation() {};
+
+const Orientation& Orientation::operator=(const EulerAngles& ea)        {
+	mType = EULER;
+	Invariant();
+	return *this;
+}
+const Orientation& Orientation::operator=(const Eigen::AngleAxisd& aa)  {
+	mType = ANGLE_AXIS;
+	Invariant();
+	return *this;
+}
+const Orientation& Orientation::operator=(const Eigen::Matrix3d& m)     {
+	mType = DCM;
+	Invariant();
+	return *this;
+}
+const Orientation& Orientation::operator=(const Eigen::Quaterniond& q)  {
+	mType = QUATERNION;
+	Invariant();
+	return *this;
+}
+
+bool Orientation::operator==(const Orientation& o) const {
+	if(mType != o.mType) {
+		return false;
 	}
+	if(mType == EULER) {
+		return o.mEuler==mEuler;
+	}
+	if(mType == DCM) {
+		return o.mMatrix == mMatrix;
+	}
+	if(mType == ANGLE_AXIS) {
+		return o.mAngleAxis.angle() == mAngleAxis.angle() &&
+			o.mAngleAxis.axis() == mAngleAxis.axis();
+	}
+	if(mType == QUATERNION) {
+		return o.mQuaternion.w()==mQuaternion.w()
+			&& o.mQuaternion.x()==mQuaternion.x()
+			&& o.mQuaternion.y()==mQuaternion.y()
+			&& o.mQuaternion.z()==mQuaternion.z();
+	}
+	spinxml_assert(false);
+	return false;
 }
 
 
-class GetAsMatrixVisitor : public static_visitor<Matrix3d> {
-public:
-    Matrix3d operator()(const EulerAngles& dat) const {
-        return ConvertToDCM(dat);
-    }
-    Matrix3d operator()(const Matrix3d& dat) const {
-        return ConvertToDCM(dat);
-    }
-    Matrix3d operator()(const Quaterniond& dat) const {
-        return ConvertToDCM(dat);
-    }
-    Matrix3d operator()(const AngleAxisd& dat) const {
-        return ConvertToDCM(dat);
-    }
-};
+
+
+Orientation::Type Orientation::GetType() const {
+	return mType;
+}
+
 Matrix3d Orientation::GetAsMatrix() const {
     Orientation normalized=Normalized();
-    return apply_visitor(GetAsMatrixVisitor(),normalized.mData);
+	if(mType == EULER) {
+        return ConvertToDCM(normalized.mEuler);
+	}
+	if(mType == DCM) {
+        return ConvertToDCM(normalized.mMatrix);
+	}
+	if(mType == ANGLE_AXIS) {
+        return ConvertToDCM(normalized.mAngleAxis);
+	}
+	if(mType == QUATERNION) {
+        return ConvertToDCM(normalized.mQuaternion);
+	}
+	spinxml_assert(false);
+	return Matrix3d();
 }
 
 Vector3d Orientation::Apply(Vector3d v) const {
-    if(get<EulerAngles>(&mData)!=NULL) {
-        EulerAngles ea=*get<EulerAngles>(&mData);
-        AngleAxisd one(ea.alpha ,Vector3d(0,0,1));
-        AngleAxisd two(ea.beta  ,Vector3d(0,1,0));
-        AngleAxisd three(ea.gamma ,Vector3d(0,0,1));
-        
+    if(mType == EULER) {
+        AngleAxisd one(mEuler.alpha ,Vector3d(0,0,1));
+        AngleAxisd two(mEuler.beta  ,Vector3d(0,1,0));
+        AngleAxisd three(mEuler.gamma ,Vector3d(0,0,1));
         return three*(two*(one*v));
-    } else if(get<AngleAxisd>(&mData)!=NULL) {
-        return (*(get<AngleAxisd>(&mData)))*v;
-    } else if(get<Matrix3d>(&mData)!=NULL) {
-        return (*(get<Matrix3d>(&mData)))*v;
-    } else  {
-        return (*(get<Quaterniond>(&mData)))*v;
+    } else if(mType == DCM) {
+        return mMatrix*v;
+    } else if(mType == ANGLE_AXIS) {
+        return mAngleAxis*v;
+    } else if(mType == QUATERNION)  {
+        return mQuaternion*v;
     }
+	spinxml_assert(false);
+	return Vector3d();
 }
 
 void Orientation::GetEuler(double* alpha,double* beta,double* gamma) const {
-    *alpha = get<EulerAngles>(mData).alpha;
-    *beta =  get<EulerAngles>(mData).beta;
-    *gamma = get<EulerAngles>(mData).gamma;
+	spinxml_assert(mType == EULER);
+    *alpha = mEuler.alpha;
+    *beta =  mEuler.beta;
+    *gamma = mEuler.gamma;
 }
 
 void Orientation::GetAngleAxis(double* angle,Vector3d* axis) const {
-    *angle = get<AngleAxisd>(mData).angle();
-    *axis =  get<AngleAxisd>(mData).axis();
+	spinxml_assert(mType == ANGLE_AXIS);
+    *angle = mAngleAxis.angle();
+    *axis =  mAngleAxis.axis();
 }
 
 void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) const {
-    *real = get<Quaterniond>(mData).w();
-    *i    = get<Quaterniond>(mData).x();
-    *j    = get<Quaterniond>(mData).y();
-    *k    = get<Quaterniond>(mData).z();
+	spinxml_assert(mType == QUATERNION);
+    *real = mQuaternion.w();
+    *i    = mQuaternion.x();
+    *j    = mQuaternion.y();
+    *k    = mQuaternion.z();
 }
 
 void Orientation::GetDCM(Matrix3d* matrix) const {
-    *matrix = get<Matrix3d>(mData);
+	spinxml_assert(mType == DCM);
+    *matrix = mMatrix;
 }
 
-
-class ToStringVisitor : public static_visitor<string> {
-public:
-    string operator()(const EulerAngles& dat) const {
+string Orientation::ToString() const {
+	if(mType == EULER) {
         ostringstream oss;
-        oss << "eu:" << dat.alpha << "," << dat.beta << "," << dat.gamma;
+        oss << "eu:" << mEuler.alpha << "," << mEuler.beta << "," << mEuler.gamma;
         return oss.str();
-    }
-    string operator()(const Matrix3d& dat) const {
+	}
+	if(mType == DCM) {
         ostringstream oss;
         oss << "es:"
-            << dat << endl;
+            << mMatrix << endl;
         return oss.str();
-    }
-    string operator()(const Quaterniond& dat) const {
+	}
+	if(mType == QUATERNION) {
         ostringstream oss;
         oss << "q:"
-            << dat.w() << ","
-            << dat.x() << ","
-            << dat.y() << ","
-            << dat.z();
+            << mQuaternion.w() << ","
+            << mQuaternion.x() << ","
+            << mQuaternion.y() << ","
+            << mQuaternion.z();
         return oss.str();
-    }
-    string operator()(const AngleAxisd& dat) const {
+	}
+	if(mType == ANGLE_AXIS) {
         ostringstream oss;
         oss << "aa:"
-            << dat.angle() << ","
-            << dat.axis().x() << ","
-            << dat.axis().y() << ","
-            << dat.axis().z();
+            << mAngleAxis.angle() << ","
+            << mAngleAxis.axis().x() << ","
+            << mAngleAxis.axis().y() << ","
+            << mAngleAxis.axis().z();
         return oss.str();
-    }
-};
-string Orientation::ToString() const {
-    return apply_visitor(ToStringVisitor(),mData);
+	}
+	spinxml_assert(false);
+	return "ERROR";
 }
 
 void Orientation::FromString(std::string string) {
@@ -200,68 +269,90 @@ void Orientation::FromString(std::string string) {
 }
 
 #define DEFINE_CONVERTER(name,return_type,function)                     \
-    struct name : public static_visitor<return_type> {                  \
-        return_type operator()(const EulerAngles& dat) const {return function(dat);} \
-        return_type operator()(const Matrix3d& dat) const    {return function(dat);} \
-        return_type operator()(const Quaterniond& dat) const {return function(dat);} \
-        return_type operator()(const AngleAxisd& dat) const  {return function(dat);} \
-    };
+    Orientation normalized=Normalized();								\
+	if(mType == EULER) {												\
+        return function(normalized.mEuler);								\
+	}																	\
+	if(mType == DCM) {													\
+        return function(normalized.mMatrix);							\
+	}																	\
+	if(mType == ANGLE_AXIS) {											\
+		return function(normalized.mAngleAxis);							\
+	}																	\
+	if(mType == QUATERNION) {											\
+        return function(normalized.mQuaternion);						\
+	}																	\
+	spinxml_assert(false);												
 
-DEFINE_CONVERTER(AsEulerVisitor,EulerAngles,ConvertToEuler)
 EulerAngles Orientation::GetAsEuler() const {
-    Orientation normalised=Normalized();
-    return apply_visitor(AsEulerVisitor(),normalised.mData);
+	DEFINE_CONVERTER(AsEulerVisitor,EulerAngles,ConvertToEuler);
+	return EulerAngles();
 }
 
-DEFINE_CONVERTER(AsDCMVisitor,Matrix3d,ConvertToDCM)
 Matrix3d Orientation::GetAsDCM() const {
-    Orientation o=Normalized();
-    return apply_visitor(AsDCMVisitor(),o.mData);
+	DEFINE_CONVERTER(AsDCMVisitor,Matrix3d,ConvertToDCM)
+	return Matrix3d();
 }
 
-DEFINE_CONVERTER(AsAngleAxisVisitor,AngleAxisd,ConvertToAngleAxis)
 AngleAxisd Orientation::GetAsAngleAxis() const {
-    Orientation o=Normalized();
-    return apply_visitor(AsAngleAxisVisitor(),o.mData);
+	DEFINE_CONVERTER(AsAngleAxisVisitor,AngleAxisd,ConvertToAngleAxis)
+	return AngleAxisd();		
 }
 
-DEFINE_CONVERTER(AsQuaternionVisitor,Quaterniond,ConvertToQuaternion)
 Quaterniond Orientation::GetAsQuaternion() const {
-    Orientation o=Normalized();
-    return apply_visitor(AsQuaternionVisitor(),o.mData);
+	DEFINE_CONVERTER(AsQuaternionVisitor,Quaterniond,ConvertToQuaternion)
+	return Quaterniond();
 }
 
 struct NormalizeVisitor : public static_visitor<> {
-    void operator()(EulerAngles& dat) const {dat.Normalize();}
+    void operator()(EulerAngles& dat) const {
+		dat.Normalize();
+	}
     void operator()(Matrix3d& dat) const { }
     void operator()(Quaterniond& dat) const {dat.normalize();}
-    void operator()(AngleAxisd& dat) const {dat.axis()=dat.axis().normalized();}
+    void operator()(AngleAxisd& dat) const {}
 };
 void Orientation::Normalize() {
-    apply_visitor(NormalizeVisitor(),mData);
+	if(mType == EULER) {						
+		mEuler.Normalize();
+	} else if(mType == DCM) {	
+		//TODO
+	} else if(mType == QUATERNION) {					
+		mQuaternion.normalize();	
+	} else if(mType == ANGLE_AXIS) {
+        mAngleAxis.axis()=mAngleAxis.axis().normalized();
+	} else {
+		spinxml_assert(false);
+	}
 	Invariant();
 }
 
-struct NormalisedVisitor : public static_visitor<Orientation> {
-    Orientation operator()(const EulerAngles& dat) const {return Orientation(dat.Normalized());}
-    Orientation operator()(const Matrix3d& dat) const    {return dat;}
-    Orientation operator()(const Quaterniond& dat) const {return Orientation(dat.normalized());}
-    Orientation operator()(const AngleAxisd& dat) const  {return Orientation(AngleAxisd(dat.angle(),dat.axis().normalized()));}
-};
 Orientation Orientation::Normalized() const {
-    return apply_visitor(NormalisedVisitor(),mData);
+	if(mType == EULER) {						
+		return mEuler.Normalized();
+	}
+	if(mType == DCM) {	
+		return mMatrix;
+	}
+	if(mType == QUATERNION) {					
+		return mQuaternion.normalized();	
+	}
+	if(mType == ANGLE_AXIS) {
+        return AngleAxisd(mAngleAxis.angle(),mAngleAxis.axis().normalized());
+	}
+	spinxml_assert(false);
+	return Orientation();
 }
 
 
 void Orientation::Invariant() const {
-    if(get<AngleAxisd>(&mData)!=NULL) {
-		Vector3d axis = get<AngleAxisd>(mData).axis();
+    if(mType == ANGLE_AXIS) {
+		Vector3d axis = mAngleAxis.axis();
 		if(axis.x() == 0 && axis.y() == 0 && axis.z() == 0) {
 			PANIC("An orientation in angle-axis notation has (0,0,0) as it's axis vector");
 		}
-    } else if(get<Quaterniond>(&mData)!=NULL) {
-		Quaterniond q = get<Quaterniond>(mData);
-		if(q.x() == 0 && q.y() == 0 && q.z() == 0 && q.w() == 0) {
+    } else if(mType == QUATERNION) {
+		if(mQuaternion.x() == 0 && mQuaternion.y() == 0 && mQuaternion.z() == 0 && mQuaternion.w() == 0) {
 			PANIC("An orientation in quaternion notation is (0,0,0,0)");
 		}
 	}

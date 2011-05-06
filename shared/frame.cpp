@@ -3,9 +3,8 @@
 #include <Eigen/Geometry>
 #include <shared/panic.hpp>
 
-#include <boost/variant/static_visitor.hpp>
-#include <boost/variant/apply_visitor.hpp>
 #include <iostream>
+#include <shared/assert.hpp>
 
 using namespace SpinXML;
 using namespace Eigen;
@@ -100,74 +99,31 @@ Matrix3d SpinXML::FromLabMatrix3d(const Frame* frame,const Matrix3d& m) {
     NaNPANIC(mprime,"ToLabMatrix3d result is NaN");
     return mprime;
 }
-
-
-struct toLabVisitor : public static_visitor<Orientation> {
-    toLabVisitor(const Frame* frame_)
-        : frame(frame_) {
-    }
-    Orientation operator()(const EulerAngles& dat) const {
+Orientation ToFromLabOrient(const Frame* frame,const Orientation& o,bool ToLab) {
+	if(o.GetType() == Orientation::DCM) {
+        return Orientation(ToLabMatrix3d(frame,o.GetAsMatrix()));
+	} else {
         Matrix3d mat3 = Affine3d(frame->getTransformToLab()).rotation();
-        Quaterniond q = ConvertToQuaternion(mat3);
-        Quaterniond qdat = ConvertToQuaternion(dat);
-        return Orientation(ConvertToEuler(q*qdat*q.conjugate()));
-    }
-    Orientation operator()(const Matrix3d& dat) const    {
-        return Orientation(ToLabMatrix3d(frame,dat));
-    }
-    Orientation operator()(const Quaterniond& dat) const {
-        Matrix3d mat3 = Affine3d(frame->getTransformToLab()).rotation();
-        Quaterniond q = ConvertToQuaternion(mat3);
-        return Orientation(q*dat*q.conjugate());
-    }
-    Orientation operator()(const AngleAxisd& dat) const  {
-        Matrix3d mat3 = Affine3d(frame->getTransformToLab()).rotation();
-        Quaterniond q = ConvertToQuaternion(mat3);
-        Quaterniond qDat = ConvertToQuaternion(dat);
-        return Orientation(ConvertToAngleAxis(q*qDat*q.conjugate()));
-    }
+        Quaterniond q = q*ConvertToQuaternion(mat3)*q.conjugate();
+        Quaterniond qdat = o.GetAsQuaternion();
+		if(o.GetType() == Orientation::EULER) {
+			return Orientation(ConvertToEuler(qdat));
+		} else if(o.GetType() == Orientation::QUATERNION) {
+			return Orientation(qdat);
+		} else if(o.GetType() == Orientation::ANGLE_AXIS) {
+			return Orientation(ConvertToAngleAxis(qdat));
+		} else {
+			spinxml_assert(false);
+		}
+	}
+}
 
-    const Frame* frame;
-};
 Orientation SpinXML::ToLabOrient(const Frame* frame,const Orientation& o) {
-    Orientation normalized=o.Normalized();
-    return apply_visitor(toLabVisitor(frame),normalized.__get_variant());
+	return ToFromLabOrient(frame,o,true);
 }
-
-
-struct fromLabVisitor : public static_visitor<Orientation> {
-    fromLabVisitor(const Frame* frame_)
-        : frame(frame_) {
-    }
-    Orientation operator()(const EulerAngles& dat) const {
-        Matrix3d mat3 = Affine3d(frame->getTransformFromLab()).rotation();
-        Quaterniond q = ConvertToQuaternion(mat3);
-        Quaterniond qdat = ConvertToQuaternion(dat);
-        return Orientation(ConvertToEuler(q*qdat*q.conjugate()));
-    }
-    Orientation operator()(const Matrix3d& dat) const    {
-        return Orientation(FromLabMatrix3d(frame,dat));
-    }
-    Orientation operator()(const Quaterniond& dat) const {
-        Matrix3d mat3 = Affine3d(frame->getTransformFromLab()).rotation();
-        Quaterniond q = ConvertToQuaternion(mat3);
-        return Orientation(q*dat*q.conjugate());
-    }
-    Orientation operator()(const AngleAxisd& dat) const  {
-        Matrix3d mat3 = Affine3d(frame->getTransformFromLab()).rotation();
-        Quaterniond q = ConvertToQuaternion(mat3);
-        Quaterniond qDat = ConvertToQuaternion(dat);
-        return Orientation(ConvertToAngleAxis(q*qDat*q.conjugate()));
-    }
-
-    const Frame* frame;
-};
 Orientation SpinXML::FromLabOrient(const Frame* frame,const Orientation& o) {
-    Orientation normalized=o.Normalized();
-    return apply_visitor(fromLabVisitor(frame),normalized.__get_variant());
+	return ToFromLabOrient(frame,o,false);
 }
-
-
 
 //================================================================================//
 

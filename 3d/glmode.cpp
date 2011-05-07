@@ -19,10 +19,10 @@ void GLLighting::On()  {
 
     // GL_LIGHT0: the white light emitting light source
     // Create light components for GL_LIGHT0
-    GLfloat ambientLight0[] =  {0.4, 0.4, 0.4, 1.0};
-    GLfloat diffuseLight0[] =  {0.6, 0.6, 0.6, 1.0};
-    GLfloat specularLight0[] = {0.8, 0.8, 0.8, 1.0};
-    GLfloat position0[] =      {-1.5, 1.0,-4.0, 1.0};
+    GLfloat ambientLight0[] =  {0.4f, 0.4f, 0.4f, 1.0f};
+    GLfloat diffuseLight0[] =  {0.6f, 0.6f, 0.6f, 1.0f};
+    GLfloat specularLight0[] = {0.8f, 0.8f, 0.8f, 1.0f};
+    GLfloat position0[] =      {-1.5f, 1.0f,-4.0f, 1.0f};
     // Assign created components to GL_LIGHT0
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight0);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
@@ -31,10 +31,10 @@ void GLLighting::On()  {
 
     // GL_LIGHT1: the red light emitting light source
     // Create light components for GL_LIGHT1
-    GLfloat ambientLight1[] =  {0.4, 0.4, 0.4, 1.0};
-    GLfloat diffuseLight1[] =  {0.6, 0.6, 0.6, 1.0};
-    GLfloat specularLight1[] = {0.8, 0.8, 0.8, 1.0};
-    GLfloat position1[] =      {1.5, 1.0, 4.0, 1.0};
+    GLfloat ambientLight1[] =  {0.4f, 0.4f, 0.4f, 1.0f};
+    GLfloat diffuseLight1[] =  {0.6f, 0.6f, 0.6f, 1.0f};
+    GLfloat specularLight1[] = {0.8f, 0.8f, 0.8f, 1.0f};
+    GLfloat position1[] =      {1.5f, 1.0f, 4.0f, 1.0f};
     // Assign created components to GL_LIGHT1
     glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight1);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight1);

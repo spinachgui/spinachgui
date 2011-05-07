@@ -52,10 +52,10 @@ void LogSlider::RealPaint(wxDC& dc) {
     
     int pixelsPer10=w/mLogWidth;
 
-    int pixel02=pixelsPer10*log10(2);
-    int pixel04=pixelsPer10*log10(4);
-    int pixel06=pixelsPer10*log10(6);
-    int pixel08=pixelsPer10*log10(8);
+    int pixel02=pixelsPer10*log10(2.0);
+    int pixel04=pixelsPer10*log10(4.0);
+    int pixel06=pixelsPer10*log10(6.0);
+    int pixel08=pixelsPer10*log10(8.0);
 
     for(double line=floor(logMin);line<ceil(logMax);line++) {
         int pixel=pixelsPer10 * (line-logMin);

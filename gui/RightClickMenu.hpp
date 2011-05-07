@@ -3,7 +3,7 @@
 
 #include <wx/menu.h>
 #include <shared/spinsys.hpp>
-#include <boost/function.hpp>.
+#include <boost/function.hpp>
 
 class RightClickAction {
     friend class RightClickMenu;

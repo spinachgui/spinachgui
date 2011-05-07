@@ -6,6 +6,14 @@
 
 #include <iostream>
 
+/*
+On MSVC draw text is a macro that is defined as DrawTextW.
+This causes conflicts with wxDC::DrawText, so undef it.
+*/
+#ifdef DrawText
+#undef DrawText
+#endif
+
 using namespace std;
 
 bool isWhite(const unsigned char* p) {

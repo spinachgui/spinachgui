@@ -413,9 +413,13 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 					//Skip it, these are always 0.00000D+00
 					continue;
 				}
+				if(col > values.size()) {
+					//We are on a short row, so we can skip to the next now.
+					break;
+				}
 				ProtoInteraction inter;
 				inter.type = Interaction::SCALAR;
-				inter.payload = values[col] * Hz;
+				inter.payload = values[col-1] * Hz;
 				inter.frame = 0;
 				inter.label = "";
 				inter.spin1 = row;

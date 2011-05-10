@@ -13,6 +13,7 @@ public:
     void OnLeftUp(wxMouseEvent&e);
     void OnLeftDown(wxMouseEvent&e);
     void OnMouseMove(wxMouseEvent&e);
+	void OnResize(wxSizeEvent& e);
 
     void SetValue(double value);
     double GetValue();

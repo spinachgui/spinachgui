@@ -94,11 +94,16 @@ void LogSlider::OnMouseMove(wxMouseEvent&e) {
     Refresh();
 }
 
+void LogSlider::OnResize(wxSizeEvent& e) {
+	Refresh();
+}
+
 BEGIN_EVENT_TABLE(LogSlider, wxControl)
 EVT_LEFT_UP(LogSlider::OnLeftUp)
 EVT_LEFT_DOWN(LogSlider::OnLeftDown)
 EVT_MOTION(LogSlider::OnMouseMove)
 EVT_PAINT(LogSlider::OnPaint)
+EVT_SIZE(LogSlider::OnResize)
 END_EVENT_TABLE()
  
 

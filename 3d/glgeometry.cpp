@@ -442,7 +442,13 @@ void BilinearInterDrawer::Geometary() const {
         double minCuttoff=GetInterSize(t);
         double maxCuttoff=minCuttoff*2;
 
-        energy norm = inter->AsMatrix().norm();
+		energy norm;
+		if(inter->GetType() == Interaction::DIPOLAR) {
+			norm = inter->AsMatrix().norm()/MHz;
+		} else {
+			norm = inter->AsMatrix().trace()/MHz;
+		}
+		norm=abs(norm);
 
         if(minCuttoff < norm) {
             double width=(norm > maxCuttoff) ? 1.0 : (norm-minCuttoff)/(maxCuttoff-minCuttoff);

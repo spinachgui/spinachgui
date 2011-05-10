@@ -89,9 +89,9 @@ void LogSlider::OnMouseMove(wxMouseEvent&e) {
         int w=size.GetWidth();
 
         mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
-    }
+	    sigChange(pow(10,mLogValue+mLogValueDelta));
+	}
     Refresh();
-    sigChange(pow(10,mLogValue+mLogValueDelta));
 }
 
 BEGIN_EVENT_TABLE(LogSlider, wxControl)

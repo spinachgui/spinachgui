@@ -408,23 +408,25 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			if(columbs.size() < values.size()) {
 				throw runtime_error("More floating point numbers on a row in the j coupling section than labeled columbs");
 			}
+			long i = 1;
 			foreach(int col,columbs) {
 				if(row == col) {
 					//Skip it, these are always 0.00000D+00
 					continue;
 				}
-				if(col > values.size()) {
+				if(i > values.size()) {
 					//We are on a short row, so we can skip to the next now.
 					break;
 				}
 				ProtoInteraction inter;
 				inter.type = Interaction::SCALAR;
-				inter.payload = values[col-1] * Hz;
+				inter.payload = values[i-1] * Hz;
 				inter.frame = 0;
 				inter.label = "";
 				inter.spin1 = row;
 				inter.spin2 = col;
 				interactions.push_back(inter);
+				i++;
 			}
 		}
 	}

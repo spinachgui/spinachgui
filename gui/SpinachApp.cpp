@@ -127,6 +127,11 @@ void leakReport();
 
 SpinachApp* gApp;
 
+SpinachApp::SpinachApp()
+  : mSS(NULL) {
+}
+
+
 SpinachApp& wxGetApp() {
     return *gApp;
 }
@@ -178,7 +183,9 @@ SpinachApp::~SpinachApp() {
     for(unsigned long i=0;i<mIOFilters.size();i++) {
         delete mIOFilters[i];
     }
-    delete mSS;
+	if(mSS) {
+        delete mSS;
+	}
 }
 
 bool SpinachApp::OnInit() {

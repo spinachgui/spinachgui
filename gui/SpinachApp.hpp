@@ -25,6 +25,7 @@ namespace SpinXML {
 
 class SpinachApp : public wxApp {
 public:
+    SpinachApp();
     ~SpinachApp();
     virtual bool OnInit();
     SpinXML::SpinSystem* GetSpinSystem() const {return mSS;}

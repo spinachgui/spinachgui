@@ -32,7 +32,7 @@ public:
     void InitFrame();
 
     void LoadFromFile(const wxString& path, const wxString& dir, const wxString& filename);
-    void SaveToFile(const wxString& filename,SpinXML::ISpinSystemLoader* saver=NULL);
+    void SaveToFile(const wxString& filename,SpinXML::ISpinSystemLoader* saver);
 
     //Utility Functions
     void SaveAs();

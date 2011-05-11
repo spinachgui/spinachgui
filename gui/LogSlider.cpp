@@ -4,23 +4,20 @@
 #include <iostream>
 #include <cmath>
 #include <stdexcept>
+#include <shared/assert.hpp>
 
 using namespace std;
 
 LogSlider::LogSlider(wxWindow* parent,double value)
     : wxControl(parent,wxID_ANY) {
-    if(value<=0) {
-	throw std::runtime_error("In LogSlider value<=0");
-    }
+	spinxml_assert(value > 0);
     mLogValue=log10(value);
     mLogWidth=4;
     mLogValueDelta=0;
 }
 
 void LogSlider::SetValue(double value) {
-    if(value<=0) {
-		throw std::runtime_error("In LogSlider value<=0");
-    }
+	spinxml_assert(value > 0);
     mLogValue=log10(value);
     wxClientDC dc(this);
     RealPaint(dc);
@@ -55,21 +52,21 @@ void LogSlider::RealPaint(wxDC& dc) {
     
     int pixelsPer10=w/mLogWidth;
 
-    int pixel02=pixelsPer10*log10(2);
-    int pixel04=pixelsPer10*log10(4);
-    int pixel06=pixelsPer10*log10(6);
-    int pixel08=pixelsPer10*log10(8);
+    int pixel02=pixelsPer10*log10(2.0);
+    int pixel04=pixelsPer10*log10(4.0);
+    int pixel06=pixelsPer10*log10(6.0);
+    int pixel08=pixelsPer10*log10(8.0);
 
     for(double line=floor(logMin);line<ceil(logMax);line++) {
-	int pixel=pixelsPer10 * (line-logMin);
+        int pixel=pixelsPer10 * (line-logMin);
 
-	dc.DrawText(wxString() << pow(10,line),pixel,h/2-8);
-	dc.DrawLine(pixel,h/2+10,pixel,h/2-10);
+        dc.DrawText(wxString() << pow(10,line),pixel,h/2-8);
+        dc.DrawLine(pixel,h/2+10,pixel,h/2-10);
 
-	dc.DrawLine(pixel+pixel02,h/2+4,pixel+pixel02,h/2-4);
-	dc.DrawLine(pixel+pixel04,h/2+4,pixel+pixel04,h/2-4);
-	dc.DrawLine(pixel+pixel06,h/2+4,pixel+pixel06,h/2-4);
-	dc.DrawLine(pixel+pixel08,h/2+4,pixel+pixel08,h/2-4);
+        dc.DrawLine(pixel+pixel02,h/2+4,pixel+pixel02,h/2-4);
+        dc.DrawLine(pixel+pixel04,h/2+4,pixel+pixel04,h/2-4);
+        dc.DrawLine(pixel+pixel06,h/2+4,pixel+pixel06,h/2-4);
+        dc.DrawLine(pixel+pixel08,h/2+4,pixel+pixel08,h/2-4);
     }
 }
 
@@ -88,10 +85,10 @@ void LogSlider::OnLeftUp(wxMouseEvent&e) {
 
 void LogSlider::OnMouseMove(wxMouseEvent&e) {
     if(e.Dragging()) {
-		wxSize size=GetClientSize();
-		int w=size.GetWidth();
+        wxSize size=GetClientSize();
+        int w=size.GetWidth();
 
-		mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
+        mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
     }
     Refresh();
     sigChange(pow(10,mLogValue+mLogValueDelta));

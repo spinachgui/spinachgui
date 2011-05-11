@@ -38,6 +38,7 @@ public:
 
     void StartPicking();
     void StopPicking();
+    Camera* GetCamera() {return mCamera;}
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -48,8 +49,9 @@ protected:
 
     //Returns the name stack of the closest object moused over
     virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) =0;
-	
+        
     virtual void DrawScene() = 0;
+    virtual void DrawForeground() = 0;
 
     //We only need this because binding Refresh directly in a signal
     //is difficult due to the default arguments
@@ -69,6 +71,8 @@ private:
     bool mBandBoxOn;
     int mBandBoxStartX;
     int mBandBoxStartY;
+
+    bool mDraging;
 
     //3D Variables
     Camera* mCamera;

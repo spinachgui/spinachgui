@@ -218,7 +218,7 @@ struct castep : grammar<castep> {
                     for(long i=0;i<ss->GetSpinCount();i++) {
                         Spin* spin=ss->GetSpin(i);
                         if(getElementBySymbol(element.c_str())==spin->GetElement()) {
-#warning "Wrong unit unsed in CASTEP"
+#pragma message ( "Wrong unit unsed in CASTEP" )
                             Interaction* quadinter=new Interaction(quadrupole_moment * MHz,Interaction::QUADRUPOLAR,spin);
 							ss->InsertInteraction(quadinter);
                         }

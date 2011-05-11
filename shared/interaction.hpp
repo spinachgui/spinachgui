@@ -10,11 +10,9 @@
 #include <shared/orientation.hpp>
 
 namespace SpinXML {
-	class InteractionView;
-
     ///============================================================//
     struct Eigenvalues {
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         Eigenvalues(const double _XX,const double _YY,const double _ZZ, const Orientation& o) 
             : xx(_XX), yy(_YY), zz(_ZZ), mOrient(o) {
         }
@@ -23,11 +21,11 @@ namespace SpinXML {
         double zz;
         Orientation mOrient;
     };
-	typedef Eigenvalues UEigenvalues;
+    typedef Eigenvalues UEigenvalues;
 
     ///============================================================//
     struct AxRhom {
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         AxRhom(const double _iso,const double _ax,const double _rh, const Orientation& o) 
             : iso(_iso), ax(_ax), rh(_rh), mOrient(o) {
         }
@@ -36,12 +34,12 @@ namespace SpinXML {
         double rh;
         Orientation mOrient;
     };
-	typedef AxRhom UAxRhom;
-	
+    typedef AxRhom UAxRhom;
+        
 
     ///============================================================//
     struct SpanSkew {
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         SpanSkew(const double _iso,const double _span,const double _skew, const Orientation& o) 
             : iso(_iso), span(_span), skew(_skew), mOrient(o) {
         }
@@ -50,7 +48,7 @@ namespace SpinXML {
         double skew;
         Orientation mOrient;
     };
-	typedef SpanSkew USpanSkew;
+    typedef SpanSkew USpanSkew;
 
     //Interaction converstions
     energy ConvertToScalar(const energy& inter);
@@ -60,7 +58,7 @@ namespace SpinXML {
     energy ConvertToScalar(const SpanSkew& inter);
 
     Eigen::Matrix3d ConvertToMatrix(const energy& inter);
-	Eigen::Matrix3d ConvertToMatrix(const Eigen::Matrix3d& inter);
+    Eigen::Matrix3d ConvertToMatrix(const Eigen::Matrix3d& inter);
     Eigen::Matrix3d ConvertToMatrix(const Eigenvalues& inter);
     Eigen::Matrix3d ConvertToMatrix(const AxRhom& inter);
     Eigen::Matrix3d ConvertToMatrix(const SpanSkew& inter);
@@ -83,19 +81,94 @@ namespace SpinXML {
     SpanSkew ConvertToSpanSkew(const AxRhom& inter);
     SpanSkew ConvertToSpanSkew(const SpanSkew& inter);
 
+	class InteractionPayload {
+	public:
+		virtual ~InteractionPayload() {}
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-    class Interaction : public SpinXMLBase<Interaction,InteractionView> {
+        ///Construct from a scalar
+        InteractionPayload(energy inter) : mData(inter){}
+        ///Construct from a matrix
+        InteractionPayload(const Eigen::Matrix3d& inter) : mData(inter) {}
+        ///Construct from a matrix
+        InteractionPayload(const Eigenvalues& inter) : mData(inter) {}
+        ///Construct from a matrix
+        InteractionPayload(const AxRhom& inter) : mData(inter){}
+        ///Construct from a matrix
+        InteractionPayload(const SpanSkew& inter)  : mData(inter){}
+
+		///Enumeration of the storage conventions used by this interaction
+		enum Storage {
+			STORAGE_SCALAR,
+			MATRIX,
+			EIGENVALUES,
+			AXRHOM,
+			SPANSKEW
+		};
+		///Get the storage convention being used
+		Storage GetStorage() const;
+
+    
+		///If the scalar sorage convention being used then this function will set
+		///the value of its argument to the appropreate value. Otherwise the
+		///result is undefined.
+		void GetScalar(energy* Scalar) const;
+		///If the Matrix sorage convention being used then this function will set
+		///the value of its argument to the appropreate value. Otherwise the
+		///result is undefined.
+		void GetMatrix(Eigen::Matrix3d* OutMatrix) const;
+		///If the Eigenvalues sorage convention being used then this function will set
+		///the value of its arguments to the appropreate value. Otherwise the
+		///result is undefined.
+		void GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const;
+		///If the Axiality-Rhombicity sorage convention being used then this function will set
+		///the value of its arguments to the appropreate value. Otherwise the
+		///result is undefined.
+		void GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const;
+		///If the Span-Skew sorage convention being used then this function will set
+		///the value of its arguments to the appropreate value. Otherwise the
+		///result is undefined.
+		void GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const;
+
+		///Set the value of the interaction using the scalar covention.
+		void SetScalar(energy Scalar);
+		///Set the value of the interaction using the matrix covention.
+		void SetMatrix(const Eigen::Matrix3d& InMatrix);
+		///Set the value of the interaction using the eigenvalue covention.
+		void SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient);
+		///Set the value of the interaction using the axiality-rhombicity covention.
+		void SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient);
+		///Set the value of the interaction using the span-skew covention.
+		void SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient);
+
+        void ToScalar();
+        void ToMatrix();
+        void ToEigenvalues();
+        void ToAxRhom();
+        void ToSpanSkew();
+
+        energy      AsScalar() const;
+        Eigen::Matrix3d    AsMatrix() const;
+        Eigenvalues AsEigenvalues() const;
+        AxRhom      AsAxRhom() const;
+        SpanSkew    AsSpanSkew() const;
+
+        InteractionPayload ToLabFrame(const Frame* frame) const;
+
+	protected:
+		///Ment to be overridden. SHould be called at the end of every
+		///non-const function
+		virtual void changed() const {}
+        typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
+        var_t mData;
+        void Invariant() const;
+	};
+
+
+    class Interaction : public InteractionPayload, public SpinXMLBase<Interaction>, private Counter<Interaction> {
     public:
+        using Counter<Interaction>::objCount;
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-        ///Enumeration of the storage conventions used by this interaction
-        enum Storage {
-            STORAGE_SCALAR,
-            MATRIX,
-            EIGENVALUES,
-            AXRHOM,
-            SPANSKEW
-        };
-
         ///Enumeration of the algebraic forms
         enum Form {
             LINEAR,
@@ -103,6 +176,8 @@ namespace SpinXML {
             QUADRATIC,
             ANY_FORM
         };
+		///Get a human readable name for a member of the enum Form
+		static const char* GetFormName(Form t);
 
         ///Enumeration what the physical source of this interaction is. Can
         ///be used as a hint for simulation software or it might determine
@@ -125,49 +200,41 @@ namespace SpinXML {
             //Interactions relevent to both nmr and epr
             QUADRUPOLAR,
             DIPOLAR,
-            CUSTOM_LINEAR,	 
+            CUSTOM_LINEAR,       
             CUSTOM_BILINEAR,
             CUSTOM_QUADRATIC,
-			
-			TYPE_END
+                        
+            TYPE_END
         };
-		
 
-        ///Construct from a scalar
-        Interaction(energy inter             ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
+		///Set a flag indicating the physical source of this interaction.
+		void SetType(Type st, Spin* spin1, Spin* spin2=NULL);
+		///Returns true if the physical source of this interaction is t. The
+		///members ST_NMR, ST_EPR and ST_ANY may be used here and will be
+		///interpreted coorectly. For example, if inter is of SubType
+		///ST_SCALAR then inter.IsSubType(ST_NMR) is true.
+		bool IsType(Type t) const;
+
+
+		///Get the physical source of this interaction
+		Type GetType() const;
+		///Get the algebrake form of the interaction
+		Form GetForm() const;
+
+		///Construct an interaction from an interaction payload. NB
+		///the raw interaction stroage types such as double, Matrix3d
+		///etc should implicitly convert to InteractionPayload
+		Interaction(const InteractionPayload& payload, Type t,Spin* spin1, Spin* spin2=NULL)
+			: InteractionPayload(payload),mSpin1(NULL), mSpin2(NULL) {
+            InitalSetType(t,spin1,spin2);
+            Invariant();
         }
-        ///Construct from a matrix
-        Interaction(const Eigen::Matrix3d& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
-        }
-        ///Construct from a matrix
-        Interaction(const Eigenvalues& inter ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
-        }
-        ///Construct from a matrix
-        Interaction(const AxRhom& inter      ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter), mSpin1(NULL), mSpin2(NULL) {
-			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
-        }
-        ///Construct from a matrix
-        Interaction(const SpanSkew& inter    ,Type t,Spin* spin1, Spin* spin2=NULL)
-            : mData(inter), mSpin1(NULL), mSpin2(NULL)  {
-			InitalSetType(t,spin1,spin2);
-            valid_or_throw();
-        }
-	protected:
-		void InitalSetType(Type t,Spin* spin1, Spin* spin2);
-	public:
-        ///Copy constructor
-        Interaction(const Interaction& inter);
+
+    protected:
+		void changed() const {sigChange(); Invariant();}
+
+        void InitalSetType(Type t,Spin* spin1, Spin* spin2);
+    public:
         ///Destructor
         ~Interaction();
 
@@ -184,60 +251,12 @@ namespace SpinXML {
         static const char* GetStorageName(Storage t);
         ///Get a human readable name for a member of the enum Type
         static const char* GetTypeName(Type t);
-        ///Get a human readable name for a member of the enum Form
-        static const char* GetFormName(Form t);
 
 
         ///Each Type implies a form (for example, HFC is bilinear)
         ///which can be retrieved via this function
         static Form GetFormFromType(Type st);
 
-        ///Get the storage convention being used
-        Storage GetStorage() const;
-        ///Get the physical source of this interaction
-        Type GetType() const;
-        ///Get the algebrake form of the interaction
-        Form GetForm() const;
-
-        ///Set a flag indicating the physical source of this interaction.
-        void SetType(Type st, Spin* spin1, Spin* spin2=NULL);
-        ///Returns true if the physical source of this interaction is t. The
-        ///members ST_NMR, ST_EPR and ST_ANY may be used here and will be
-        ///interpreted coorectly. For example, if inter is of SubType
-        ///ST_SCALAR then inter.IsSubType(ST_NMR) is true.
-        bool IsType(Type t) const;
-    
-        ///If the scalar sorage convention being used then this function will set
-        ///the value of its argument to the appropreate value. Otherwise the
-        ///result is undefined.
-        void GetScalar(energy* Scalar) const;
-        ///If the Matrix sorage convention being used then this function will set
-        ///the value of its argument to the appropreate value. Otherwise the
-        ///result is undefined.
-        void GetMatrix(Eigen::Matrix3d* OutMatrix) const;
-        ///If the Eigenvalues sorage convention being used then this function will set
-        ///the value of its arguments to the appropreate value. Otherwise the
-        ///result is undefined.
-        void GetEigenvalues(energy* XX,energy* YY, energy* ZZ, Orientation* OrientOut) const;
-        ///If the Axiality-Rhombicity sorage convention being used then this function will set
-        ///the value of its arguments to the appropreate value. Otherwise the
-        ///result is undefined.
-        void GetAxRhom(energy* iso,energy* ax, energy* rh, Orientation* OrientOut) const;
-        ///If the Span-Skew sorage convention being used then this function will set
-        ///the value of its arguments to the appropreate value. Otherwise the
-        ///result is undefined.
-        void GetSpanSkew(energy* iso,energy* Span, double* Skew, Orientation* OrientOut) const;
-
-        ///Set the value of the interaction using the scalar covention.
-        void SetScalar(energy Scalar);
-        ///Set the value of the interaction using the matrix covention.
-        void SetMatrix(const Eigen::Matrix3d& InMatrix);
-        ///Set the value of the interaction using the eigenvalue covention.
-        void SetEigenvalues(energy XX,energy YY, energy ZZ, const Orientation& Orient);
-        ///Set the value of the interaction using the axiality-rhombicity covention.
-        void SetAxRhom(energy iso,energy ax, energy rh, const Orientation& Orient);
-        ///Set the value of the interaction using the span-skew covention.
-        void SetSpanSkew(energy iso,energy Span, double Skew, const Orientation& Orient);
 
         bool GetIsLinear() const;   
         bool GetIsBilinear() const; 
@@ -248,17 +267,6 @@ namespace SpinXML {
         ///spin
         sigc::signal<void,Interaction*,Spin*> sigRemoveSpin;
 
-        void ToScalar();
-        void ToMatrix();
-        void ToEigenvalues();
-        void ToAxRhom();
-        void ToSpanSkew();
-
-        energy      AsScalar() const;
-        Eigen::Matrix3d    AsMatrix() const;
-        Eigenvalues AsEigenvalues() const;
-        AxRhom      AsAxRhom() const;
-        SpanSkew    AsSpanSkew() const;
 
 
         Spin* GetSpin1() const {return mSpin1;}
@@ -268,14 +276,12 @@ namespace SpinXML {
         ///the other spin. In all other cases return NULL
         Spin* GetOtherSpin(const Spin* spin) const {return (mSpin1==spin ? mSpin2 : 
                                                             (mSpin2==spin ? mSpin1 : NULL));}
-		///Returns true if the interaction involves Spin spin
-		bool GetHasSpin(const Spin* spin) const {return mSpin1 == spin || mSpin2 == spin;}
+        ///Returns true if the interaction involves Spin spin
+        bool GetHasSpin(const Spin* spin) const {return mSpin1 == spin || mSpin2 == spin;}
     private:
-
+        void Invariant() const;
         void valid_or_throw() const;
 
-		typedef boost::variant<energy,Eigen::Matrix3d,Eigenvalues,AxRhom,SpanSkew> var_t;
-		var_t mData;
         Type mType;
 
         Spin* mSpin1;
@@ -284,78 +290,13 @@ namespace SpinXML {
         sigc::connection mDyingConnect2;
     };
 
-
-
-
-
-    class InteractionView : public ViewBase<InteractionView,Interaction> {
-    public:
-        typedef ViewBase<InteractionView,Interaction> Base;
-
-        ///Construct from a scalar
-        InteractionView(Interaction* inter   ,const Frame* frame, const UnitSystem* unitSystem)
-			: Base(inter,frame,unitSystem) {
-        }
-
-        ///Get the storage convention being used
-        Interaction::Storage GetStorage() const                   {return mData->GetStorage();}
-        ///Get the physical source of this interaction
-        Interaction::Type GetType() const                         {return mData->GetType();}
-        ///Get the algebrake form of the interaction
-        Interaction::Form GetForm() const                         {return mData->GetForm();}
-
-        ///Set a flag indicating the physical source of this interaction.
-        void SetType(Interaction::Type st, Spin* spin1, Spin* spin2=NULL) {return mData->SetType(st,spin1,spin2);}
-        ///Returns true if the physical source of this interaction is t. The
-        ///members ST_NMR, ST_EPR and ST_ANY may be used here and will be
-        ///interpreted coorectly. For example, if inter is of SubType
-        ///ST_SCALAR then inter.IsSubType(ST_NMR) is true.
-        bool IsType(Interaction::Type t) const {return mData->IsType(t);}
-    
-        ///For a bilinear interaction, get the spin that is not spinA
-        SpinView GetOtherSpin(SpinView spinA) {return mData->GetOtherSpin(spinA.Get())->GetView(mFrame,mUnitSystem);}
-
-        ///Set the value of the interaction using the scalar covention.
-        void SetScalar(double Scalar);
-        ///Set the value of the interaction using the matrix covention.
-        void SetMatrix(const Eigen::Matrix3d& InMatrix);
-        ///Set the value of the interaction using the eigenvalue covention.
-        void SetEigenvalues(double XX,double YY,   double ZZ,  const Orientation& Orient);
-        ///Set the value of the interaction using the axiality-rhombicity covention.
-        void SetAxRhom(double iso,    double ax,   double rh,  const Orientation& Orient);
-        ///Set the value of the interaction using the span-skew covention.
-        void SetSpanSkew(double iso,  double Span, double Skew,const Orientation& Orient);
-
-        bool GetIsLinear() const    {return mData->GetIsLinear();}
-        bool GetIsBilinear() const  {return mData->GetIsBilinear();}
-        bool GetIsQuadratic() const {return mData->GetIsQuadratic();}
-
-        void ToScalar()      {mData->ToScalar();}
-        void ToMatrix()      {mData->ToMatrix();}
-        void ToEigenvalues() {mData->ToEigenvalues();}
-        void ToAxRhom()      {mData->ToAxRhom();}
-        void ToSpanSkew()    {mData->ToSpanSkew();}
-
-        double       AsScalar() const;
-        Eigen::Matrix3d     AsMatrix() const;
-        UEigenvalues AsEigenvalues() const;
-        UAxRhom      AsAxRhom() const;
-        USpanSkew    AsSpanSkew() const;
-
-
-        SpinView GetSpin1() const {return mData->GetSpin1()->GetView(mFrame,mUnitSystem);}
-        SpinView GetSpin2() const {return mData->GetSpin2()->GetView(mFrame,mUnitSystem);}
-        ///If the interaction involves two spins and this function is
-        ///given a pointer to one of those spins, return a pointer to
-        ///the other spin. In all other cases return NULL
-        SpinView GetOtherSpin(const SpinView spin) const {return mData->GetOtherSpin(spin.Get())->GetView(mFrame,mUnitSystem);}
-    };
-
-	extern std::vector<Interaction::Type> Types;
-	extern std::vector<Interaction::Type> MonoTypes;
-	extern std::vector<Interaction::Type> BinaryTypes;
+    extern std::vector<Interaction::Type> Types;
+    extern std::vector<Interaction::Type> MonoTypes;
+    extern std::vector<Interaction::Type> BinaryTypes;
 
 };
+
+
 
 //Private
 

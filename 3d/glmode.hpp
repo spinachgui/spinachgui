@@ -10,8 +10,8 @@
 ///modes
 class GLMode {
 public:
-	virtual void On()  = 0;
-	virtual void Off() = 0;
+    virtual void On()  = 0;
+    virtual void Off() = 0;
 };
 
 
@@ -29,8 +29,8 @@ public:
 
 class GLTranslucent : public GLMode {
 public:
-	virtual void On();
-	virtual void Off();
+    virtual void On();
+    virtual void Off();
 };
 
 class GLPicking : public GLMode {
@@ -53,15 +53,15 @@ private:
 
 class ModeCollection : public GLMode {
 public:
-	ModeCollection(const std::vector<GLMode*>& modes);
-	ModeCollection(GLMode* mode1);
-	ModeCollection(GLMode* mode1,GLMode* mode2);
-	ModeCollection(GLMode* mode1,GLMode* mode2,GLMode* mode3);
+    ModeCollection(const std::vector<GLMode*>& modes);
+    ModeCollection(GLMode* mode1);
+    ModeCollection(GLMode* mode1,GLMode* mode2);
+    ModeCollection(GLMode* mode1,GLMode* mode2,GLMode* mode3);
 
-	virtual void On();
-	virtual void Off();
+    virtual void On();
+    virtual void Off();
 private:
-	std::vector<GLMode*> mModes;
+    std::vector<GLMode*> mModes;
 };
 
 

@@ -21,9 +21,7 @@ namespace SpinXML {
 	class Spin;
 	class SpinSystem;
 	class ISpinSystemLoader;
-	class XMLLoader;
 };
-void PANIC(std::string s);
 
 
 class SpinachApp : public wxApp {
@@ -86,7 +84,7 @@ void SetSelection(std::set<SpinXML::Spin*>& selection);
 void AddSelection(SpinXML::Spin* spinToAdd);
 void RemoveSelection(SpinXML::Spin* spin);
 SpinXML::Spin* GetHover();
-std::set<SpinXML::Spin*> GetSelection();
+const std::set<SpinXML::Spin*>& GetSelection();
 
 //Selection Actions
 void DeleteSelectedSpins();
@@ -97,7 +95,7 @@ void DeleteSelectedSpins();
 SpinachApp& wxGetApp();
 
 //Define macros for accessing the most up to date spin system
-#define GetSS() (wxGetApp().GetSpinSystem()->GetView(GetFrame(),GetUnitSystem()))
+//#define GetSS() (wxGetApp().GetSpinSystem()->GetView(GetFrame(),GetUnitSystem()))
 #define GetRawSS() (wxGetApp().GetSpinSystem())
 #define Chkpoint(x) 
 

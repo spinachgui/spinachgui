@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 project(popi)
 
 #SET(CMAKE_CXX_COMPILER "gcc-4.4")
-
-ENABLE_LANGUAGE(ASM)
-
 ############################################################
 # Enable Testing
 
@@ -16,6 +13,10 @@ enable_testing()
 
 # Make gcc output all the debug information it can! Enclose this in
 #some sort of "if" if more than one compiler is ever supported
+
+#set(CMAKE_CXX_COMPILER "g++-4.5")
+#set(CMAKE_CXX_LINKER "g++-4.5")
+
 set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -D__WXGTK__ -DEIGEN_DONT_ALIGN")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wno-write-strings -Wall")
 
@@ -56,9 +57,12 @@ file(GLOB formatSources shared/formats/*.cpp)
 file(GLOB guiSources gui/*.cpp)
 file(GLOB threeDeeSources 3d/*.cpp)
 
-set(guiSources ${guiSources} ${threeDeeSources} gui/schema_import.s)
+set(guiSources ${guiSources} ${threeDeeSources})
 set(wxformbuilderSources ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp)
-set(xmlSources           ${CMAKE_CURRENT_BINARY_DIR}/auto/spinxml_schema.cpp)
+set(xmlSources
+  shared/formats/tinyxml/tinyxml.cpp 
+  shared/formats/tinyxml/tinyxmlerror.cpp
+  shared/formats/tinyxml/tinyxmlparser.cpp)
 
 ############################################################
 # Link and include directories
@@ -82,7 +86,7 @@ add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
-target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml xerces-c sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
 # Tests specified here
@@ -108,7 +112,7 @@ target_link_libraries(FrameTest spinxml ${Boost_LIBRARIES}  sigc-2.0)
 add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/SpinSystemTest)
 
 add_executable(FormatTest "shared/test/format_test.cpp" )
-target_link_libraries(FormatTest spinxml ${Boost_LIBRARIES} sigc-2.0 xerces-c)
+target_link_libraries(FormatTest spinxml ${Boost_LIBRARIES} sigc-2.0)
 add_test(FrameTest ${EXECUTABLE_OUTPUT_PATH}/FormatTest)
 
 

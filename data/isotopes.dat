@@ -1,7 +1,7 @@
 #Everything after a '#' is a comment. This file was based on data from the GAMMA NMR libraries
 #The gyromagnetic ratio is listed in radians per second per tesla
 #
-#proton number,	mass number,	multplicity,	gyromagnetic ratio
+#proton number,	mass number,	multplicity,	gyromagnetic ratio (10^6 rads s^-1 T^-1 with hydrgen 1 set as 400.130 MHz)
 #Electron
 0        0        2        -176101
 #Hydrogen

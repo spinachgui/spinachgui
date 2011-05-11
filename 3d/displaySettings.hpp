@@ -16,8 +16,8 @@ extern sigc::signal<void> sig3DChange;
 // Wireframe settings
 
 enum QUADRIC_TYPE {
-	QUAD_WIREFRAME,
-	QUAD_SOLID
+    QUAD_WIREFRAME,
+    QUAD_SOLID
 };
 
 GLUquadric* GetQuadric();
@@ -27,23 +27,23 @@ void SetQuadric(QUADRIC_TYPE type);
 // RGB colour struct
 
 struct ColourRGB {
-	ColourRGB() {}
-	ColourRGB(float _r,float _g, float _b) 
-		: r(_r),g(_g),b(_b) {
-	}
-	void SetMaterial(float alpha) {
-		GLfloat material[4];
+    ColourRGB() {}
+    ColourRGB(float _r,float _g, float _b) 
+        : r(_r),g(_g),b(_b) {
+    }
+    void SetMaterial(float alpha) {
+        GLfloat material[4];
 
-		material[0] = r;
-		material[1] = g;
-		material[2] = b;
-		material[3]=  alpha;
+        material[0] = r;
+        material[1] = g;
+        material[2] = b;
+        material[3]=  alpha;
 
-		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
-	}
-	float r;
-	float g;
-	float b;
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material);
+    }
+    float r;
+    float g;
+    float b;
 };
 
 //================================================================================//
@@ -55,6 +55,17 @@ extern sigc::signal<void,bool> sigShowBonds;
 
 extern ColourRGB gBondColour;
 
+//================================================================================//
+// Should we draw an ellipsoid of an eigenframe
+
+enum MONO_DRAW_MODE {
+        MONO_ELIPSOID,
+        MONO_AXES
+};
+
+void SetMonoDrawMode(MONO_DRAW_MODE mode);
+MONO_DRAW_MODE GetMonoDrawMode();
+extern sigc::signal<void,MONO_DRAW_MODE> sigDrawMode;
 
 //================================================================================//
 //Interaction Display Settings
@@ -84,8 +95,8 @@ extern sigc::signal<void,const std::set<SpinXML::Spin*>&> sigSupressedChange;
 
 class __ModInit  {
 public:
-	__ModInit();
-	~__ModInit();
+    __ModInit();
+    ~__ModInit();
 };
 
 #endif

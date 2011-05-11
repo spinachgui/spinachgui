@@ -1,6 +1,5 @@
 
 #include <gui/RightClickMenu.hpp>
-#include <gui/SpinDialog.hpp>
 #include <gui/SpinachApp.hpp>
 
 using namespace SpinXML;
@@ -12,7 +11,7 @@ using namespace std;
 //-- Lambda
 
 RCActionLambda::RCActionLambda(wxString str,CommandT command)
-	: RightClickAction(str),mCommand(command) {
+    : RightClickAction(str),mCommand(command) {
 }
 
 void RCActionLambda::Exec(wxCommandEvent& e) {
@@ -41,29 +40,6 @@ void RCActionDeleteHover::Exec(wxCommandEvent& e) {
     delete mHoverAtTimeOfOpening;
 }
 
-//-- Spin Properties
-
-RCActionShowSpinProperties::RCActionShowSpinProperties(wxWindow* parent) 
-    : RightClickAction(wxT("Properties")), mParent(parent) {
-}
-
-void RCActionShowSpinProperties::Exec(wxCommandEvent& e) {
-    const set<Spin*>& selection = GetSelection();
-    if(selection.begin() != selection.end()) {
-	Spin* spin = *(selection.begin());
-	SpinView spinV = spin->GetView(GetFrame(),GetUnitSystem());
-	SpinDialog* dialog=new SpinDialog(mParent,spinV);
-	dialog->ShowModal(); 
-    } else if(GetHover() != NULL) {
-	SpinView spinV = GetHover()->GetView(GetFrame(),GetUnitSystem());
-	SpinDialog* dialog=new SpinDialog(mParent,spinV);
-	dialog->ShowModal();
-    }
-}
-
-bool RCActionShowSpinProperties::Visible() const {
-    return GetSelectedCount() == 1 || GetHover() != NULL;
-}
 
 //============================================================//
 // PopupMenu
@@ -76,7 +52,7 @@ RightClickMenu::RightClickMenu(wxWindow* parent)
 
  RightClickMenu::~RightClickMenu() {
     for(std::vector<RightClickAction*>::iterator i = mActions.begin();i!=mActions.end();++i) {
-	delete *i;
+        delete *i;
     }
  }
 
@@ -84,10 +60,10 @@ void RightClickMenu::Build(std::vector<RightClickAction*> actions) {
     mActions = actions;
     int id = 0;
     for(std::vector<RightClickAction*>::iterator i = actions.begin();i!=actions.end();++i) {
-	if ((*i)->Visible()) {
-	    Append(id, (*i)->mText);
-	}
-	id++;
+        if ((*i)->Visible()) {
+            Append(id, (*i)->mText);
+        }
+        id++;
     }
 }
 
@@ -99,8 +75,7 @@ void RightClickMenu::OnSelect(wxCommandEvent& e) {
 void RightClickMenu::Build() {
     vector<RightClickAction*> actions;
     actions.push_back(new RCActionDeleteHover                );
-    actions.push_back(new RCActionDeleteSelection	     );
-    actions.push_back(new RCActionShowSpinProperties(mParent));
+    actions.push_back(new RCActionDeleteSelection            );
     Build(actions);
 }
 

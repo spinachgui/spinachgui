@@ -4,9 +4,14 @@
 
 //Includes opengl in a platform agnostic manner
 
+#ifdef _WINDOWS
+#include <windows.h>
 #include <GL/gl.h>
+#endif
+
 
 #ifdef __linux__
+#include <GL/gl.h>
 #include <GL/glx.h>
 #endif
 

@@ -3,13 +3,13 @@
 
 #include <wx/menu.h>
 #include <shared/spinsys.hpp>
-#include <boost/function.hpp>.
+#include <boost/function.hpp>
 
 class RightClickAction {
     friend class RightClickMenu;
 public:
     RightClickAction(const wxString& text) 
-	: mText(text) {
+        : mText(text) {
     }
     virtual ~RightClickAction() {}
     virtual void Exec(wxCommandEvent& e) = 0;
@@ -69,15 +69,6 @@ public:
     RCActionDeleteSelection() : RightClickAction(wxT("Delete selected spins")) {}
     virtual void Exec(wxCommandEvent&e);
     virtual bool Visible() const;
-};
-
-class RCActionShowSpinProperties : public RightClickAction {
-public:
-    RCActionShowSpinProperties(wxWindow* parent);
-    virtual void Exec(wxCommandEvent& e);
-    virtual bool Visible() const;
-private:
-    wxWindow* mParent;
 };
 
 #endif RIGHT_CLICK_MENU_H

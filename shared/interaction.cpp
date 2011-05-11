@@ -71,9 +71,9 @@ AxRhom SpinXML::ConvertToAxRhom(const Eigenvalues& I) {
     energy xx=I.xx; energy yy=I.yy; energy zz=I.zz;
     //Sort so that xx <= yy <= zz
     energy tmp;
-    if(zz < yy) tmp=zz; zz=yy; yy=tmp;
-    if(zz < xx) tmp=zz; zz=xx; xx=tmp; //Now zz is definatly bigest
-    if(yy < xx) tmp=xx; xx=yy; yy=tmp;
+	if(zz < yy) {tmp=zz; zz=yy; yy=tmp;}
+	if(zz < xx) {tmp=zz; zz=xx; xx=tmp;} //Now zz is definatly bigest
+	if(yy < xx) {tmp=xx; xx=yy; yy=tmp;}
 
     energy iso = (xx+yy+zz)/3.0;
     energy ax=2*zz -  xx - yy;
@@ -92,9 +92,9 @@ SpanSkew SpinXML::ConvertToSpanSkew(const Eigenvalues& I) {
     energy xx=I.xx; energy yy=I.yy; energy zz=I.zz;
     //Sort so that xx <= yy <= zz
     energy tmp;
-    if(zz < yy) tmp=zz; zz=yy; yy=tmp;
-    if(zz < xx) tmp=zz; zz=xx; xx=tmp; //Now zz is the bigest
-    if(yy < xx) tmp=xx; xx=yy; yy=tmp;
+	if(zz < yy) {tmp=zz; zz=yy; yy=tmp;}
+	if(zz < xx) {tmp=zz; zz=xx; xx=tmp;} //Now zz is the bigest
+	if(yy < xx) {tmp=xx; xx=yy; yy=tmp;}
 
     energy iso = (xx+yy+zz)/3.0;
     energy span=zz - xx;

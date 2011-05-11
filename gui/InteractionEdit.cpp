@@ -134,7 +134,7 @@ void InterEditPanel::UpdateSubTypeCombo(bool subtypeWarning) {
         return;
     }
     Interaction::Type t = mInter->GetType();
-    if(true) {//If nucleus
+    if(mWithRespectTo->GetElement() != 0) {//If nucleus
         for(long i=0;i<NuclearSTLen;i++) {
             mSubTypeCombo->Append(wxString(Interaction::GetTypeName(NuclearT[i]),wxConvUTF8),new STClientData(NuclearT[i]));
         }

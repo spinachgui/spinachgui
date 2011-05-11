@@ -1,0 +1,11 @@
+<spin_system>
+    <spin number="0" element="0" isotope="0" label="electron">
+        <coordinates x="0" y="0" z="0" reference_frame="0" />
+    </spin>
+    <interaction kind="g-tenser" units="unitless" spin_1="0">
+        <eigenvalues XX="1" YY="1" ZZ="3" />
+        <orientation>
+            <quaternion re="1" i="0" j="0" k="0" reference_frame="0" />
+        </orientation>
+    </interaction>
+</spin_system>

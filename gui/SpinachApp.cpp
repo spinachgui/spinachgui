@@ -17,6 +17,8 @@
 #include <shared/formats/simpson.hpp>
 #include <shared/formats/easyspin.hpp>
 
+#include <shared/foreach.hpp>
+
 #include <wx/filename.h>
 
 #include <shared/unit.hpp>
@@ -94,6 +96,30 @@ void CheesyUnitSystemChangerHandler() {
 }
 
 //================================================================================//
+// 
+
+vector<ISpinSystemLoader*> gIOFilters;
+
+const vector<ISpinSystemLoader*>& GetIOFilters()  {
+	return gIOFilters;
+}
+
+ISpinSystemLoader* GetLoaderFromExtension(const string& ext) {
+	foreach(ISpinSystemLoader* loader,gIOFilters) {
+		if(string(loader->GetFilter()) == ext) {
+			return loader;
+		}
+	}
+	return NULL;
+}
+
+G03Loader      gG03Loader;	   
+SIMPSONLoader  gSIMPSONLoader; 
+CASTEPLoader   gCASTEPLoader;  
+EasySpinLoader gEasySpinLoader;
+XMLLoader      gXMLLoader;     
+
+//================================================================================//
 // Set and get gobal reference frame
 
 Frame* gFrame = NULL;
@@ -163,13 +189,6 @@ SpinachApp::~SpinachApp() {
 
 bool SpinachApp::OnInit() {
 	printf("%p %u\n",spinxmlSchema, spinxmlSchemaSize);
-    //Load the I/O Filters
-
-    mIOFilters.push_back(new G03Loader);
-    mIOFilters.push_back(new SIMPSONLoader);
-    mIOFilters.push_back(new CASTEPLoader);
-    mIOFilters.push_back(new EasySpinLoader);
-    mIOFilters.push_back(new XMLLoader(spinxmlSchema));
 
 	//Connect up the selection manager so that when a spin is deleted
 	//it also gets unselected
@@ -338,3 +357,19 @@ void RemoveSelection(SpinXML::Spin* spin) {
 
 
 
+//================================================================================//
+// Module Initalisation
+
+ __GUI__Init::__GUI__Init() {
+	 gIOFilters.push_back(gG03Loader);
+	 //gIOFilters.push_back(gSIMPSONLoader);  //<- Uncomment when ready 
+	 //gIOFilters.push_back(gCASTEPLoader);   //<- Uncomment when ready 
+	 gIOFilters.push_back(gEasySpinLoader);
+	 gIOFilters.push_back(gXMLLoader);
+ }
+
+ __GUI__Init::~__GUI__Init() {
+
+ }
+
+ static __GUI__Init __init;

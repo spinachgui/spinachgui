@@ -16,6 +16,7 @@
 #include <wx/statusbr.h>
 #include <wx/treectrl.h>
 #include <wx/aui/aui.h>
+#include <shared/foreach.hpp>
 
 //Input and output filters
 #define ID_UNIT_START 12345
@@ -344,18 +345,16 @@ void RootFrame::UpdateTitle() {
 void RootFrame::OnOpen(wxCommandEvent& e) {
     wxString filter;
     bool first=true;
-    for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
-        i!=wxGetApp().GetIOFilters().end();
-        ++i) {
-        if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
-           (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+    foreach(ISpinSystemLoader* loader,GetIOFilters()) {
+        if(loader->GetFilterType()==ISpinSystemLoader::LOAD ||
+           loader->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
             if(!first) {
                 filter << wxT("|");
             } else {
                 first=false;
             }
-            wxString ThisFilter((*i)->GetFilter(),wxConvUTF8);
-            wxString ThisFilterName((*i)->GetFormatName(),wxConvUTF8);
+            wxString ThisFilter(loader->GetFilter(),wxConvUTF8);
+            wxString ThisFilterName(loader->GetFormatName(),wxConvUTF8);
             filter << ThisFilterName << wxT(" (*.") << ThisFilter << wxT(")|*.") << ThisFilter;
         }
     }
@@ -378,14 +377,11 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
     wxString ext=GetExtension(mOpenFile).Lower();
 
     ISpinSystemLoader* loader=NULL;
-    typedef vector<ISpinSystemLoader*>::const_iterator itor;
-    for(itor i=wxGetApp().GetIOFilters().begin();
-        i!=wxGetApp().GetIOFilters().end();
-        ++i) {
-        if((*i)->GetFilterType()==ISpinSystemLoader::LOAD ||
-           (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
-            if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
-                loader=*i;
+    foreach(ISpinSystemLoader* iofilter,GetIOFilters()) {
+        if(iofilter->GetFilterType()==ISpinSystemLoader::LOAD ||
+           iofilter->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+            if(ext==wxString(iofilter->GetFilter(),wxConvUTF8).Lower()) {
+                loader=iofilter;
                 break;
             }
         }
@@ -407,7 +403,7 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
 
 void RootFrame::OnSave(wxCommandEvent& e) {
     if(GetExtension(mOpenFile) == wxT("xml")) {
-        SaveToFile(mOpenPath);
+        SaveToFile(mOpenPath,GetLoaderFromExtension("xml"));
     } else {
         SaveAs();
     }
@@ -420,18 +416,16 @@ void RootFrame::OnSaveAs(wxCommandEvent& e) {
 void RootFrame::SaveAs() {
     wxString filter;
     bool first=true;
-    for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
-        i!=wxGetApp().GetIOFilters().end();
-        ++i) {
-        if((*i)->GetFilterType()==ISpinSystemLoader::SAVE ||
-           (*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+    foreach(ISpinSystemLoader* ioFilter,GetIOFilters()) {
+        if(ioFilter->GetFilterType()==ISpinSystemLoader::SAVE ||
+           ioFilter->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
             if(!first) {
                 filter << wxT("|");
             } else {
                 first=false;
             }
-            wxString ThisFilter((*i)->GetFilter(),wxConvUTF8);
-            wxString ThisFilterName((*i)->GetFormatName(),wxConvUTF8);
+            wxString ThisFilter(ioFilter->GetFilter(),wxConvUTF8);
+            wxString ThisFilterName(ioFilter->GetFormatName(),wxConvUTF8);
             filter << ThisFilterName << wxT(" (*.") << ThisFilter << wxT(")|*.") << ThisFilter;
         } 
     }
@@ -447,12 +441,10 @@ void RootFrame::SaveAs() {
         mOpenDir=fd->GetDirectory();
         wxString ext=GetExtension(mOpenFile).Lower();
         ISpinSystemLoader* saver=NULL;
-        for(vector<ISpinSystemLoader*>::const_iterator i=wxGetApp().GetIOFilters().begin();
-            i!=wxGetApp().GetIOFilters().end();
-            ++i) {
-            if((*i)->GetFilterType()==ISpinSystemLoader::SAVE ||(*i)->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
-                if(ext==wxString((*i)->GetFilter(),wxConvUTF8).Lower()) {
-                    saver=*i;
+        foreach(ISpinSystemLoader* ioFilter,GetIOFilters()) {
+            if(ioFilter->GetFilterType()==ISpinSystemLoader::SAVE ||ioFilter->GetFilterType()==ISpinSystemLoader::LOADSAVE) {
+                if(ext==wxString(ioFilter->GetFilter(),wxConvUTF8).Lower()) {
+                    saver=ioFilter;
                     break;
                 }
             }

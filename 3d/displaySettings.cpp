@@ -143,11 +143,11 @@ __ModInit::__ModInit() {
 
     //Set sensible default scallings
     sizeMap[Interaction::HFC             ] = 0.01;
-    sizeMap[Interaction::G_TENSER        ] = 1;
+    sizeMap[Interaction::G_TENSER        ] = 12;
     sizeMap[Interaction::ZFS             ] = 0.01;
     sizeMap[Interaction::EXCHANGE        ] = 0.01;
     sizeMap[Interaction::SHIELDING       ] = 0.01;
-    sizeMap[Interaction::SCALAR          ] = 0.01;
+    sizeMap[Interaction::SCALAR          ] = 5e-6;
     sizeMap[Interaction::QUADRUPOLAR     ] = 0.01;
     sizeMap[Interaction::DIPOLAR         ] = 0.01;
     sizeMap[Interaction::CUSTOM_LINEAR   ] = 0.01;
@@ -166,17 +166,17 @@ __ModInit::__ModInit() {
     visableMap[Interaction::CUSTOM_BILINEAR ] = true;
     visableMap[Interaction::CUSTOM_QUADRATIC] = true;
 
-    colourMap[Interaction::HFC             ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::G_TENSER        ] = ColourRGB(0.1f,0.8f,0.1f);
-    colourMap[Interaction::ZFS             ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::EXCHANGE        ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::SHIELDING       ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::SCALAR          ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::QUADRUPOLAR     ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::DIPOLAR         ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::CUSTOM_LINEAR   ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::CUSTOM_BILINEAR ] = ColourRGB(0.0f,0.0f,0.0f);
-    colourMap[Interaction::CUSTOM_QUADRATIC] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::HFC             ] = ColourRGB(1.0f,  0.501960784314f,  0.0f);
+    colourMap[Interaction::G_TENSER        ] = ColourRGB(0.247058823529f,  0.76862745098f,  0.352941176471f);
+    colourMap[Interaction::ZFS             ] = ColourRGB(0.043137254902f,  0.807843137255f,  0.972549019608f);
+    colourMap[Interaction::EXCHANGE        ] = ColourRGB(0.1f,0.1f,0.1f);
+    colourMap[Interaction::SHIELDING       ] = ColourRGB(0.078431372549f,  0.078431372549f,  0.909803921569f);
+    colourMap[Interaction::SCALAR          ] = ColourRGB(0.941176470588f,  0.0196078431373f,  0.0313725490196f);
+    colourMap[Interaction::QUADRUPOLAR     ] = ColourRGB(1.0f,  0.501960784314f,  0.0f);
+    colourMap[Interaction::DIPOLAR         ] = ColourRGB(0.81568627451f,  0.847058823529f,  0.0941176470588f);
+    colourMap[Interaction::CUSTOM_LINEAR   ] = ColourRGB(0.81568627451f,  0.81568627451f,  0.81568627451f);
+    colourMap[Interaction::CUSTOM_BILINEAR ] = ColourRGB(0.81568627451f,  0.81568627451f,  0.81568627451f);
+    colourMap[Interaction::CUSTOM_QUADRATIC] = ColourRGB(0.81568627451f,  0.81568627451f,  0.81568627451f);
 }
 
 __ModInit::~__ModInit() {

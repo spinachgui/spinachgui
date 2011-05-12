@@ -121,13 +121,13 @@ void DrawSpin(Spin* spin,long name) {
     GLfloat material[4]; material[3]=0.0f;
 
     if(spin == hover) {
-        material[0] = 200/255.0;
+        material[0] = 200/255.0f;
         material[1] = 1.0;
-        material[2] = 200/255.0;
+        material[2] = 200/255.0f;
     } else if(selection.find(spin) != selection.end()) {
-        material[0] = 255/255.0;
-        material[1] = 100/255.0;
-        material[2] = 100/255.0;
+        material[0] = 255/255.0f;
+        material[1] = 100/255.0f;
+        material[2] = 100/255.0f;
     } else {
         material[0] = getElementR(spin->GetElement());
         material[1] = getElementG(spin->GetElement());
@@ -190,7 +190,7 @@ void SpinDrawer::Geometary() const {
                      spin->GetPosition().y() / Angstroms,
                      spin->GetPosition().z() / Angstroms);
 
-        glScalef(0.4,0.4,0.4);
+        glScalef(0.4f,0.4f,0.4f);
         DrawSpin(spin,i);
         glPopMatrix();
 

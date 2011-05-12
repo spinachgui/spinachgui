@@ -81,6 +81,9 @@ unit GetUnit(PhysDimension d) {
         return gUnitSystem.lengthUnit;
     case DIM_ENERGY:
         return gUnitSystem.energyUnit;
+	default:
+		spinxml_assert(false);
+		throw logic_error("Bad PhysDimension passed to ::GetUnit(PhysDimension)");
     }
 }
 

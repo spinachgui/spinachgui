@@ -8,7 +8,7 @@ using namespace Eigen;
 using namespace std;
 
 Camera::Camera()
-    :  mZoom(0.01) {
+    :  mZoom(0.01f) {
     mTransform = Matrix4f::Identity();
 }
 void Camera::SetZoom(float zoom) {
@@ -18,7 +18,7 @@ void Camera::SetZoom(float zoom) {
 void Camera::DeltaZoom(float deltaZoom) {
     mZoom+=deltaZoom;
     if(mZoom<0.001) {
-        mZoom=0.001;
+        mZoom=0.001f;
     }
 }
 

@@ -94,7 +94,7 @@ sigc::signal<void,bool> sigShowBonds;
 //================================================================================//
 // What colour should bonds be drawn
 
-ColourRGB gBondColour(0,0,0.9);
+ColourRGB gBondColour(0,0,0.9f);
 
 //================================================================================//
 // Supress Interactions
@@ -166,17 +166,17 @@ __ModInit::__ModInit() {
     visableMap[Interaction::CUSTOM_BILINEAR ] = true;
     visableMap[Interaction::CUSTOM_QUADRATIC] = true;
 
-    colourMap[Interaction::HFC             ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::G_TENSER        ] = ColourRGB(0.1,0.8,0.1);
-    colourMap[Interaction::ZFS             ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::EXCHANGE        ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::SHIELDING       ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::SCALAR          ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::QUADRUPOLAR     ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::DIPOLAR         ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::CUSTOM_LINEAR   ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::CUSTOM_BILINEAR ] = ColourRGB(0.0,0.0,0.0);
-    colourMap[Interaction::CUSTOM_QUADRATIC] = ColourRGB(0.0,0.0,0.0);
+    colourMap[Interaction::HFC             ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::G_TENSER        ] = ColourRGB(0.1f,0.8f,0.1f);
+    colourMap[Interaction::ZFS             ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::EXCHANGE        ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::SHIELDING       ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::SCALAR          ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::QUADRUPOLAR     ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::DIPOLAR         ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::CUSTOM_LINEAR   ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::CUSTOM_BILINEAR ] = ColourRGB(0.0f,0.0f,0.0f);
+    colourMap[Interaction::CUSTOM_QUADRATIC] = ColourRGB(0.0f,0.0f,0.0f);
 }
 
 __ModInit::~__ModInit() {

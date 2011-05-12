@@ -408,7 +408,7 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			if(columbs.size() < values.size()) {
 				throw runtime_error("More floating point numbers on a row in the j coupling section than labeled columbs");
 			}
-			long i = 1;
+			unsigned long i = 1;
 			foreach(int col,columbs) {
 				if(row == col) {
 					//Skip it, these are always 0.00000D+00

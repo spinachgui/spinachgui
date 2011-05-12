@@ -121,7 +121,8 @@ G03Loader      gG03Loader;
 SIMPSONLoader  gSIMPSONLoader; 
 CASTEPLoader   gCASTEPLoader;  
 EasySpinLoader gEasySpinLoader;
-XMLLoader      gXMLLoader;     
+XMLLoader      gXMLLoader;
+XYZLoader      gXYZLoader;
 
 //================================================================================//
 // Set and get gobal reference frame
@@ -386,11 +387,12 @@ void RemoveSelection(SpinXML::Spin* spin) {
 // Module Initalisation
 
  __GUI__Init::__GUI__Init() {
+	 gIOFilters.push_back(&gXMLLoader);
 	 gIOFilters.push_back(&gG03Loader);
 	 //gIOFilters.push_back(&gSIMPSONLoader);  //<- Uncomment when ready 
 	 //gIOFilters.push_back(&gCASTEPLoader);   //<- Uncomment when ready 
 	 gIOFilters.push_back(&gEasySpinLoader);
-	 gIOFilters.push_back(&gXMLLoader);
+	 gIOFilters.push_back(&gXYZLoader);
  }
 
  __GUI__Init::~__GUI__Init() {

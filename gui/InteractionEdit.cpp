@@ -12,6 +12,7 @@
 #include <wx/log.h>
 
 #include <stdexcept>
+#include <gui/SpinChoice.hpp>
 
 using namespace std;
 using namespace SpinXML;

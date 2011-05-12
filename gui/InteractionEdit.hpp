@@ -10,6 +10,7 @@
 #include <gui/DialogCombo.hpp>
 #include <sigc++/sigc++.h>
 
+
 class InterEditPanel : public InterEditPanelBase, public sigc::trackable {
 public:
     InterEditPanel(wxWindow* parent, wxWindowID id=-1);

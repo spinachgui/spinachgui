@@ -11,7 +11,7 @@ using namespace Eigen;
 // Gobal Singals
 
 sigc::signal<void,Spin*> SpinXML::sigAnySpinDying;
-
+sigc::signal<void,Spin*> SpinXML::sigAnySpinChange;
 
 //==============================================================================//
 // Spin
@@ -44,6 +44,7 @@ Vector3d& Spin::GetPosition() {
 void Spin::SetPosition(Vector3d Position) {
     mPosition=Position;
     sigChange();
+	sigAnySpinChange(this);
 }
 
 void Spin::GetCoordinates(length* _x,length* _y, length* _z) const {
@@ -58,11 +59,13 @@ void Spin::SetCoordinates(length _x,length _y, length _z) {
     mPosition[1]=_y;
     mPosition[2]=_z;
     sigChange();
+	sigAnySpinChange(this);
 }
 
 void Spin::SetLabel(string Label) {
     mLabel=Label;
     sigChange();
+	sigAnySpinChange(this);
 }
 
 const char* Spin::GetLabel() const {
@@ -76,11 +79,13 @@ long Spin::GetElement() const {
 void Spin::SetElement(long element) {
     mElement=element;
     sigChange();
+	sigAnySpinChange(this);
 }
 
 void Spin::SetIsotope(long isotope) {
     mIsotope=isotope;
     sigChange();
+	sigAnySpinChange(this);
 }
 
 long Spin::GetIsotope() const {

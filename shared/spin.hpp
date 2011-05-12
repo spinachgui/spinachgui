@@ -41,7 +41,7 @@ namespace SpinXML {
     };
 
     extern sigc::signal<void,Spin*> sigAnySpinDying;
-
+	extern sigc::signal<void,Spin*> sigAnySpinChange;
 
 };
 

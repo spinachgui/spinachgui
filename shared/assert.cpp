@@ -27,7 +27,7 @@ void defaultHandler(char const * expr, char const * function, char const * file,
 
 	// Free the string pointers
 	free( funcNames );
-	raise(SIGSEGV);
+	abort();
 #else
     int* x = NULL;
     x++;

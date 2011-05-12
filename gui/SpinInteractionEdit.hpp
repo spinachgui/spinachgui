@@ -6,7 +6,6 @@
 #include <shared/spinsys.hpp>
 #include <auto/SpinachGUI.h>
 
-
 class SpinInterEditPanel : public SpinInterEditPanelBase, public sigc::trackable {
 public:
     SpinInterEditPanel(wxWindow* parent,wxWindowID id= -1);
@@ -50,7 +49,6 @@ private:
     SpinXML::Spin* mSpin;
   
     bool mUpdatingListBox;
-
 };
 
 #endif

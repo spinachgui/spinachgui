@@ -2,6 +2,7 @@
 #include <gui/SpinInteractionEdit.hpp>
 #include <gui/SpinachApp.hpp>
 #include <shared/foreach.hpp>
+#include <gui/SpinChoice.hpp>
 
 using namespace SpinXML;
 
@@ -13,8 +14,10 @@ SpinInterEditPanel::SpinInterEditPanel(wxWindow* parent,wxWindowID id)
       mEditMode(EDIT_ALL),
       mSpin(NULL),
       mUpdatingListBox(false) {
+
     mInterEdit=new InterEditPanel(this);
     mInterEdit->sigChange.connect(mem_fun(this,&SpinInterEditPanel::UpdateListBox));
+	mSpinChoice->sigChange.connect(mem_fun(this,&SpinInterEditPanel::SetSpin));
 
     GetSizer()->Add(mInterEdit,1,wxEXPAND | wxALL);
     Enable(false);
@@ -26,6 +29,7 @@ SpinInterEditPanel::~SpinInterEditPanel() {
 
 void SpinInterEditPanel::SetSpin(Spin* spin) {
     mSpin=spin;
+	mSpinChoice->SetSpin(spin);
     LoadFromSpin();
 }
 

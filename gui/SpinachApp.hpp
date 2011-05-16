@@ -16,6 +16,7 @@
 #include <vector>
 #include <algorithm>
 
+#include <shared/interaction.hpp>
 
 namespace SpinXML {
 	class Spin;
@@ -49,11 +50,14 @@ SpinXML::ISpinSystemLoader* GetLoaderFromExtension(const std::string& ext);
 //================================================================================//
 // Unit systems
 
-void SetUnit(PhysDimension d,unit u);
-unit GetUnit(PhysDimension d);
+void SetLengthUnit(unit u);
+unit GetLengthUnit();
 
-extern sigc::signal<void> sigUnitSystemChange;
-extern sigc::signal<void,PhysDimension,unit> sigUnitChange;
+void SetInterUnit(SpinXML::Interaction::Type type,unit u);
+unit GetInterUnit(SpinXML::Interaction::Type type);
+
+extern sigc::signal<void,unit> sigLengthUnitChange;
+extern sigc::signal<void,SpinXML::Interaction::Type,unit> sigInterUnitChange;
 
 //================================================================================//
 // Reference frames, there is exactly on active reference frame at a time

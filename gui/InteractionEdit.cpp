@@ -179,7 +179,7 @@ void InterEditPanel::LoadFromInter() {
     }
     cout << "About the start testing types" << endl;
 
-    unit energyUnit = mInter->GetType() == Interaction::G_TENSER ? Unitless : GetUnit(DIM_ENERGY);
+    unit energyUnit = GetInterUnit(mInter->GetType());
    
     if(mInter->GetStorage()==Interaction::STORAGE_SCALAR) {
         energy scalar = mInter->AsScalar() / energyUnit;
@@ -250,7 +250,7 @@ void InterEditPanel::SaveToInter() {
     interChangeConnect.block();
     Interaction::Storage storage = StorageOrders[mTypeChoiceBook->GetSelection()];
 
-    unit energyUnit = mInter->GetType() == Interaction::G_TENSER ? Unitless : GetUnit(DIM_ENERGY);
+    unit energyUnit = GetInterUnit(mInter->GetType());
 
     if(storage==Interaction::STORAGE_SCALAR) {
         double scalar;

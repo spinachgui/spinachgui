@@ -240,26 +240,24 @@ END_EVENT_TABLE()
 //============================================================//
 // Custom Status Bar
 
-class StatusBar : public wxStatusBar {
+class StatusBar : public wxStatusBar,public sigc::trackable {
 public:
     StatusBar(wxWindow* parent) : wxStatusBar(parent) {
         int widths_field[] = {-1,80,80};
         SetFieldsCount(3,widths_field);
-        SlotUnitChange(DIM_LENGTH,GetUnit(DIM_LENGTH));
-        SlotUnitChange(DIM_ENERGY,GetUnit(DIM_ENERGY));
+        SlotLengthUnitChange(GetLengthUnit());
     }
 
-    void SlotUnitChange(PhysDimension d,unit u) {
+    void SlotLengthUnitChange(unit u) {
         wxString str = wxString(u.get_name().c_str(),wxConvUTF8);
-        switch(d) {
-        case DIM_LENGTH:
-            SetStatusText(str,1);
-            break;
-        case DIM_ENERGY:
-            SetStatusText(str,2);
-            break;
-        }
+        SetStatusText(str,1);
     }
+
+    void SlotInterFocusChange(Interaction::Type t) {
+        wxString str = wxString(GetInterUnit(t).get_name().c_str(),wxConvUTF8);
+        SetStatusText(str,2);
+    }
+
 
     void SlotSizeChange(Interaction::Type t,double s) {
 
@@ -353,33 +351,23 @@ void RootFrame::InitFrame() {
 
 
     //Connect up the signals
-    mSpinGrid->sigSelect.connect(mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
-    sigUnitChange.connect(mem_fun(statusBar,&StatusBar::SlotUnitChange));
+    mSpinGrid->sigSelect.connect(sigc::mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
+    sigLengthUnitChange.connect(sigc::mem_fun(statusBar,&StatusBar::SlotLengthUnitChange));
 
     //Units menu. To avoid writing an On* function for every unit
     //(which would make making units configurable impossible) we
     //connect them all to the same handler and setup a lookup for
     //translating the id into a unit and physical dimension.
-    typedef pair<PhysDimension,unit> p;
 
-    mIdToUnit.push_back(p(DIM_LENGTH,Angstroms));  //Default
-    mIdToUnit.push_back(p(DIM_LENGTH,nanometre));
-    mIdToUnit.push_back(p(DIM_LENGTH,BohrRadius));
+    mIdToUnit.push_back(Angstroms);  //Default
+    mIdToUnit.push_back(nanometre);
+    mIdToUnit.push_back(BohrRadius);
 
-    mIdToUnit.push_back(p(DIM_LENGTH,metres));
-
-    mIdToUnit.push_back(p(DIM_ENERGY,Hz));  //Default
-    mIdToUnit.push_back(p(DIM_ENERGY,KHz));
-    mIdToUnit.push_back(p(DIM_ENERGY,MHz));
-    mIdToUnit.push_back(p(DIM_ENERGY,eV));
-    mIdToUnit.push_back(p(DIM_ENERGY,Joules));
+    mIdToUnit.push_back(metres);
 
     for(unsigned long i = 0;i<mIdToUnit.size();i++) {
-        PhysDimension d = mIdToUnit[i].first;
-        unit u = mIdToUnit[i].second;
-
-        wxMenu *menu = d == DIM_LENGTH ? mMenuLength : mMenuEnergy;
-        menu->AppendRadioItem(ID_UNIT_START+i,wxString(u.get_name().c_str(),wxConvUTF8));
+        unit u = mIdToUnit[i];
+        mMenuLength->AppendRadioItem(ID_UNIT_START+i,wxString(u.get_name().c_str(),wxConvUTF8));
     }
     wxObjectEventFunction afterCast = 
         (wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
@@ -399,11 +387,10 @@ void RootFrame::OnElementSelect(wxCommandEvent& e) {
     }
 }
 
+//Currently we only handle length changes
 void RootFrame::OnUnitChange(wxCommandEvent& e) {
-    pair<PhysDimension,unit> thePair = mIdToUnit[e.GetId()-ID_UNIT_START];
-    PhysDimension d = thePair.first;
-    unit u = thePair.second;
-    SetUnit(d,u);
+    unit u = mIdToUnit[e.GetId()-ID_UNIT_START];
+    SetLengthUnit(u);
 }
 
 void RootFrame::OnNew(wxCommandEvent& e) {

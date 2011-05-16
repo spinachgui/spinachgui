@@ -104,7 +104,7 @@ private:
     ///Just the name of the open file
     wxString mOpenFile;
 
-    std::vector<std::pair<PhysDimension,unit> > mIdToUnit;
+    std::vector<unit> mIdToUnit;
 
     void AUIToggle(wxWindow* p);
 };

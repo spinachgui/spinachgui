@@ -63,37 +63,38 @@ bool panicHandler(const string& s) {
 // Unit Systems
 
 unit gLengthUnit = Angstroms;
-unit gEnergyUnit = MHz;
+map<Interaction::Type,unit> gInterUnits;
 
-sigc::signal<void> sigUnitSystemChange;
-sigc::signal<void,PhysDimension,unit> sigUnitChange;
+sigc::signal<void,unit> sigLengthUnitChange;
+sigc::signal<void,Interaction::Type,unit> sigInterUnitChange;
 
-void SetUnit(PhysDimension d,unit u) {
-    switch(d) {
-    case DIM_LENGTH: gLengthUnit = u; break;
-    case DIM_ENERGY: gEnergyUnit = u; break;
-    }
-    sigUnitChange(d,u);
-    sigUnitSystemChange();
+void SetLengthUnit(unit u) {
+    gLengthUnit = u;
+    sigLengthUnitChange(u);
+}
+unit GetLengthUnit() {
+    return gLengthUnit;
 }
 
-unit GetUnit(PhysDimension d) {
-    switch(d) {
-    case DIM_LENGTH:
-        return gLengthUnit;
-    case DIM_ENERGY:
-        return gEnergyUnit;
-	default:
-		spinxml_assert(false);
-		throw logic_error("Bad PhysDimension passed to ::GetUnit(PhysDimension)");
-    }
+void SetInterUnit(Interaction::Type t,unit u) {
+    gInterUnits.find(t)->second=u;
+    sigInterUnitChange(t,u);
+}
+unit GetInterUnit(Interaction::Type t) {
+    return gInterUnits.find(t)->second;
 }
 
-void CheesyUnitSystemChangerHandler() {
+void CheesyLengthUnitChangerHandler(unit) {
     //Quick hack for making sure everything gets updated, emit a
     //sigReloaded signal
     GetRawSS()->sigReloaded();
 }
+void CheesyInterUnitChangerHandler(Interaction::Type,unit) {
+    //Quick hack for making sure everything gets updated, emit a
+    //sigReloaded signal
+    GetRawSS()->sigReloaded();
+}
+
 
 //================================================================================//
 // 
@@ -214,7 +215,9 @@ bool SpinachApp::OnInit() {
     //it also gets unselected
     sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
 
-    sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
+    sigLengthUnitChange.connect(sigc::ptr_fun(CheesyLengthUnitChangerHandler));
+    sigInterUnitChange.connect(sigc::ptr_fun(CheesyInterUnitChangerHandler));
+
     sigFrameChange.connect(sigc::ptr_fun(&CheesyFrameChangerHandler));
 
     //Load the isotopes
@@ -384,6 +387,18 @@ void RemoveSelection(SpinXML::Spin* spin) {
 	 //gIOFilters.push_back(&gCASTEPLoader);   //<- Uncomment when ready 
 	 gIOFilters.push_back(&gEasySpinLoader);
 	 gIOFilters.push_back(&gXYZLoader);
+
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::HFC             , MHz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::G_TENSER        , Unitless));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::ZFS             , MHz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::EXCHANGE        , MHz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::SHIELDING       , Unitless));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::SCALAR          , Hz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::QUADRUPOLAR     , MHz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::DIPOLAR         , MHz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::CUSTOM_LINEAR   , MHz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::CUSTOM_BILINEAR , MHz));
+     gInterUnits.insert(pair<Interaction::Type,unit>(Interaction::CUSTOM_QUADRATIC, MHz));
  }
 
  __GUI__Init::~__GUI__Init() {

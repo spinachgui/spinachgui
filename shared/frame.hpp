@@ -11,19 +11,6 @@
 
 namespace SpinXML {
 
-    class UnitSystem : private Counter<UnitSystem> {
-    public:
-        using Counter<UnitSystem>::objCount;
-        //SI by default
-        UnitSystem();
-        unit energyUnit;
-        unit lengthUnit;
-        unit timeUnit;
-        static const UnitSystem* GetDefault() {return &singleton;}
-    private:
-        static UnitSystem singleton;
-
-    };
     ///Class representing a frame in a hiraci of nested reference
     ///frames. This class will try to do a resonable amount of
     ///precomputation as soon as possible possible so that all queries

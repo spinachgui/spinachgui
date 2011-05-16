@@ -62,14 +62,16 @@ bool panicHandler(const string& s) {
 //------------------------------------------------------------//
 // Unit Systems
 
-UnitSystem gUnitSystem;
+unit gLengthUnit = Angstroms;
+unit gEnergyUnit = MHz;
+
 sigc::signal<void> sigUnitSystemChange;
 sigc::signal<void,PhysDimension,unit> sigUnitChange;
 
 void SetUnit(PhysDimension d,unit u) {
     switch(d) {
-    case DIM_LENGTH: gUnitSystem.lengthUnit = u; break;
-    case DIM_ENERGY: gUnitSystem.energyUnit = u; break;
+    case DIM_LENGTH: gLengthUnit = u; break;
+    case DIM_ENERGY: gEnergyUnit = u; break;
     }
     sigUnitChange(d,u);
     sigUnitSystemChange();
@@ -78,22 +80,13 @@ void SetUnit(PhysDimension d,unit u) {
 unit GetUnit(PhysDimension d) {
     switch(d) {
     case DIM_LENGTH:
-        return gUnitSystem.lengthUnit;
+        return gLengthUnit;
     case DIM_ENERGY:
-        return gUnitSystem.energyUnit;
+        return gEnergyUnit;
 	default:
 		spinxml_assert(false);
 		throw logic_error("Bad PhysDimension passed to ::GetUnit(PhysDimension)");
     }
-}
-
-const UnitSystem* GetUnitSystem() {
-    return &gUnitSystem;
-}
-
-void SetUnitSystem(const UnitSystem& us) {
-    gUnitSystem = us;
-    sigUnitSystemChange();
 }
 
 void CheesyUnitSystemChangerHandler() {
@@ -205,7 +198,6 @@ void leakReport() {
     cout << "Spin:" << Spin::objCount() << endl;
     cout << "Interaction:" << Interaction::objCount() << endl;
     cout << "Orientation:" << Orientation::objCount() << endl;
-    cout << "UnitSystem:" << UnitSystem::objCount() << endl;
     cout << "========================================" << endl;
 }
 
@@ -221,10 +213,6 @@ bool SpinachApp::OnInit() {
     //Connect up the selection manager so that when a spin is deleted
     //it also gets unselected
     sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
-
-    //Setup a sensible system of units
-    gUnitSystem.energyUnit = MHz;
-    gUnitSystem.lengthUnit = Angstroms;
 
     sigUnitSystemChange.connect(sigc::ptr_fun(&CheesyUnitSystemChangerHandler));
     sigFrameChange.connect(sigc::ptr_fun(&CheesyFrameChangerHandler));

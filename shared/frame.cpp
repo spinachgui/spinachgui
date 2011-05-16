@@ -11,10 +11,6 @@ using namespace Eigen;
 using namespace boost;
 using namespace std;
 
-UnitSystem::UnitSystem()
-    : energyUnit(unit("Joules",1.0)),lengthUnit(unit("Metres",1.0)),timeUnit(unit("Seconds",1.0)) {
-}
-
 //============================================================//
 
 Frame::Frame(const Vector3d& translation, const Orientation& rotation) 
@@ -158,8 +154,4 @@ void Frame::Invariant() const {
     NaNPANIC(mInvertedAffine(2,1),"mInvertedAffine containts a NaN element");
     NaNPANIC(mInvertedAffine(2,2),"mInvertedAffine containts a NaN element");
 }
-
-
-//Initalise the static default UnitSystem
-UnitSystem UnitSystem::singleton;
 

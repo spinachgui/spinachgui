@@ -558,18 +558,51 @@ void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {
 }
 
 void RootFrame::OnNmrEpr(wxCommandEvent& e) {
-    mMenuItemNmrEpr->Check(true);
-    mRootToolbar->ToggleTool(ID_NMR_EPR,true);
+	SetInterVisible(true,Interaction::HFC);
+	SetInterVisible(true,Interaction::G_TENSER);
+	SetInterVisible(true,Interaction::ZFS);
+	SetInterVisible(true,Interaction::EXCHANGE);
+
+	SetInterVisible(true,Interaction::SHIELDING);
+	SetInterVisible(true,Interaction::SCALAR);
+
+	SetInterVisible(true,Interaction::QUADRUPOLAR);
+	SetInterVisible(true,Interaction::DIPOLAR);
+	SetInterVisible(true,Interaction::CUSTOM_LINEAR);
+	SetInterVisible(true,Interaction::CUSTOM_BILINEAR);
+	SetInterVisible(true,Interaction::CUSTOM_QUADRATIC);
 }
 
 void RootFrame::OnNmr(wxCommandEvent& e) {
-    mMenuItemNmr->Check(true);
-    mRootToolbar->ToggleTool(ID_NMR,true);
+	SetInterVisible(false,Interaction::HFC);
+	SetInterVisible(false,Interaction::G_TENSER);
+	SetInterVisible(false,Interaction::ZFS);
+	SetInterVisible(false,Interaction::EXCHANGE);
+
+	SetInterVisible(true,Interaction::SHIELDING);
+	SetInterVisible(true,Interaction::SCALAR);
+
+	SetInterVisible(true,Interaction::QUADRUPOLAR);
+	SetInterVisible(true,Interaction::DIPOLAR);
+	SetInterVisible(true,Interaction::CUSTOM_LINEAR);
+	SetInterVisible(true,Interaction::CUSTOM_BILINEAR);
+	SetInterVisible(true,Interaction::CUSTOM_QUADRATIC);
 }
 
 void RootFrame::OnEpr(wxCommandEvent& e) {
-    mMenuItemEpr->Check(true);
-    mRootToolbar->ToggleTool(ID_EPR,true);
+	SetInterVisible(true,Interaction::HFC);
+	SetInterVisible(true,Interaction::G_TENSER);
+	SetInterVisible(true,Interaction::ZFS);
+	SetInterVisible(true,Interaction::EXCHANGE);
+
+	SetInterVisible(false,Interaction::SHIELDING);
+	SetInterVisible(false,Interaction::SCALAR);
+
+	SetInterVisible(true,Interaction::QUADRUPOLAR);
+	SetInterVisible(true,Interaction::DIPOLAR);
+	SetInterVisible(true,Interaction::CUSTOM_LINEAR);
+	SetInterVisible(true,Interaction::CUSTOM_BILINEAR);
+	SetInterVisible(true,Interaction::CUSTOM_QUADRATIC);
 }
 
 

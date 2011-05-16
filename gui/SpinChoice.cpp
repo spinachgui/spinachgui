@@ -60,7 +60,7 @@ void SpinChoice::SlotAnySpinChange(Spin* spin) {
 	for(unsigned long i = 0;i < GetCount();i++) {
 		if(GetClientData(i) == spin) {
 			Delete(i);
-			Insert(wxString(spin->GetLabel(),wxConvUTF8),i+1,(void*)spin);
+			Insert(wxString(spin->GetLabel(),wxConvUTF8),i,(void*)spin);
 			break;
 		}
 	}

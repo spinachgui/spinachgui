@@ -29,6 +29,7 @@ public:
     void OnInterChange() {LoadFromInter();}
 
     sigc::signal<void> sigChange;
+    sigc::signal<void,SpinXML::Interaction*> sigInterSet;
 protected:
     DECLARE_EVENT_TABLE();
     sigc::connection interChangeConnect;

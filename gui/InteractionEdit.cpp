@@ -104,6 +104,7 @@ void InterEditPanel::SetInter(Interaction* inter,Spin* withRespectTo) {
         interChangeConnect=mInter->sigChange.connect(mem_fun(this,&InterEditPanel::OnInterChange));
         LoadFromInter();
     }
+    sigInterSet(inter);
 }
 
 

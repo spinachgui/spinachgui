@@ -23,6 +23,8 @@ public:
     void UpdateListBox();
     void InteractionChange();
 
+    InterEditPanel* GetInterEdit();
+
     enum EDIT_MODE {
         EDIT_ALL,
         EDIT_LINEAR,

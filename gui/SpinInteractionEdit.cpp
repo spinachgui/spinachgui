@@ -27,6 +27,10 @@ SpinInterEditPanel::~SpinInterEditPanel() {
     Clear();
 }
 
+InterEditPanel* SpinInterEditPanel::GetInterEdit() {
+    return mInterEdit;
+}
+
 void SpinInterEditPanel::SetSpin(Spin* spin) {
     mSpin=spin;
 	mSpinChoice->SetSpin(spin);

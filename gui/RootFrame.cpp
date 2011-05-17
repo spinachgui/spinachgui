@@ -253,12 +253,15 @@ public:
         SetStatusText(str,1);
     }
 
-    void SlotInterFocusChange(Interaction::Type t) {
+    void SlotInterFocusChange(Interaction* inter) {
+        if(inter == NULL) {
+            SetStatusText(wxT(""),2);
+            return;
+        }
+        Interaction::Type t = inter->GetType();
         wxString str = wxString(GetInterUnit(t).get_name().c_str(),wxConvUTF8);
         SetStatusText(str,2);
     }
-
-
     void SlotSizeChange(Interaction::Type t,double s) {
 
     }
@@ -353,6 +356,8 @@ void RootFrame::InitFrame() {
     //Connect up the signals
     mSpinGrid->sigSelect.connect(sigc::mem_fun(mSpinInterEdit,&SpinInterEditPanel::SetSpin));
     sigLengthUnitChange.connect(sigc::mem_fun(statusBar,&StatusBar::SlotLengthUnitChange));
+
+    mSpinInterEdit->GetInterEdit()->sigInterSet.connect(sigc::mem_fun(statusBar,&StatusBar::SlotInterFocusChange));
 
     //Units menu. To avoid writing an On* function for every unit
     //(which would make making units configurable impossible) we

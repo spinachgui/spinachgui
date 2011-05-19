@@ -93,7 +93,6 @@ protected:
         //starting from the left
         glTranslatef(40,mHeight-40,0);
         mElectronScene.Draw();
-        mInteractionScene.Draw();
 
         translucent.On();
         mElectronInterDrawer.Draw();

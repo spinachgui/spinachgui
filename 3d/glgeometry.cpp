@@ -280,7 +280,7 @@ void DrawMonoInter(Spin* spin,Interaction* inter) {
     glMultMatrixf(mat);
 
     //We need to treat the g_tensor specially
-    unit u = inter->GetType() == Interaction::G_TENSER ? Unitless : MHz;
+	unit u = inter->GetType() == Interaction::G_TENSER || Interaction::SHIELDING ? Unitless : MHz;
     glScaled(xx / u,yy /u, zz / u);
                         
     double size = GetInterSize(t);
@@ -331,6 +331,9 @@ void ElectronInterDrawer::Geometary() const {
             continue;
         }
 
+        if(t != Interaction::G_TENSER) {
+            continue;
+        }
 
         if(supressed.find(spin) != supressed.end()) {
             return;

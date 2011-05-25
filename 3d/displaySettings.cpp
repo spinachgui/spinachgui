@@ -146,7 +146,7 @@ __ModInit::__ModInit() {
     sizeMap[Interaction::G_TENSER        ] = 12;
     sizeMap[Interaction::ZFS             ] = 0.01;
     sizeMap[Interaction::EXCHANGE        ] = 0.01;
-    sizeMap[Interaction::SHIELDING       ] = 0.01;
+    sizeMap[Interaction::SHIELDING       ] = 0.0001;
     sizeMap[Interaction::SCALAR          ] = 5e-6;
     sizeMap[Interaction::QUADRUPOLAR     ] = 0.01;
     sizeMap[Interaction::DIPOLAR         ] = 0.01;

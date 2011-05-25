@@ -280,7 +280,7 @@ void DrawMonoInter(Spin* spin,Interaction* inter) {
     glMultMatrixf(mat);
 
     //We need to treat the g_tensor specially
-	unit u = inter->GetType() == Interaction::G_TENSER || Interaction::SHIELDING ? Unitless : MHz;
+	unit u = inter->GetType() == Interaction::G_TENSER || inter->GetType() == Interaction::SHIELDING ? Unitless : MHz;
     glScaled(xx / u,yy /u, zz / u);
                         
     double size = GetInterSize(t);

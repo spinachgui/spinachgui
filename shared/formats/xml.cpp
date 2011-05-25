@@ -24,10 +24,11 @@ using namespace boost;
 //================================================================================//
 //                                     Units                                      //
 //================================================================================//
-// For now, everything in Anstroms and MHz. If the units field is set
+// For now, everything in Anstroms, Hz and MHz. If the units field is set
 // to anything else it's wrong
 
 string _MHz_ = "MHz";
+string _Hz_  = "Hz";
 string _Angstrom_ = "Angstroms";
 string _unitless_ = "unitless";
 
@@ -270,13 +271,23 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
 
     string unitStr;
     Guard(e->QueryStringAttribute("units",&unitStr),"missing units in interaction");
-    if(protoInteraction.type!=Interaction::G_TENSER && unitStr != _MHz_) {
-        throw runtime_error("Invalid unit in interaction");
-    } else if(protoInteraction.type==Interaction::G_TENSER && unitStr != _unitless_) {
-        throw runtime_error("Invalid unit in interaction");
+	if(protoInteraction.type==Interaction::G_TENSER || protoInteraction.type == Interaction::SHIELDING) {
+		if(unitStr != _MHz_) {
+            throw runtime_error("Invalid unit in interaction");
+		}
+	} else if(protoInteraction.type==Interaction::SCALAR) {
+		if(unitStr != _Hz_) {
+            throw runtime_error("Invalid unit in interaction");
+		}
+	} else {
+		if(unitStr != _unitless_) {
+            throw runtime_error("Invalid unit in interaction");
+		}
     }
-    unit u = protoInteraction.type!=Interaction::G_TENSER ? MHz : Unitless;
-
+	unit u = protoInteraction.type==Interaction::G_TENSER || protoInteraction.type==Interaction::SHIELDING ? Unitless : MHz;
+	if(protoInteraction.type==Interaction::SCALAR) {
+        u = Hz;
+	}
     //Be leinient about mixing up the order of eigenvalues etc. and
     //orientation
     const TiXmlNode* mag = NULL; //One of scalar|tensor|eigenvalues|axiality_rhombicity|span_skew
@@ -594,7 +605,11 @@ public:
 
     void encodeInterStorage(const Interaction* inter,TiXmlElement* interEl) const {
         Orientation o;
-        unit u = inter->GetType() == Interaction::G_TENSER ? Unitless : MHz;
+        unit u = inter->GetType() == Interaction::G_TENSER ||
+			     inter->GetType() == Interaction::SHIELDING ? Unitless : MHz;
+		if(inter->GetType() == Interaction::SCALAR) {
+            u = Hz;
+		}
         Frame* frame = inter->GetPreferedFrame();
         int frameNumber = lookupFrame(frame);
 
@@ -713,10 +728,10 @@ public:
             }
 
             interEl->SetAttribute("kind" ,gType2XMLKind[inter->GetType()]);
-            if(inter->GetType() == Interaction::G_TENSER) {
+            if(inter->GetType() == Interaction::G_TENSER || inter->GetType() == Interaction::SHIELDING) {
                 interEl->SetAttribute("units",_unitless_);
-            } else {
-                interEl->SetAttribute("units",_MHz_);
+            } else if(inter->GetType() == Interaction::SCALAR) {
+                interEl->SetAttribute("units",_Hz_);
             }
             interEl->SetAttribute("spin_1",spin1n);
             if(spin2n != -1) {

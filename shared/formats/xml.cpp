@@ -272,7 +272,7 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
     string unitStr;
     Guard(e->QueryStringAttribute("units",&unitStr),"missing units in interaction");
 	if(protoInteraction.type==Interaction::G_TENSER || protoInteraction.type == Interaction::SHIELDING) {
-		if(unitStr != _MHz_) {
+		if(unitStr != _unitless_) {
             throw runtime_error("Invalid unit in interaction");
 		}
 	} else if(protoInteraction.type==Interaction::SCALAR) {
@@ -280,7 +280,7 @@ void decodeInteraction(const TiXmlElement* e,ProtoInteraction& protoInteraction)
             throw runtime_error("Invalid unit in interaction");
 		}
 	} else {
-		if(unitStr != _unitless_) {
+		if(unitStr != _MHz_) {
             throw runtime_error("Invalid unit in interaction");
 		}
     }
@@ -450,7 +450,7 @@ void SpinXML::XMLLoader::LoadFile(SpinSystem* ss,const char* filename) const {
             Guard(coords->QueryDoubleAttribute("x",&x),"missing x attribute");
             Guard(coords->QueryDoubleAttribute("y",&y),"missing y attribute");
             Guard(coords->QueryDoubleAttribute("z",&z),"missing z attribute");
-            Guard(coords->QueryIntAttribute("z",&spin.frame),"missing reference frame");
+            Guard(coords->QueryIntAttribute("reference_frame",&spin.frame),"missing reference frame");
 
             spin.x = x * Angstroms;
             spin.y = y * Angstroms;
@@ -732,7 +732,9 @@ public:
                 interEl->SetAttribute("units",_unitless_);
             } else if(inter->GetType() == Interaction::SCALAR) {
                 interEl->SetAttribute("units",_Hz_);
-            }
+			} else {
+                interEl->SetAttribute("units",_MHz_);
+			}
             interEl->SetAttribute("spin_1",spin1n);
             if(spin2n != -1) {
                 interEl->SetAttribute("spin_2",spin2n);

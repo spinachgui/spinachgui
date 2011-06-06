@@ -17,8 +17,13 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlSweep-> SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
     mCtrlMWFreq->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlModAmp->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlNPoints->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
     SetMinMax(310,330);
+
+    mCtrlMWFreq->ChangeValue(wxT("9.5"));
 }
 
 void EasySpinFrame::OnMaxMin(wxCommandEvent& e) {
@@ -68,6 +73,20 @@ void EasySpinFrame::OnTempCheck(wxCommandEvent& e)  {
     mCtrlTemp->Enable(checked);
 }
 
+void EasySpinFrame::OnModAmpCheck(wxCommandEvent& e) {
+    bool checked = mCtrlModAmpOn->GetValue();
+    mCtrlModAmp->Enable(checked);
+    mCtrlModAmpUnit->Enable(checked);
+}
+
+void EasySpinFrame::OnModAmpUnit(wxCommandEvent& e) {
+    mCtrlRangeUnit->SetSelection(mCtrlModAmpUnit->GetSelection());
+}
+
+void EasySpinFrame::OnRangeUnit(wxCommandEvent& e) {
+    mCtrlModAmpUnit->SetSelection(mCtrlRangeUnit->GetSelection());    
+}
+
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -81,6 +100,10 @@ EVT_BUTTON(ID_QBAND,EasySpinFrame::OnQBand)
 EVT_BUTTON(ID_WBAND,EasySpinFrame::OnWBand)
 
 EVT_CHECKBOX(ID_TEMPON,EasySpinFrame::OnTempCheck)
+EVT_CHECKBOX(ID_MODAMPON,EasySpinFrame::OnModAmpCheck)
+
+EVT_CHOICE(ID_MODAMPUNIT,EasySpinFrame::OnModAmpUnit)
+EVT_CHOICE(ID_RANGEUNIT ,EasySpinFrame::OnRangeUnit)
 
 END_EVENT_TABLE()
 

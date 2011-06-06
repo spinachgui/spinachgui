@@ -23,6 +23,11 @@ public:
     void OnWBand(wxCommandEvent& e);
 
     void OnTempCheck(wxCommandEvent& e);
+    void OnModAmpCheck(wxCommandEvent& e);
+
+    void OnRangeUnit(wxCommandEvent& e);
+    void OnModAmpUnit(wxCommandEvent& e);
+
 
     //Methods
     void SetMWFreq(double freq);

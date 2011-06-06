@@ -42,6 +42,7 @@ public:
     void OnOpen  (wxCommandEvent& e);
     void OnSave  (wxCommandEvent& e);
     void OnSaveAs(wxCommandEvent& e);
+    void OnExportToEasyspin(wxCommandEvent& e);
     void OnExit  (wxCommandEvent& e);
 
     //Edit Menu Event handlers

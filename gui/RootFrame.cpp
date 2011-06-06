@@ -19,6 +19,8 @@
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
 
+#include <gui/EasySpin.hpp>
+
 //Input and output filters
 #define ID_UNIT_START 12345
 #define ID_ELEMENT_START 20000
@@ -679,6 +681,11 @@ void RootFrame::OnMenu(wxMenuEvent& e) {
     }
 }
 
+void RootFrame::OnExportToEasyspin(wxCommandEvent& e) {
+    EasySpinFrame* es = new EasySpinFrame(this);
+    es->Show();
+}
+
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)
 
 EVT_MENU_OPEN(RootFrame::OnMenu)
@@ -688,6 +695,7 @@ EVT_MENU(ID_NEW   ,RootFrame::OnNew   )
 EVT_MENU(ID_OPEN  ,RootFrame::OnOpen  )
 EVT_MENU(ID_SAVE  ,RootFrame::OnSave  )
 EVT_MENU(ID_SAVEAS,RootFrame::OnSaveAs)
+EVT_MENU(ID_EASYSPIN,RootFrame::OnExportToEasyspin)
 EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
 
 //Edit Menu

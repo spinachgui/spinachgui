@@ -58,7 +58,10 @@ file(GLOB guiSources gui/*.cpp)
 file(GLOB threeDeeSources 3d/*.cpp)
 
 set(guiSources ${guiSources} ${threeDeeSources})
-set(wxformbuilderSources ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp)
+set(wxformbuilderSources
+  ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/auto/easyspin.cpp
+)
 set(xmlSources
   shared/formats/tinyxml/tinyxml.cpp 
   shared/formats/tinyxml/tinyxmlerror.cpp

@@ -12,7 +12,17 @@ public:
                   const wxPoint& pos = wxDefaultPosition,
                   const wxSize& size = wxDefaultSize,//Size( 700,500 ),
                   long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+    DECLARE_EVENT_TABLE();
 
+    void OnCentreSweep(wxCommandEvent& e);
+    void OnMaxMin(wxCommandEvent& e);
+
+
+protected:
+    wxString mStrMin;
+    wxString mStrMax;
+    wxString mStrCentre;
+    wxString mStrSweep;
 };
 
 #endif

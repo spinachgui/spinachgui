@@ -50,6 +50,8 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     //Options section
     mCtrlKnots->SetRange(2,INT_MAX);
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
+    mCtrlInterp->SetRange(2,INT_MAX);
+
 }
 
 
@@ -161,8 +163,15 @@ void EasySpinFrame::SlotAngularResUnFocus() {
     SetKnots(knots);
 }
 
+void EasySpinFrame::OnInterpCheck(wxCommandEvent& e) {
+    bool checked = mCtrlInterpOn->GetValue();
+    mCtrlInterp->Enable(checked);
+}
+
+
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
+//Experiment
 EVT_TEXT(ID_MAX,   EasySpinFrame::OnMax)
 EVT_TEXT(ID_MIN,   EasySpinFrame::OnMin)
 EVT_TEXT(ID_CENTRE,EasySpinFrame::OnCentreSweep)
@@ -178,7 +187,10 @@ EVT_CHECKBOX(ID_MODAMPON,EasySpinFrame::OnModAmpCheck)
 EVT_CHOICE(ID_MODAMPUNIT,EasySpinFrame::OnModAmpUnit)
 EVT_CHOICE(ID_RANGEUNIT ,EasySpinFrame::OnRangeUnit)
 
+//Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
+
+EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
 
 END_EVENT_TABLE()
 

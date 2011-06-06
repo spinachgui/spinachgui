@@ -34,6 +34,8 @@ public:
 
     void SlotAngularResUnFocus();
 
+    void OnInterpCheck(wxCommandEvent& e);
+
     //Methods
     void SetMWFreq(double freq);
     void SetMinMax(double min,double max);

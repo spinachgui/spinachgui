@@ -17,6 +17,12 @@ public:
     void OnCentreSweep(wxCommandEvent& e);
     void OnMaxMin(wxCommandEvent& e);
 
+    void OnXBand(wxCommandEvent& e);
+    void OnQBand(wxCommandEvent& e);
+    void OnWBand(wxCommandEvent& e);
+
+
+    void SetMWFreq(double freq);
 
 protected:
     wxString mStrMin;

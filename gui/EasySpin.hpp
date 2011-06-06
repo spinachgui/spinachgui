@@ -29,15 +29,21 @@ public:
     void OnRangeUnit(wxCommandEvent& e);
     void OnModAmpUnit(wxCommandEvent& e);
 
+    void OnKnotsChange(wxSpinEvent& e);
+    void OnAngularResText(wxCommandEvent& e);
+
+    void SlotAngularResUnFocus();
 
     //Methods
     void SetMWFreq(double freq);
     void SetMinMax(double min,double max);
+    void SetKnots(unsigned long nKnots);
 protected:
     wxString mStrMin;
     wxString mStrMax;
     wxString mStrCentre;
     wxString mStrSweep;
 };
+
 
 #endif

@@ -18,7 +18,7 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
     mCtrlMWFreq->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
-    
+    SetMinMax(310,330);
 }
 
 void EasySpinFrame::OnMaxMin(wxCommandEvent& e) {
@@ -55,7 +55,18 @@ void EasySpinFrame::SetMWFreq(double freq) {
     mCtrlMWFreq->ChangeValue(wxString() << freq);
 }
 
+void EasySpinFrame::SetMinMax(double min,double max) {
+    mCtrlMin->ChangeValue(wxString() << min);
+    mCtrlMax->ChangeValue(wxString() << max);
 
+    mCtrlCentre->ChangeValue(wxString() << (min+max)/2);
+    mCtrlSweep ->ChangeValue(wxString() << max-min);
+}
+
+void EasySpinFrame::OnTempCheck(wxCommandEvent& e)  {
+    bool checked = mCtrlTempOn->GetValue();
+    mCtrlTemp->Enable(checked);
+}
 
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
@@ -68,6 +79,8 @@ EVT_TEXT(ID_SWEEP, EasySpinFrame::OnCentreSweep)
 EVT_BUTTON(ID_XBAND,EasySpinFrame::OnXBand)
 EVT_BUTTON(ID_QBAND,EasySpinFrame::OnQBand)
 EVT_BUTTON(ID_WBAND,EasySpinFrame::OnWBand)
+
+EVT_CHECKBOX(ID_TEMPON,EasySpinFrame::OnTempCheck)
 
 END_EVENT_TABLE()
 

@@ -14,6 +14,7 @@ public:
                   long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
     DECLARE_EVENT_TABLE();
 
+    //Widget events
     void OnCentreSweep(wxCommandEvent& e);
     void OnMaxMin(wxCommandEvent& e);
 
@@ -21,9 +22,11 @@ public:
     void OnQBand(wxCommandEvent& e);
     void OnWBand(wxCommandEvent& e);
 
+    void OnTempCheck(wxCommandEvent& e);
 
+    //Methods
     void SetMWFreq(double freq);
-
+    void SetMinMax(double min,double max);
 protected:
     wxString mStrMin;
     wxString mStrMax;

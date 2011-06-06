@@ -16,7 +16,8 @@ public:
 
     //Widget events
     void OnCentreSweep(wxCommandEvent& e);
-    void OnMaxMin(wxCommandEvent& e);
+    void OnMin(wxCommandEvent& e);
+    void OnMax(wxCommandEvent& e);
 
     void OnXBand(wxCommandEvent& e);
     void OnQBand(wxCommandEvent& e);

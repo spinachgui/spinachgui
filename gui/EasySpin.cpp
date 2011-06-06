@@ -26,10 +26,29 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlMWFreq->ChangeValue(wxT("9.5"));
 }
 
-void EasySpinFrame::OnMaxMin(wxCommandEvent& e) {
+
+void EasySpinFrame::OnMin(wxCommandEvent& e) {
     double min,max;
-    mCtrlMax->GetValue().ToDouble(&min);
-    mCtrlMin->GetValue().ToDouble(&max);
+    mCtrlMax->GetValue().ToDouble(&max);
+    mCtrlMin->GetValue().ToDouble(&min);
+
+    if(min>max) {
+        max = min;
+        mCtrlMax->ChangeValue(wxString() << max);
+    }
+
+    mCtrlCentre->ChangeValue(wxString() << (min+max)/2);
+    mCtrlSweep ->ChangeValue(wxString() << max-min);
+}
+void EasySpinFrame::OnMax(wxCommandEvent& e) {
+    double min,max;
+    mCtrlMax->GetValue().ToDouble(&max);
+    mCtrlMin->GetValue().ToDouble(&min);
+
+    if(min>max) {
+        min = max;
+        mCtrlMin->ChangeValue(wxString() << min);
+    }
 
     mCtrlCentre->ChangeValue(wxString() << (min+max)/2);
     mCtrlSweep ->ChangeValue(wxString() << max-min);
@@ -39,6 +58,10 @@ void EasySpinFrame::OnCentreSweep(wxCommandEvent& e) {
     double centre,sweep;
     mCtrlCentre->GetValue().ToDouble(&centre);
     mCtrlSweep ->GetValue().ToDouble(&sweep);
+
+    if(sweep < 0) {
+        sweep = 0;
+    }
 
     mCtrlMin->ChangeValue(wxString() << centre-sweep/2);
     mCtrlMax->ChangeValue(wxString() << centre+sweep/2);
@@ -90,8 +113,8 @@ void EasySpinFrame::OnRangeUnit(wxCommandEvent& e) {
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
-EVT_TEXT(ID_MAX,   EasySpinFrame::OnMaxMin)
-EVT_TEXT(ID_MIN,   EasySpinFrame::OnMaxMin)
+EVT_TEXT(ID_MAX,   EasySpinFrame::OnMax)
+EVT_TEXT(ID_MIN,   EasySpinFrame::OnMin)
 EVT_TEXT(ID_CENTRE,EasySpinFrame::OnCentreSweep)
 EVT_TEXT(ID_SWEEP, EasySpinFrame::OnCentreSweep)
 

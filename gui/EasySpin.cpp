@@ -12,6 +12,7 @@
 
 #include <sigc++/sigc++.h>
 
+
 using namespace std;
 using namespace sigc;
 
@@ -49,11 +50,15 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
     mCtrlPhase->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
+    mOrientEditPanel = new OrientEditPanel(mPanelCystal);
+    mSizerOrient->Add(mOrientEditPanel,1,wxEXPAND,2);
+    Layout();
+    mOrientEditPanel->Enable(false);
+
     //Options section
     mCtrlKnots->SetRange(2,INT_MAX);
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
     mCtrlInterp->SetRange(2,INT_MAX);
-    
 }
 
 
@@ -173,7 +178,18 @@ void EasySpinFrame::OnInterpCheck(wxCommandEvent& e) {
 void EasySpinFrame::OnCystal(wxCommandEvent& e) {
     bool cystalChecked = mRadioCrystal->GetValue();
     mPanelCystal->Enable(cystalChecked);
+    mCtrlSpaceGroup->Enable(cystalChecked);
+    mOrientEditPanel->Enable(cystalChecked);
 }
+
+void EasySpinFrame::OnAddOrient(wxCommandEvent& e) {
+    
+}
+
+void EasySpinFrame::OnDeleteOrient(wxCommandEvent& e) {
+
+}
+
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -196,6 +212,9 @@ EVT_CHOICE(ID_RANGEUNIT ,EasySpinFrame::OnRangeUnit)
 EVT_RADIOBUTTON(ID_CRYSTAL,EasySpinFrame::OnCystal)
 EVT_RADIOBUTTON(ID_POWDER,EasySpinFrame::OnCystal)
 
+EVT_BUTTON(ID_ADD_ORIENT,   EasySpinFrame::OnAddOrient)
+EVT_BUTTON(ID_DELETE_ORIENT,EasySpinFrame::OnDeleteOrient)
+
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
 
@@ -212,7 +231,7 @@ void loadSpaceGroups() {
 
     fstream fin("data/spacegroups.txt",ios::in);
     if(!fin.is_open()) {
-        //wxLogError(wxT("Could not open data/spacegroups.txt, no spacegroups will be available\n"));
+        wxLogError(wxT("Could not open data/spacegroups.txt, no spacegroups will be available\n"));
         return;
     }
 
@@ -222,10 +241,15 @@ void loadSpaceGroups() {
         //wstrings need to be used rather than strings
         string symbol;
         fin >> symbol;
+        if(symbol == "") {
+            //Ignore blank lines
+            continue;
+        }
         gSpaceGroups.push_back(wxString(symbol.c_str(),wxConvUTF8));
+        count++;
     }
-    if(count < 230) {
-        wxLogError(wxT("Could not open data/spacegroups.txt, no spacegroups will be available\n"));
+    if(count != 230) {
+        wxLogError(wxString() << wxT("Expecting 230 entries in data/spacegroups.txt, found\n") << count);
         return;
     }
 

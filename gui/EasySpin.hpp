@@ -3,6 +3,8 @@
 #define __EASYSPIN_FRAME_HPP__
 
 #include <auto/easyspin.h>
+#include <shared/orientation.hpp>
+#include <gui/OrientationEdit.hpp>
 
 class EasySpinFrame : public EasySpinFrameBase {
 public:
@@ -10,7 +12,7 @@ public:
                   wxWindowID id = wxID_ANY,
                   const wxString& title = wxT("Export to Easyspin"),
                   const wxPoint& pos = wxDefaultPosition,
-                  const wxSize& size = wxDefaultSize,//Size( 700,500 ),
+                  const wxSize& size = wxSize( 870,550 ),
                   long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
     DECLARE_EVENT_TABLE();
 
@@ -31,6 +33,10 @@ public:
 
     void OnCystal(wxCommandEvent& e);
 
+    void OnAddOrient(wxCommandEvent& e);
+    void OnDeleteOrient(wxCommandEvent& e);
+
+
     //Options Events
     void OnKnotsChange(wxSpinEvent& e);
     void OnAngularResText(wxCommandEvent& e);
@@ -48,6 +54,10 @@ protected:
     wxString mStrMax;
     wxString mStrCentre;
     wxString mStrSweep;
+
+    std::vector<SpinXML::Orientation> mOrients;
+
+    OrientEditPanel* mOrientEditPanel;
 };
 
 

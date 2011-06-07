@@ -682,6 +682,7 @@ void RootFrame::OnMenu(wxMenuEvent& e) {
 }
 
 void RootFrame::OnExportToEasyspin(wxCommandEvent& e) {
+    //TODO: Does this leak memory or will RootFrame clean up?
     EasySpinFrame* es = new EasySpinFrame(this);
     es->Show();
 }

@@ -14,7 +14,7 @@ public:
                   long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
     DECLARE_EVENT_TABLE();
 
-    //Widget events
+    //Exp events
     void OnCentreSweep(wxCommandEvent& e);
     void OnMin(wxCommandEvent& e);
     void OnMax(wxCommandEvent& e);
@@ -29,6 +29,9 @@ public:
     void OnRangeUnit(wxCommandEvent& e);
     void OnModAmpUnit(wxCommandEvent& e);
 
+    void OnCystal(wxCommandEvent& e);
+
+    //Options Events
     void OnKnotsChange(wxSpinEvent& e);
     void OnAngularResText(wxCommandEvent& e);
 

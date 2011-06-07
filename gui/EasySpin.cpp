@@ -47,11 +47,13 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
         mCtrlSpaceGroup->Append(spaceGroup);
     }
 
+    mCtrlPhase->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
     //Options section
     mCtrlKnots->SetRange(2,INT_MAX);
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
     mCtrlInterp->SetRange(2,INT_MAX);
-
+    
 }
 
 
@@ -168,6 +170,10 @@ void EasySpinFrame::OnInterpCheck(wxCommandEvent& e) {
     mCtrlInterp->Enable(checked);
 }
 
+void EasySpinFrame::OnCystal(wxCommandEvent& e) {
+    bool cystalChecked = mRadioCrystal->GetValue();
+    mPanelCystal->Enable(cystalChecked);
+}
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -186,6 +192,9 @@ EVT_CHECKBOX(ID_MODAMPON,EasySpinFrame::OnModAmpCheck)
 
 EVT_CHOICE(ID_MODAMPUNIT,EasySpinFrame::OnModAmpUnit)
 EVT_CHOICE(ID_RANGEUNIT ,EasySpinFrame::OnRangeUnit)
+
+EVT_RADIOBUTTON(ID_CRYSTAL,EasySpinFrame::OnCystal)
+EVT_RADIOBUTTON(ID_POWDER,EasySpinFrame::OnCystal)
 
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)

@@ -36,7 +36,7 @@ public:
     void OnAddOrient(wxCommandEvent& e);
     void OnDeleteOrient(wxCommandEvent& e);
 
-
+    void OnShowSpaceGroups(wxCommandEvent& e);
     //Options Events
     void OnKnotsChange(wxSpinEvent& e);
     void OnAngularResText(wxCommandEvent& e);
@@ -49,6 +49,7 @@ public:
     void SetMWFreq(double freq);
     void SetMinMax(double min,double max);
     void SetKnots(unsigned long nKnots);
+    void RepopulateCrystalOrients();
 protected:
     wxString mStrMin;
     wxString mStrMax;

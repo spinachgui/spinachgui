@@ -9,12 +9,14 @@
 #include <wx/log.h>
 #include <shared/foreach.hpp>
 #include <climits>
+#include <gui/Spacegroup.hpp>
 
 #include <sigc++/sigc++.h>
 
 
 using namespace std;
 using namespace sigc;
+using namespace SpinXML;
 
 void loadSpaceGroups();
 vector<wxString> gSpaceGroups;
@@ -43,10 +45,6 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     SetKnots(2);
 
     mCtrlMWFreq->ChangeValue(wxT("9.5"));
-
-    foreach(wxString spaceGroup,gSpaceGroups) {
-        mCtrlSpaceGroup->Append(spaceGroup);
-    }
 
     mCtrlPhase->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
@@ -178,16 +176,30 @@ void EasySpinFrame::OnInterpCheck(wxCommandEvent& e) {
 void EasySpinFrame::OnCystal(wxCommandEvent& e) {
     bool cystalChecked = mRadioCrystal->GetValue();
     mPanelCystal->Enable(cystalChecked);
-    mCtrlSpaceGroup->Enable(cystalChecked);
+    mCtrlSpaceGroupButton->Enable(cystalChecked);
+    mCtrlSpaceGroupTxt->Enable(cystalChecked);
     mOrientEditPanel->Enable(cystalChecked);
 }
 
+void EasySpinFrame::RepopulateCrystalOrients() {
+    mCtrlOrients->Clear();
+    foreach(Orientation o,mOrients) {
+        //mListCtrl->Append();
+    }
+}
+
 void EasySpinFrame::OnAddOrient(wxCommandEvent& e) {
-    
+    mOrients.push_back(Orientation());
 }
 
 void EasySpinFrame::OnDeleteOrient(wxCommandEvent& e) {
 
+}
+
+void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
+    //TODO: Memory leak?
+    SpaceGroupDialog* spaceGroupDialog = new SpaceGroupDialog(this);
+    spaceGroupDialog->ShowModal();
 }
 
 
@@ -214,6 +226,9 @@ EVT_RADIOBUTTON(ID_POWDER,EasySpinFrame::OnCystal)
 
 EVT_BUTTON(ID_ADD_ORIENT,   EasySpinFrame::OnAddOrient)
 EVT_BUTTON(ID_DELETE_ORIENT,EasySpinFrame::OnDeleteOrient)
+
+EVT_BUTTON(ID_SPACEGROUP_BUTTON,EasySpinFrame::OnShowSpaceGroups)
+
 
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)

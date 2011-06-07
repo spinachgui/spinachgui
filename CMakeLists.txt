@@ -44,7 +44,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ggdb  -Wno-write-string
 ############################################################
 # Do automatic library detection
 
-find_package(wxWidgets COMPONENTS gl adv aui REQUIRED)
+find_package(wxWidgets COMPONENTS gl adv aui html REQUIRED)
 find_package(Boost REQUIRED program_options filesystem unit_test_framework) 
 #set(Boost_INCLUDE_DIRS /usr/shared/include)
 set(Boost_LIBRARIES  -lboost_program_options -lboost_unit_test_framework -lboost_filesystem)
@@ -89,6 +89,12 @@ add_library(spinxml STATIC ${xmlSources} ${sharedSources} ${formatSources})
 # GUI code build here
 
 add_executable(SpinachGUI ${guiSources} ${wxformbuilderSources})
+target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+
+############################################################
+# Easyspin standalone app here
+
+add_executable(EasySpinGUI ${wxformbuilderSources})
 target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################

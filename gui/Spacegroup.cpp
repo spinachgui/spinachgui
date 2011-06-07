@@ -15,11 +15,14 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <vector>
 
 #include <shared/formats/spirit_common.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/karma.hpp>
+
+using namespace std;
 
 namespace karma=boost::spirit::karma;
 
@@ -34,12 +37,41 @@ using boost::spirit::karma::space;
 using boost::spirit::karma::_1;
 
 template <typename OutputIterator>
+struct table_grammar 
+    : karma::grammar<OutputIterator,vector<vector<int> >()>
+{
+    table_grammar()
+        : table_grammar::base_type(table)
+    {
+        i = 0;
+        table = "<html><body><table><tr>" << *row << "</tr></table></body></html>";
+        row = "<td>" << *("<td>" << int_ << "</td>") << "</td>";
+    }
+
+    int i;
+
+    rule<OutputIterator,vector<vector<int> >()> table;
+    rule<OutputIterator,vector<int>()> row;
+};
+
+template <typename OutputIterator>
 bool generateHTML(OutputIterator sink) {
-    return generate(sink,lit("<html></html>"));
+    vector<int> v;
+    v.push_back(3);
+    v.push_back(2);
+    v.push_back(8);
+    vector<vector<int> > vv;
+    vv.push_back(v);
+    vv.push_back(v);
+    vv.push_back(v);
+
+    table_grammar<OutputIterator> g;
+    return generate(sink,g,vv);
 }
 
 using namespace std;
 
+wxString testHTML;
 vector<wxString> gCystalSystemNames;
 
 SpaceGroupDialog::SpaceGroupDialog( wxWindow* parent,
@@ -65,11 +97,12 @@ SpaceGroupDialog::SpaceGroupDialog( wxWindow* parent,
 
         wxHtmlWindow* htmlWindow = new wxHtmlWindow(panel, wxID_ANY);
         wxString filename  =  wxT("data/") + cystalSystemName + wxT(".html");
-        htmlWindow->LoadPage(filename);
+        htmlWindow->SetPage(testHTML);
         innerSizer->Add(htmlWindow, 1, wxALL|wxEXPAND, 5);
 
         mNotebook->AddPage(panel,cystalSystemName,false);
     }
+
 	this->Layout();
 	this->Centre( wxBOTH );
 }
@@ -88,6 +121,10 @@ __SpacegroupInit::__SpacegroupInit() {
     std::string generated;
     std::back_insert_iterator<std::string> sink(generated);
     generateHTML(sink);
+
+    cout << generated << endl;
+
+    testHTML = wxString(generated.c_str(),wxConvUTF8);
 }
 static __SpacegroupInit __spacegroupInit;
 

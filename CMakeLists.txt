@@ -62,6 +62,20 @@ set(wxformbuilderSources
   ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/auto/easyspin.cpp
 )
+
+set(easyspinSources   #For the standalone easyspin version
+  gui/EasySpin.cpp
+  gui/TextCtrlFocus.cpp
+  gui/OrientationEdit.cpp
+  gui/Spacegroup.cpp
+  easyspin/EasySpinStandalone.cpp
+  #These are pulled in because of SpinachGUI.cpp from
+  #wxFormBuilder. We could probably get rid of them with we modualised
+  #more
+  gui/LogSlider.cpp
+  gui/SpinChoice.cpp
+)
+
 set(xmlSources
   shared/formats/tinyxml/tinyxml.cpp 
   shared/formats/tinyxml/tinyxmlerror.cpp
@@ -94,8 +108,8 @@ target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidget
 ############################################################
 # Easyspin standalone app here
 
-add_executable(EasySpinGUI ${wxformbuilderSources})
-target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+add_executable(EasySpinGUI ${easyspinSources} ${wxformbuilderSources})
+target_link_libraries(EasySpinGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
 # Tests specified here

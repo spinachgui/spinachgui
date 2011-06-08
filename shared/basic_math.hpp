@@ -56,7 +56,10 @@ namespace SpinXML {
     std::complex<F> acos(complex<F> z) {
         return log(z + complex<F>(0,1) * sqrt(complex<F>(1,0)-z*z))/complex<F>(0,1);
     }
+    
 
+    ///Convert a matrix3d to a matrix3f
+    Matrix3f Matrix3d2Matrix3f(const Matrix3d& mat);
 }
 
 #endif

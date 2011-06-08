@@ -1,42 +1,12 @@
 #include <gui/OrientationEdit.hpp>
 
+#include <iostream>
+#include <wx/log.h>
+#include <shared/basic_math.hpp>
 
 using namespace std;
 using namespace SpinXML;
 
-#include <iostream>
-#include <wx/log.h>
-#include <shared/basic_math.hpp>
-#include <gui/Display3D.hpp>
-#include <3d/displaySettings.hpp>
-#include <3d/glmode.hpp>
-
-
-class OrientDisplay : public Display3D {
-public:
-    OrientDisplay(wxWindow* parent) 
-        : Display3D(parent) {
-    }
-protected:
-
-    virtual void DrawScene() {
-        std::cout << "Drawing a frame" << std::endl;
-        
-        lighting.On();
-        gluSphere(GetQuadric(),1.0,30,30);
-        lighting.Off();
-    }
-    virtual void DrawForeground() {
-    }
-
-    virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) {
-    }
-        
-private:
-    static GLLighting lighting;
-};
-
-GLLighting OrientDisplay::lighting;
 
 
 
@@ -54,7 +24,6 @@ OrientEditPanel::OrientEditPanel(wxWindow* parent,
                                  long style)
     : OrientEditPanelBase(parent,id,pos,size,style),mLoading(false),mDirty(false) {
     Enable(false);
-    GetSizer()->Insert(0,new OrientDisplay(this),1,wxEXPAND,5);
 }
 
 void OrientEditPanel::SetOrient(const Orientation& orient) {

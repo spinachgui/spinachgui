@@ -39,6 +39,21 @@ void Camera::Rotate(float deltaX,float deltaY) {
     float norm=sqrt(dotProduct);
     mTransform = Affine3f(AngleAxisf(dotProduct/300,Vector3f(deltaY/norm,deltaX/norm,0))).matrix() * mTransform;
 }
+
+void Camera::SetRotation(Eigen::Matrix3f& rotation) {
+    mTransform(0,0) = rotation(0,0);
+    mTransform(0,1) = rotation(0,1);
+    mTransform(0,2) = rotation(0,2);
+                                  
+    mTransform(1,0) = rotation(1,0);
+    mTransform(1,1) = rotation(1,1);
+    mTransform(1,2) = rotation(1,2);
+                                  
+    mTransform(2,0) = rotation(2,0);
+    mTransform(2,1) = rotation(2,1);
+    mTransform(2,2) = rotation(2,2);
+}
+
 void Camera::Set(int width,int height) const {
     glMatrixMode(GL_PROJECTION);
     //NB: glOrtho multiplies the current matrix so glLoadIdentity is

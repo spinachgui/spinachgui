@@ -6,7 +6,6 @@
 #include <shared/spinsys.hpp>
 #include <sigc++/sigc++.h>
 
-
 //============================================================//
 // OrientEditPanel
 

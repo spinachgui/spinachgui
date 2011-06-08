@@ -36,3 +36,18 @@ Vector3d SpinXML::MakeVector3d(Vector4d v) {
     return Vector3d(v.x(),v.y(),v.z());
 }
 
+Matrix3f SpinXML::Matrix3d2Matrix3f(const Matrix3d& mat) {
+    Matrix3f matf;
+    matf(0,0) = mat(0,0);
+    matf(0,1) = mat(0,1);
+    matf(0,2) = mat(0,2);
+                                  
+    matf(1,0) = mat(1,0);
+    matf(1,1) = mat(1,1);
+    matf(1,2) = mat(1,2);
+                                  
+    matf(2,0) = mat(2,0);
+    matf(2,1) = mat(2,1);
+    matf(2,2) = mat(2,2);
+    return matf;
+}

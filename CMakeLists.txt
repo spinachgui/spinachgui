@@ -61,13 +61,17 @@ set(guiSources ${guiSources} ${threeDeeSources})
 set(wxformbuilderSources
   ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/auto/easyspin.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/auto/orientdialog.cpp
 )
 
 set(easyspinSources   #For the standalone easyspin version
+  ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/auto/easyspin.cpp
   gui/EasySpin.cpp
   gui/TextCtrlFocus.cpp
   gui/OrientationEdit.cpp
   gui/Spacegroup.cpp
+  gui/OrientDisplay.cpp
   gui/Display3D.cpp
   3d/camera.cpp
   3d/glmode.cpp
@@ -79,6 +83,19 @@ set(easyspinSources   #For the standalone easyspin version
   gui/LogSlider.cpp
   gui/SpinChoice.cpp
 )
+
+set(orientDialogSources   #For the standalone easyspin version
+  ${CMAKE_CURRENT_BINARY_DIR}/auto/orientdialog.cpp
+  gui/TextCtrlFocus.cpp
+  gui/OrientDialog2.cpp
+  gui/OrientDisplay.cpp
+  gui/Display3D.cpp
+  3d/camera.cpp
+  3d/glmode.cpp
+  3d/displaySettings.cpp
+  orientdialog/app.cpp
+)
+
 
 set(xmlSources
   shared/formats/tinyxml/tinyxml.cpp 
@@ -112,8 +129,14 @@ target_link_libraries(SpinachGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidget
 ############################################################
 # Easyspin standalone app here
 
-add_executable(EasySpinGUI ${easyspinSources} ${wxformbuilderSources})
+add_executable(EasySpinGUI ${easyspinSources})
 target_link_libraries(EasySpinGUI ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
+
+############################################################
+# Orient Dialog Standalone
+
+add_executable(OrientDialog ${orientDialogSources})
+target_link_libraries(OrientDialog ${Boost_LIBRARIES} spinxml sigc-2.0  ${wxWidgets_LIBRARIES} GL)
 
 ############################################################
 # Tests specified here

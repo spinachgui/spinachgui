@@ -1,5 +1,4 @@
 
-#include <gui/SpinachApp.hpp>
 #include <gui/Display3D.hpp>
 #include <wx/dcclient.h>
 #include <wx/image.h>
@@ -9,9 +8,6 @@
 #include <shared/foreach.hpp>
 
 
-#include <3d/glgeometry.hpp>
-#include <3d/glmode.hpp>
-#include <3d/camera.hpp>
 
 using namespace std;
 using namespace sigc;

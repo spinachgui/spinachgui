@@ -2,6 +2,9 @@
 #ifndef _3DDISPLAY_H
 #define _3DDISPLAY_H
 
+#include <3d/glgeometry.hpp>
+#include <3d/glmode.hpp>
+#include <3d/camera.hpp>
 #include <wx/glcanvas.h>
 #include <sigc++/sigc++.h>
 

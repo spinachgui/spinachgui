@@ -262,6 +262,8 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
 
 void EasySpinFrame::OnMin(wxCommandEvent& e) {
+    e.Skip();
+
     double min,max;
     mCtrlMax->GetValue().ToDouble(&max);
     mCtrlMin->GetValue().ToDouble(&min);
@@ -275,6 +277,8 @@ void EasySpinFrame::OnMin(wxCommandEvent& e) {
     mCtrlSweep ->ChangeValue(wxString() << max-min);
 }
 void EasySpinFrame::OnMax(wxCommandEvent& e) {
+    e.Skip();
+
     double min,max;
     mCtrlMax->GetValue().ToDouble(&max);
     mCtrlMin->GetValue().ToDouble(&min);
@@ -289,6 +293,8 @@ void EasySpinFrame::OnMax(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnCentreSweep(wxCommandEvent& e) {
+    e.Skip();
+
     double centre,sweep;
     mCtrlCentre->GetValue().ToDouble(&centre);
     mCtrlSweep ->GetValue().ToDouble(&sweep);
@@ -326,31 +332,42 @@ void EasySpinFrame::SetMinMax(double min,double max) {
 }
 
 void EasySpinFrame::OnTempCheck(wxCommandEvent& e)  {
+    e.Skip();
+
     bool checked = mCtrlTempOn->GetValue();
     mCtrlTemp->Enable(checked);
 }
 
 void EasySpinFrame::OnModAmpCheck(wxCommandEvent& e) {
+    e.Skip();
+
     bool checked = mCtrlModAmpOn->GetValue();
     mCtrlModAmp->Enable(checked);
     mCtrlModAmpUnit->Enable(checked);
 }
 
 void EasySpinFrame::OnModAmpUnit(wxCommandEvent& e) {
+    e.Skip();
+
     mCtrlRangeUnit->SetSelection(mCtrlModAmpUnit->GetSelection());
 }
 
 void EasySpinFrame::OnRangeUnit(wxCommandEvent& e) {
+    e.Skip();
+
     mCtrlModAmpUnit->SetSelection(mCtrlRangeUnit->GetSelection());    
 }
 
 void EasySpinFrame::SetKnots(unsigned long nKnots) {
+
     mCtrlKnots->SetValue(nKnots);
     double angularRes = 90.0 / nKnots;
     mCtrlAngularRes->ChangeValue(wxString() << angularRes);
 }
 
 void EasySpinFrame::OnKnotsChange(wxSpinEvent& e) {
+    e.Skip();
+
     SetKnots(mCtrlKnots->GetValue());
 }
 
@@ -404,6 +421,7 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
+    e.Skip();
     EasySpinInput easySpinInput;
 
     //Collect values from the GUI
@@ -485,6 +503,9 @@ EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
 
 //Other
 EVT_BUTTON(ID_TMP_GEN, EasySpinFrame::OnGenerate)
+
+//Catch everything and trigger a regeneration
+EVT_TEXT(wxID_ANY, EasySpinFrame::OnGenerate)
 
 END_EVENT_TABLE()
 

@@ -406,8 +406,12 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
 void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     EasySpinInput easySpinInput;
 
-    //Collect these from the GUI
-    easySpinInput.setCentreSweep(300,20);
+    //Collect values from the GUI
+    double centre,sweep;
+    mCtrlCentre->GetValue().ToDouble(&centre);
+    mCtrlSweep->GetValue().ToDouble(&sweep);
+    easySpinInput.setCentreSweep(centre,sweep);
+
     easySpinInput.setMWFreq(9.5);
     easySpinInput.setTemperature(70);
     easySpinInput.setNPoints(1024);

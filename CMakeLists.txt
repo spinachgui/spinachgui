@@ -68,6 +68,10 @@ set(easyspinSources   #For the standalone easyspin version
   gui/TextCtrlFocus.cpp
   gui/OrientationEdit.cpp
   gui/Spacegroup.cpp
+  gui/Display3D.cpp
+  3d/camera.cpp
+  3d/glmode.cpp
+  3d/displaySettings.cpp
   easyspin/EasySpinStandalone.cpp
   #These are pulled in because of SpinachGUI.cpp from
   #wxFormBuilder. We could probably get rid of them with we modualised

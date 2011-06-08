@@ -2,12 +2,11 @@
 
 #include <gui/InterDisplaySettings.hpp>
 #include <gui/RightClickMenu.hpp>
-#include <3d/glgeometry.hpp>
-#include <3d/displaySettings.hpp>
-#include <gui/Display3D.hpp>
 #include <gui/SpinachApp.hpp>
 #include <gui/SpinGrid.hpp>
 #include <gui/SpinInteractionEdit.hpp>
+
+#include <gui/SpinsysDisplay3D.hpp>
 
 #include <shared/spinsys.hpp>
 
@@ -39,115 +38,6 @@ wxString GetExtension(const wxString& filename) {
     wxString ext=(dot != wxNOT_FOUND ? filename.Mid(dot+1) : wxT(""));
     return ext;
 }
-
-//============================================================//
-// Our spin system display
-
-class SpinSysDisplay3D : public Display3D {
-public:
-    SpinSysDisplay3D(wxWindow* parent) 
-        : Display3D(parent),
-          mElectronScene(GetCamera()),
-          mElectronInterDrawer(GetCamera()) {
-        
-        GetRawSS()->sigReloaded.connect(mem_fun(this,&Display3D::ResetView));
-                
-        //Make sure that if anything changes we redraw the scene
-        SpinSystem::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinChange));
-        Spin::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotInterChange));
-        Interaction::sigAnyChange.connect(mem_fun(this,&SpinSysDisplay3D::SlotSpinSysChange));
-    }
-    void SlotSpinChange() {Refresh();}
-    void SlotInterChange() {Refresh();}
-    void SlotSpinSysChange() {Refresh();}
-protected:
-    virtual void DrawScene() {
-        lighting.On();
-
-        mMolScene.Draw();
-
-        translucent.On();
-        mInteractionScene.Draw();
-        translucent.Off();
-
-        //Also draw the interactions as wireframes
-        wire.On();
-        mInteractionScene.Draw();
-        wire.Off();
-
-        lighting.Off();
-
-        StartPicking();
-        mMolScene.Draw();
-        mInteractionScene.Draw();
-        StopPicking();
-    }
-    virtual void DrawForeground() {
-        int mWidth, mHeight;
-        GetClientSize(&mWidth,&mHeight);
-
-        glColor3f(0.0,0.0,0.0);
-
-        lighting.On();
-
-        glPushMatrix();
-        //Place the electron tensors along the top of the screne
-        //starting from the left
-        glTranslatef(40,mHeight-40,0);
-        mElectronScene.Draw();
-
-        translucent.On();
-        mElectronInterDrawer.Draw();
-        translucent.Off();
-
-        wire.On();
-        mElectronInterDrawer.Draw();
-        wire.Off();
-
-        lighting.Off();         
-
-        glPopMatrix();
-
-        lighting.Off();
-    }
-
-    virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) {
-        if(stackLength == 0) {
-            SetHover(NULL);
-            return;
-        }
-        Spin* hover;
-        Spin* newHover;
-        switch(ClosestName[0]) {
-        case NAME_MONO_INTERACTIONS:
-            cout << "Moused over a spin" << endl;
-        case NAME_SPINS:
-            hover = GetHover();
-            newHover = GetRawSS()->GetSpin(ClosestName[stackLength-1]);
-            if(hover != newHover) {
-                SetHover(newHover);
-            }
-            break;
-        default:
-            SetHover(NULL);
-        }
-    }
-        
-private:
-    //These nodes can be rotated and translated  with the mouse
-    static GLLighting lighting;
-    static GLTranslucent translucent;
-    static GLWire wire;
-
-    SpinSysScene     mMolScene;
-    InteractionScene mInteractionScene;
-    ElectronScene    mElectronScene;
-    ElectronInterDrawer mElectronInterDrawer;
-};
-GLLighting    SpinSysDisplay3D::lighting;
-GLTranslucent SpinSysDisplay3D::translucent;
-GLWire        SpinSysDisplay3D::wire;
-
 
 //============================================================//
 // Reference frame tree view
@@ -310,7 +200,7 @@ void RootFrame::InitFrame() {
     mInterSizePanel= new InterDisplaySettingsPanel(this);
     mSpinGrid      = new SpinGrid(this);
     mSpinInterEdit = new SpinInterEditPanel(this);
-    mDisplay3D     = new SpinSysDisplay3D(this);
+    mDisplay3D     = new SpinsysDisplay3D(this);
     mFrameTree     = new FrameTree(this);
 
     // add the panes to the manager

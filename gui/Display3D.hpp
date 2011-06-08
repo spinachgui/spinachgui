@@ -24,10 +24,8 @@ public:
     void OnPaint(wxPaintEvent& e);
     void OnMouseMove(wxMouseEvent& e);
     void OnWheel(wxMouseEvent& e);
-    void OnRightClick(wxMouseEvent& e);
     void OnLeftClick(wxMouseEvent& e);
     void OnResize(wxSizeEvent& e);
-    void OnDeleteSpinHover(wxCommandEvent& e);
 
     void ResetView();
 
@@ -39,6 +37,12 @@ public:
     void StartPicking();
     void StopPicking();
     Camera* GetCamera() {return mCamera;}
+
+    //We only need this because binding Refresh directly in a signal
+    //is difficult due to the default arguments
+    void Redraw(){Refresh();}
+
+    bool IsDragging(){return mDraging;}
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -53,9 +57,6 @@ protected:
     virtual void DrawScene() = 0;
     virtual void DrawForeground() = 0;
 
-    //We only need this because binding Refresh directly in a signal
-    //is difficult due to the default arguments
-    void Redraw(){Refresh();}
 private:
 
 

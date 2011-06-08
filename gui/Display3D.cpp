@@ -1,7 +1,6 @@
 
 #include <gui/SpinachApp.hpp>
 #include <gui/Display3D.hpp>
-#include <gui/RightClickMenu.hpp>
 #include <wx/dcclient.h>
 #include <wx/image.h>
 #include <wx/dcmemory.h>
@@ -45,7 +44,6 @@ Display3D::Display3D(wxWindow* parent)
 
     mGLContext=NULL;
     mGLEnabled=false;
-    sig3DChange.connect(sigc::mem_fun(this,&Display3D::Redraw));
 }
 
 void Display3D::ResetView() {
@@ -102,7 +100,6 @@ void Display3D::ChangeViewport() {
     glViewport(0,0,mWidth,mHeight);
 }
 
-
 void Display3D::OnMouseMove(wxMouseEvent& e) {
     if(e.Dragging()) {
 	mDraging = true;
@@ -130,47 +127,19 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
 }
 
 
+
 void Display3D::OnWheel(wxMouseEvent& e) {
     mCamera->DeltaZoom(-(0.001)*e.GetWheelRotation()/e.GetWheelDelta());
     Refresh();
 }
 
-void Display3D::OnRightClick(wxMouseEvent& e) {
-    if(!mDraging) {
-	if(GetHover()!=NULL) {
-	    RightClickMenu* menu = new RightClickMenu(this);
-	    menu->Build();
-	    PopupMenu(menu);
-	    delete menu;
-	}
-    }
-}
 
 void Display3D::OnLeftClick(wxMouseEvent& e) {
     if(mBandBoxOn) {
-	cout << "Band Box Up" << endl;
-	mBandBoxOn = false;
-	return;
+        cout << "Band Box Up" << endl;
+        mBandBoxOn = false;
+        return;
     }
-    if(mDraging) {
-	return;
-    }
-
-    if(GetHover() == NULL) {
-	ClearSelection();
-	return;
-    }
-
-    if(!e.ShiftDown()) {
-	SetSelection(GetHover());
-    } else {
-	if(GetSelection().find(GetHover()) == GetSelection().end()) {
-	    AddSelection(GetHover());
-	} else {
-	    RemoveSelection(GetHover());
-	}
-    }
-
 }
 
 void Display3D::OnResize(wxSizeEvent& e) {
@@ -182,9 +151,6 @@ void Display3D::OnResize(wxSizeEvent& e) {
     }
 }
 
-
-void Display3D::OnDeleteSpinHover(wxCommandEvent& e) {
-}
 
 void Display3D::Set2DView() {
     int width,height;
@@ -266,22 +232,22 @@ void Display3D::StopPicking() {
     GLuint* closestNames=NULL;
     GLuint closestNameCount=0;
     if(hits <= 0) {
-	OnMouseOver3D(0,NULL);
-	return;
+        OnMouseOver3D(0,NULL);
+        return;
     }
 
     for(long i=0;i<hits;i++) {
-	GLuint name_count = *(buff++);
-	float d1=float(*(buff++))/0x7fffffff;
-	float d2=float(*(buff++))/0x7fffffff;
-	float thisDistance=d1<d2 ? d1 : d2;
-	if(closestDistance > thisDistance) {
-	    closestDistance=thisDistance;
-	    closestNames=buff;
-	    closestNameCount=name_count;
-	}
-	buff+=name_count;
-	cout << endl;
+        GLuint name_count = *(buff++);
+        float d1=float(*(buff++))/0x7fffffff;
+        float d2=float(*(buff++))/0x7fffffff;
+        float thisDistance=d1<d2 ? d1 : d2;
+        if(closestDistance > thisDistance) {
+            closestDistance=thisDistance;
+            closestNames=buff;
+            closestNameCount=name_count;
+        }
+        buff+=name_count;
+        cout << endl;
     }
     OnMouseOver3D(closestNameCount,closestNames);
 }
@@ -291,7 +257,6 @@ BEGIN_EVENT_TABLE(Display3D,wxGLCanvas)
 EVT_PAINT     (                       Display3D::OnPaint)
 EVT_MOTION    (                       Display3D::OnMouseMove)
 EVT_MOUSEWHEEL(                       Display3D::OnWheel)
-EVT_RIGHT_UP  (                       Display3D::OnRightClick)
 EVT_LEFT_UP   (                       Display3D::OnLeftClick)
 EVT_SIZE      (                       Display3D::OnResize)
 EVT_ERASE_BACKGROUND(Display3D::OnEraseBackground)

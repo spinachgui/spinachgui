@@ -3,9 +3,27 @@
 #include <iostream>
 #include <wx/log.h>
 #include <shared/basic_math.hpp>
+#include <gui/Display3D.hpp>
 
 using namespace std;
 using namespace SpinXML;
+
+class OrientDisplay : public Display3D {
+public:
+    OrientDisplay(wxWindow* parent) 
+        : Display3D(parent) {
+    }
+protected:
+    virtual void DrawScene() {
+    }
+    virtual void DrawForeground() {
+    }
+
+    virtual void OnMouseOver3D(int stackLength,const GLuint* ClosestName) {
+    }
+        
+private:
+};
 
 DEFINE_EVENT_TYPE(EVT_ORIENT_EDIT)
 
@@ -23,6 +41,7 @@ OrientEditPanel::OrientEditPanel(wxWindow* parent,
                                  long style)
     : OrientEditPanelBase(parent,id,pos,size,style),mLoading(false),mDirty(false) {
     Enable(false);
+    GetSizer()->Insert(0,new OrientDisplay(this),1,wxEXPAND,5);
 }
 
 void OrientEditPanel::SetOrient(const Orientation& orient) {

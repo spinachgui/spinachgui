@@ -412,16 +412,37 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     mCtrlSweep->GetValue().ToDouble(&sweep);
     easySpinInput.setCentreSweep(centre,sweep);
 
-    easySpinInput.setMWFreq(9.5);
-    easySpinInput.setTemperature(70);
-    easySpinInput.setNPoints(1024);
-    easySpinInput.setHarmonic(1);
+    double mwFreq;
+    mCtrlMWFreq->GetValue().ToDouble(&mwFreq);
+    easySpinInput.setMWFreq(mwFreq);
+
+    if(mCtrlTempOn->GetValue()) {
+        double temperature;
+        mCtrlTemp->GetValue().ToDouble(&temperature);
+        easySpinInput.setTemperature(temperature);
+    }
+
+    unsigned long nPoints;
+    mCtrlNPoints->GetValue().ToULong(&nPoints);
+    easySpinInput.setNPoints(nPoints);
+
+    easySpinInput.setHarmonic(mCtrlHarmonic->GetSelection());
+
     easySpinInput.setMode(EasySpinInput::PARALLEL);
-    easySpinInput.setSpaceGroup(1);
-    easySpinInput.setMWPhase(0);
-    easySpinInput.setMethod(EasySpinInput::PERT1);
-    easySpinInput.setNKnots(8);
-    easySpinInput.setInterpolate(3);
+
+    if(mRadioCrystal->GetValue()) {
+        easySpinInput.setSpaceGroup(1);
+    }
+
+    double mwPhase;
+    mCtrlPhase->GetValue().ToDouble(&mwPhase);
+    easySpinInput.setMWPhase(mwPhase);
+
+    easySpinInput.setMethod(EasySpinInput::MATRIX);
+
+    easySpinInput.setNKnots(mCtrlKnots->GetValue());
+    easySpinInput.setInterpolate(mCtrlInterp->GetValue());
+
     easySpinInput.setOutput(EasySpinInput::SUMMED);
 
     //Do code generation

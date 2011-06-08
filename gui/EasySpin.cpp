@@ -58,7 +58,7 @@ struct EasySpinInput {
     // Experiment
 
 public:
-    void setCentreWidth(double centre,double sweep) {
+    void setCentreSweep(double centre,double sweep) {
         mCentre = centre;
         mSweep = sweep;
     }
@@ -394,7 +394,7 @@ void EasySpinFrame::OnAddOrient(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnDeleteOrient(wxCommandEvent& e) {
-
+    
 }
 
 void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
@@ -407,7 +407,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     EasySpinInput easySpinInput;
 
     //Collect these from the GUI
-    easySpinInput.setCentreWidth(300,20);
+    easySpinInput.setCentreSweep(300,20);
     easySpinInput.setMWFreq(9.5);
     easySpinInput.setTemperature(70);
     easySpinInput.setNPoints(1024);

@@ -6,10 +6,12 @@
 #include <gui/NumericValidators.hpp>
 #include <fstream>
 #include <vector>
+#include <map>
 #include <wx/log.h>
 #include <shared/foreach.hpp>
 #include <climits>
 #include <gui/Spacegroup.hpp>
+#include <boost/optional.hpp>
 
 #include <sigc++/sigc++.h>
 
@@ -17,6 +19,205 @@
 using namespace std;
 using namespace sigc;
 using namespace SpinXML;
+using boost::optional;
+
+//================================================================================//
+// EasySpin struct, a structure for storing an easyspin experiment
+
+struct EasySpinInput {
+    EasySpinInput() {
+    }
+
+    string generate() const {
+        ostringstream oss;
+
+        oss << "Sys = struct('g',[2.0088 2.0061 2.0027],'Nucs','14N','A',A);" << endl;
+
+        oss << endl;
+
+        oss << "Exp.mwFreq = " << mMWFreq << ";" << endl;
+        oss << "Exp.CenterSweep = [" << mCentre << " " << mSweep << "];" << endl;
+        oss << endl;
+        oss << "Exp.Harmonic = " << mHarmonic << ";" << endl;
+        oss << "Exp.nPoints = "  << mNPoints << ";" << endl;
+        oss << "Exp.Mode = \""     << mModeNames[mMode] << "\";" << endl;
+        oss << "Exp.mwPhase = "  << mMWPhase << ";" << endl;
+
+        oss << endl;
+        if(mModAmp) {
+            oss << "Exp.ModAmp = " << mModAmp.get() << ";" << endl;}
+        if(mTemperature) {
+            oss << "Exp.Temperature = " << mTemperature.get() << ";" << endl;}
+
+        
+
+        return oss.str();
+    }
+
+    //================================================================================//
+    // Experiment
+
+public:
+    void setCentreWidth(double centre,double sweep) {
+        mCentre = centre;
+        mSweep = sweep;
+    }
+private:
+    double mCentre;
+    double mSweep;
+
+    //----------------------------------------//
+
+public:
+    void setMWFreq(double mwFreq) {
+        mMWFreq = mwFreq;
+    }
+private:
+    double mMWFreq;
+
+    //----------------------------------------//
+
+public:
+    void setTemperature(double temperature) {
+        mTemperature = temperature;
+    }
+private:
+    optional<double> mTemperature;
+    
+    //----------------------------------------//
+
+public:
+    void setModAmp(double modAmp) {
+        mModAmp = modAmp;
+    }
+private:
+    optional<double> mModAmp;
+
+
+    //----------------------------------------//
+public:
+    void setNPoints(unsigned long nPoints) {
+        mNPoints = nPoints;
+    }
+private:
+    unsigned long mNPoints;
+    //----------------------------------------//
+public:
+    void setHarmonic(unsigned long harmonic) {
+        mHarmonic = harmonic;
+    }
+private:
+    unsigned long mHarmonic;
+    //----------------------------------------//
+public:
+    enum Mode {
+        PARALLEL,
+        PERPENDICULAR
+    };
+    void setMode(Mode mode) {
+        mMode = mode;
+    }
+private:
+    Mode mMode;
+    //----------------------------------------//
+
+    //Should only be set iff mSampleState = Cystal
+public:
+    void setSpaceGroup(unsigned long spaceGroup) {
+        mSpaceGroup = spaceGroup;
+    }
+private:
+    boost::optional<unsigned long> mSpaceGroup;
+    //----------------------------------------//
+public:
+    //TODO: Crystal Orientations
+private:
+    //----------------------------------------//
+    //Valid range is 0 to 2Pi
+public:
+    void setMWPhase(unsigned long mwPhase) {
+        mMWPhase = mwPhase;
+    }
+private:
+    double mMWPhase;
+
+    //================================================================================//
+    // Options
+public:
+    enum Method {
+        MATRIX,
+        PERT1,
+        PERT2
+    };
+    void setMethod(Method method) {
+        mMethod = method;
+    }
+private:
+    Method mMethod;
+
+public:
+    void setNKnots(unsigned long nKnots) {
+        mNKnots = nKnots;
+    }
+private:
+    //0 => unused/default
+    unsigned long mNKnots;
+
+public:
+    void setInterpolate(unsigned long interpolate) {
+        mInterpolate = interpolate;
+    }
+private:
+    //0 => no interpolation
+    unsigned long mInterpolate;
+
+public:
+    enum Output {
+        SUMMED,
+        SEPERATE
+    };
+    void setOutput(Output output) {
+        mOutput = output;
+    }
+private:
+    Output mOutput;
+
+public:
+    //Static stuff
+    static void staticCtor() {
+        mModeNames[PARALLEL] = "parallel";
+        mModeNames[PERPENDICULAR] = "perpendicular";
+
+        mMethodNames[MATRIX] = "matrix?";
+        mMethodNames[PERT1] = "pert1?";
+        mMethodNames[PERT2] = "pert2?";
+
+        mOutputNames[SUMMED] = "summed?";
+        mOutputNames[SEPERATE] = "seperate?";
+    }
+    struct __Init {
+        __Init() {
+            staticCtor();
+        }
+    };
+    static map<Mode  ,string> mModeNames;
+    static map<Method,string> mMethodNames;
+    static map<Output,string> mOutputNames;
+private:
+    static __Init __init;
+};
+// NB Make sure the maps are defined before __init or the static
+// constructor called by __init will try to use them before they are
+// constructed.
+map<EasySpinInput::Mode  ,string> EasySpinInput::mModeNames;
+map<EasySpinInput::Method,string> EasySpinInput::mMethodNames;
+map<EasySpinInput::Output,string> EasySpinInput::mOutputNames;
+EasySpinInput::__Init EasySpinInput::__init;
+
+
+
+//================================================================================//
+// GUI Functions
 
 void loadSpaceGroups();
 vector<wxString> gSpaceGroups;
@@ -202,6 +403,29 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
     spaceGroupDialog->ShowModal();
 }
 
+void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
+    EasySpinInput easySpinInput;
+
+    //Collect these from the GUI
+    easySpinInput.setCentreWidth(300,20);
+    easySpinInput.setMWFreq(9.5);
+    easySpinInput.setTemperature(70);
+    easySpinInput.setNPoints(1024);
+    easySpinInput.setHarmonic(1);
+    easySpinInput.setMode(EasySpinInput::PARALLEL);
+    easySpinInput.setSpaceGroup(1);
+    easySpinInput.setMWPhase(0);
+    easySpinInput.setMethod(EasySpinInput::PERT1);
+    easySpinInput.setNKnots(8);
+    easySpinInput.setInterpolate(3);
+    easySpinInput.setOutput(EasySpinInput::SUMMED);
+
+    //Do code generation
+    string easyCode = easySpinInput.generate();
+    
+    mCtrlPreview->ChangeValue(wxString(easyCode.c_str(),wxConvUTF8));
+}
+
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -229,11 +453,13 @@ EVT_BUTTON(ID_DELETE_ORIENT,EasySpinFrame::OnDeleteOrient)
 
 EVT_BUTTON(ID_SPACEGROUP_BUTTON,EasySpinFrame::OnShowSpaceGroups)
 
-
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
 
 EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
+
+//Other
+EVT_BUTTON(ID_TMP_GEN, EasySpinFrame::OnGenerate)
 
 END_EVENT_TABLE()
 

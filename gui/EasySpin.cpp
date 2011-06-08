@@ -361,7 +361,7 @@ void EasySpinFrame::OnRangeUnit(wxCommandEvent& e) {
 void EasySpinFrame::SetKnots(unsigned long nKnots) {
 
     mCtrlKnots->SetValue(nKnots);
-    double angularRes = 90.0 / nKnots;
+    double angularRes = 90.0 / (nKnots-1);
     mCtrlAngularRes->ChangeValue(wxString() << angularRes);
 }
 
@@ -371,9 +371,6 @@ void EasySpinFrame::OnKnotsChange(wxSpinEvent& e) {
     SetKnots(mCtrlKnots->GetValue());
 }
 
-void EasySpinFrame::OnAngularResText(wxCommandEvent& e) {
-}
-
 void EasySpinFrame::SlotAngularResUnFocus() {
     double angularRes;
     mCtrlAngularRes->GetValue().ToDouble(&angularRes);
@@ -381,7 +378,7 @@ void EasySpinFrame::SlotAngularResUnFocus() {
     //Find the closest angular resolution to angularRes that divides
     //90 degrees
 
-    double fractionalKnots = 90/angularRes;
+    double fractionalKnots = 90/angularRes + 1;
     unsigned long knots = round(fractionalKnots);
     SetKnots(knots);
 }

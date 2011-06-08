@@ -39,8 +39,6 @@ public:
     void OnShowSpaceGroups(wxCommandEvent& e);
     //Options Events
     void OnKnotsChange(wxSpinEvent& e);
-    void OnAngularResText(wxCommandEvent& e);
-
     void SlotAngularResUnFocus();
 
     void OnInterpCheck(wxCommandEvent& e);

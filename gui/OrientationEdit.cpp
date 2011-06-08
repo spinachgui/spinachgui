@@ -1,12 +1,16 @@
 #include <gui/OrientationEdit.hpp>
 
+
+using namespace std;
+using namespace SpinXML;
+
 #include <iostream>
 #include <wx/log.h>
 #include <shared/basic_math.hpp>
 #include <gui/Display3D.hpp>
+#include <3d/displaySettings.hpp>
+#include <3d/glmode.hpp>
 
-using namespace std;
-using namespace SpinXML;
 
 class OrientDisplay : public Display3D {
 public:
@@ -14,7 +18,13 @@ public:
         : Display3D(parent) {
     }
 protected:
+
     virtual void DrawScene() {
+        std::cout << "Drawing a frame" << std::endl;
+        
+        lighting.On();
+        gluSphere(GetQuadric(),1.0,30,30);
+        lighting.Off();
     }
     virtual void DrawForeground() {
     }
@@ -23,9 +33,12 @@ protected:
     }
         
 private:
+    static GLLighting lighting;
 };
 
-DEFINE_EVENT_TYPE(EVT_ORIENT_EDIT)
+GLLighting OrientDisplay::lighting;
+
+
 
 Orientation::Type TypeOrder[]={
     Orientation::EULER,

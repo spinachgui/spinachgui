@@ -101,25 +101,26 @@ void Display3D::ChangeViewport() {
 }
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
+    cout << "Mousemove!" << endl;
     if(e.Dragging()) {
-	mDraging = true;
+        mDraging = true;
     } else {
-	mDraging = false;
+        mDraging = false;
     }
     if(e.Dragging() && e.RightIsDown()) {
-	mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+        mCamera->Translate(e.GetX()-mMouseX,e.GetY()-mMouseY);
     }  else if(e.Dragging() && e.LeftIsDown()) {
-	if(e.ShiftDown()) {
-	    //Band box select
-	    if(!mBandBoxOn) {
-		mBandBoxOn = true;
-		mBandBoxStartX = mMouseX;
-		mBandBoxStartY = mMouseY;
-	    }
-	} else {
-	    //Ajust camera angle
-	    mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
-	}
+        if(e.ShiftDown()) {
+            //Band box select
+            if(!mBandBoxOn) {
+                mBandBoxOn = true;
+                mBandBoxStartX = mMouseX;
+                mBandBoxStartY = mMouseY;
+            }
+        } else {
+            //Ajust camera angle
+            mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+        }
     } 
     mMouseX=e.GetX();
     mMouseY=e.GetY();

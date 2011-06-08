@@ -6,7 +6,6 @@
 #include <shared/spinsys.hpp>
 #include <sigc++/sigc++.h>
 
-DECLARE_EVENT_TYPE(EVT_ORIENT_EDIT, -1)
 
 //============================================================//
 // OrientEditPanel

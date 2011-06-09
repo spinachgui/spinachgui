@@ -15,9 +15,13 @@
 #include <boost/optional.hpp>
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
+#include <wx/image.h>
+#include <wx/bitmap.h>
+#include <wx/dcmemory.h>
 
 #include <sigc++/sigc++.h>
 
+#define ORIENT_ICON_SIZE 41
 
 using namespace std;
 using namespace sigc;
@@ -47,6 +51,18 @@ double magneticFieldUnit(unsigned int index) {
         cerr << "Unknown value passed to magneticFieldUnit(unsigned int index)" << endl;
         return numeric_limits<double>::quiet_NaN();
     }
+}
+
+//================================================================================//
+// Orientation visualisation algorithm. Summarise an orientation in a
+// visual way in a very small space
+
+void drawOrientationIcon(wxBitmap& bitmap,const Orientation* o) {
+    wxMemoryDC dc;
+    dc.SelectObject(bitmap);
+
+    dc.Clear();
+    dc.DrawCircle(ORIENT_ICON_SIZE/2,ORIENT_ICON_SIZE/2,ORIENT_ICON_SIZE/2-4);
 }
 
 //================================================================================//
@@ -637,7 +653,6 @@ EVT_LISTBOX_DCLICK(ID_ORIENT_LIST,EasySpinFrame::OnOrientDClick)
 
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
-
 EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
 
 //Other

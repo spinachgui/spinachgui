@@ -45,7 +45,9 @@ public:
 
     //Other events
     void OnGenerate(wxCommandEvent& e);
-
+    void OnGenerateButton(wxCommandEvent& e);
+    void PreviewEdit(wxCommandEvent& e);
+    
     //Methods
     void SetMWFreq(double freq);
     void SetMinMax(double min,double max);
@@ -54,6 +56,7 @@ public:
     void HideCrystal(bool hide = true);
     
 protected:
+    bool mPreviewEdited;
     wxString mStrMin;
     wxString mStrMax;
     wxString mStrCentre;

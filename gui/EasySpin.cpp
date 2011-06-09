@@ -228,7 +228,7 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
                              const wxPoint& pos,
                              const wxSize& size,
                              long style) 
-    : EasySpinFrameBase(parent,id,title,pos,size,style) {
+    : EasySpinFrameBase(parent,id,title,pos,size,style),mPreviewEdited(false) {
     loadSpaceGroups();
 
     //Add numeric validators to the numeric text boxes
@@ -433,8 +433,19 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
     spaceGroupDialog->ShowModal();
 }
 
+void EasySpinFrame::OnGenerateButton(wxCommandEvent& e) {
+    //User has decided to discard changes
+    mPreviewEdited = false;
+    mTempGenerate->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    OnGenerate(e);
+}
+
 void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
-    e.Skip();
+    if(mPreviewEdited) {
+        mTempGenerate->SetForegroundColour(*wxRED);
+        return;
+    }
+
     EasySpinInput easySpinInput;
 
     //Collect values from the GUI
@@ -482,6 +493,9 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     mCtrlPreview->ChangeValue(wxString(easyCode.c_str(),wxConvUTF8));
 }
 
+void EasySpinFrame::PreviewEdit(wxCommandEvent& e) {
+    mPreviewEdited = true;
+}
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -515,7 +529,8 @@ EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
 EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
 
 //Other
-EVT_BUTTON(ID_TMP_GEN, EasySpinFrame::OnGenerate)
+EVT_BUTTON(ID_TMP_GEN, EasySpinFrame::OnGenerateButton)
+EVT_TEXT(ID_PREVIEW,EasySpinFrame::PreviewEdit)
 
 //Catch everything and trigger a regeneration
 EVT_TEXT(wxID_ANY, EasySpinFrame::OnGenerate)

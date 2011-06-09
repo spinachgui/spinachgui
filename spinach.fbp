@@ -10392,7 +10392,7 @@
                 </object>
                 <object class="sizeritem" expanded="0">
                     <property name="border">0</property>
-                    <property name="flag"></property>
+                    <property name="flag">wxALIGN_CENTER</property>
                     <property name="proportion">0</property>
                     <object class="wxColourPickerCtrl" expanded="0">
                         <property name="BottomDockable">1</property>
@@ -10421,9 +10421,9 @@
                         <property name="id">wxID_ANY</property>
                         <property name="layer"></property>
                         <property name="maximize_button">0</property>
-                        <property name="maximum_size"></property>
+                        <property name="maximum_size">30,30</property>
                         <property name="minimize_button">0</property>
-                        <property name="minimum_size"></property>
+                        <property name="minimum_size">30,30</property>
                         <property name="moveable">1</property>
                         <property name="name">mColour</property>
                         <property name="pane_border">1</property>
@@ -10436,7 +10436,7 @@
                         <property name="resize">Resizable</property>
                         <property name="row"></property>
                         <property name="show">1</property>
-                        <property name="size">-1,-1</property>
+                        <property name="size">30,30</property>
                         <property name="style">wxCLRP_DEFAULT_STYLE</property>
                         <property name="subclass"></property>
                         <property name="toolbar_pane">0</property>

@@ -578,7 +578,7 @@
                                             <property name="minimize_button">0</property>
                                             <property name="minimum_size"></property>
                                             <property name="moveable">1</property>
-                                            <property name="name">m_panel3</property>
+                                            <property name="name">mExpNotebookPage</property>
                                             <property name="pane_border">1</property>
                                             <property name="pane_position"></property>
                                             <property name="pane_size"></property>
@@ -2119,7 +2119,7 @@
                                                     <property name="border">5</property>
                                                     <property name="flag">wxEXPAND</property>
                                                     <property name="proportion">0</property>
-                                                    <object class="wxFlexGridSizer" expanded="1">
+                                                    <object class="wxFlexGridSizer" expanded="0">
                                                         <property name="cols">4</property>
                                                         <property name="flexible_direction">wxBOTH</property>
                                                         <property name="growablecols"></property>
@@ -3066,11 +3066,11 @@
                                                                 <event name="OnUpdateUI"></event>
                                                             </object>
                                                         </object>
-                                                        <object class="sizeritem" expanded="1">
+                                                        <object class="sizeritem" expanded="0">
                                                             <property name="border">5</property>
                                                             <property name="flag">wxEXPAND</property>
                                                             <property name="proportion">1</property>
-                                                            <object class="wxBoxSizer" expanded="1">
+                                                            <object class="wxBoxSizer" expanded="0">
                                                                 <property name="minimum_size"></property>
                                                                 <property name="name">bSizer12</property>
                                                                 <property name="orient">wxHORIZONTAL</property>
@@ -3333,7 +3333,7 @@
                                                         <event name="OnUpdateUI"></event>
                                                     </object>
                                                 </object>
-                                                <object class="sizeritem" expanded="0">
+                                                <object class="sizeritem" expanded="1">
                                                     <property name="border">5</property>
                                                     <property name="flag">wxEXPAND</property>
                                                     <property name="proportion">1</property>
@@ -3556,7 +3556,7 @@
                                                                         <property name="minimize_button">0</property>
                                                                         <property name="minimum_size"></property>
                                                                         <property name="moveable">1</property>
-                                                                        <property name="name">m_staticText15</property>
+                                                                        <property name="name">mSpaceGroupText</property>
                                                                         <property name="pane_border">1</property>
                                                                         <property name="pane_position"></property>
                                                                         <property name="pane_size"></property>
@@ -3605,11 +3605,11 @@
                                                                         <event name="OnUpdateUI"></event>
                                                                     </object>
                                                                 </object>
-                                                                <object class="sizeritem" expanded="1">
+                                                                <object class="sizeritem" expanded="0">
                                                                     <property name="border">5</property>
                                                                     <property name="flag">wxALIGN_CENTER|wxBOTTOM|wxLEFT|wxTOP</property>
                                                                     <property name="proportion">1</property>
-                                                                    <object class="wxTextCtrl" expanded="1">
+                                                                    <object class="wxTextCtrl" expanded="0">
                                                                         <property name="BottomDockable">1</property>
                                                                         <property name="LeftDockable">1</property>
                                                                         <property name="RightDockable">1</property>
@@ -3693,11 +3693,11 @@
                                                                         <event name="OnUpdateUI"></event>
                                                                     </object>
                                                                 </object>
-                                                                <object class="sizeritem" expanded="1">
+                                                                <object class="sizeritem" expanded="0">
                                                                     <property name="border">5</property>
                                                                     <property name="flag">wxALIGN_CENTER|wxBOTTOM|wxRIGHT|wxTOP</property>
                                                                     <property name="proportion">0</property>
-                                                                    <object class="wxButton" expanded="1">
+                                                                    <object class="wxButton" expanded="0">
                                                                         <property name="BottomDockable">1</property>
                                                                         <property name="LeftDockable">1</property>
                                                                         <property name="RightDockable">1</property>
@@ -3814,7 +3814,7 @@
                                                                 <property name="minimize_button">0</property>
                                                                 <property name="minimum_size"></property>
                                                                 <property name="moveable">1</property>
-                                                                <property name="name">mPanelCystal</property>
+                                                                <property name="name">mPanelCrystal</property>
                                                                 <property name="pane_border">1</property>
                                                                 <property name="pane_position"></property>
                                                                 <property name="pane_size"></property>

@@ -51,6 +51,8 @@ public:
     void SetMinMax(double min,double max);
     void SetKnots(unsigned long nKnots);
     void RepopulateCrystalOrients();
+    void HideCrystal(bool hide = true);
+    
 protected:
     wxString mStrMin;
     wxString mStrMax;

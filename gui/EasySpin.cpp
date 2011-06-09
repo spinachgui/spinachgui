@@ -249,15 +249,17 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
     mCtrlPhase->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
-    mOrientEditPanel = new OrientEditPanel(mPanelCystal);
+    mOrientEditPanel = new OrientEditPanel(mPanelCrystal);
+    mOrientEditPanel->Enable(true);
     mSizerOrient->Add(mOrientEditPanel,1,wxEXPAND,2);
-    Layout();
-    mOrientEditPanel->Enable(false);
+
 
     //Options section
     mCtrlKnots->SetRange(2,INT_MAX);
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
     mCtrlInterp->SetRange(2,INT_MAX);
+
+    HideCrystal(true);
 }
 
 
@@ -389,11 +391,21 @@ void EasySpinFrame::OnInterpCheck(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnCystal(wxCommandEvent& e) {
-    bool cystalChecked = mRadioCrystal->GetValue();
-    mPanelCystal->Enable(cystalChecked);
-    mCtrlSpaceGroupButton->Enable(cystalChecked);
-    mCtrlSpaceGroupTxt->Enable(cystalChecked);
-    mOrientEditPanel->Enable(cystalChecked);
+    bool crystalChecked = mRadioCrystal->GetValue();
+    HideCrystal(!crystalChecked);
+}
+
+void EasySpinFrame::HideCrystal(bool hide) {
+    mRadioPowder->SetValue(hide);
+
+    mPanelCrystal->Show(!hide);
+    mCtrlSpaceGroupButton->Show(!hide);
+    mCtrlSpaceGroupTxt->Show(!hide);
+    mOrientEditPanel->Show(!hide);
+    mSpaceGroupText->Show(!hide);
+
+    mExpNotebookPage->Layout();
+    mPanelCrystal->Layout();
 }
 
 void EasySpinFrame::RepopulateCrystalOrients() {

@@ -10,6 +10,7 @@
 #include <wx/log.h>
 #include <shared/foreach.hpp>
 #include <climits>
+#include <limits>
 #include <gui/Spacegroup.hpp>
 #include <boost/optional.hpp>
 
@@ -20,6 +21,31 @@ using namespace std;
 using namespace sigc;
 using namespace SpinXML;
 using boost::optional;
+
+//================================================================================//
+// wxChoice decoder functions. Decode an wxChoice index into a
+// meaninful value. It would generally be preferable to use the
+// clientData but sometimes it's just neeter to use a lookup table.
+// NB: These functions must be edited with the coresponding wxChoice
+// changes
+
+//Return a number which a quantity in the coresponding unit can be
+//multiplied by to make it mT
+double magneticFieldUnit(unsigned int index) {
+    switch(index) {
+    case 0: //mT
+        return 1;
+    case 1: //G
+        return 0.1;
+    case 2: //T
+        return 1000;
+    case 3: //kG
+        return 100;
+    default:
+        cerr << "Unknown value passed to magneticFieldUnit(unsigned int index)" << endl;
+        return numeric_limits<double>::quiet_NaN();
+    }
+}
 
 //================================================================================//
 // EasySpin struct, a structure for storing an easyspin experiment
@@ -473,6 +499,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
         mTempGenerate->SetForegroundColour(*wxRED);
         return;
     }
+    double toMiliT = magneticFieldUnit(mCtrlRangeUnit->GetSelection());
 
     EasySpinInput easySpinInput;
 
@@ -483,7 +510,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     double centre,sweep;
     mCtrlCentre->GetValue().ToDouble(&centre);
     mCtrlSweep->GetValue().ToDouble(&sweep);
-    easySpinInput.setCentreSweep(centre,sweep);
+    easySpinInput.setCentreSweep(centre*toMiliT,sweep*toMiliT);
 
     double mwFreq;
     mCtrlMWFreq->GetValue().ToDouble(&mwFreq);
@@ -510,7 +537,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     if(mCtrlModAmpOn->GetValue()) {
         double modAmp;
         mCtrlModAmp->GetValue().ToDouble(&modAmp);
-        easySpinInput.setModAmp(modAmp);
+        easySpinInput.setModAmp(modAmp*toMiliT);
     }
 
     double mwPhase;

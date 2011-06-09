@@ -49,8 +49,24 @@ struct EasySpinInput {
         if(mTemperature) {
             oss << "Exp.Temperature = " << mTemperature.get() << ";" << endl;}
 
+        oss << mEasySpinNames[mEasySpinFunc] << "(Sys,Exp)" << endl;
+
         return oss.str();
     }
+
+    //================================================================================//
+    // EasySpin function
+public:
+    enum EasySpinFunc {
+        GARLIC,
+        CHILI,
+        PEPPER
+    };
+    void setEasySpinFunction(EasySpinFunc easySpinFunc) {
+        mEasySpinFunc = easySpinFunc;
+    }
+private:
+    EasySpinFunc mEasySpinFunc;
 
     //================================================================================//
     // Experiment
@@ -192,6 +208,10 @@ public:
 
         mOutputNames[SUMMED] = "summed?";
         mOutputNames[SEPERATE] = "seperate?";
+
+        mEasySpinNames[GARLIC] = "garlic";
+        mEasySpinNames[CHILI] = "chili";
+        mEasySpinNames[PEPPER] = "pepper";
     }
     struct __Init {
         __Init() {
@@ -201,6 +221,9 @@ public:
     static map<Mode  ,string> mModeNames;
     static map<Method,string> mMethodNames;
     static map<Output,string> mOutputNames;
+    static map<EasySpinFunc,string> mEasySpinNames;
+
+
 private:
     static __Init __init;
 };
@@ -210,6 +233,7 @@ private:
 map<EasySpinInput::Mode  ,string> EasySpinInput::mModeNames;
 map<EasySpinInput::Method,string> EasySpinInput::mMethodNames;
 map<EasySpinInput::Output,string> EasySpinInput::mOutputNames;
+map<EasySpinInput::EasySpinFunc,string> EasySpinInput::mEasySpinNames;
 EasySpinInput::__Init EasySpinInput::__init;
 
 
@@ -447,6 +471,8 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     EasySpinInput easySpinInput;
 
     //Collect values from the GUI
+    easySpinInput.setEasySpinFunction(EasySpinInput::GARLIC);
+
     double centre,sweep;
     mCtrlCentre->GetValue().ToDouble(&centre);
     mCtrlSweep->GetValue().ToDouble(&sweep);

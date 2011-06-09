@@ -25,6 +25,7 @@
 
 using namespace std;
 using namespace sigc;
+using namespace Eigen;
 using namespace SpinXML;
 using boost::optional;
 
@@ -58,11 +59,24 @@ double magneticFieldUnit(unsigned int index) {
 // visual way in a very small space
 
 void drawOrientationIcon(wxBitmap& bitmap,const Orientation& o) {
+    Matrix3d rot = o.GetAsDCM();
+
     wxMemoryDC dc;
     dc.SelectObject(bitmap);
 
+    long centre = ORIENT_ICON_SIZE/2;
+
     dc.Clear();
-    dc.DrawCircle(ORIENT_ICON_SIZE/2,ORIENT_ICON_SIZE/2,ORIENT_ICON_SIZE/2-4);
+    dc.DrawCircle(centre,centre,centre-4);
+
+    dc.SetBrush(wxBrush(wxColour(255,0,0)));
+    dc.DrawLine(centre,centre,centre*(rot(0,0)+1),centre*(rot(0,1)+1));
+    dc.SetBrush(*wxGREEN_BRUSH);
+    dc.DrawLine(centre,centre,centre*(rot(1,0)+1),centre*(rot(1,1)+1));
+    dc.SetBrush(*wxBLUE_BRUSH);
+    dc.DrawLine(centre,centre,centre*(rot(2,0)+1),centre*(rot(2,1)+1));
+
+
 }
 
 //================================================================================//
@@ -486,7 +500,7 @@ void EasySpinFrame::RepopulateCrystalOrients() {
     mCtrlOrients->ClearAll();
     long i = 0;
     foreach(Orientation o,mOrients) {
-        wxBitmap bm(ORIENT_ICON_SIZE,ORIENT_ICON_SIZE);
+        wxBitmap bm(ORIENT_ICON_SIZE,ORIENT_ICON_SIZE,24);
         drawOrientationIcon(bm,o);
         imageList->Add(bm);
         mCtrlOrients->InsertItem(i,wxString() << wxT("Orientation") << i);
@@ -525,6 +539,7 @@ void EasySpinFrame::OnOrientDClick(wxListEvent& e) {
     if (orientDialog->ShowModal() == wxID_OK) {
         mOrients[itemIndex] = orientDialog->GetOrient();
     }
+    RepopulateCrystalOrients();
 }
 
 void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {

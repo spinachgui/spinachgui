@@ -470,17 +470,39 @@ void EasySpinFrame::HideCrystal(bool hide) {
 
 void EasySpinFrame::RepopulateCrystalOrients() {
     mCtrlOrients->Clear();
+    long i = 0;
     foreach(Orientation o,mOrients) {
-        //mListCtrl->Append();
+        mCtrlOrients->Append(wxString() << wxT("Orientation") << i);
+        i++;
     }
 }
 
 void EasySpinFrame::OnAddOrient(wxCommandEvent& e) {
     mOrients.push_back(Orientation());
+    RepopulateCrystalOrients();
 }
 
 void EasySpinFrame::OnDeleteOrient(wxCommandEvent& e) {
-    
+    if(mCtrlOrients->GetSelection() != wxNOT_FOUND) {
+        mOrients.erase(mOrients.begin()+mCtrlOrients->GetSelection());
+        RepopulateCrystalOrients();
+    }
+}
+
+void EasySpinFrame::OnOrientSelect(wxCommandEvent& e) {
+
+}
+
+void EasySpinFrame::OnOrientDClick(wxCommandEvent& e) {
+    if(mCtrlOrients->GetSelection() == wxNOT_FOUND) {
+        //Not sure if this can actually happen
+        return;
+    }
+    OrientEditDialog* orientDialog = new OrientEditDialog(this);
+    orientDialog->SetOrient(mOrients[mCtrlOrients->GetSelection()]);
+    if (orientDialog->ShowModal() == wxID_OK) {
+        mOrients[mCtrlOrients->GetSelection()] = orientDialog->GetOrient();
+    }
 }
 
 void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
@@ -609,6 +631,9 @@ EVT_BUTTON(ID_ADD_ORIENT,   EasySpinFrame::OnAddOrient)
 EVT_BUTTON(ID_DELETE_ORIENT,EasySpinFrame::OnDeleteOrient)
 
 EVT_BUTTON(ID_SPACEGROUP_BUTTON,EasySpinFrame::OnShowSpaceGroups)
+
+EVT_LISTBOX(ID_ORIENT_LIST,EasySpinFrame::OnOrientSelect)
+EVT_LISTBOX_DCLICK(ID_ORIENT_LIST,EasySpinFrame::OnOrientDClick)
 
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)

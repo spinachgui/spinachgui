@@ -547,7 +547,7 @@
                                     <object class="notebookpage" expanded="1">
                                         <property name="bitmap"></property>
                                         <property name="label">experiment</property>
-                                        <property name="select">0</property>
+                                        <property name="select">1</property>
                                         <object class="wxPanel" expanded="0">
                                             <property name="BottomDockable">1</property>
                                             <property name="LeftDockable">1</property>
@@ -3901,7 +3901,7 @@
                                                                                     <property name="font"></property>
                                                                                     <property name="gripper">0</property>
                                                                                     <property name="hidden">0</property>
-                                                                                    <property name="id">wxID_ANY</property>
+                                                                                    <property name="id">ID_ORIENT_LIST</property>
                                                                                     <property name="layer"></property>
                                                                                     <property name="maximize_button">0</property>
                                                                                     <property name="maximum_size"></property>
@@ -4152,7 +4152,7 @@
                                     <object class="notebookpage" expanded="1">
                                         <property name="bitmap"></property>
                                         <property name="label">options</property>
-                                        <property name="select">1</property>
+                                        <property name="select">0</property>
                                         <object class="wxPanel" expanded="1">
                                             <property name="BottomDockable">1</property>
                                             <property name="LeftDockable">1</property>

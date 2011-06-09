@@ -37,6 +37,11 @@ public:
     void OnDeleteOrient(wxCommandEvent& e);
 
     void OnShowSpaceGroups(wxCommandEvent& e);
+
+    void OnOrientSelect(wxCommandEvent& e);
+    void OnOrientDClick(wxCommandEvent& e);
+
+
     //Options Events
     void OnKnotsChange(wxSpinEvent& e);
     void SlotAngularResUnFocus();

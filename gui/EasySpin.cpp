@@ -20,6 +20,8 @@
 #include <wx/dcmemory.h>
 #include <wx/imaglist.h>
 #include <sigc++/sigc++.h>
+#include <shared/spinsys.hpp>
+#include <shared/nuclear_data.hpp>
 
 #define ORIENT_ICON_SIZE 41
 
@@ -82,14 +84,163 @@ void drawOrientationIcon(wxBitmap& bitmap,const Orientation& o) {
 //================================================================================//
 // EasySpin struct, a structure for storing an easyspin experiment
 
+string MatlabMatrix_(Matrix3d mat) {
+	ostringstream out;
+
+	out << "[";
+
+	out << mat(0,0) << ",";
+	out << mat(0,1) << ",";
+	out << mat(0,2) << ";";
+
+	out << mat(1,0) << ",";
+	out << mat(1,1) << ",";
+	out << mat(1,2) << ";";
+
+	out << mat(2,0) << ",";
+	out << mat(2,1) << ",";
+	out << mat(2,2);
+
+	out << "]";
+
+	return out.str();
+}
+
+struct Appender_ {
+	Appender_(string& str_,const string& delim_ = ",")
+		: first(true),delim(delim_),str(str_) {
+	}
+	void operator()(string toAppend) {
+		if(!first)
+			str += delim;
+		first = false;
+		str += toAppend;
+	}
+	string& Get() {return str;}
+	bool first;
+	string delim;
+	string& str;
+};
+
+Matrix3d Crush_(const vector<Interaction*>& inters,unit u) {
+	Matrix3d total;
+	total <<
+		0,0,0,
+		0,0,0,
+		0,0,0;
+	for(unsigned long j = 0;j<inters.size();j++) {
+		Interaction* inter = inters[j];
+		total += inter->AsMatrix()*(1/u);
+	}
+	return total;
+}
+
+void monoTensor_(const SpinSystem* ss,ostream& out,string varname,vector<Spin*> spins,Interaction::Type t,unit u) {
+	string line;
+	Appender_ appender(line);
+	foreach(Spin* spin,spins) {
+		vector<Interaction*> tensors = ss->GetInteractionsBySpin(spin,t);
+		appender(MatlabMatrix_(Crush_(tensors,u)));
+	}
+	out << "sys." << varname << " = " << line << ";" << endl;
+}
+
+
 struct EasySpinInput {
     EasySpinInput() {
     }
 
-    string generate() const {
+    string generate(SpinSystem* spinsys) const {
         ostringstream oss;
 
-        oss << "Sys = struct('g',[2.0088 2.0061 2.0027],'Nucs','14N','A',A);" << endl;
+        ostringstream NucsStream;
+        long count=spinsys->GetSpinCount();
+
+        string electronLine;
+        Appender_ electronAppender(electronLine);
+        bool first = true;
+        vector<Spin*> electronSpins;
+        vector<Spin*> nucSpins;
+
+        for(long i=0;i<count;i++) {
+            Spin* spin = spinsys->GetSpin(i);
+            if(spin->GetElement() == 0) {
+                //We have an electron
+                electronSpins.push_back(spin);
+                electronAppender("1/2");
+            } else {
+                //We have a nucleus
+                nucSpins.push_back(spin);
+                if(!first) NucsStream << ",";
+                NucsStream << (spin->GetIsotope()+spin->GetElement()) << getElementSymbol(spin->GetElement());
+                first = false;
+            }
+        }
+
+        oss << "sys.S = [" << electronLine << "];" << endl;
+        oss << "sys.Nucs = [" << NucsStream.str() << "];" << endl;
+
+
+        //G tensors
+        monoTensor_(spinsys,oss,"g",electronSpins,Interaction::G_TENSER,Joules);
+        //Nuclear Quadrupole
+        monoTensor_(spinsys,oss,"Q",nucSpins,Interaction::QUADRUPOLAR,MHz);
+        //ZFS
+        monoTensor_(spinsys,oss,"D",electronSpins,Interaction::ZFS,MHz);
+
+        /*
+          From the easyspin documentation:
+
+          It is possible to specify full A matrices in A. The 3x3 matrices
+          have to be combined like the 1x3 vectors used when only
+          principal values are defined: For different electrons, put the
+          3x3 matrices side by side, for different nuclei, on top of each
+          other. If full matrices are given in A, Apa is ignored.
+
+
+        */
+        string ATensorLine;
+        Appender_ ATensorAppender(ATensorLine);
+        foreach(Spin* nuc,nucSpins) {
+            string NuclearALine;  //The A line of a singular nucleous
+            Appender_ nucAppender(NuclearALine,";");
+
+            foreach(Spin* electron,electronSpins) {
+                vector<Interaction*> a_tensor = spinsys->GetInteractionsBySpin(electron,nuc,Interaction::HFC);
+                //If, for some reason, more than one g_tensor is specified,
+                //crush them all together
+
+                nucAppender(MatlabMatrix_(Crush_(a_tensor,MHz)));
+            }
+            ATensorAppender(NuclearALine);
+        }
+        oss << "sys.A = [" << ATensorLine << "];" << endl;
+
+        /*
+          From the easyspin documentation:
+
+          Principal value of the electron-electron interaction
+          matrices. Each row corresponds to the diagonal of an interaction
+          matrix (in its eigenframe). They are lexicographically ordered
+          according to the indices of the electrons involved. If n is the
+          number of electrons, there are N = n(n-1)/2 rows. E.g. for four
+          electrons there have to be six rows with the principal values
+          for the interaction of electrons 1-2, 1-3, 1-4, 2-3, 2-4, and
+          3-4, in this order. For two electrons, ee contains one row only.
+        */
+        string eeTensorLine;
+        Appender_ eeTensorAppender(eeTensorLine);
+        for(vector<Spin*>::iterator i = electronSpins.begin();i != electronSpins.end();++i) {
+
+            for(vector<Spin*>::iterator j = i+1;j != electronSpins.end();++j) {
+                vector<Interaction*> tensors = spinsys->GetInteractionsBySpin(*i,*j,Interaction::DIPOLAR);
+                //If, for some reason, more than one g_tensor is specified,
+                //crush them all together
+                eeTensorAppender(MatlabMatrix_(Crush_(tensors,MHz)));
+            }
+
+        }
+        oss << "sys.ee = [" << eeTensorLine << "];" << endl;
 
         oss << endl;
 
@@ -342,6 +493,10 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlInterp->SetRange(2,INT_MAX);
 
     HideCrystal(true);
+}
+
+void EasySpinFrame::SetSpinsys(SpinXML::SpinSystem* spinsys) {
+    mSpinSystem = spinsys;
 }
 
 
@@ -614,7 +769,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.setOutput(gOutputSelectOrdering[mCtrlOutput->GetSelection()]);
 
     //Do code generation
-    string easyCode = easySpinInput.generate();
+    string easyCode = easySpinInput.generate(mSpinSystem);
     
     mCtrlPreview->ChangeValue(wxString(easyCode.c_str(),wxConvUTF8));
 }

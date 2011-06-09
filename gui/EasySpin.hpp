@@ -5,6 +5,9 @@
 #include <auto/easyspin.h>
 #include <shared/orientation.hpp>
 #include <gui/OrientationEdit.hpp>
+namespace SpinXML {
+    class SpinSystem;
+};
 
 class EasySpinFrame : public EasySpinFrameBase {
 public:
@@ -14,8 +17,12 @@ public:
                   const wxPoint& pos = wxDefaultPosition,
                   const wxSize& size = wxSize( 870,550 ),
                   long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-    DECLARE_EVENT_TABLE();
 
+
+    void SetSpinsys(SpinXML::SpinSystem* spinsys);
+
+protected:
+    DECLARE_EVENT_TABLE();
     //Exp events
     void OnCentreSweep(wxCommandEvent& e);
     void OnMin(wxCommandEvent& e);
@@ -66,6 +73,8 @@ protected:
     wxString mStrMax;
     wxString mStrCentre;
     wxString mStrSweep;
+
+    SpinXML::SpinSystem* mSpinSystem;
 
     std::vector<SpinXML::Orientation> mOrients;
 };

@@ -1,15 +1,27 @@
 
 #include <wx/app.h>
 #include <gui/EasySpin.hpp>
+#include <shared/spinsys.hpp>
+
+#include <shared/formats/g03.hpp>
+
+using namespace SpinXML;
+
+G03Loader g03Loader;
 
 class EasySpinApp;
 EasySpinApp* theApp = NULL;
 
+SpinSystem spinsys;
+
 class EasySpinApp : public wxApp {
 public:
     virtual bool OnInit() {
+        g03Loader.LoadFile(&spinsys,"examples/Gaussian/testing/methyl.log");
+
         theApp = this;
         EasySpinFrame* easySpinFrame = new EasySpinFrame(NULL);
+        easySpinFrame->SetSpinsys(&spinsys);
         easySpinFrame->Show();
         return true;
     }

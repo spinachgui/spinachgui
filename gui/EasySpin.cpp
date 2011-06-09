@@ -495,6 +495,7 @@ void EasySpinFrame::OnGenerateButton(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
+    e.Skip();
     if(mPreviewEdited) {
         mTempGenerate->SetForegroundColour(*wxRED);
         return;
@@ -561,6 +562,17 @@ void EasySpinFrame::PreviewEdit(wxCommandEvent& e) {
     mPreviewEdited = true;
 }
 
+void EasySpinFrame::OnEasySpinFunc(wxCommandEvent& e) {
+    e.Skip();
+    unsigned int n = mCtrlEasySpinF->GetSelection();
+
+    mGarlicOptions->Show(n == 0);
+    mChiliOptions->Show(n == 1);
+    mPepperOptions->Show(n == 2);
+
+    mOptionsPage->Layout();
+}
+
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
 //Experiment
@@ -595,6 +607,7 @@ EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
 //Other
 EVT_BUTTON(ID_TMP_GEN, EasySpinFrame::OnGenerateButton)
 EVT_TEXT(ID_PREVIEW,EasySpinFrame::PreviewEdit)
+EVT_CHOICE(ID_EASYSPIN_F,EasySpinFrame::OnEasySpinFunc)
 
 //Catch everything and trigger a regeneration
 EVT_TEXT(wxID_ANY, EasySpinFrame::OnGenerate)

@@ -47,7 +47,8 @@ public:
     void OnGenerate(wxCommandEvent& e);
     void OnGenerateButton(wxCommandEvent& e);
     void PreviewEdit(wxCommandEvent& e);
-    
+    void OnEasySpinFunc(wxCommandEvent& e);
+
     //Methods
     void SetMWFreq(double freq);
     void SetMinMax(double min,double max);

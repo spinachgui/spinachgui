@@ -38,9 +38,7 @@ public:
 
     void OnShowSpaceGroups(wxCommandEvent& e);
 
-    void OnOrientSelect(wxCommandEvent& e);
-    void OnOrientDClick(wxCommandEvent& e);
-
+    void OnOrientDClick(wxListEvent& e);
 
     //Options Events
     void OnKnotsChange(wxSpinEvent& e);
@@ -70,8 +68,6 @@ protected:
     wxString mStrSweep;
 
     std::vector<SpinXML::Orientation> mOrients;
-
-    OrientEditPanel* mOrientEditPanel;
 };
 
 

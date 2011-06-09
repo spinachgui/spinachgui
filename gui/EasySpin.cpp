@@ -18,7 +18,7 @@
 #include <wx/image.h>
 #include <wx/bitmap.h>
 #include <wx/dcmemory.h>
-
+#include <wx/imaglist.h>
 #include <sigc++/sigc++.h>
 
 #define ORIENT_ICON_SIZE 41
@@ -57,7 +57,7 @@ double magneticFieldUnit(unsigned int index) {
 // Orientation visualisation algorithm. Summarise an orientation in a
 // visual way in a very small space
 
-void drawOrientationIcon(wxBitmap& bitmap,const Orientation* o) {
+void drawOrientationIcon(wxBitmap& bitmap,const Orientation& o) {
     wxMemoryDC dc;
     dc.SelectObject(bitmap);
 
@@ -322,10 +322,6 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
     mCtrlPhase->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
-    mOrientEditPanel = new OrientEditPanel(mPanelCrystal);
-    mOrientEditPanel->Enable(true);
-    mSizerOrient->Add(mOrientEditPanel,1,wxEXPAND,2);
-
     //Options section
     mCtrlKnots->SetRange(2,INT_MAX);
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
@@ -477,7 +473,6 @@ void EasySpinFrame::HideCrystal(bool hide) {
     mPanelCrystal->Show(!hide);
     mCtrlSpaceGroupButton->Show(!hide);
     mCtrlSpaceGroupTxt->Show(!hide);
-    mOrientEditPanel->Show(!hide);
     mSpaceGroupText->Show(!hide);
 
     mExpNotebookPage->Layout();
@@ -485,12 +480,20 @@ void EasySpinFrame::HideCrystal(bool hide) {
 }
 
 void EasySpinFrame::RepopulateCrystalOrients() {
-    mCtrlOrients->Clear();
+    wxImageList* imageList = new wxImageList(ORIENT_ICON_SIZE,ORIENT_ICON_SIZE);
+    mCtrlOrients->AssignImageList(imageList,wxIMAGE_LIST_NORMAL);
+
+    mCtrlOrients->ClearAll();
     long i = 0;
     foreach(Orientation o,mOrients) {
-        mCtrlOrients->Append(wxString() << wxT("Orientation") << i);
+        wxBitmap bm(ORIENT_ICON_SIZE,ORIENT_ICON_SIZE);
+        drawOrientationIcon(bm,o);
+        imageList->Add(bm);
+        mCtrlOrients->InsertItem(i,wxString() << wxT("Orientation") << i);
+        mCtrlOrients->SetItemImage(i,i);
         i++;
     }
+
 }
 
 void EasySpinFrame::OnAddOrient(wxCommandEvent& e) {
@@ -499,25 +502,28 @@ void EasySpinFrame::OnAddOrient(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnDeleteOrient(wxCommandEvent& e) {
-    if(mCtrlOrients->GetSelection() != wxNOT_FOUND) {
-        mOrients.erase(mOrients.begin()+mCtrlOrients->GetSelection());
-        RepopulateCrystalOrients();
+    long itemIndex = mCtrlOrients->GetNextItem(-1,
+                                               wxLIST_NEXT_ALL,
+                                               wxLIST_STATE_SELECTED);
+    if (itemIndex != -1) {
+            mOrients.erase(mOrients.begin()+itemIndex);
+            RepopulateCrystalOrients();
     }
 }
 
-void EasySpinFrame::OnOrientSelect(wxCommandEvent& e) {
 
-}
-
-void EasySpinFrame::OnOrientDClick(wxCommandEvent& e) {
-    if(mCtrlOrients->GetSelection() == wxNOT_FOUND) {
+void EasySpinFrame::OnOrientDClick(wxListEvent& e) {
+    long itemIndex = mCtrlOrients->GetNextItem(-1,
+                                               wxLIST_NEXT_ALL,
+                                               wxLIST_STATE_SELECTED);
+    if(itemIndex == -1) {
         //Not sure if this can actually happen
         return;
     }
     OrientEditDialog* orientDialog = new OrientEditDialog(this);
-    orientDialog->SetOrient(mOrients[mCtrlOrients->GetSelection()]);
+    orientDialog->SetOrient(mOrients[itemIndex]);
     if (orientDialog->ShowModal() == wxID_OK) {
-        mOrients[mCtrlOrients->GetSelection()] = orientDialog->GetOrient();
+        mOrients[itemIndex] = orientDialog->GetOrient();
     }
 }
 
@@ -648,8 +654,7 @@ EVT_BUTTON(ID_DELETE_ORIENT,EasySpinFrame::OnDeleteOrient)
 
 EVT_BUTTON(ID_SPACEGROUP_BUTTON,EasySpinFrame::OnShowSpaceGroups)
 
-EVT_LISTBOX(ID_ORIENT_LIST,EasySpinFrame::OnOrientSelect)
-EVT_LISTBOX_DCLICK(ID_ORIENT_LIST,EasySpinFrame::OnOrientDClick)
+EVT_LIST_ITEM_ACTIVATED(ID_ORIENT_LIST,EasySpinFrame::OnOrientDClick)
 
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)

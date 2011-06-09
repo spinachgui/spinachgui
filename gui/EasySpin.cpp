@@ -128,6 +128,28 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
     mCtrlInterp->SetRange(2,INT_MAX);
 
+    //Broadernings
+    mCtrlGaussFWHM-> SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlGaussPP->   SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlLorentFWHM->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlLorentPP->  SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlHX->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlHY->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlHZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlGX->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlGY->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlGZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlAX->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlAY->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlAZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+        
+    mCtrlDD->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDE->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDCorrCoeff->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
     HideCrystal(true);
 }
 

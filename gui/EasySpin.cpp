@@ -507,6 +507,12 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
         easySpinInput.setSpaceGroup(1);
     }
 
+    if(mCtrlModAmpOn->GetValue()) {
+        double modAmp;
+        mCtrlModAmp->GetValue().ToDouble(&modAmp);
+        easySpinInput.setModAmp(modAmp);
+    }
+
     double mwPhase;
     mCtrlPhase->GetValue().ToDouble(&mwPhase);
     easySpinInput.setMWPhase(mwPhase);

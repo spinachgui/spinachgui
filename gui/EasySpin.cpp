@@ -40,7 +40,7 @@ struct EasySpinInput {
         oss << endl;
         oss << "Exp.Harmonic = " << mHarmonic << ";" << endl;
         oss << "Exp.nPoints = "  << mNPoints << ";" << endl;
-        oss << "Exp.Mode = \""     << mModeNames[mMode] << "\";" << endl;
+        oss << "Exp.Mode = '"     << mModeNames[mMode] << "';" << endl;
         oss << "Exp.mwPhase = "  << mMWPhase << ";" << endl;
 
         oss << endl;
@@ -48,8 +48,6 @@ struct EasySpinInput {
             oss << "Exp.ModAmp = " << mModAmp.get() << ";" << endl;}
         if(mTemperature) {
             oss << "Exp.Temperature = " << mTemperature.get() << ";" << endl;}
-
-        
 
         return oss.str();
     }

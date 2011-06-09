@@ -26,6 +26,9 @@
 
 #define ORIENT_ICON_SIZE 41
 
+#define SQRT_2LN2 1.1774100225154747
+#define SQRT_3    1.7320508075688773
+
 using namespace std;
 using namespace sigc;
 using namespace Eigen;
@@ -149,6 +152,9 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlDD->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
     mCtrlDE->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
     mCtrlDCorrCoeff->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    //Make strain based broaderning hidded until the user selects pepper
+    mSizerStrain->Show(false);
 
     HideCrystal(true);
 }
@@ -445,6 +451,9 @@ void EasySpinFrame::OnEasySpinFunc(wxCommandEvent& e) {
     mPepperOptions->Show(n == 2);
 
     mOptionsPage->Layout();
+
+    //Strain based line broaderning is only present in pepper
+    mSizerStrain->Show(n == 2);
 }
 
 void EasySpinFrame::OnCopy(wxCommandEvent& e) {
@@ -455,6 +464,31 @@ void EasySpinFrame::OnCopy(wxCommandEvent& e) {
         wxLogError(wxT("Could not copy to clipboard. Clipboard may be being used by another application."));
     }
 }
+
+void EasySpinFrame::OnGaussFWHM(wxCommandEvent& e) {
+    double value;
+    mCtrlGaussFWHM->GetValue().ToDouble(&value);
+    mCtrlGaussPP->ChangeValue(wxString() << value/SQRT_2LN2);
+}
+
+void EasySpinFrame::OnGaussPP(wxCommandEvent& e) {
+    double value;
+    mCtrlGaussPP->GetValue().ToDouble(&value);
+    mCtrlGaussFWHM->ChangeValue(wxString() << value*SQRT_2LN2);
+}
+
+void EasySpinFrame::OnLorentFWHM(wxCommandEvent& e) {
+    double value;
+    mCtrlLorentFWHM->GetValue().ToDouble(&value);
+    mCtrlLorentPP->ChangeValue(wxString() << value/SQRT_3);
+}
+
+void EasySpinFrame::OnLorentPP(wxCommandEvent& e) {
+    double value;
+    mCtrlLorentPP->GetValue().ToDouble(&value);
+    mCtrlLorentFWHM->ChangeValue(wxString() << value*SQRT_3);
+}
+
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -487,6 +521,13 @@ EVT_LIST_ITEM_ACTIVATED(ID_ORIENT_LIST,EasySpinFrame::OnOrientDClick)
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
 EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
+
+//Broadernings
+EVT_TEXT(ID_GAUSS_FWHM ,EasySpinFrame::OnGaussFWHM)
+EVT_TEXT(ID_GAUSS_PP   ,EasySpinFrame::OnGaussPP)
+EVT_TEXT(ID_LORENT_FWHM,EasySpinFrame::OnLorentFWHM)
+EVT_TEXT(ID_LORENT_PP  ,EasySpinFrame::OnLorentPP)
+
 
 //Other
 EVT_BUTTON(ID_TMP_GEN,   EasySpinFrame::OnGenerateButton)

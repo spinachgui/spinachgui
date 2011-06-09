@@ -53,6 +53,12 @@ protected:
 
     void OnInterpCheck(wxCommandEvent& e);
 
+    //Broaderning Events
+    void OnGaussFWHM(wxCommandEvent& e);
+    void OnGaussPP(wxCommandEvent& e);
+    void OnLorentFWHM(wxCommandEvent& e);
+    void OnLorentPP(wxCommandEvent& e);
+
     //Other events
     void OnGenerate(wxCommandEvent& e);
     void OnGenerateButton(wxCommandEvent& e);

@@ -69,11 +69,11 @@ void drawOrientationIcon(wxBitmap& bitmap,const Orientation& o) {
     dc.Clear();
     dc.DrawCircle(centre,centre,centre-4);
 
-    dc.SetBrush(wxBrush(wxColour(255,0,0)));
+    dc.SetPen(*wxRED_PEN);
     dc.DrawLine(centre,centre,centre*(rot(0,0)+1),centre*(rot(0,1)+1));
-    dc.SetBrush(*wxGREEN_BRUSH);
+    dc.SetPen(*wxGREEN_PEN);
     dc.DrawLine(centre,centre,centre*(rot(1,0)+1),centre*(rot(1,1)+1));
-    dc.SetBrush(*wxBLUE_BRUSH);
+    dc.SetPen(wxPen(wxColour(0,0,255)));
     dc.DrawLine(centre,centre,centre*(rot(2,0)+1),centre*(rot(2,1)+1));
 
 

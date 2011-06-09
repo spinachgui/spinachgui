@@ -230,13 +230,20 @@ private:
 // NB Make sure the maps are defined before __init or the static
 // constructor called by __init will try to use them before they are
 // constructed.
-map<EasySpinInput::Mode  ,string> EasySpinInput::mModeNames;
-map<EasySpinInput::Method,string> EasySpinInput::mMethodNames;
-map<EasySpinInput::Output,string> EasySpinInput::mOutputNames;
+map<EasySpinInput::Mode        ,string> EasySpinInput::mModeNames;
+map<EasySpinInput::Method      ,string> EasySpinInput::mMethodNames;
+map<EasySpinInput::Output      ,string> EasySpinInput::mOutputNames;
 map<EasySpinInput::EasySpinFunc,string> EasySpinInput::mEasySpinNames;
 EasySpinInput::__Init EasySpinInput::__init;
 
-
+//These vectors map the selection to the enum. These *must* be updated
+//if the order items in the corresponding selection is changed. They
+//are initalised in the module initalisation code in __init's
+//constructor
+vector<EasySpinInput::Mode        > gModeSelectOrdering;    
+vector<EasySpinInput::Method      > gMethodSelectOrdering;  
+vector<EasySpinInput::Output      > gOutputSelectOrdering;  
+vector<EasySpinInput::EasySpinFunc> gEasySpinSelectOrdering;
 
 //================================================================================//
 // GUI Functions
@@ -274,7 +281,6 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mOrientEditPanel = new OrientEditPanel(mPanelCrystal);
     mOrientEditPanel->Enable(true);
     mSizerOrient->Add(mOrientEditPanel,1,wxEXPAND,2);
-
 
     //Options section
     mCtrlKnots->SetRange(2,INT_MAX);
@@ -471,7 +477,8 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     EasySpinInput easySpinInput;
 
     //Collect values from the GUI
-    easySpinInput.setEasySpinFunction(EasySpinInput::GARLIC);
+    unsigned int easyspinf_select = mCtrlEasySpinF->GetSelection();
+    easySpinInput.setEasySpinFunction(gEasySpinSelectOrdering[easyspinf_select]);
 
     double centre,sweep;
     mCtrlCentre->GetValue().ToDouble(&centre);
@@ -494,7 +501,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
 
     easySpinInput.setHarmonic(mCtrlHarmonic->GetSelection());
 
-    easySpinInput.setMode(EasySpinInput::PARALLEL);
+    easySpinInput.setMode(gModeSelectOrdering[mCtrlMode->GetSelection()]);
 
     if(mRadioCrystal->GetValue()) {
         easySpinInput.setSpaceGroup(1);
@@ -504,12 +511,12 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     mCtrlPhase->GetValue().ToDouble(&mwPhase);
     easySpinInput.setMWPhase(mwPhase);
 
-    easySpinInput.setMethod(EasySpinInput::MATRIX);
+    easySpinInput.setMethod(gMethodSelectOrdering[mCtrlMethod->GetSelection()]);
 
     easySpinInput.setNKnots(mCtrlKnots->GetValue());
     easySpinInput.setInterpolate(mCtrlInterp->GetValue());
 
-    easySpinInput.setOutput(EasySpinInput::SUMMED);
+    easySpinInput.setOutput(gOutputSelectOrdering[mCtrlOutput->GetSelection()]);
 
     //Do code generation
     string easyCode = easySpinInput.generate();
@@ -599,3 +606,22 @@ void loadSpaceGroups() {
     loaded = true;
     return;
 }
+
+struct __Init {
+    __Init() {
+        gModeSelectOrdering.push_back(EasySpinInput::PARALLEL);
+        gModeSelectOrdering.push_back(EasySpinInput::PERPENDICULAR);
+
+        gMethodSelectOrdering.push_back(EasySpinInput::MATRIX);
+        gMethodSelectOrdering.push_back(EasySpinInput::PERT1);
+        gMethodSelectOrdering.push_back(EasySpinInput::PERT2);
+
+        gOutputSelectOrdering.push_back(EasySpinInput::SUMMED);
+        gOutputSelectOrdering.push_back(EasySpinInput::SEPERATE);
+
+        gEasySpinSelectOrdering.push_back(EasySpinInput::GARLIC);
+        gEasySpinSelectOrdering.push_back(EasySpinInput::CHILI);
+        gEasySpinSelectOrdering.push_back(EasySpinInput::PEPPER);
+    }
+};
+static __Init __init;

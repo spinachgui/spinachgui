@@ -48,6 +48,7 @@ public:
     void OnGenerateButton(wxCommandEvent& e);
     void PreviewEdit(wxCommandEvent& e);
     void OnEasySpinFunc(wxCommandEvent& e);
+    void OnCopy(wxCommandEvent& e);
 
     //Methods
     void SetMWFreq(double freq);

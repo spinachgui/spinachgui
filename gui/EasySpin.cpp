@@ -13,6 +13,8 @@
 #include <limits>
 #include <gui/Spacegroup.hpp>
 #include <boost/optional.hpp>
+#include <wx/clipbrd.h>
+#include <wx/dataobj.h>
 
 #include <sigc++/sigc++.h>
 
@@ -573,6 +575,15 @@ void EasySpinFrame::OnEasySpinFunc(wxCommandEvent& e) {
     mOptionsPage->Layout();
 }
 
+void EasySpinFrame::OnCopy(wxCommandEvent& e) {
+    if (wxTheClipboard->Open()) {
+        wxTheClipboard->SetData(new wxTextDataObject(mCtrlPreview->GetValue()));
+        wxTheClipboard->Close();
+    } else {
+        wxLogError(wxT("Could not copy to clipboard. Clipboard may be being used by another application."));
+    }
+}
+
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
 //Experiment
@@ -605,9 +616,10 @@ EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
 EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)
 
 //Other
-EVT_BUTTON(ID_TMP_GEN, EasySpinFrame::OnGenerateButton)
-EVT_TEXT(ID_PREVIEW,EasySpinFrame::PreviewEdit)
+EVT_BUTTON(ID_TMP_GEN,   EasySpinFrame::OnGenerateButton)
+EVT_TEXT(ID_PREVIEW,     EasySpinFrame::PreviewEdit)
 EVT_CHOICE(ID_EASYSPIN_F,EasySpinFrame::OnEasySpinFunc)
+EVT_BUTTON(ID_COPY,      EasySpinFrame::OnCopy)
 
 //Catch everything and trigger a regeneration
 EVT_TEXT(wxID_ANY, EasySpinFrame::OnGenerate)

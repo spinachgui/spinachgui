@@ -310,14 +310,17 @@ void EasySpinFrame::OnCentreSweep(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnXBand(wxCommandEvent& e) {
+    e.Skip();
     SetMWFreq(9.5);
 }
 
 void EasySpinFrame::OnQBand(wxCommandEvent& e) {
+    e.Skip();
     SetMWFreq(35);
 }
 
 void EasySpinFrame::OnWBand(wxCommandEvent& e) {
+    e.Skip();
     SetMWFreq(95);
 }
 
@@ -390,7 +393,8 @@ void EasySpinFrame::OnInterpCheck(wxCommandEvent& e) {
     mCtrlInterp->Enable(checked);
 }
 
-void EasySpinFrame::OnCystal(wxCommandEvent& e) {
+void EasySpinFrame::OnCrystal(wxCommandEvent& e) {
+    e.Skip();
     bool crystalChecked = mRadioCrystal->GetValue();
     HideCrystal(!crystalChecked);
 }
@@ -497,8 +501,8 @@ EVT_CHECKBOX(ID_MODAMPON,EasySpinFrame::OnModAmpCheck)
 EVT_CHOICE(ID_MODAMPUNIT,EasySpinFrame::OnModAmpUnit)
 EVT_CHOICE(ID_RANGEUNIT ,EasySpinFrame::OnRangeUnit)
 
-EVT_RADIOBUTTON(ID_CRYSTAL,EasySpinFrame::OnCystal)
-EVT_RADIOBUTTON(ID_POWDER,EasySpinFrame::OnCystal)
+EVT_RADIOBUTTON(ID_CRYSTAL,EasySpinFrame::OnCrystal)
+EVT_RADIOBUTTON(ID_POWDER,EasySpinFrame::OnCrystal)
 
 EVT_BUTTON(ID_ADD_ORIENT,   EasySpinFrame::OnAddOrient)
 EVT_BUTTON(ID_DELETE_ORIENT,EasySpinFrame::OnDeleteOrient)
@@ -515,6 +519,10 @@ EVT_BUTTON(ID_TMP_GEN, EasySpinFrame::OnGenerate)
 
 //Catch everything and trigger a regeneration
 EVT_TEXT(wxID_ANY, EasySpinFrame::OnGenerate)
+EVT_BUTTON(wxID_ANY, EasySpinFrame::OnGenerate)
+EVT_CHECKBOX(wxID_ANY, EasySpinFrame::OnGenerate)
+EVT_CHOICE(wxID_ANY, EasySpinFrame::OnGenerate)
+EVT_RADIOBUTTON(wxID_ANY, EasySpinFrame::OnGenerate)
 
 END_EVENT_TABLE()
 

@@ -31,7 +31,7 @@ public:
     void OnRangeUnit(wxCommandEvent& e);
     void OnModAmpUnit(wxCommandEvent& e);
 
-    void OnCystal(wxCommandEvent& e);
+    void OnCrystal(wxCommandEvent& e);
 
     void OnAddOrient(wxCommandEvent& e);
     void OnDeleteOrient(wxCommandEvent& e);

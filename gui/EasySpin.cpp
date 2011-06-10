@@ -144,7 +144,7 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
                              const wxPoint& pos,
                              const wxSize& size,
                              long style) 
-    : EasySpinFrameBase(parent,id,title,pos,size,style) {
+    : EasySpinFrameBase(parent,id,title,pos,size,style),mSpinSystem(NULL) {
     loadSpaceGroups();
 
     //Add numeric validators to the numeric text boxes
@@ -203,6 +203,9 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
 void EasySpinFrame::SetSpinsys(SpinXML::SpinSystem* spinsys) {
     mSpinSystem = spinsys;
+    if(mSpinSystem == NULL) {
+        return;
+    }
 
     //gStrain and AStrain are only applicable for one electron spin, D
     //strain is only applicable for multipul electron spins

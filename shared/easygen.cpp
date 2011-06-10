@@ -99,99 +99,100 @@ void monoTensor_(const SpinSystem* ss,ostream& out,string varname,vector<Spin*> 
 string EasySpinInput::generate(SpinSystem* spinsys) const {
     ostringstream oss;
 
-    string electronLine;
-    vector<Spin*> electronSpins;
-    vector<Spin*> nucSpins;
+    if(spinsys != NULL) {
+        string electronLine;
+        vector<Spin*> electronSpins;
+        vector<Spin*> nucSpins;
 
-    //Step 1, divide the spin system into nuclear an electron spins
-    foreach(Spin* spin,spinsys->GetSpins()) {
-        if(spin->GetElement() == 0) {
-            electronSpins.push_back(spin);
-        } else {
-            nucSpins.push_back(spin);
-        }
-    }
-
-    oss << "sys.S = [";
-    for(long i = 0;i<electronSpins.size();i++) {
-        oss << "1/2 ";
-    }
-    oss << "];" << endl;
-
-    if(electronSpins.size() == 0) {
-        oss << "%Warning, no electron spins in spin system" << endl;
-    }
-    foreach(Spin* nucSpin,nucSpins) {
-        oss << "Sys = nucspinadd(Sys,'"
-            << (nucSpin->GetIsotope()+nucSpin->GetElement()) 
-            << getElementSymbol(nucSpin->GetElement()) << "',";
-
-        ostringstream APart; //In the form [Axx,Ayy,Azz],[alpha,beta,gamma]
-        ostringstream QPart; //In the form [Qxx,Qyy,Qzz],[alpha,beta,gamma]
-
-        bool useQ = false;
-
-        foreach(Spin* eSpin,electronSpins) {
-			Eigenvalues a_tensor = Crush_2(spinsys->GetInteractionsBySpin(nucSpin,eSpin,Interaction::HFC),MHz);
-            EulerAngles ea = a_tensor.mOrient.GetAsEuler();
-
-			Eigenvalues q_tensor = Crush_2(spinsys->GetInteractionsBySpin(nucSpin,eSpin,Interaction::QUADRUPOLAR),MHz);
-            EulerAngles ea_q = q_tensor.mOrient.GetAsEuler();
-            
-            APart << "[" << a_tensor.xx << "," << a_tensor.yy << "," << a_tensor.zz << "]" << "," 
-                  << "[" << ea.alpha/PI*180 << "," << ea.beta/PI*180 << "," << ea.gamma/PI*180 << "]*PI/180";
-            QPart << "[" << q_tensor.xx << "," << q_tensor.yy << "," << q_tensor.zz << "]" << "," 
-                  << "[" << ea_q.alpha/PI*180 << "," << ea_q.beta/PI*180 << "," << ea_q.gamma/PI*180 << "]*PI/180";
-
-            if(q_tensor.xx != 0 || q_tensor.yy != 0 || q_tensor.zz != 0) {
-                useQ = true;
+        //Step 1, divide the spin system into nuclear an electron spins
+        foreach(Spin* spin,spinsys->GetSpins()) {
+            if(spin->GetElement() == 0) {
+                electronSpins.push_back(spin);
+            } else {
+                nucSpins.push_back(spin);
             }
         }
-        string APartStr = APart.str();
-        string QPartStr = QPart.str();
 
-        if(useQ) {
-            oss << APartStr << "," << QPartStr << ")" << endl;
-        } else {
-            oss << APartStr << ")" << endl;
+        oss << "sys.S = [";
+        for(unsigned long i = 0;i<electronSpins.size();i++) {
+            oss << "1/2 ";
         }
-    }
+        oss << "];" << endl;
 
-    //G tensors
-    monoTensor_(spinsys,oss,"g",electronSpins,Interaction::G_TENSER,Joules);
-    //ZFS
-    monoTensor_(spinsys,oss,"D",electronSpins,Interaction::ZFS,MHz);
+        if(electronSpins.size() == 0) {
+            oss << "%Warning, no electron spins in spin system" << endl;
+        }
+        foreach(Spin* nucSpin,nucSpins) {
+            oss << "Sys = nucspinadd(Sys,'"
+                << (nucSpin->GetIsotope()+nucSpin->GetElement()) 
+                << getElementSymbol(nucSpin->GetElement()) << "',";
 
+            ostringstream APart; //In the form [Axx,Ayy,Azz],[alpha,beta,gamma]
+            ostringstream QPart; //In the form [Qxx,Qyy,Qzz],[alpha,beta,gamma]
 
-    /*
-      From the easyspin documentation:
+            bool useQ = false;
 
-      Principal value of the electron-electron interaction
-      matrices. Each row corresponds to the diagonal of an interaction
-      matrix (in its eigenframe). They are lexicographically ordered
-      according to the indices of the electrons involved. If n is the
-      number of electrons, there are N = n(n-1)/2 rows. E.g. for four
-      electrons there have to be six rows with the principal values
-      for the interaction of electrons 1-2, 1-3, 1-4, 2-3, 2-4, and
-      3-4, in this order. For two electrons, ee contains one row only.
-    */
-    /*
-    string eeTensorLine;
-    Appender_ eeTensorAppender(eeTensorLine);
-    for(vector<Spin*>::iterator i = electronSpins.begin();i != electronSpins.end();++i) {
+            foreach(Spin* eSpin,electronSpins) {
+                Eigenvalues a_tensor = Crush_2(spinsys->GetInteractionsBySpin(nucSpin,eSpin,Interaction::HFC),MHz);
+                EulerAngles ea = a_tensor.mOrient.GetAsEuler();
 
-        for(vector<Spin*>::iterator j = i+1;j != electronSpins.end();++j) {
-            vector<Interaction*> tensors = spinsys->GetInteractionsBySpin(*i,*j,Interaction::DIPOLAR);
-            //If, for some reason, more than one g_tensor is specified,
-            //crush them all together
-            eeTensorAppender(MatlabMatrix_(Crush_(tensors,MHz)));
+                Eigenvalues q_tensor = Crush_2(spinsys->GetInteractionsBySpin(nucSpin,eSpin,Interaction::QUADRUPOLAR),MHz);
+                EulerAngles ea_q = q_tensor.mOrient.GetAsEuler();
+            
+                APart << "[" << a_tensor.xx << "," << a_tensor.yy << "," << a_tensor.zz << "]" << "," 
+                      << "[" << ea.alpha/PI*180 << "," << ea.beta/PI*180 << "," << ea.gamma/PI*180 << "]*PI/180";
+                QPart << "[" << q_tensor.xx << "," << q_tensor.yy << "," << q_tensor.zz << "]" << "," 
+                      << "[" << ea_q.alpha/PI*180 << "," << ea_q.beta/PI*180 << "," << ea_q.gamma/PI*180 << "]*PI/180";
+
+                if(q_tensor.xx != 0 || q_tensor.yy != 0 || q_tensor.zz != 0) {
+                    useQ = true;
+                }
+            }
+            string APartStr = APart.str();
+            string QPartStr = QPart.str();
+
+            if(useQ) {
+                oss << APartStr << "," << QPartStr << ")" << endl;
+            } else {
+                oss << APartStr << ")" << endl;
+            }
         }
 
-    }
-    oss << "sys.ee = [" << eeTensorLine << "];" << endl;
-    */
-    oss << endl;
+        //G tensors
+        monoTensor_(spinsys,oss,"g",electronSpins,Interaction::G_TENSER,Joules);
+        //ZFS
+        monoTensor_(spinsys,oss,"D",electronSpins,Interaction::ZFS,MHz);
 
+
+        /*
+          From the easyspin documentation:
+
+          Principal value of the electron-electron interaction
+          matrices. Each row corresponds to the diagonal of an interaction
+          matrix (in its eigenframe). They are lexicographically ordered
+          according to the indices of the electrons involved. If n is the
+          number of electrons, there are N = n(n-1)/2 rows. E.g. for four
+          electrons there have to be six rows with the principal values
+          for the interaction of electrons 1-2, 1-3, 1-4, 2-3, 2-4, and
+          3-4, in this order. For two electrons, ee contains one row only.
+        */
+        /*
+          string eeTensorLine;
+          Appender_ eeTensorAppender(eeTensorLine);
+          for(vector<Spin*>::iterator i = electronSpins.begin();i != electronSpins.end();++i) {
+
+          for(vector<Spin*>::iterator j = i+1;j != electronSpins.end();++j) {
+          vector<Interaction*> tensors = spinsys->GetInteractionsBySpin(*i,*j,Interaction::DIPOLAR);
+          //If, for some reason, more than one g_tensor is specified,
+          //crush them all together
+          eeTensorAppender(MatlabMatrix_(Crush_(tensors,MHz)));
+          }
+
+          }
+          oss << "sys.ee = [" << eeTensorLine << "];" << endl;
+        */
+        oss << endl;
+    }
     oss << "Exp.mwFreq = " << mMWFreq << ";" << endl;
     oss << "Exp.CenterSweep = [" << mCentre << " " << mSweep << "];" << endl;
     oss << endl;

@@ -574,6 +574,7 @@ void RootFrame::OnMenu(wxMenuEvent& e) {
 void RootFrame::OnExportToEasyspin(wxCommandEvent& e) {
     //TODO: Does this leak memory or will RootFrame clean up?
     EasySpinFrame* es = new EasySpinFrame(this);
+    es->SetSpinsys(GetRawSS());
     es->Show();
 }
 
@@ -586,7 +587,7 @@ EVT_MENU(ID_NEW   ,RootFrame::OnNew   )
 EVT_MENU(ID_OPEN  ,RootFrame::OnOpen  )
 EVT_MENU(ID_SAVE  ,RootFrame::OnSave  )
 EVT_MENU(ID_SAVEAS,RootFrame::OnSaveAs)
-EVT_MENU(ID_EASYSPIN,RootFrame::OnExportToEasyspin)
+EVT_MENU(ID_EASYSPIN_EXPORT,RootFrame::OnExportToEasyspin)
 EVT_MENU(ID_EXIT  ,RootFrame::OnExit  )
 
 //Edit Menu

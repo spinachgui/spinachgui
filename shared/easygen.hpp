@@ -131,9 +131,9 @@ struct EasySpinInput {
     double mGaussianFWHM;
     double mLorentFWHM;
 
-    double mHStrainX,mHStrainY,mHStrainZ;
-    double mGStrainX,mGStrainY,mGStrainZ;
-    double mAStrainX,mAStrainY,mAStrainZ;
+    double mHStrainX,mHStrainY,mHStrainZ;        
+    double mGStrainX,mGStrainY,mGStrainZ;        
+    double mAStrainX,mAStrainY,mAStrainZ;        
     double mDStrainD,mDStrainE,mDStrainCorrCoeff;
 
     //Static stuff

@@ -160,6 +160,17 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
     if(mTemperature) {
         oss << "Exp.Temperature = " << mTemperature.get() << ";" << endl;}
 
+    //Brodernings
+    oss << "Sys.lw = [" << mGaussianFWHM << "," << mLorentFWHM << "]" << endl;
+
+    if(mEasySpinFunc == PEPPER) {
+        oss << "Sys.HStrain = [" << mHStrainX << "," << mHStrainY << "," << mHStrainZ         << "];" << endl;
+        oss << "Sys.gStrain = [" << mGStrainX << "," << mGStrainY << "," << mGStrainZ         << "];" << endl;
+        oss << "Sys.AStrain = [" << mAStrainX << "," << mAStrainY << "," << mAStrainZ         << "];" << endl;
+        oss << "Sys.DStrain = [" << mDStrainD << "," << mDStrainE << "," << mDStrainCorrCoeff << "];" << endl;
+    }
+    oss << endl;
+
     oss << mEasySpinNames[mEasySpinFunc] << "(Sys,Exp)" << endl;
 
     return oss.str();

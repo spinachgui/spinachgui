@@ -16,59 +16,7 @@
 #include <fstream>
 #include <streambuf>
 #include <vector>
-
-#include <shared/formats/spirit_common.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/karma.hpp>
-
-using namespace std;
-
-namespace karma=boost::spirit::karma;
-
-using boost::spirit::karma::char_;
-using boost::spirit::karma::int_;
-using boost::spirit::karma::alpha;
-using boost::spirit::karma::double_;
-using boost::spirit::karma::lit;
-using boost::spirit::karma::generate;
-using boost::spirit::karma::rule;
-using boost::spirit::karma::space;
-using boost::spirit::karma::_1;
-
-template <typename OutputIterator>
-struct table_grammar 
-    : karma::grammar<OutputIterator,vector<vector<int> >()>
-{
-    table_grammar()
-        : table_grammar::base_type(table)
-    {
-        i = 0;
-        table = "<html><body><table><tr>" << *row << "</tr></table></body></html>";
-        row = "<td>" << *("<td>" << int_ << "</td>") << "</td>";
-    }
-
-    int i;
-
-    rule<OutputIterator,vector<vector<int> >()> table;
-    rule<OutputIterator,vector<int>()> row;
-};
-
-template <typename OutputIterator>
-bool generateHTML(OutputIterator sink) {
-    vector<int> v;
-    v.push_back(3);
-    v.push_back(2);
-    v.push_back(8);
-    vector<vector<int> > vv;
-    vv.push_back(v);
-    vv.push_back(v);
-    vv.push_back(v);
-
-    table_grammar<OutputIterator> g;
-    return generate(sink,g,vv);
-}
-
+#include <wx/html/htmlwin.h>
 using namespace std;
 
 wxString testHTML;
@@ -79,7 +27,9 @@ SpaceGroupDialog::SpaceGroupDialog( wxWindow* parent,
                                     const wxString& title,
                                     const wxPoint& pos,
                                     const wxSize& size,
-                                    long style ) : wxDialog( parent, id, title, pos, size, style ) {
+                                    long style )
+    : wxDialog( parent, id, title, pos, size, style ),
+      spacegroup(-1) {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
 	wxBoxSizer* boxSizer = new wxBoxSizer( wxVERTICAL );
@@ -97,7 +47,7 @@ SpaceGroupDialog::SpaceGroupDialog( wxWindow* parent,
 
         wxHtmlWindow* htmlWindow = new wxHtmlWindow(panel, wxID_ANY);
         wxString filename  =  wxT("data/") + cystalSystemName + wxT(".html");
-        htmlWindow->SetPage(testHTML);
+        htmlWindow->LoadPage(wxT("data/spacegroups.html"));
         innerSizer->Add(htmlWindow, 1, wxALL|wxEXPAND, 5);
 
         mNotebook->AddPage(panel,cystalSystemName,false);
@@ -106,6 +56,16 @@ SpaceGroupDialog::SpaceGroupDialog( wxWindow* parent,
 	this->Layout();
 	this->Centre( wxBOTH );
 }
+
+void SpaceGroupDialog::LinkClicked(wxHtmlLinkEvent& e) {
+    wxString ref = e.GetLinkInfo().GetHref();
+    ref.ToLong(&spacegroup);
+    EndModal(wxID_OK);
+}
+
+BEGIN_EVENT_TABLE(SpaceGroupDialog,wxDialog)
+EVT_HTML_LINK_CLICKED(wxID_ANY,SpaceGroupDialog::LinkClicked)
+END_EVENT_TABLE()
 
 
 //================================================================================//
@@ -117,14 +77,8 @@ __SpacegroupInit::__SpacegroupInit() {
     gCystalSystemNames.push_back(wxT("tetragonal"));
     gCystalSystemNames.push_back(wxT("hexagonal"));
     gCystalSystemNames.push_back(wxT("cubic"));
-
-    std::string generated;
-    std::back_insert_iterator<std::string> sink(generated);
-    generateHTML(sink);
-
-    cout << generated << endl;
-
-    testHTML = wxString(generated.c_str(),wxConvUTF8);
 }
 static __SpacegroupInit __spacegroupInit;
+
+
 

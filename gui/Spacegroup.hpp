@@ -5,6 +5,8 @@
 #include <wx/notebook.h>
 #include <wx/dialog.h>
 
+class wxHtmlLinkEvent;
+
 class SpaceGroupDialog : public wxDialog {
 public:
     SpaceGroupDialog(wxWindow* parent,
@@ -13,7 +15,10 @@ public:
                      const wxPoint& pos = wxDefaultPosition,
                      const wxSize& size = wxSize( 600,400 ),
                      long style = wxDEFAULT_DIALOG_STYLE );
+    long spacegroup;
 protected:
+    DECLARE_EVENT_TABLE()
+    void LinkClicked(wxHtmlLinkEvent& e);
     wxNotebook* mNotebook;
 };
 

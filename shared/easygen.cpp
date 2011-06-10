@@ -43,8 +43,8 @@ string MatlabMatrix_(Matrix3d mat) {
 	return out.str();
 }
 
-struct Appender_ {
-	Appender_(string& str_,const string& delim_ = ",")
+struct _Appender {
+	_Appender(string& str_,const string& delim_ = ",")
 		: first(true),delim(delim_),str(str_) {
 	}
 	void operator()(string toAppend) {
@@ -87,7 +87,7 @@ Matrix3d Crush_(const vector<Interaction*>& inters,unit u) {
 
 void monoTensor_(const SpinSystem* ss,ostream& out,string varname,vector<Spin*> spins,Interaction::Type t,unit u) {
 	string line;
-	Appender_ appender(line);
+	_Appender appender(line);
 	foreach(Spin* spin,spins) {
 		vector<Interaction*> tensors = ss->GetInteractionsBySpin(spin,t);
 		appender(MatlabMatrix_(Crush_(tensors,u)));
@@ -99,47 +99,63 @@ void monoTensor_(const SpinSystem* ss,ostream& out,string varname,vector<Spin*> 
 string EasySpinInput::generate(SpinSystem* spinsys) const {
     ostringstream oss;
 
-    ostringstream NucsStream;
-    long count=spinsys->GetSpinCount();
-
     string electronLine;
-    Appender_ electronAppender(electronLine);
-    bool first = true;
     vector<Spin*> electronSpins;
     vector<Spin*> nucSpins;
 
-    for(long i=0;i<count;i++) {
-        Spin* spin = spinsys->GetSpin(i);
+    //Step 1, divide the spin system into nuclear an electron spins
+    foreach(Spin* spin,spinsys->GetSpins()) {
         if(spin->GetElement() == 0) {
-            //We have an electron
             electronSpins.push_back(spin);
-            electronAppender("1/2");
         } else {
-            //We have a nucleus
             nucSpins.push_back(spin);
-
-			Eigenvalues a_tensor = Crush_2(spinsys->GetInteractionsBySpin(spin,spin,Interaction::HFC),MHz);
-            EulerAngles ea = a_tensor.mOrient.GetAsEuler();
-
-			Eigenvalues q_tensor = Crush_2(spinsys->GetInteractionsBySpin(spin,spin,Interaction::QUADRUPOLAR),MHz);
-            EulerAngles ea_q = q_tensor.mOrient.GetAsEuler();
-            
-            //Format is:
-            //NewSys = nucspinadd(Sys,Nuc,A,Apa,Q,Qpa)
-            NucsStream << "Sys = nucspinadd(Sys,'"
-                       << (spin->GetIsotope()+spin->GetElement()) 
-                       << getElementSymbol(spin->GetElement()) << "'," 
-                       << "[" << a_tensor.xx << "," << a_tensor.yy << "," << a_tensor.zz << "]" << "," 
-                       << "[" << ea.alpha << "," << ea.beta << "," << ea.gamma << "]" << ","
-                       << "[" << q_tensor.xx << "," << q_tensor.yy << "," << q_tensor.zz << "]" << "," 
-                       << "[" << ea_q.alpha << "," << ea_q.beta << "," << ea_q.gamma << "]" << ");" << endl;
-            first = false;
         }
     }
 
-    oss << "sys.S = [" << electronLine << "];" << endl;
-    oss << NucsStream.str() << endl;
+    oss << "sys.S = [";
+    for(long i = 0;i<electronSpins.size();i++) {
+        oss << "1/2 ";
+    }
+    oss << "];" << endl;
 
+    if(electronSpins.size() == 0) {
+        oss << "%Warning, no electron spins in spin system" << endl;
+    }
+    foreach(Spin* nucSpin,nucSpins) {
+        oss << "Sys = nucspinadd(Sys,'"
+            << (nucSpin->GetIsotope()+nucSpin->GetElement()) 
+            << getElementSymbol(nucSpin->GetElement()) << "',";
+
+        ostringstream APart; //In the form [Axx,Ayy,Azz],[alpha,beta,gamma]
+        ostringstream QPart; //In the form [Qxx,Qyy,Qzz],[alpha,beta,gamma]
+
+        bool useQ = false;
+
+        foreach(Spin* eSpin,electronSpins) {
+			Eigenvalues a_tensor = Crush_2(spinsys->GetInteractionsBySpin(nucSpin,eSpin,Interaction::HFC),MHz);
+            EulerAngles ea = a_tensor.mOrient.GetAsEuler();
+
+			Eigenvalues q_tensor = Crush_2(spinsys->GetInteractionsBySpin(nucSpin,eSpin,Interaction::QUADRUPOLAR),MHz);
+            EulerAngles ea_q = q_tensor.mOrient.GetAsEuler();
+            
+            APart << "[" << a_tensor.xx << "," << a_tensor.yy << "," << a_tensor.zz << "]" << "," 
+                  << "[" << ea.alpha/PI*180 << "," << ea.beta/PI*180 << "," << ea.gamma/PI*180 << "]*PI/180";
+            QPart << "[" << q_tensor.xx << "," << q_tensor.yy << "," << q_tensor.zz << "]" << "," 
+                  << "[" << ea_q.alpha/PI*180 << "," << ea_q.beta/PI*180 << "," << ea_q.gamma/PI*180 << "]*PI/180";
+
+            if(q_tensor.xx != 0 || q_tensor.yy != 0 || q_tensor.zz != 0) {
+                useQ = true;
+            }
+        }
+        string APartStr = APart.str();
+        string QPartStr = QPart.str();
+
+        if(useQ) {
+            oss << APartStr << "," << QPartStr << ")" << endl;
+        } else {
+            oss << APartStr << ")" << endl;
+        }
+    }
 
     //G tensors
     monoTensor_(spinsys,oss,"g",electronSpins,Interaction::G_TENSER,Joules);
@@ -159,6 +175,7 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
       for the interaction of electrons 1-2, 1-3, 1-4, 2-3, 2-4, and
       3-4, in this order. For two electrons, ee contains one row only.
     */
+    /*
     string eeTensorLine;
     Appender_ eeTensorAppender(eeTensorLine);
     for(vector<Spin*>::iterator i = electronSpins.begin();i != electronSpins.end();++i) {
@@ -172,7 +189,7 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
 
     }
     oss << "sys.ee = [" << eeTensorLine << "];" << endl;
-
+    */
     oss << endl;
 
     oss << "Exp.mwFreq = " << mMWFreq << ";" << endl;

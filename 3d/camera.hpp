@@ -9,6 +9,7 @@ class Camera {
 public:
     Camera();
     void SetRotation(Eigen::Matrix3f& rotation);
+    Eigen::Matrix3f GetRotation();
     void SetZoom(float zoom);
     void DeltaZoom(float delta);
     void Translate(float deltaX,float deltaY);

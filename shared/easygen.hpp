@@ -16,6 +16,10 @@ struct EasySpinInput {
 
     std::string generate(SpinXML::SpinSystem* spinsys) const;
 
+    typedef boost::optional<double> maybeDouble;
+    typedef boost::optional<long> maybeLong;
+    typedef boost::optional<unsigned long> maybeULong;
+
     //================================================================================//
     // EasySpin function
     enum EasySpinFunc {
@@ -57,10 +61,10 @@ struct EasySpinInput {
 
 
     //----------------------------------------//
-    void setNPoints(unsigned long nPoints) {
+    void setNPoints(maybeULong nPoints) {
         mNPoints = nPoints;
     }
-    unsigned long mNPoints;
+    maybeULong mNPoints;
     //----------------------------------------//
     void setHarmonic(unsigned long harmonic) {
         mHarmonic = harmonic;
@@ -88,10 +92,10 @@ struct EasySpinInput {
 
     //----------------------------------------//
     //Valid range is 0 to 2Pi
-    void setMWPhase(unsigned long mwPhase) {
+    void setMWPhase(maybeDouble mwPhase) {
         mMWPhase = mwPhase;
     }
-    double mMWPhase;
+    maybeDouble mMWPhase;
 
     //================================================================================//
     // Options
@@ -128,7 +132,6 @@ struct EasySpinInput {
 
     //============================================================//
     // Broadernings
-    typedef boost::optional<double> maybeDouble;
     maybeDouble mGaussianFWHM;
     maybeDouble mLorentFWHM;
 

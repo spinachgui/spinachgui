@@ -8,6 +8,8 @@
 class OrientDialog2 : public OrientDialog2Base {
 public:
     OrientDialog2(wxWindow* parent);
+    void SlotRotate(Eigen::Matrix3f rotation);
+    
 private:
     std::vector<TextCtrlFocus*> mEulerAngleCtrls;
     std::vector<TextCtrlFocus*> mMatrixCtrls;

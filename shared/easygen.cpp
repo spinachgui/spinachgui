@@ -157,9 +157,13 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
     oss << "Exp.CenterSweep = [" << mCentre << " " << mSweep << "];" << endl;
     oss << endl;
     oss << "Exp.Harmonic = " << mHarmonic << ";" << endl;
-    oss << "Exp.nPoints = "  << mNPoints << ";" << endl;
+    if(mNPoints) {
+        oss << "Exp.nPoints = "  << mNPoints.get() << ";" << endl;
+    }
     oss << "Exp.Mode = '"     << mModeNames[mMode] << "';" << endl;
-    oss << "Exp.mwPhase = "  << mMWPhase << ";" << endl;
+    if(mMWPhase) {
+        oss << "Exp.mwPhase = "  << mMWPhase.get() << ";" << endl;
+    }
 
     oss << endl;
     if(mModAmp) {
@@ -168,7 +172,13 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
         oss << "Exp.Temperature = " << mTemperature.get() << ";" << endl;}
 
     //Brodernings
-    oss << "Sys.lw = [" << mGaussianFWHM << "," << mLorentFWHM << "]" << endl;
+    if(mGaussianFWHM && mLorentFWHM) {
+        oss << "Sys.lw = [" << mGaussianFWHM.get() << "," << mLorentFWHM.get() << "]" << endl;
+    } else if(mGaussianFWHM) {
+        oss << "Sys.lw = " << mGaussianFWHM.get() << ";" << endl;
+    } else if(mLorentFWHM) {
+        oss << "Sys.lw = [0," << mLorentFWHM.get() << "]" << endl;
+    }
 
     if(mEasySpinFunc == PEPPER) {
         //For each of these, if any of x,y and z are instansiated we print out the row.

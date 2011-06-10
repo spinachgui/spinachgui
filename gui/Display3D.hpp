@@ -46,6 +46,9 @@ public:
     void Redraw(){Refresh();}
 
     bool IsDragging(){return mDraging;}
+    
+    //Triggered when the view is rotated
+    sigc::signal<void,Eigen::Matrix3f> sigRotate;
 protected:
     DECLARE_EVENT_TABLE();
 

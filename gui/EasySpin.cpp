@@ -35,6 +35,8 @@ using namespace Eigen;
 using namespace SpinXML;
 using boost::optional;
 
+typedef optional<double> maybeDouble;
+
 //================================================================================//
 // wxChoice decoder functions. Decode an wxChoice index into a
 // meaninful value. It would generally be preferable to use the
@@ -106,6 +108,30 @@ optional<double> getOptionalValue(const wxTextCtrl* textCtrl) {
     str.ToDouble(&value);
     return value;
 }
+
+optional<double> getOptionalValue(const wxComboBox* textCtrl) {
+    wxString str = textCtrl->GetValue();
+    if(str == wxT("")) {
+         //Return an empty optional
+        return optional<double>();
+    }
+    double value;
+    str.ToDouble(&value);
+    return value;
+}
+
+optional<unsigned long> getOptionalULong(const wxComboBox* textCtrl) {
+    wxString str = textCtrl->GetValue();
+    if(str == wxT("")) {
+         //Return an empty optional
+        return optional<unsigned long>();
+    }
+    unsigned long value;
+    str.ToULong(&value);
+    return value;
+}
+
+
 
 void loadSpaceGroups();
 vector<wxString> gSpaceGroups;
@@ -414,9 +440,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
         easySpinInput.setTemperature(temperature);
     }
 
-    unsigned long nPoints;
-    mCtrlNPoints->GetValue().ToULong(&nPoints);
-    easySpinInput.setNPoints(nPoints);
+    easySpinInput.mNPoints = getOptionalULong(mCtrlNPoints);
 
     easySpinInput.setHarmonic(mCtrlHarmonic->GetSelection());
 
@@ -432,9 +456,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
         easySpinInput.setModAmp(modAmp*toMiliT);
     }
 
-    double mwPhase;
-    mCtrlPhase->GetValue().ToDouble(&mwPhase);
-    easySpinInput.setMWPhase(mwPhase);
+    easySpinInput.mMWPhase = getOptionalValue(mCtrlPhase);
 
     easySpinInput.setMethod(gMethodSelectOrdering[mCtrlMethod->GetSelection()]);
 
@@ -444,11 +466,8 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.setOutput(gOutputSelectOrdering[mCtrlOutput->GetSelection()]);
 
     //Broadernings
-    double fwhm;
-    mCtrlGaussFWHM->GetValue().ToDouble(&fwhm);
-    easySpinInput.mGaussianFWHM = fwhm;
-    mCtrlLorentFWHM->GetValue().ToDouble(&fwhm);
-    easySpinInput.mLorentFWHM = fwhm;
+    easySpinInput.mGaussianFWHM = getOptionalValue(mCtrlGaussFWHM);
+    easySpinInput.mLorentFWHM = getOptionalValue(mCtrlLorentFWHM);
 
     if(mCtrlEasySpinF->GetSelection() == 2) {
         easySpinInput.mHStrainX = getOptionalValue(mCtrlHX);
@@ -502,27 +521,43 @@ void EasySpinFrame::OnCopy(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnGaussFWHM(wxCommandEvent& e) {
-    double value;
-    mCtrlGaussFWHM->GetValue().ToDouble(&value);
-    mCtrlGaussPP->ChangeValue(wxString() << value/SQRT_2LN2);
+    e.Skip();
+    maybeDouble value = getOptionalValue(mCtrlGaussFWHM);
+    if(value) {
+        mCtrlGaussPP->ChangeValue(wxString() << value.get()/SQRT_2LN2);
+    } else {
+        mCtrlGaussPP->ChangeValue(wxT(""));
+    }
 }
 
 void EasySpinFrame::OnGaussPP(wxCommandEvent& e) {
-    double value;
-    mCtrlGaussPP->GetValue().ToDouble(&value);
-    mCtrlGaussFWHM->ChangeValue(wxString() << value*SQRT_2LN2);
+    e.Skip();
+    maybeDouble value = getOptionalValue(mCtrlGaussPP);
+    if(value) {
+        mCtrlGaussFWHM->ChangeValue(wxString() << value.get()*SQRT_2LN2);
+    } else {
+        mCtrlGaussFWHM->ChangeValue(wxT(""));
+    }
 }
 
 void EasySpinFrame::OnLorentFWHM(wxCommandEvent& e) {
-    double value;
-    mCtrlLorentFWHM->GetValue().ToDouble(&value);
-    mCtrlLorentPP->ChangeValue(wxString() << value/SQRT_3);
+    e.Skip();
+    maybeDouble value = getOptionalValue(mCtrlLorentFWHM);
+    if(value) {
+        mCtrlLorentPP->ChangeValue(wxString() << value.get()/SQRT_3);
+    } else {
+        mCtrlLorentPP->ChangeValue(wxT(""));
+    }
 }
 
 void EasySpinFrame::OnLorentPP(wxCommandEvent& e) {
-    double value;
-    mCtrlLorentPP->GetValue().ToDouble(&value);
-    mCtrlLorentFWHM->ChangeValue(wxString() << value*SQRT_3);
+    e.Skip();
+    maybeDouble value = getOptionalValue(mCtrlLorentPP);
+    if(value) {
+        mCtrlLorentFWHM->ChangeValue(wxString() << value.get()*SQRT_3);
+    } else {
+        mCtrlLorentFWHM->ChangeValue(wxT(""));
+    }
 }
 
 

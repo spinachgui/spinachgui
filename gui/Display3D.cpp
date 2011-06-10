@@ -97,7 +97,6 @@ void Display3D::ChangeViewport() {
 }
 
 void Display3D::OnMouseMove(wxMouseEvent& e) {
-    cout << "Mousemove!" << endl;
     if(e.Dragging()) {
         mDraging = true;
     } else {
@@ -116,6 +115,7 @@ void Display3D::OnMouseMove(wxMouseEvent& e) {
         } else {
             //Ajust camera angle
             mCamera->Rotate(e.GetX()-mMouseX,e.GetY()-mMouseY);
+            sigRotate(mCamera->GetRotation());
         }
     } 
     mMouseX=e.GetX();

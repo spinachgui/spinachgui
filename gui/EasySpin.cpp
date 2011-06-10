@@ -193,6 +193,9 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     //Make strain based broaderning hidded until the user selects pepper
     mSizerStrain->Show(false);
 
+    //Start on the experiment page
+    mNotebook->SetSelection(1);
+
     HideCrystal(true);
 }
 

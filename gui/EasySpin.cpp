@@ -198,6 +198,29 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
 void EasySpinFrame::SetSpinsys(SpinXML::SpinSystem* spinsys) {
     mSpinSystem = spinsys;
+
+    //gStrain and AStrain are only applicable for one electron spin, D
+    //strain is only applicable for multipul electron spins
+    unsigned long nElectrons = 0;
+    foreach(Spin* spin,mSpinSystem->GetSpins()) {
+        if(spin->GetElement() == 0) {
+            nElectrons++;
+            if(nElectrons >= 2) {
+                break;
+            }
+        }
+    }
+    mCtrlGX->Enable(nElectrons == 1);
+    mCtrlGY->Enable(nElectrons == 1);
+    mCtrlGZ->Enable(nElectrons == 1);
+
+    mCtrlAX->Enable(nElectrons == 1);
+    mCtrlAY->Enable(nElectrons == 1);
+    mCtrlAZ->Enable(nElectrons == 1);
+
+    mCtrlDD->Enable(nElectrons > 1);
+    mCtrlDE->Enable(nElectrons > 1);
+    mCtrlDCorrCoeff->Enable(nElectrons > 1);
 }
 
 

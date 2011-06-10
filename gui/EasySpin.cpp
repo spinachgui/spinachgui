@@ -142,7 +142,7 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
                              const wxPoint& pos,
                              const wxSize& size,
                              long style) 
-    : EasySpinFrameBase(parent,id,title,pos,size,style),mPreviewEdited(false) {
+    : EasySpinFrameBase(parent,id,title,pos,size,style) {
     loadSpaceGroups();
 
     //Add numeric validators to the numeric text boxes
@@ -427,17 +427,14 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
     spaceGroupDialog->ShowModal();
 }
 
-void EasySpinFrame::OnGenerateButton(wxCommandEvent& e) {
+void EasySpinFrame::OnAutoGen(wxCommandEvent& e) {
     //User has decided to discard changes
-    mPreviewEdited = false;
-    mTempGenerate->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     OnGenerate(e);
 }
 
 void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     e.Skip();
-    if(mPreviewEdited) {
-        mTempGenerate->SetForegroundColour(*wxRED);
+    if(!mCtrlAutoGen->GetValue()) {
         return;
     }
     double toMiliT = magneticFieldUnit(mCtrlRangeUnit->GetSelection());
@@ -517,7 +514,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::PreviewEdit(wxCommandEvent& e) {
-    mPreviewEdited = true;
+    mCtrlAutoGen->SetValue(false);
 }
 
 void EasySpinFrame::OnEasySpinFunc(wxCommandEvent& e) {
@@ -636,7 +633,7 @@ EVT_TEXT(ID_CORR_COEFF, EasySpinFrame::OnCorrCoeff)
 
 
 //Other
-EVT_BUTTON(ID_TMP_GEN,   EasySpinFrame::OnGenerateButton)
+EVT_CHECKBOX(ID_AUTOGEN,EasySpinFrame::OnAutoGen)
 EVT_TEXT(ID_PREVIEW,     EasySpinFrame::PreviewEdit)
 EVT_CHOICE(ID_EASYSPIN_F,EasySpinFrame::OnEasySpinFunc)
 EVT_BUTTON(ID_COPY,      EasySpinFrame::OnCopy)

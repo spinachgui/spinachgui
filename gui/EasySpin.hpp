@@ -61,7 +61,7 @@ protected:
     void OnCorrCoeff(wxCommandEvent& e);
     //Other events
     void OnGenerate(wxCommandEvent& e);
-    void OnGenerateButton(wxCommandEvent& e);
+    void OnAutoGen(wxCommandEvent& e);
     void PreviewEdit(wxCommandEvent& e);
     void OnEasySpinFunc(wxCommandEvent& e);
     void OnCopy(wxCommandEvent& e);
@@ -74,7 +74,6 @@ protected:
     void HideCrystal(bool hide = true);
     
 protected:
-    bool mPreviewEdited;
     wxString mStrMin;
     wxString mStrMax;
     wxString mStrCentre;

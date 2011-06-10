@@ -23,6 +23,8 @@
 #include <shared/spinsys.hpp>
 #include <shared/nuclear_data.hpp>
 #include <shared/easygen.hpp>
+#include <wx/filedlg.h>
+#include <fstream>
 
 #define ORIENT_ICON_SIZE 41
 
@@ -594,6 +596,27 @@ void EasySpinFrame::OnCorrCoeff(wxCommandEvent& e) {
     }
 }
 
+void EasySpinFrame::OnSave(wxCommandEvent& e) {
+    wxFileDialog* fd=new wxFileDialog(this,
+                                      wxString(wxT("Choose a file")),
+                                      wxString(wxT("")), //Default file
+                                      wxString(wxT("")), //Default dir
+                                      wxT("MATLAB files (*.m)|*.m"),
+                                      wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    if(fd->ShowModal() == wxID_OK) {
+        string filename(fd->GetPath().mb_str());
+        ofstream file(filename.c_str());
+        if(!file.is_open()) {
+            wxLogError(wxT("Unknown error while saving file"));
+            delete fd;
+            return;
+        }
+        file << mCtrlPreview->GetValue().mb_str();
+    }
+    delete fd;
+}
+
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
 //Experiment
@@ -636,10 +659,11 @@ EVT_TEXT(ID_CORR_COEFF, EasySpinFrame::OnCorrCoeff)
 
 
 //Other
-EVT_CHECKBOX(ID_AUTOGEN,EasySpinFrame::OnAutoGen)
 EVT_TEXT(ID_PREVIEW,     EasySpinFrame::PreviewEdit)
 EVT_CHOICE(ID_EASYSPIN_F,EasySpinFrame::OnEasySpinFunc)
 EVT_BUTTON(ID_COPY,      EasySpinFrame::OnCopy)
+EVT_BUTTON(ID_EAYSPINDLG_SAVE,      EasySpinFrame::OnSave)
+EVT_CHECKBOX(ID_AUTOGEN,EasySpinFrame::OnAutoGen)
 
 //Catch everything and trigger a regeneration
 EVT_TEXT(wxID_ANY, EasySpinFrame::OnGenerate)

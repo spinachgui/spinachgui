@@ -65,7 +65,8 @@ protected:
     void PreviewEdit(wxCommandEvent& e);
     void OnEasySpinFunc(wxCommandEvent& e);
     void OnCopy(wxCommandEvent& e);
-
+    void OnSave(wxCommandEvent& e);
+    
     //Methods
     void SetMWFreq(double freq);
     void SetMinMax(double min,double max);

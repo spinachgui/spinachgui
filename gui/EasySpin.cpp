@@ -432,6 +432,32 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
 
     easySpinInput.setOutput(gOutputSelectOrdering[mCtrlOutput->GetSelection()]);
 
+    //Broadernings
+    double fwhm;
+    mCtrlGaussFWHM->GetValue().ToDouble(&fwhm);
+    easySpinInput.mGaussianFWHM = fwhm;
+    mCtrlLorentFWHM->GetValue().ToDouble(&fwhm);
+    easySpinInput.mLorentFWHM = fwhm;
+
+    if(mCtrlEasySpinF->GetSelection() == 2) {
+        double strainVar;
+        mCtrlHX->GetValue().ToDouble(&strainVar);  easySpinInput.mHStrainX = strainVar;
+        mCtrlHY->GetValue().ToDouble(&strainVar);  easySpinInput.mHStrainY = strainVar;
+        mCtrlHZ->GetValue().ToDouble(&strainVar);  easySpinInput.mHStrainZ = strainVar;
+
+        mCtrlGX->GetValue().ToDouble(&strainVar);  easySpinInput.mGStrainX = strainVar;
+        mCtrlGY->GetValue().ToDouble(&strainVar);  easySpinInput.mGStrainY = strainVar;
+        mCtrlGZ->GetValue().ToDouble(&strainVar);  easySpinInput.mGStrainZ = strainVar;
+
+        mCtrlAX->GetValue().ToDouble(&strainVar);  easySpinInput.mAStrainX = strainVar;
+        mCtrlAY->GetValue().ToDouble(&strainVar);  easySpinInput.mAStrainY = strainVar;
+        mCtrlAZ->GetValue().ToDouble(&strainVar);  easySpinInput.mAStrainZ = strainVar;
+
+        mCtrlDD->GetValue().ToDouble(&strainVar);  easySpinInput.mDStrainD = strainVar;
+        mCtrlDE->GetValue().ToDouble(&strainVar);  easySpinInput.mDStrainE = strainVar;
+        mCtrlDCorrCoeff->GetValue().ToDouble(&strainVar);  easySpinInput.mDStrainCorrCoeff = strainVar;
+    }
+
     //Do code generation
     string easyCode = easySpinInput.generate(mSpinSystem);
     

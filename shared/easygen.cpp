@@ -9,6 +9,7 @@
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
 #include <boost/optional.hpp>
+#include <shared/orientation.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -58,6 +59,19 @@ struct Appender_ {
 	string& str;
 };
 
+Eigenvalues Crush_2(const vector<Interaction*>& inters,unit u) {
+	Matrix3d total;
+	total <<
+		0,0,0,
+		0,0,0,
+		0,0,0;
+	for(unsigned long j = 0;j<inters.size();j++) {
+		Interaction* inter = inters[j];
+		total += inter->AsMatrix()*(1/u);
+	}
+    return ConvertToEigenvalues(total);
+}
+
 Matrix3d Crush_(const vector<Interaction*>& inters,unit u) {
 	Matrix3d total;
 	total <<
@@ -104,13 +118,21 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
             //We have a nucleus
             nucSpins.push_back(spin);
 
+			Eigenvalues a_tensor = Crush_2(spinsys->GetInteractionsBySpin(spin,spin,Interaction::HFC),MHz);
+            EulerAngles ea = a_tensor.mOrient.GetAsEuler();
+
+			Eigenvalues q_tensor = Crush_2(spinsys->GetInteractionsBySpin(spin,spin,Interaction::QUADRUPOLAR),MHz);
+            EulerAngles ea_q = q_tensor.mOrient.GetAsEuler();
+            
             //Format is:
             //NewSys = nucspinadd(Sys,Nuc,A,Apa,Q,Qpa)
-            NucsStream << "Sys = nucspinadd(Sys,"
+            NucsStream << "Sys = nucspinadd(Sys,'"
                        << (spin->GetIsotope()+spin->GetElement()) 
-                       << getElementSymbol(spin->GetElement()) << "," 
-                       << "[Ax Ay Az]" << "," << "[alpha,beta,gamma]" << ","
-                       << "[Qx Qy Qz]" << "," << "[alpha,beta,gamma]" << ");" << endl;
+                       << getElementSymbol(spin->GetElement()) << "'," 
+                       << "[" << a_tensor.xx << "," << a_tensor.yy << "," << a_tensor.zz << "]" << "," 
+                       << "[" << ea.alpha << "," << ea.beta << "," << ea.gamma << "]" << ","
+                       << "[" << q_tensor.xx << "," << q_tensor.yy << "," << q_tensor.zz << "]" << "," 
+                       << "[" << ea_q.alpha << "," << ea_q.beta << "," << ea_q.gamma << "]" << ");" << endl;
             first = false;
         }
     }

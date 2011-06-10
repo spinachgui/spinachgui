@@ -560,6 +560,16 @@ void EasySpinFrame::OnLorentPP(wxCommandEvent& e) {
     }
 }
 
+void EasySpinFrame::OnCorrCoeff(wxCommandEvent& e) {
+    e.Skip();
+    double value;
+    mCtrlDCorrCoeff->GetValue().ToDouble(&value);
+    if(value > 1) {
+        mCtrlDCorrCoeff->ChangeValue(wxT("1"));
+    } else if(value < -1) {
+        mCtrlDCorrCoeff->ChangeValue(wxT("-1"));
+    }
+}
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -598,6 +608,8 @@ EVT_TEXT(ID_GAUSS_FWHM ,EasySpinFrame::OnGaussFWHM)
 EVT_TEXT(ID_GAUSS_PP   ,EasySpinFrame::OnGaussPP)
 EVT_TEXT(ID_LORENT_FWHM,EasySpinFrame::OnLorentFWHM)
 EVT_TEXT(ID_LORENT_PP  ,EasySpinFrame::OnLorentPP)
+
+EVT_TEXT(ID_CORR_COEFF, EasySpinFrame::OnCorrCoeff)
 
 
 //Other

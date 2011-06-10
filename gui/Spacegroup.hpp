@@ -22,6 +22,9 @@ protected:
     wxNotebook* mNotebook;
 };
 
+std::string findSpacegroup(std::string partial);
+std::string nameSpacegroup(unsigned long number);
+
 //Private
 
 struct __SpacegroupInit {

@@ -134,19 +134,13 @@ optional<unsigned long> getOptionalULong(const wxComboBox* textCtrl) {
 }
 
 
-
-void loadSpaceGroups();
-vector<wxString> gSpaceGroups;
-
 EasySpinFrame::EasySpinFrame(wxWindow* parent,
                              wxWindowID id,
                              const wxString& title,
                              const wxPoint& pos,
                              const wxSize& size,
                              long style) 
-    : EasySpinFrameBase(parent,id,title,pos,size,style),mSpinSystem(NULL) {
-    loadSpaceGroups();
-
+    : EasySpinFrameBase(parent,id,title,pos,size,style),mSpinSystem(NULL),mSpacegroupSelected(-1) {
     //Add numeric validators to the numeric text boxes
     mCtrlMax->   SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
     mCtrlMin->   SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
@@ -164,6 +158,9 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlMWFreq->ChangeValue(wxT("9.5"));
 
     mCtrlPhase->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlSpaceGroupTxt->sigFocus.connect  (mem_fun(this,&EasySpinFrame::OnSpaceGroupFocus));
+    mCtrlSpaceGroupTxt->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::OnSpaceGroupUnfocus));
 
     //Options section
     mCtrlKnots->SetRange(2,INT_MAX);
@@ -440,6 +437,40 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
     delete spaceGroupDialog;
 }
 
+void EasySpinFrame::OnSpaceGroupTxt(wxCommandEvent& e) {
+    //Try to decide which space group the user ment and display that
+    wxString value = mCtrlSpaceGroupTxt->GetValue();
+
+    string compleated_value = findSpacegroup(string(value.mb_str()));
+    if(compleated_value != "") {
+        mCtrlSpaceGroupTxt->ChangeValue(wxString(compleated_value.c_str(),wxConvUTF8));
+    }
+}
+
+void EasySpinFrame::OnSpaceGroupFocus() {
+    if(mCtrlSpaceGroupTxt->GetValue() == wxT("(Unknown space group)")) {
+        mCtrlSpaceGroupTxt->ChangeValue(wxT(""));
+    }
+}
+
+void EasySpinFrame::OnSpaceGroupUnfocus() {
+    //Try to decide which space group the user ment and display that
+    wxString value = mCtrlSpaceGroupTxt->GetValue();
+    long number;
+    string name;
+    if(value.ToLong(&number)) {
+        //They entered a number, find the name
+        name = nameSpacegroup(number);
+    } else {
+        number = -1;
+    }
+    if(number != -1) {
+        mCtrlSpaceGroupTxt->ChangeValue(wxString() << number << wxT(" (") << wxString(name.c_str(),wxConvUTF8) << wxT(")"));
+    } else {
+        mCtrlSpaceGroupTxt->ChangeValue(wxT("(Unknown space group)"));
+    }
+}
+
 void EasySpinFrame::OnAutoGen(wxCommandEvent& e) {
     //User has decided to discard changes
     OnGenerate(e);
@@ -649,6 +680,7 @@ EVT_RADIOBUTTON(ID_POWDER,EasySpinFrame::OnCrystal)
 EVT_BUTTON(ID_ADD_ORIENT,   EasySpinFrame::OnAddOrient)
 EVT_BUTTON(ID_DELETE_ORIENT,EasySpinFrame::OnDeleteOrient)
 
+EVT_TEXT(ID_SPACEGROUP_TEXT, EasySpinFrame::OnSpaceGroupTxt)
 EVT_BUTTON(ID_SPACEGROUP_BUTTON,EasySpinFrame::OnShowSpaceGroups)
 
 EVT_LIST_ITEM_ACTIVATED(ID_ORIENT_LIST,EasySpinFrame::OnOrientDClick)
@@ -682,40 +714,6 @@ EVT_RADIOBUTTON(wxID_ANY, EasySpinFrame::OnGenerate)
 
 END_EVENT_TABLE()
 
-
-void loadSpaceGroups() {
-    static bool loaded = false;
-    if(loaded) {
-        return;
-    }
-
-    fstream fin("data/spacegroups.txt",ios::in);
-    if(!fin.is_open()) {
-        wxLogError(wxT("Could not open data/spacegroups.txt, no spacegroups will be available\n"));
-        return;
-    }
-
-    long count = 0;
-    while(!fin.eof()) {
-        //TODO: I'm not sure if this code will work on windows, where
-        //wstrings need to be used rather than strings
-        string symbol;
-        fin >> symbol;
-        if(symbol == "") {
-            //Ignore blank lines
-            continue;
-        }
-        gSpaceGroups.push_back(wxString(symbol.c_str(),wxConvUTF8));
-        count++;
-    }
-    if(count != 230) {
-        wxLogError(wxString() << wxT("Expecting 230 entries in data/spacegroups.txt, found\n") << count);
-        return;
-    }
-
-    loaded = true;
-    return;
-}
 
 struct __Init {
     __Init() {

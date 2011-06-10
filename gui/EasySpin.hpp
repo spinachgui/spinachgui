@@ -20,7 +20,6 @@ public:
 
 
     void SetSpinsys(SpinXML::SpinSystem* spinsys);
-
 protected:
     DECLARE_EVENT_TABLE();
     //Exp events
@@ -46,6 +45,10 @@ protected:
     void OnShowSpaceGroups(wxCommandEvent& e);
 
     void OnOrientDClick(wxListEvent& e);
+
+    void OnSpaceGroupTxt(wxCommandEvent& e);
+    void OnSpaceGroupUnfocus();
+    void OnSpaceGroupFocus();
 
     //Options Events
     void OnKnotsChange(wxSpinEvent& e);
@@ -81,6 +84,7 @@ protected:
     wxString mStrSweep;
 
     SpinXML::SpinSystem* mSpinSystem;
+    long mSpacegroupSelected;
 
     std::vector<SpinXML::Orientation> mOrients;
 };

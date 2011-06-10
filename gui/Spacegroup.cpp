@@ -19,6 +19,41 @@
 #include <wx/html/htmlwin.h>
 using namespace std;
 
+//NB this number is as likey to change as pi
+#define NUM_SPACEGROUPS 230
+
+//================================================================================//
+// Spacegroup Queries
+
+vector<string> gSpaceGroups;
+
+string findSpacegroup(string partial) {
+    bool found1 = false;
+    string found = "";
+    foreach(string name,gSpaceGroups) {
+        if(name.substr(0,partial.length()) == partial) {
+            if(found1) {
+                //Not unambigous
+                return "";
+            } else {
+                found1 = true;
+                found = name;
+            }
+        }
+    }
+    return found;
+}
+
+string nameSpacegroup(unsigned long number) {
+    if(number > 0 && number <= NUM_SPACEGROUPS) {
+        return gSpaceGroups[number-1];
+    }
+    return "";
+}
+
+//================================================================================//
+// Spacegroup GUI class
+
 wxString testHTML;
 vector<wxString> gCystalSystemNames;
 
@@ -70,6 +105,41 @@ END_EVENT_TABLE()
 
 //================================================================================//
 
+
+void loadSpaceGroups() {
+    static bool loaded = false;
+    if(loaded) {
+        return;
+    }
+
+    fstream fin("data/spacegroups.txt",ios::in);
+    if(!fin.is_open()) {
+        wxLogError(wxT("Could not open data/spacegroups.txt, no spacegroups will be available\n"));
+        return;
+    }
+
+    long count = 0;
+    while(!fin.eof()) {
+        //TODO: I'm not sure if this code will work on windows, where
+        //wstrings need to be used rather than strings
+        string symbol;
+        fin >> symbol;
+        if(symbol == "") {
+            //Ignore blank lines
+            continue;
+        }
+        gSpaceGroups.push_back(symbol);
+        count++;
+    }
+    if(count != NUM_SPACEGROUPS) {
+        wxLogError(wxString() << wxT("Expecting 230 entries in data/spacegroups.txt, found\n") << count);
+        return;
+    }
+
+    loaded = true;
+    return;
+}
+
 __SpacegroupInit::__SpacegroupInit() {
     gCystalSystemNames.push_back(wxT("triclinic"));
     gCystalSystemNames.push_back(wxT("monoclinic"));
@@ -77,7 +147,11 @@ __SpacegroupInit::__SpacegroupInit() {
     gCystalSystemNames.push_back(wxT("tetragonal"));
     gCystalSystemNames.push_back(wxT("hexagonal"));
     gCystalSystemNames.push_back(wxT("cubic"));
+
+    loadSpaceGroups();
 }
+
+
 static __SpacegroupInit __spacegroupInit;
 
 

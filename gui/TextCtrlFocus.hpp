@@ -16,9 +16,11 @@ public:
                   const wxValidator& validator = wxDefaultValidator,
                   const wxString& name = wxTextCtrlNameStr);
     sigc::signal<void> sigUnFocus;
+    sigc::signal<void> sigFocus;
     
     DECLARE_EVENT_TABLE()
 
+    void OnFocus(wxFocusEvent& e);
     void OnUnFocus(wxFocusEvent& e);
 };
 

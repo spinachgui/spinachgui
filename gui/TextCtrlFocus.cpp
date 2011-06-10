@@ -12,6 +12,9 @@ TextCtrlFocus::TextCtrlFocus(wxWindow* parent,
     : wxTextCtrl(parent,id,value,pos,size,style,validator,name) {
 }
 
+void TextCtrlFocus::OnFocus(wxFocusEvent& e) {
+    sigFocus();
+}
 
 void TextCtrlFocus::OnUnFocus(wxFocusEvent& e) {
     sigUnFocus();
@@ -19,6 +22,7 @@ void TextCtrlFocus::OnUnFocus(wxFocusEvent& e) {
 
 BEGIN_EVENT_TABLE(TextCtrlFocus,wxTextCtrl)
 
+EVT_SET_FOCUS(TextCtrlFocus::OnFocus)
 EVT_KILL_FOCUS(TextCtrlFocus::OnUnFocus)
 
 END_EVENT_TABLE()

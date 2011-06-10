@@ -8,10 +8,17 @@
 #include <shared/interaction.hpp>
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
+#include <boost/optional.hpp>
 
 using namespace std;
 using namespace Eigen;
 using namespace SpinXML;
+using namespace boost;
+
+template<typename T,typename T2>
+T orDefault(optional<T> o,T2 d) {
+    return o ? o.get() : T(d);
+}
 
 string MatlabMatrix_(Matrix3d mat) {
 	ostringstream out;
@@ -164,10 +171,31 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
     oss << "Sys.lw = [" << mGaussianFWHM << "," << mLorentFWHM << "]" << endl;
 
     if(mEasySpinFunc == PEPPER) {
-        oss << "Sys.HStrain = [" << mHStrainX << "," << mHStrainY << "," << mHStrainZ         << "];" << endl;
-        oss << "Sys.gStrain = [" << mGStrainX << "," << mGStrainY << "," << mGStrainZ         << "];" << endl;
-        oss << "Sys.AStrain = [" << mAStrainX << "," << mAStrainY << "," << mAStrainZ         << "];" << endl;
-        oss << "Sys.DStrain = [" << mDStrainD << "," << mDStrainE << "," << mDStrainCorrCoeff << "];" << endl;
+        //For each of these, if any of x,y and z are instansiated we print out the row.
+        if(mHStrainX || mHStrainY || mHStrainZ) {
+            oss << "Sys.HStrain = ["
+                << orDefault(mHStrainX,0) << ","
+                << orDefault(mHStrainY,0) << ","
+                << orDefault(mHStrainZ,0) << "];" << endl;
+        }
+        if(mGStrainX || mGStrainY || mGStrainZ) {
+            oss << "Sys.HStrain = ["
+                << orDefault(mGStrainX,0) << ","
+                << orDefault(mGStrainY,0) << ","
+                << orDefault(mGStrainZ,0) << "];" << endl;
+        }
+        if(mAStrainX || mAStrainY || mAStrainZ) {
+            oss << "Sys.HStrain = ["
+                << orDefault(mAStrainX,0) << ","
+                << orDefault(mAStrainY,0) << ","
+                << orDefault(mAStrainZ,0) << "];" << endl;
+        }
+        if(mDStrainD || mDStrainE || mDStrainCorrCoeff) {
+            oss << "Sys.HStrain = ["
+                << orDefault(mDStrainD,0) << ","
+                << orDefault(mDStrainE,0) << ","
+                << orDefault(mDStrainCorrCoeff,0) << "];" << endl;
+        }
     }
     oss << endl;
 

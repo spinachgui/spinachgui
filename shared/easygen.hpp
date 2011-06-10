@@ -128,13 +128,14 @@ struct EasySpinInput {
 
     //============================================================//
     // Broadernings
-    double mGaussianFWHM;
-    double mLorentFWHM;
+    typedef boost::optional<double> maybeDouble;
+    maybeDouble mGaussianFWHM;
+    maybeDouble mLorentFWHM;
 
-    double mHStrainX,mHStrainY,mHStrainZ;        
-    double mGStrainX,mGStrainY,mGStrainZ;        
-    double mAStrainX,mAStrainY,mAStrainZ;        
-    double mDStrainD,mDStrainE,mDStrainCorrCoeff;
+    maybeDouble mHStrainX,mHStrainY,mHStrainZ;        
+    maybeDouble mGStrainX,mGStrainY,mGStrainZ;        
+    maybeDouble mAStrainX,mAStrainY,mAStrainZ;        
+    maybeDouble mDStrainD,mDStrainE,mDStrainCorrCoeff;
 
     //Static stuff
     static void staticCtor() {

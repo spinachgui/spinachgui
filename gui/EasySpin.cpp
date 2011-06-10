@@ -96,6 +96,17 @@ vector<EasySpinInput::EasySpinFunc> gEasySpinSelectOrdering;
 //================================================================================//
 // GUI Functions
 
+optional<double> getOptionalValue(const wxTextCtrl* textCtrl) {
+    wxString str = textCtrl->GetValue();
+    if(str == wxT("")) {
+         //Return an empty optional
+        return optional<double>();
+    }
+    double value;
+    str.ToDouble(&value);
+    return value;
+}
+
 void loadSpaceGroups();
 vector<wxString> gSpaceGroups;
 
@@ -440,22 +451,21 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.mLorentFWHM = fwhm;
 
     if(mCtrlEasySpinF->GetSelection() == 2) {
-        double strainVar;
-        mCtrlHX->GetValue().ToDouble(&strainVar);  easySpinInput.mHStrainX = strainVar;
-        mCtrlHY->GetValue().ToDouble(&strainVar);  easySpinInput.mHStrainY = strainVar;
-        mCtrlHZ->GetValue().ToDouble(&strainVar);  easySpinInput.mHStrainZ = strainVar;
-
-        mCtrlGX->GetValue().ToDouble(&strainVar);  easySpinInput.mGStrainX = strainVar;
-        mCtrlGY->GetValue().ToDouble(&strainVar);  easySpinInput.mGStrainY = strainVar;
-        mCtrlGZ->GetValue().ToDouble(&strainVar);  easySpinInput.mGStrainZ = strainVar;
-
-        mCtrlAX->GetValue().ToDouble(&strainVar);  easySpinInput.mAStrainX = strainVar;
-        mCtrlAY->GetValue().ToDouble(&strainVar);  easySpinInput.mAStrainY = strainVar;
-        mCtrlAZ->GetValue().ToDouble(&strainVar);  easySpinInput.mAStrainZ = strainVar;
-
-        mCtrlDD->GetValue().ToDouble(&strainVar);  easySpinInput.mDStrainD = strainVar;
-        mCtrlDE->GetValue().ToDouble(&strainVar);  easySpinInput.mDStrainE = strainVar;
-        mCtrlDCorrCoeff->GetValue().ToDouble(&strainVar);  easySpinInput.mDStrainCorrCoeff = strainVar;
+        easySpinInput.mHStrainX = getOptionalValue(mCtrlHX);
+        easySpinInput.mHStrainY = getOptionalValue(mCtrlHY);
+        easySpinInput.mHStrainZ = getOptionalValue(mCtrlHZ);
+                                         
+        easySpinInput.mGStrainX = getOptionalValue(mCtrlGX);
+        easySpinInput.mGStrainY = getOptionalValue(mCtrlGY);
+        easySpinInput.mGStrainZ = getOptionalValue(mCtrlGZ);
+                                         
+        easySpinInput.mAStrainX = getOptionalValue(mCtrlAX);
+        easySpinInput.mAStrainY = getOptionalValue(mCtrlAY);
+        easySpinInput.mAStrainZ = getOptionalValue(mCtrlAZ);
+                                         
+        easySpinInput.mDStrainD = getOptionalValue(mCtrlDD);
+        easySpinInput.mDStrainE = getOptionalValue(mCtrlDE);
+        easySpinInput.mDStrainCorrCoeff = getOptionalValue(mCtrlDCorrCoeff);
     }
 
     //Do code generation

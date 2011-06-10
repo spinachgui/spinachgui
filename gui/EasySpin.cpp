@@ -430,9 +430,14 @@ void EasySpinFrame::OnOrientDClick(wxListEvent& e) {
 }
 
 void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
-    //TODO: Memory leak?
+    //TODO: if we keep the constructed object around it would probably
+    //load faster the second time around
     SpaceGroupDialog* spaceGroupDialog = new SpaceGroupDialog(this);
-    spaceGroupDialog->ShowModal();
+    if(spaceGroupDialog->ShowModal() == wxID_OK) {
+        mCtrlSpaceGroupTxt->ChangeValue(wxString() << spaceGroupDialog->spacegroup);
+    }
+
+    delete spaceGroupDialog;
 }
 
 void EasySpinFrame::OnAutoGen(wxCommandEvent& e) {

@@ -92,7 +92,7 @@ void monoTensor_(const SpinSystem* ss,ostream& out,string varname,vector<Spin*> 
 		vector<Interaction*> tensors = ss->GetInteractionsBySpin(spin,t);
 		appender(MatlabMatrix_(Crush_(tensors,u)));
 	}
-	out << "sys." << varname << " = " << line << ";" << endl;
+	out << "Sys." << varname << " = " << line << ";" << endl;
 }
 
 
@@ -113,7 +113,7 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
             }
         }
 
-        oss << "sys.S = [";
+        oss << "Sys.S = [";
         for(unsigned long i = 0;i<electronSpins.size();i++) {
             oss << "1/2 ";
         }
@@ -189,7 +189,7 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
           }
 
           }
-          oss << "sys.ee = [" << eeTensorLine << "];" << endl;
+          oss << "Sys.ee = [" << eeTensorLine << "];" << endl;
         */
         oss << endl;
     }

@@ -104,9 +104,6 @@ struct EasySpinInput {
         PERT1,
         PERT2
     };
-    void setMethod(Method method) {
-        mMethod = method;
-    }
     Method mMethod;
 
     void setNKnots(unsigned long nKnots) {

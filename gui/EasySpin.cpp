@@ -31,6 +31,13 @@
 #define SQRT_2LN2 1.1774100225154747
 #define SQRT_3    1.7320508075688773
 
+//These numbers correspon to the order of the pages in the dropdown,
+//i.e. if mCtrlEasySpinF->GetSelection() == GARLIC_TAB is true the selection is garlic
+#define PAGE_GARLIC 0
+#define PAGE_CHILI 1
+#define PAGE_PEPPER 2
+
+
 using namespace std;
 using namespace sigc;
 using namespace Eigen;
@@ -166,6 +173,11 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlKnots->SetRange(2,INT_MAX);
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
     mCtrlInterp->SetRange(2,INT_MAX);
+    
+    mCtrlEvenLMax->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlOddLMax->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlKMax->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlKMin->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
     //Broadernings
     mCtrlGaussFWHM-> SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
@@ -194,6 +206,9 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
     //Start on the experiment page
     mNotebook->SetSelection(1);
+    //Hide the options sections that should be hidden
+    {wxCommandEvent tmp;OnEasySpinFunc(tmp);}
+
 
     HideCrystal(true);
 }
@@ -522,7 +537,11 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
 
     easySpinInput.mMWPhase = getOptionalValue(mCtrlPhase);
 
-    easySpinInput.setMethod(gMethodSelectOrdering[mCtrlMethod->GetSelection()]);
+    if(mCtrlEasySpinF->GetSelection() == PAGE_PEPPER) {
+        easySpinInput.mMethod = gMethodSelectOrdering[mCtrlPepperMethod->GetSelection()];
+    } else if(mCtrlEasySpinF->GetSelection() == PAGE_GARLIC) {
+        easySpinInput.mMethod = gMethodSelectOrdering[mCtrlGarlicMethod->GetSelection()];
+    }
 
     easySpinInput.setNKnots(mCtrlKnots->GetValue());
     easySpinInput.setInterpolate(mCtrlInterp->GetValue());
@@ -533,7 +552,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.mGaussianFWHM = getOptionalValue(mCtrlGaussFWHM);
     easySpinInput.mLorentFWHM = getOptionalValue(mCtrlLorentFWHM);
 
-    if(mCtrlEasySpinF->GetSelection() == 2) {
+    if(mCtrlEasySpinF->GetSelection() == PAGE_PEPPER) {
         easySpinInput.mHStrainX = getOptionalValue(mCtrlHX);
         easySpinInput.mHStrainY = getOptionalValue(mCtrlHY);
         easySpinInput.mHStrainZ = getOptionalValue(mCtrlHZ);
@@ -565,9 +584,15 @@ void EasySpinFrame::OnEasySpinFunc(wxCommandEvent& e) {
     e.Skip();
     unsigned int n = mCtrlEasySpinF->GetSelection();
 
-    mGarlicOptions->Show(n == 0);
-    mChiliOptions->Show(n == 1);
-    mPepperOptions->Show(n == 2);
+    mSizerLLKM->Show(n == PAGE_CHILI);
+    mSizerPepperMethod->Show(n==PAGE_PEPPER);
+    mSizerGarlicMethod->Show(n==PAGE_GARLIC);
+    mSizerKnots->Show(n == PAGE_PEPPER || n == PAGE_CHILI);
+    mSizerOutput->Show(n == PAGE_PEPPER);
+
+    //Make sure the hoizonal lines look right
+    mLnTop->Show(n == PAGE_CHILI);
+    mLnBottom->Show(n == PAGE_PEPPER);
 
     mOptionsPage->Layout();
 

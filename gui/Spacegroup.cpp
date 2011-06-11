@@ -17,6 +17,27 @@
 #include <streambuf>
 #include <vector>
 #include <wx/html/htmlwin.h>
+
+/*
+#include <shared/formats/spirit_common.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+
+namespace qi=boost::spirit::qi;
+
+using boost::spirit::qi::char_;
+using boost::spirit::qi::int_;
+using boost::spirit::qi::alpha;
+using boost::spirit::qi::double_;
+using boost::spirit::qi::lit;
+using boost::spirit::qi::phrase_parse;
+using boost::spirit::qi::rule;
+using boost::spirit::qi::space;
+using boost::spirit::qi::_1;
+
+typedef string::iterator stritor;
+*/
+
 using namespace std;
 
 //NB this number is as likey to change as pi

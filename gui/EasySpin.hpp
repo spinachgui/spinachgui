@@ -62,8 +62,13 @@ protected:
     void OnLorentPP(wxCommandEvent& e);
     void OnCorrCoeff(wxCommandEvent& e);
 
+    //Dynamics Events
+    void OnTCorr(wxCommandEvent& e);
+    void OnDiff(wxCommandEvent& e);
+
     //Other events
     void OnGenerate(wxCommandEvent& e);
+    void OnGenerateNotebook(wxChoicebookEvent& e);
     void OnAutoGen(wxCommandEvent& e);
     void PreviewEdit(wxCommandEvent& e);
     void OnEasySpinFunc(wxCommandEvent& e);

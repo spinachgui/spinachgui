@@ -12,6 +12,7 @@ namespace SpinXML {
 
 struct EasySpinInput {
     EasySpinInput() {
+        mTCorrUseLog = false;
     }
 
     std::string generate(SpinXML::SpinSystem* spinsys) const;
@@ -138,6 +139,19 @@ struct EasySpinInput {
     maybeDouble mGStrainX,mGStrainY,mGStrainZ;        
     maybeDouble mAStrainX,mAStrainY,mAStrainZ;        
     maybeDouble mDStrainD,mDStrainE,mDStrainCorrCoeff;
+
+    //============================================================//
+    // Dynamics for chili
+
+    maybeDouble mLambda20,mLambda22,mLambda40,mLambda42,mLambda44;
+
+    bool mTCorrUseLog;
+    
+    maybeDouble mTCorr;
+    maybeDouble mTCorrXY,mTCorrAxialZ;
+    maybeDouble mTCorrX, mTCorrY,mTCorrZ;
+    
+    maybeDouble mExchange;
 
     //Static stuff
     static void staticCtor() {

@@ -253,6 +253,50 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
         oss << "Exp.MOND = 1;" << endl;
     }
 
+    if(mEasySpinFunc == CHILI) {
+        if(mLambda20 || mLambda22 || mLambda40 || mLambda42 || mLambda44) {
+            oss << "Sys.lambda = ["
+                << orDefault(mLambda20,0) << ","
+                << orDefault(mLambda22,0) << ","
+                << orDefault(mLambda40,0) << ","
+                << orDefault(mLambda42,0) << ","
+                << orDefault(mLambda44,0)
+                << "]" << endl;
+        }
+
+        if(!mTCorrUseLog) {
+            if(mTCorr) {
+                oss << "Sys.tcorr = " << mTCorr.get() <<  ";" << endl;
+            } else  if(mTCorrXY || mTCorrAxialZ) {
+                oss << "Sys.tcorr = [" << orDefault(mTCorrXY,0) << ","
+                    << orDefault(mTCorrAxialZ,0) <<  "];" << endl;
+            } else if(mTCorrX || mTCorrY || mTCorrZ) {
+                oss << "Sys.tcorr = [" << orDefault(mTCorrX,0) << ","
+                    << orDefault(mTCorrY,0) << ","
+                    << orDefault(mTCorrZ,0) << "];" << endl;
+            }
+        } else {
+            if(mTCorr) {
+                oss << "Sys.logtcorr = " << mTCorr.get() <<  ";" << endl;
+            } else if(mTCorrXY || mTCorrAxialZ) {
+                oss << "Sys.logtcorr = [" << orDefault(mTCorrXY,0) << ","
+                    << orDefault(mTCorrAxialZ,0) <<  "];" << endl;
+            } else if(mTCorrX || mTCorrY || mTCorrZ) {
+                oss << "Sys.logtcorr = [" << orDefault(mTCorrX,0) << ","
+                    << orDefault(mTCorrY,0) << ","
+                    << orDefault(mTCorrZ,0) << "];" << endl;
+            }
+            if(mExchange) {
+                oss << "Sys.Exchange = " << mExchange.get() << ";" << endl;
+            }
+
+        }
+        if(mExchange) {
+            oss << "Sys.Exchange = " << mExchange.get() << ";" << endl;
+        }
+
+    }
+    
     oss << mEasySpinNames[mEasySpinFunc] << "(Sys,Exp)" << endl;
 
     return oss.str();

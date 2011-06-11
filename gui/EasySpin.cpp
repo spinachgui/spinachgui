@@ -107,6 +107,16 @@ vector<EasySpinInput::EasySpinFunc> gEasySpinSelectOrdering;
 //================================================================================//
 // GUI Functions
 
+
+template<typename T>
+wxString maybeToWXString(optional<T> maybe) {
+    if(maybe) {
+        return wxString() << maybe.get();
+    } else {
+        return wxString();
+    }
+}
+
 optional<double> getOptionalValue(const wxTextCtrl* textCtrl) {
     wxString str = textCtrl->GetValue();
     if(str == wxT("")) {
@@ -575,6 +585,31 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.setInterpolate(mCtrlInterp->GetValue());
 
     easySpinInput.setOutput(gOutputSelectOrdering[mCtrlOutput->GetSelection()]);
+    
+    //Chili Dynamics
+    easySpinInput.mLambda20    =  getOptionalValue(mCtrlLambda20   );
+    easySpinInput.mLambda22    =  getOptionalValue(mCtrlLambda22   );
+    easySpinInput.mLambda40    =  getOptionalValue(mCtrlLambda40   );
+    easySpinInput.mLambda42    =  getOptionalValue(mCtrlLambda42   );
+    easySpinInput.mLambda44    =  getOptionalValue(mCtrlLambda44   );
+
+    switch(mCtrlRotationCorrType->GetSelection()) {
+    case 0:
+        easySpinInput.mTCorr       =  getOptionalValue(mCtrlTCorr      );
+        break;
+    case 1:                                                     
+        easySpinInput.mTCorrXY     =  getOptionalValue(mCtrlTCorrXY    );
+        easySpinInput.mTCorrAxialZ =  getOptionalValue(mCtrlTCorrAxialZ);
+        break;
+    case 2:                                                
+        easySpinInput.mTCorrX      =  getOptionalValue(mCtrlTCorrX     );
+        easySpinInput.mTCorrY      =  getOptionalValue(mCtrlTCorrY     );
+        easySpinInput.mTCorrZ      =  getOptionalValue(mCtrlTCorrZ     );
+        break;
+    }
+    easySpinInput.mTCorrUseLog = mDiffusionLog10->GetValue();
+
+    easySpinInput.mExchange    =  getOptionalValue(mCtrlExchange   );
 
     //Broadernings
     double unit = mCtrlConvUnit->GetSelection() == 0 ? 1 : 0.1;
@@ -623,11 +658,12 @@ void EasySpinFrame::OnEasySpinFunc(wxCommandEvent& e) {
 
     //Make sure the hoizonal lines look right
     mLnTop->Show(n == PAGE_CHILI);
-    mLnBottom->Show(n == PAGE_PEPPER | n == PAGE_CHILI);
+    mLnBottom->Show(n == PAGE_PEPPER || n == PAGE_CHILI);
 
     mCtrlUseMOND->Show(n == PAGE_CHILI);
     mOptionsPage->Layout();
 
+    mDynamicsPage->Show(n == PAGE_CHILI);
     //Strain based line broaderning is only present in pepper
     mSizerStrain->Show(n == 2);
 }
@@ -720,6 +756,47 @@ void EasySpinFrame::OnOrientEdit(wxCommandEvent& e) {
     OnOrientDClick(listEvent);
 }
 
+//TCorr = 1/(6*Diff). This function does the interconversion both ways
+template<typename T>
+maybeDouble maybeOver6X(optional<T> maybe) {
+    if(maybe) {
+        return optional<T>(1/(6*maybe.get()));
+    } else {
+        return optional<T>();
+    }
+}
+
+void EasySpinFrame::OnTCorr(wxCommandEvent& e) {
+    e.Skip();
+    mCtrlDiff      ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorr))));
+
+    mCtrlDiffXY    ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrXY))));
+    mCtrlDiffAxialZ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrAxialZ))));
+
+    mCtrlDiffX ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrX))));
+    mCtrlDiffY ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrY))));
+    mCtrlDiffZ ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrZ))));
+}
+
+void EasySpinFrame::OnDiff(wxCommandEvent& e) {
+    e.Skip();
+    mCtrlTCorr      ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiff      ))));
+                                                                                        
+    mCtrlTCorrXY    ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffXY    ))));
+    mCtrlTCorrAxialZ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffAxialZ))));
+                                                                                        
+    mCtrlTCorrX     ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffX     ))));
+    mCtrlTCorrY     ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffY     ))));
+    mCtrlTCorrZ     ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffZ     ))));
+}
+
+void EasySpinFrame::OnGenerateNotebook(wxChoicebookEvent& e) {
+    wxCommandEvent commandEvent;
+    OnGenerate(commandEvent);
+}
+
+
+
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
 //Experiment
@@ -761,6 +838,10 @@ EVT_TEXT(ID_LORENT_PP  ,EasySpinFrame::OnLorentPP)
 
 EVT_TEXT(ID_CORR_COEFF, EasySpinFrame::OnCorrCoeff)
 
+//Chili Dynamics
+EVT_TEXT(ID_TCORR, EasySpinFrame::OnTCorr)
+EVT_TEXT(ID_DIFF,  EasySpinFrame::OnDiff)
+
 //Other
 EVT_TEXT(ID_PREVIEW,     EasySpinFrame::PreviewEdit)
 EVT_CHOICE(ID_EASYSPIN_F,EasySpinFrame::OnEasySpinFunc)
@@ -774,6 +855,7 @@ EVT_BUTTON(wxID_ANY, EasySpinFrame::OnGenerate)
 EVT_CHECKBOX(wxID_ANY, EasySpinFrame::OnGenerate)
 EVT_CHOICE(wxID_ANY, EasySpinFrame::OnGenerate)
 EVT_RADIOBUTTON(wxID_ANY, EasySpinFrame::OnGenerate)
+EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,EasySpinFrame::OnGenerateNotebook)
 
 END_EVENT_TABLE()
 

@@ -205,6 +205,30 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlDE->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
     mCtrlDCorrCoeff->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
+    //Dynamics for Chili
+    mCtrlLambda20->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlLambda22->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlLambda40->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlLambda42->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlLambda44->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlTCorr->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDiff->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlTCorrXY->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlTCorrAxialZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDiffXY->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDiffAxialZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlTCorrX->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlTCorrY->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlTCorrZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDiffX->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDiffY->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    mCtrlDiffZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mCtrlExchange->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
     //Make strain based broaderning hidded until the user selects pepper
     mSizerStrain->Show(false);
 

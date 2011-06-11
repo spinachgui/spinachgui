@@ -106,6 +106,8 @@ struct EasySpinInput {
     };
     Method mMethod;
 
+    bool mMOND;
+
     void setNKnots(unsigned long nKnots) {
         mNKnots = nKnots;
     }

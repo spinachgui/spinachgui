@@ -575,6 +575,8 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
         easySpinInput.mDStrainCorrCoeff = getOptionalValue(mCtrlDCorrCoeff);
     }
 
+    easySpinInput.mMOND = mCtrlUseMOND->GetValue();
+
     //Do code generation
     string easyCode = easySpinInput.generate(mSpinSystem);
     
@@ -597,8 +599,9 @@ void EasySpinFrame::OnEasySpinFunc(wxCommandEvent& e) {
 
     //Make sure the hoizonal lines look right
     mLnTop->Show(n == PAGE_CHILI);
-    mLnBottom->Show(n == PAGE_PEPPER);
+    mLnBottom->Show(n == PAGE_PEPPER | n == PAGE_CHILI);
 
+    mCtrlUseMOND->Show(n == PAGE_CHILI);
     mOptionsPage->Layout();
 
     //Strain based line broaderning is only present in pepper

@@ -249,6 +249,9 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
         }
     }
     oss << endl;
+    if(mMOND) {
+        oss << "Exp.MOND = 1;" << endl;
+    }
 
     oss << mEasySpinNames[mEasySpinFunc] << "(Sys,Exp)" << endl;
 

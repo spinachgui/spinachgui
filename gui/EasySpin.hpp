@@ -53,7 +53,6 @@ protected:
     //Options Events
     void OnKnotsChange(wxSpinEvent& e);
     void SlotAngularResUnFocus();
-
     void OnInterpCheck(wxCommandEvent& e);
 
     //Broaderning Events

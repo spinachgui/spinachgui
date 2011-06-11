@@ -113,11 +113,12 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
             }
         }
 
-        oss << "Sys.S = [";
+        oss << "Sys.S = ";
+        if(electronSpins.size() != 1) oss << "[";
         for(unsigned long i = 0;i<electronSpins.size();i++) {
             oss << "1/2 ";
         }
-        oss << "];" << endl;
+        if(electronSpins.size() != 1) oss << "];" << endl;
 
         if(electronSpins.size() == 0) {
             oss << "%Warning, no electron spins in spin system" << endl;

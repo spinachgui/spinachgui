@@ -289,7 +289,6 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
             if(mExchange) {
                 oss << "Sys.Exchange = " << mExchange.get() << ";" << endl;
             }
-
         }
         if(mExchange) {
             oss << "Sys.Exchange = " << mExchange.get() << ";" << endl;

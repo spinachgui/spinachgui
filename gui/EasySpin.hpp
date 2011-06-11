@@ -65,6 +65,7 @@ protected:
     //Dynamics Events
     void OnTCorr(wxCommandEvent& e);
     void OnDiff(wxCommandEvent& e);
+    void OnLog10Toggle(wxCommandEvent& e);
 
     //Other events
     void OnGenerate(wxCommandEvent& e);

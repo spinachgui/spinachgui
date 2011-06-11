@@ -140,6 +140,10 @@ optional<unsigned long> getOptionalULong(const wxComboBox* textCtrl) {
     return value;
 }
 
+template<typename T,typename T2>
+optional<T> multOptional(optional<T> o,T2 n) {
+    return o ? o.get()*T(n) : optional<T>();
+}
 
 EasySpinFrame::EasySpinFrame(wxWindow* parent,
                              wxWindowID id,
@@ -549,9 +553,9 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.setOutput(gOutputSelectOrdering[mCtrlOutput->GetSelection()]);
 
     //Broadernings
-    double unit = mCtrlConvUnit->GetSelection == 0 ? 1 : 10;
-    easySpinInput.mGaussianFWHM = getOptionalValue(mCtrlGaussFWHM) * unit;
-    easySpinInput.mLorentFWHM = getOptionalValue(mCtrlLorentFWHM)  * unit;
+    double unit = mCtrlConvUnit->GetSelection() == 0 ? 1 : 0.1;
+    easySpinInput.mGaussianFWHM = multOptional(getOptionalValue(mCtrlGaussFWHM), unit);
+    easySpinInput.mLorentFWHM =   multOptional(getOptionalValue(mCtrlLorentFWHM),unit);
 
     if(mCtrlEasySpinF->GetSelection() == PAGE_PEPPER) {
         easySpinInput.mHStrainX = getOptionalValue(mCtrlHX);

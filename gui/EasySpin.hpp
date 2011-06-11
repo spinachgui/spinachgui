@@ -39,12 +39,12 @@ protected:
 
     void OnCrystal(wxCommandEvent& e);
 
-    void OnAddOrient(wxCommandEvent& e);
-    void OnDeleteOrient(wxCommandEvent& e);
-
     void OnShowSpaceGroups(wxCommandEvent& e);
 
+    void OnAddOrient(wxCommandEvent& e);
+    void OnDeleteOrient(wxCommandEvent& e);
     void OnOrientDClick(wxListEvent& e);
+    void OnOrientEdit(wxCommandEvent& e);
 
     void OnSpaceGroupTxt(wxCommandEvent& e);
     void OnSpaceGroupUnfocus();

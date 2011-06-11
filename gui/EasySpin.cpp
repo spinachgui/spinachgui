@@ -686,6 +686,13 @@ void EasySpinFrame::OnSave(wxCommandEvent& e) {
     delete fd;
 }
 
+void EasySpinFrame::OnOrientEdit(wxCommandEvent& e) {
+    wxListEvent listEvent;
+    //The double click handler isn't compleatly trivial, so re-use the
+    //logic by fakeing the call
+    OnOrientDClick(listEvent);
+}
+
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
 //Experiment
@@ -714,7 +721,7 @@ EVT_TEXT(ID_SPACEGROUP_TEXT, EasySpinFrame::OnSpaceGroupTxt)
 EVT_BUTTON(ID_SPACEGROUP_BUTTON,EasySpinFrame::OnShowSpaceGroups)
 
 EVT_LIST_ITEM_ACTIVATED(ID_ORIENT_LIST,EasySpinFrame::OnOrientDClick)
-
+EVT_BUTTON(ID_EDIT_ORIENT,    EasySpinFrame::OnOrientEdit)
 //Options
 EVT_SPINCTRL(ID_KNOTS,      EasySpinFrame::OnKnotsChange)
 EVT_CHECKBOX(ID_INTERPON,EasySpinFrame::OnInterpCheck)

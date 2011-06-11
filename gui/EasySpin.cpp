@@ -549,8 +549,9 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.setOutput(gOutputSelectOrdering[mCtrlOutput->GetSelection()]);
 
     //Broadernings
-    easySpinInput.mGaussianFWHM = getOptionalValue(mCtrlGaussFWHM);
-    easySpinInput.mLorentFWHM = getOptionalValue(mCtrlLorentFWHM);
+    double unit = mCtrlConvUnit->GetSelection == 0 ? 1 : 10;
+    easySpinInput.mGaussianFWHM = getOptionalValue(mCtrlGaussFWHM) * unit;
+    easySpinInput.mLorentFWHM = getOptionalValue(mCtrlLorentFWHM)  * unit;
 
     if(mCtrlEasySpinF->GetSelection() == PAGE_PEPPER) {
         easySpinInput.mHStrainX = getOptionalValue(mCtrlHX);
@@ -721,7 +722,6 @@ EVT_TEXT(ID_LORENT_FWHM,EasySpinFrame::OnLorentFWHM)
 EVT_TEXT(ID_LORENT_PP  ,EasySpinFrame::OnLorentPP)
 
 EVT_TEXT(ID_CORR_COEFF, EasySpinFrame::OnCorrCoeff)
-
 
 //Other
 EVT_TEXT(ID_PREVIEW,     EasySpinFrame::PreviewEdit)

@@ -62,6 +62,7 @@ protected:
     void OnLorentFWHM(wxCommandEvent& e);
     void OnLorentPP(wxCommandEvent& e);
     void OnCorrCoeff(wxCommandEvent& e);
+
     //Other events
     void OnGenerate(wxCommandEvent& e);
     void OnAutoGen(wxCommandEvent& e);

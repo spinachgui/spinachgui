@@ -269,7 +269,7 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
                 oss << "Sys.tcorr = " << mTCorr.get() <<  ";" << endl;
             } else  if(mTCorrXY || mTCorrAxialZ) {
                 oss << "Sys.tcorr = [" << orDefault(mTCorrXY,0) << ","
-                    << orDefault(mTCorrAxialZ,0) <<  "];" << endl;
+                    << orDefault(mTCorrAxialZ,0) << "];" << endl;
             } else if(mTCorrX || mTCorrY || mTCorrZ) {
                 oss << "Sys.tcorr = [" << orDefault(mTCorrX,0) << ","
                     << orDefault(mTCorrY,0) << ","
@@ -289,6 +289,13 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
             if(mExchange) {
                 oss << "Sys.Exchange = " << mExchange.get() << ";" << endl;
             }
+        }
+        if(mTCorrXY || mTCorrAxialZ || mTCorrX || mTCorrY || mTCorrZ) {
+            //If we ouputed principle components of the rotatinal
+            //correlation potential we need to output the orientation
+            //too
+            EulerAngles ea = mDynamicsOrient.GetAsEuler();
+            oss << "Diffpa = [" << ea.alpha/PI*180 << ", " << ea.beta/PI/180 << ", " << ea.gamma/PI/180 << "]/180*pi;" << endl;
         }
         if(mExchange) {
             oss << "Sys.Exchange = " << mExchange.get() << ";" << endl;

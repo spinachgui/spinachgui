@@ -613,7 +613,7 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
         easySpinInput.mTCorrZ      =  getOptionalValue(mCtrlTCorrZ     );
         break;
     }
-
+    easySpinInput.mDynamicsOrient = mOrientDialogCombo->GetOrient();
     //Okay, what we have the mTCorr<X> variables is either the
     //required value in some unit OR the logarithm. we don't need to
     //do anything with the logarithm but we do need to convert down to

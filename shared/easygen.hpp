@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <boost/optional.hpp>
+#include <shared/orientation.hpp>
 
 namespace SpinXML {
     class SpinSystem;
@@ -150,6 +151,7 @@ struct EasySpinInput {
     maybeDouble mTCorr;
     maybeDouble mTCorrXY,mTCorrAxialZ;
     maybeDouble mTCorrX, mTCorrY,mTCorrZ;
+    SpinXML::Orientation mDynamicsOrient;
     
     maybeDouble mExchange;
 

@@ -68,10 +68,11 @@ set(easyspinSources   #For the standalone easyspin version
   ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/auto/easyspin.cpp
   gui/EasySpin.cpp
-  gui/TextCtrlFocus.cpp
+  gui/TextBitmap.cpp
   gui/OrientationEdit.cpp
   gui/Spacegroup.cpp
   gui/OrientDisplay.cpp
+  gui/TextCtrlFocus.cpp
   gui/Display3D.cpp
   3d/camera.cpp
   3d/glmode.cpp
@@ -86,6 +87,7 @@ set(easyspinSources   #For the standalone easyspin version
 
 set(orientDialogSources   #For the standalone easyspin version
   ${CMAKE_CURRENT_BINARY_DIR}/auto/orientdialog.cpp
+  gui/TextBitmap.cpp
   gui/TextCtrlFocus.cpp
   gui/OrientDialog2.cpp
   gui/OrientDisplay.cpp

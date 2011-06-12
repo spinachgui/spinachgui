@@ -56,6 +56,9 @@ void OrientDialog2::SetOrient(const Orientation& orient,maybeOrientType typeToKe
         mJ ->ChangeValue(wxString() << q.y());
         mK ->ChangeValue(wxString() << q.z());
     }
+    Matrix3f mat3f = Matrix3d2Matrix3f(mat);
+    mOrientDisplay3D->GetCamera()->SetRotation(mat3f);
+    mOrientDisplay3D->Refresh();
 }
 
 void OrientDialog2::OnEulerEdit(wxCommandEvent& e) {
@@ -63,7 +66,7 @@ void OrientDialog2::OnEulerEdit(wxCommandEvent& e) {
     mAlpha->GetValue().ToDouble(&alpha);
     mBeta ->GetValue().ToDouble(&beta);
     mGamma->GetValue().ToDouble(&gamma);
-    EulerAngles ea(alpha,beta,gamma);
+    EulerAngles ea(alpha*PI/180,beta*PI/180,gamma*PI/180);
     SetOrient(Orientation(ea),Orientation::EULER);
 }
 void OrientDialog2::OnAngleAxisEdit(wxCommandEvent& e) {
@@ -107,11 +110,17 @@ void OrientDialog2::OnDCMEdit(wxCommandEvent& e) {
                                        mat02,mat12,mat22)),Orientation::DCM);
 }
 
+void OrientDialog2::OnIdentity(wxCommandEvent& e) {
+    SetOrient(EulerAngles(0,0,0));
+}
+
 BEGIN_EVENT_TABLE(OrientDialog2,wxDialog)
 EVT_TEXT(ID_EULER    ,OrientDialog2::OnEulerEdit)
 EVT_TEXT(ID_ANGLEAXIS,OrientDialog2::OnAngleAxisEdit)
 EVT_TEXT(ID_QUAT     ,OrientDialog2::OnQuaternionEdit)
 EVT_TEXT(ID_MATRIX   ,OrientDialog2::OnDCMEdit)
+
+EVT_BUTTON(ID_IDENTITY,OrientDialog2::OnIdentity)
 
 END_EVENT_TABLE()
 

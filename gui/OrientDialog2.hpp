@@ -23,6 +23,7 @@ protected:
     void OnAngleAxisEdit(wxCommandEvent& e);
     void OnQuaternionEdit(wxCommandEvent& e);
     void OnDCMEdit(wxCommandEvent& e);
+    void OnIdentity(wxCommandEvent& e);
 private:
     std::vector<TextCtrlFocus*> mEulerAngleCtrls;
     std::vector<TextCtrlFocus*> mMatrixCtrls;

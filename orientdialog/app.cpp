@@ -3,6 +3,7 @@
 
 #include <wx/app.h>
 #include <gui/OrientDialog2.hpp>
+#include <wx/image.h>
 
 class App;
 App* theApp = NULL;
@@ -10,6 +11,7 @@ App* theApp = NULL;
 class App : public wxApp {
 public:
     virtual bool OnInit() {
+        wxInitAllImageHandlers();
         theApp = this;
         OrientDialog2* frame = new OrientDialog2(NULL);
         frame->Show();

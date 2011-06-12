@@ -194,6 +194,13 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
         */
         oss << endl;
     }
+    if(mEasySpinFunc == CHILI) {
+        if(!(mEvenLMax == 0 && mOddLMax == 0 && mKMax == 0 && mMMax == 0)) {
+            oss << "Opt.LLKM = [" << mEvenLMax << ", " << mOddLMax << ", " << mKMax  << ", " << mMMax << "];" << endl;
+        }
+    }
+
+
     oss << "Exp.mwFreq = " << mMWFreq << ";" << endl;
     oss << "Exp.CenterSweep = [" << mCentre << " " << mSweep << "];" << endl;
     oss << endl;
@@ -253,6 +260,7 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
     if(mMOND && (mLambda20 || mLambda22 || mLambda40 || mLambda42 || mLambda44)) {
         oss << "Exp.MOND = 1;" << endl;
     }
+    
 
     if(mEasySpinFunc == CHILI) {
         if(mLambda20 || mLambda22 || mLambda40 || mLambda42 || mLambda44) {

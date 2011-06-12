@@ -131,6 +131,8 @@ struct EasySpinInput {
     }
     Output mOutput;
 
+    long mEvenLMax,mOddLMax,mKMax,mMMax;
+
     //============================================================//
     // Broadernings
     maybeDouble mGaussianFWHM;

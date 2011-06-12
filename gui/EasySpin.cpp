@@ -190,10 +190,11 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlAngularRes->sigUnFocus.connect(mem_fun(this,&EasySpinFrame::SlotAngularResUnFocus));
     mCtrlInterp->SetRange(2,INT_MAX);
     
-    mCtrlEvenLMax->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
-    mCtrlOddLMax->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
-    mCtrlKMax->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
-    mCtrlKMin->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+    //No bounds checking on these yet
+    mCtrlEvenLMax->SetRange(INT_MIN,INT_MAX);
+    mCtrlOddLMax->SetRange(INT_MIN,INT_MAX);
+    mCtrlKMax->SetRange(INT_MIN,INT_MAX);
+    mCtrlMMax->SetRange(INT_MIN,INT_MAX);
 
     //Set the MOND checkbox to the correct inital state
     {wxCommandEvent tmp; OnLambda(tmp);}
@@ -662,6 +663,11 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     }
 
     easySpinInput.mMOND = mCtrlUseMOND->GetValue();
+
+    easySpinInput.mEvenLMax = mCtrlEvenLMax->GetValue();
+    easySpinInput.mOddLMax  = mCtrlOddLMax->GetValue();
+    easySpinInput.mKMax     = mCtrlKMax->GetValue();
+    easySpinInput.mMMax     = mCtrlMMax->GetValue();
 
     //Do code generation
     string easyCode = easySpinInput.generate(mSpinSystem);

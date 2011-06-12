@@ -51,3 +51,19 @@ Matrix3f SpinXML::Matrix3d2Matrix3f(const Matrix3d& mat) {
     matf(2,2) = mat(2,2);
     return matf;
 }
+
+Matrix3d SpinXML::Matrix3f2Matrix3d(const Matrix3f& mat) {
+    Matrix3d matd;
+    matd(0,0) = mat(0,0);
+    matd(0,1) = mat(0,1);
+    matd(0,2) = mat(0,2);
+                                  
+    matd(1,0) = mat(1,0);
+    matd(1,1) = mat(1,1);
+    matd(1,2) = mat(1,2);
+                                  
+    matd(2,0) = mat(2,0);
+    matd(2,1) = mat(2,1);
+    matd(2,2) = mat(2,2);
+    return matd;
+}

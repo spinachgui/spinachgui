@@ -60,6 +60,7 @@ namespace SpinXML {
 
     ///Convert a matrix3d to a matrix3f
     Matrix3f Matrix3d2Matrix3f(const Matrix3d& mat);
+    Matrix3d Matrix3f2Matrix3d(const Matrix3f& mat);
 }
 
 #endif

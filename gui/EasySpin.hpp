@@ -67,6 +67,15 @@ protected:
     void OnDiff(wxCommandEvent& e);
     void OnLog10Toggle(wxCommandEvent& e);
 
+    void OnTCorrIsoUnit(wxCommandEvent& e);
+    void OnTCorrAxUnit(wxCommandEvent& e);
+    void OnTCorrRhUnit(wxCommandEvent& e);
+    void OnDiffIsoUnit(wxCommandEvent& e);
+    void OnDiffAxUnit(wxCommandEvent& e);
+    void OnDiffRhUnit(wxCommandEvent& e);
+    void SetTCorrUnit(unsigned long selection);
+    void SetDiffUnit(unsigned long selection);
+
     //Other events
     void OnGenerate(wxCommandEvent& e);
     void OnGenerateNotebook(wxChoicebookEvent& e);

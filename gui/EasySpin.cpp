@@ -608,7 +608,26 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
         easySpinInput.mTCorrZ      =  getOptionalValue(mCtrlTCorrZ     );
         break;
     }
+
+    //Okay, what we have the mTCorr<X> variables is either the
+    //required value in some unit OR the logarithm. we don't need to
+    //do anything with the logarithm but we do need to convert down to
+    //SI native units
     easySpinInput.mTCorrUseLog = mDiffusionLog10->GetValue();
+
+    if(!easySpinInput.mTCorrUseLog) {
+        //0 is ns, 1 is us
+        double unit = mCtrlTCorrIsoUnit->GetSelection() == 0 ? 1e-9 : 1e-6;
+        cout << unit << endl;
+        easySpinInput.mTCorr       =  multOptional(getOptionalValue(mCtrlTCorr      ),unit);
+
+        easySpinInput.mTCorrXY     =  multOptional(getOptionalValue(mCtrlTCorrXY    ),unit);
+        easySpinInput.mTCorrAxialZ =  multOptional(getOptionalValue(mCtrlTCorrAxialZ),unit);
+
+        easySpinInput.mTCorrX      =  multOptional(getOptionalValue(mCtrlTCorrX     ),unit);
+        easySpinInput.mTCorrY      =  multOptional(getOptionalValue(mCtrlTCorrY     ),unit);
+        easySpinInput.mTCorrZ      =  multOptional(getOptionalValue(mCtrlTCorrZ     ),unit);
+    }
 
     easySpinInput.mExchange    =  getOptionalValue(mCtrlExchange   );
 
@@ -898,6 +917,65 @@ void EasySpinFrame::OnGenerateNotebook(wxChoicebookEvent& e) {
     OnGenerate(commandEvent);
 }
 
+void EasySpinFrame::OnTCorrIsoUnit(wxCommandEvent& e) {
+    e.Skip();
+    unsigned long selection = mCtrlTCorrIsoUnit->GetSelection();
+
+    mCtrlTCorrAxUnit-> SetSelection(selection);
+    mCtrlTCorrRhUnit-> SetSelection(selection);
+    SetTCorrUnit(selection);
+}
+
+void EasySpinFrame::OnTCorrAxUnit(wxCommandEvent& e) {
+    e.Skip();
+    unsigned long selection = mCtrlTCorrAxUnit->GetSelection();
+
+    mCtrlTCorrIsoUnit->SetSelection(selection);
+    mCtrlTCorrRhUnit-> SetSelection(selection);
+    SetTCorrUnit(selection);
+}
+
+void EasySpinFrame::OnTCorrRhUnit(wxCommandEvent& e) {
+    e.Skip();
+    unsigned long selection = mCtrlTCorrRhUnit->GetSelection();
+
+    mCtrlTCorrIsoUnit->SetSelection(selection);
+    mCtrlTCorrAxUnit-> SetSelection(selection);
+    SetTCorrUnit(selection);
+}
+void EasySpinFrame::SetTCorrUnit(unsigned long selection) {
+    
+}
+
+void EasySpinFrame::OnDiffIsoUnit(wxCommandEvent& e) {
+    e.Skip();
+    unsigned long selection = mCtrlDiffIsoUnit->GetSelection();
+
+    mCtrlDiffAxUnit-> SetSelection(selection);
+    mCtrlDiffRhUnit-> SetSelection(selection);
+    SetDiffUnit(selection);
+}
+
+void EasySpinFrame::OnDiffAxUnit(wxCommandEvent& e) {
+    e.Skip();
+    unsigned long selection = mCtrlDiffAxUnit->GetSelection();
+
+    mCtrlDiffAxUnit-> SetSelection(selection);
+    mCtrlDiffRhUnit-> SetSelection(selection);
+    SetDiffUnit(selection);
+}
+
+void EasySpinFrame::OnDiffRhUnit(wxCommandEvent& e) {
+    e.Skip();
+    unsigned long selection = mCtrlDiffRhUnit->GetSelection();
+
+    mCtrlDiffIsoUnit->SetSelection(selection);
+    mCtrlDiffAxUnit-> SetSelection(selection);
+    SetDiffUnit(selection);
+}
+void EasySpinFrame::SetDiffUnit(unsigned long selection) {
+    
+}
 
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
@@ -945,6 +1023,13 @@ EVT_TEXT(ID_CORR_COEFF, EasySpinFrame::OnCorrCoeff)
 EVT_TEXT(ID_TCORR, EasySpinFrame::OnTCorr)
 EVT_TEXT(ID_DIFF,  EasySpinFrame::OnDiff)
 EVT_CHECKBOX(ID_LOG_TOGGLE,  EasySpinFrame::OnLog10Toggle)
+
+EVT_CHOICE(ID_TCORR_ISO_UNIT,EasySpinFrame::OnTCorrIsoUnit)
+EVT_CHOICE(ID_TCORR_AX_UNIT ,EasySpinFrame::OnTCorrAxUnit )
+EVT_CHOICE(ID_TCORR_RH_UNIT ,EasySpinFrame::OnTCorrRhUnit )
+EVT_CHOICE(ID_DIFF_ISO_UNIT ,EasySpinFrame::OnDiffIsoUnit )
+EVT_CHOICE(ID_DIFF_AX_UNIT  ,EasySpinFrame::OnDiffAxUnit  )
+EVT_CHOICE(ID_DIFF_RH_UNIT  ,EasySpinFrame::OnDiffRhUnit  )
 
 //Other
 EVT_TEXT(ID_PREVIEW,     EasySpinFrame::PreviewEdit)

@@ -2,6 +2,7 @@
 #include <gui/EasySpin.hpp>
 #include <wx/valtext.h>
 
+#include <gui/OrientationEdit.hpp>
 #include <gui/TextCtrlFocus.hpp>
 #include <gui/NumericValidators.hpp>
 #include <fstream>
@@ -239,6 +240,10 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlDiffZ->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
     mCtrlExchange->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
+
+    mOrientDialogCombo = new OrientDialogCombo(mDynamicsPage,-1);
+    mOrientDialogCombo->SetOrient(Orientation(EulerAngles(0,0,0)));
+    mSizerRotCorrOrient->Add(mOrientDialogCombo,0,wxALIGN_CENTER,0);
 
     //Make strain based broaderning hidded until the user selects pepper
     mSizerStrain->Show(false);

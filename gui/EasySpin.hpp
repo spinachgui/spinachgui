@@ -3,8 +3,11 @@
 #define __EASYSPIN_FRAME_HPP__
 
 #include <auto/easyspin.h>
+#include <vector>
 #include <shared/orientation.hpp>
-#include <gui/OrientationEdit.hpp>
+
+class OrientDialogCombo;
+
 namespace SpinXML {
     class SpinSystem;
 };
@@ -100,6 +103,8 @@ protected:
 
     SpinXML::SpinSystem* mSpinSystem;
     long mSpacegroupSelected;
+
+    OrientDialogCombo* mOrientDialogCombo;
 
     std::vector<SpinXML::Orientation> mOrients;
 };

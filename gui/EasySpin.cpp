@@ -618,7 +618,6 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     if(!easySpinInput.mTCorrUseLog) {
         //0 is ns, 1 is us
         double unit = mCtrlTCorrIsoUnit->GetSelection() == 0 ? 1e-9 : 1e-6;
-        cout << unit << endl;
         easySpinInput.mTCorr       =  multOptional(getOptionalValue(mCtrlTCorr      ),unit);
 
         easySpinInput.mTCorrXY     =  multOptional(getOptionalValue(mCtrlTCorrXY    ),unit);
@@ -800,7 +799,7 @@ maybeDouble maybeLogOver6X(optional<T> maybe) {
 //Does what it says on the tin. Haskell maybe monad would be really
 //useful about now.
 template<typename T>
-maybeDouble maybeLog(optional<T> maybe) {
+optional<T> maybeLog(optional<T> maybe) {
     if(maybe) {
         double ans = log10(maybe.get());
         return optional<T>(ans);
@@ -812,7 +811,7 @@ maybeDouble maybeLog(optional<T> maybe) {
 //Does what it says on the tin. Haskell maybe monad would be really
 //useful about now.
 template<typename T>
-maybeDouble maybePow10(optional<T> maybe) {
+optional<T> maybePow10(optional<T> maybe) {
     if(maybe) {
         double ans = pow(10,maybe.get());
         return optional<T>(ans);
@@ -824,59 +823,82 @@ maybeDouble maybePow10(optional<T> maybe) {
 
 void EasySpinFrame::OnLog10Toggle(wxCommandEvent& e) {
     e.Skip();
+    mCtrlTCorrIsoUnit->Enable(!mDiffusionLog10->GetValue());
+    mCtrlTCorrAxUnit->Enable( !mDiffusionLog10->GetValue());
+    mCtrlTCorrRhUnit->Enable( !mDiffusionLog10->GetValue());
+
+    mCtrlDiffIsoUnit->Enable( !mDiffusionLog10->GetValue());
+    mCtrlDiffAxUnit->Enable(  !mDiffusionLog10->GetValue());
+    mCtrlDiffRhUnit->Enable(  !mDiffusionLog10->GetValue());
+
+    double tCorrToSi  = mCtrlTCorrIsoUnit->GetSelection() == 0 ? 1e-9 : 1e-6;
+    double diffFromSi = mCtrlDiffIsoUnit->GetSelection()  == 0 ? 1e-9 : 1e-6;
+
+    /*
+      Okay, so these lines got kind of crazy with the f(g(h(x))) style
+      composed functions. Just read it right to left and imagine it's a unix pipe
+     */
+
     if(mDiffusionLog10->GetValue()) {
         //Converting to log
-        mCtrlTCorr      ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlTCorr))));
-                        
-        mCtrlTCorrXY    ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlTCorrXY))));
-        mCtrlTCorrAxialZ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlTCorrAxialZ))));
-                        
-        mCtrlTCorrX     ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlTCorrX))));
-        mCtrlTCorrY     ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlTCorrY))));
-        mCtrlTCorrZ     ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlTCorrZ))));
+        mCtrlTCorr      ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlTCorr)      ,tCorrToSi))));
+                                                                                                                        
+        mCtrlTCorrXY    ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlTCorrXY)    ,tCorrToSi))));
+        mCtrlTCorrAxialZ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlTCorrAxialZ),tCorrToSi))));
+                                                                                                                        
+        mCtrlTCorrX     ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlTCorrX)     ,tCorrToSi))));
+        mCtrlTCorrY     ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlTCorrY)     ,tCorrToSi))));
+        mCtrlTCorrZ     ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlTCorrZ)     ,tCorrToSi))));
 
-        mCtrlDiff       ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlDiff      ))));
-                                                                                           
-        mCtrlDiffXY     ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlDiffXY    ))));
-        mCtrlDiffAxialZ ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlDiffAxialZ))));
-                                                                                           
-        mCtrlDiffX      ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlDiffX     ))));
-        mCtrlDiffY      ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlDiffY     ))));
-        mCtrlDiffZ      ->ChangeValue(maybeToWXString(maybeLog(getOptionalValue(mCtrlDiffZ     ))));
+        mCtrlDiff       ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlDiff      ),diffFromSi))));
+                                                                                                                        
+        mCtrlDiffXY     ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlDiffXY    ),diffFromSi))));
+        mCtrlDiffAxialZ ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlDiffAxialZ),diffFromSi))));
+                                                                                                                        
+        mCtrlDiffX      ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlDiffX     ),diffFromSi))));
+        mCtrlDiffY      ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlDiffY     ),diffFromSi))));
+        mCtrlDiffZ      ->ChangeValue(maybeToWXString(maybeLog(multOptional(getOptionalValue(mCtrlDiffZ     ),diffFromSi))));
     } else {
         //Converting from log
-        mCtrlTCorr      ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlTCorr))));
-                        
-        mCtrlTCorrXY    ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlTCorrXY))));
-        mCtrlTCorrAxialZ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlTCorrAxialZ))));
-                        
-        mCtrlTCorrX     ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlTCorrX))));
-        mCtrlTCorrY     ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlTCorrY))));
-        mCtrlTCorrZ     ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlTCorrZ))));
-
-        mCtrlDiff       ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlDiff      ))));
-                                                                                           
-        mCtrlDiffXY     ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlDiffXY    ))));
-        mCtrlDiffAxialZ ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlDiffAxialZ))));
-                                                                                           
-        mCtrlDiffX      ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlDiffX     ))));
-        mCtrlDiffY      ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlDiffY     ))));
-        mCtrlDiffZ      ->ChangeValue(maybeToWXString(maybePow10(getOptionalValue(mCtrlDiffZ     ))));
+        mCtrlTCorr      ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlTCorr))      ,1/tCorrToSi)));
+                                                                                                                          
+        mCtrlTCorrXY    ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlTCorrXY))    ,1/tCorrToSi)));
+        mCtrlTCorrAxialZ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlTCorrAxialZ)),1/tCorrToSi)));
+                                                                                                                          
+        mCtrlTCorrX     ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlTCorrX))     ,1/tCorrToSi)));
+        mCtrlTCorrY     ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlTCorrY))     ,1/tCorrToSi)));
+        mCtrlTCorrZ     ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlTCorrZ))     ,1/tCorrToSi)));
+                                                                             
+        mCtrlDiff       ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlDiff      )) ,1/diffFromSi)));
+                                                                                                                           
+        mCtrlDiffXY     ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlDiffXY    )) ,1/diffFromSi)));
+        mCtrlDiffAxialZ ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlDiffAxialZ)) ,1/diffFromSi)));
+                                                                                                                           
+        mCtrlDiffX      ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlDiffX     )) ,1/diffFromSi)));
+        mCtrlDiffY      ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlDiffY     )) ,1/diffFromSi)));
+        mCtrlDiffZ      ->ChangeValue(maybeToWXString(multOptional(maybePow10(getOptionalValue(mCtrlDiffZ     )) ,1/diffFromSi)));
     }
 }
 
+wxString maybeOver6XComposed(wxTextCtrl* mCtrl,double inputUnit,double outputUnit) {
+    maybeDouble inSI = multOptional(getOptionalValue(mCtrl),inputUnit);
+    return maybeToWXString(multOptional(maybeOver6X(inSI),outputUnit));
+}
 
 void EasySpinFrame::OnTCorr(wxCommandEvent& e) {
     e.Skip();
     if(!mDiffusionLog10->GetValue()) {
-        mCtrlDiff      ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorr))));
+        double tCorrToSi  = mCtrlTCorrIsoUnit->GetSelection() == 0 ? 1e-9 : 1e-6;
+        double diffFromSi = mCtrlDiffIsoUnit->GetSelection()  == 0 ? 1e-9 : 1e-6;
 
-        mCtrlDiffXY    ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrXY))));
-        mCtrlDiffAxialZ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrAxialZ))));
-
-        mCtrlDiffX ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrX))));
-        mCtrlDiffY ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrY))));
-        mCtrlDiffZ ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlTCorrZ))));
+        mCtrlDiff      ->ChangeValue(maybeOver6XComposed(mCtrlTCorr      ,tCorrToSi,diffFromSi));
+                                                                                              
+        mCtrlDiffXY    ->ChangeValue(maybeOver6XComposed(mCtrlTCorrXY    ,tCorrToSi,diffFromSi));
+        mCtrlDiffAxialZ->ChangeValue(maybeOver6XComposed(mCtrlTCorrAxialZ,tCorrToSi,diffFromSi));
+                                                                                              
+        mCtrlDiffX     ->ChangeValue(maybeOver6XComposed(mCtrlTCorrX     ,tCorrToSi,diffFromSi));
+        mCtrlDiffY     ->ChangeValue(maybeOver6XComposed(mCtrlTCorrY     ,tCorrToSi,diffFromSi));
+        mCtrlDiffZ     ->ChangeValue(maybeOver6XComposed(mCtrlTCorrZ     ,tCorrToSi,diffFromSi));
     } else {
         mCtrlDiff      ->ChangeValue(maybeToWXString(maybeLogOver6X(getOptionalValue(mCtrlTCorr))));
 
@@ -892,14 +914,17 @@ void EasySpinFrame::OnTCorr(wxCommandEvent& e) {
 void EasySpinFrame::OnDiff(wxCommandEvent& e) {
     e.Skip();
     if(!mDiffusionLog10->GetValue()) {
-        mCtrlTCorr      ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiff      ))));
-                                                                                        
-        mCtrlTCorrXY    ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffXY    ))));
-        mCtrlTCorrAxialZ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffAxialZ))));
-                                                                                        
-        mCtrlTCorrX     ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffX     ))));
-        mCtrlTCorrY     ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffY     ))));
-        mCtrlTCorrZ     ->ChangeValue(maybeToWXString(maybeOver6X(getOptionalValue(mCtrlDiffZ     ))));
+        double diffToSi    = mCtrlDiffIsoUnit->GetSelection() == 0 ? 1e+9 : 1e+6;
+        double tCorrFromSi = mCtrlTCorrIsoUnit->GetSelection()  == 0 ? 1e+9 : 1e+6;
+
+        mCtrlTCorr      ->ChangeValue(maybeOver6XComposed(mCtrlDiff      ,diffToSi,tCorrFromSi));
+                                                                                                         
+        mCtrlTCorrXY    ->ChangeValue(maybeOver6XComposed(mCtrlDiffXY    ,diffToSi,tCorrFromSi));
+        mCtrlTCorrAxialZ->ChangeValue(maybeOver6XComposed(mCtrlDiffAxialZ,diffToSi,tCorrFromSi));
+                                                                                                         
+        mCtrlTCorrX     ->ChangeValue(maybeOver6XComposed(mCtrlDiffX     ,diffToSi,tCorrFromSi));
+        mCtrlTCorrY     ->ChangeValue(maybeOver6XComposed(mCtrlDiffY     ,diffToSi,tCorrFromSi));
+        mCtrlTCorrZ     ->ChangeValue(maybeOver6XComposed(mCtrlDiffZ     ,diffToSi,tCorrFromSi));
     } else {
         mCtrlTCorr      ->ChangeValue(maybeToWXString(maybeLogOver6X(getOptionalValue(mCtrlDiff      ))));
                                                                                         
@@ -944,7 +969,10 @@ void EasySpinFrame::OnTCorrRhUnit(wxCommandEvent& e) {
     SetTCorrUnit(selection);
 }
 void EasySpinFrame::SetTCorrUnit(unsigned long selection) {
-    
+    //Actually, we can get the required behavior by calling the TCorr
+    //onchange handler
+    wxCommandEvent event;
+    OnTCorr(event);
 }
 
 void EasySpinFrame::OnDiffIsoUnit(wxCommandEvent& e) {
@@ -974,7 +1002,10 @@ void EasySpinFrame::OnDiffRhUnit(wxCommandEvent& e) {
     SetDiffUnit(selection);
 }
 void EasySpinFrame::SetDiffUnit(unsigned long selection) {
-    
+    //Actually, we can get the required behavior by calling the TCorr
+    //onchange handler
+    wxCommandEvent event;
+    OnDiff(event);
 }
 
 

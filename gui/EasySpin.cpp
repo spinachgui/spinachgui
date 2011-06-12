@@ -195,6 +195,9 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     mCtrlKMax->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
     mCtrlKMin->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
+    //Set the MOND checkbox to the correct inital state
+    {wxCommandEvent tmp; OnLambda(tmp);}
+
     //Broadernings
     mCtrlGaussFWHM-> SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
     mCtrlGaussPP->   SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
@@ -1013,6 +1016,24 @@ void EasySpinFrame::SetDiffUnit(unsigned long selection) {
     OnDiff(event);
 }
 
+void EasySpinFrame::OnLambda(wxCommandEvent& e) {
+    e.Skip();
+    bool usingLambda = !(mCtrlLambda20->GetValue() == wxT("") &&
+                         mCtrlLambda22->GetValue() == wxT("") &&
+                         mCtrlLambda40->GetValue() == wxT("") &&
+                         mCtrlLambda42->GetValue() == wxT("") &&
+                         mCtrlLambda44->GetValue() == wxT(""));
+
+    if(usingLambda) {
+        mCtrlUseMOND->Enable(true);
+        mCtrlUseMOND->SetLabel(wxT("Use MOND model"));
+    } else {
+        mCtrlUseMOND->Enable(false);
+        mCtrlUseMOND->SetLabel(wxT("Enter an ordering potential to use the MOND model"));
+    }
+    mOptionsPage->Layout();
+}
+
 
 BEGIN_EVENT_TABLE(EasySpinFrame,wxFrame)
 
@@ -1066,6 +1087,8 @@ EVT_CHOICE(ID_TCORR_RH_UNIT ,EasySpinFrame::OnTCorrRhUnit )
 EVT_CHOICE(ID_DIFF_ISO_UNIT ,EasySpinFrame::OnDiffIsoUnit )
 EVT_CHOICE(ID_DIFF_AX_UNIT  ,EasySpinFrame::OnDiffAxUnit  )
 EVT_CHOICE(ID_DIFF_RH_UNIT  ,EasySpinFrame::OnDiffRhUnit  )
+
+EVT_TEXT(ID_LAMBDA,EasySpinFrame::OnLambda)
 
 //Other
 EVT_TEXT(ID_PREVIEW,     EasySpinFrame::PreviewEdit)

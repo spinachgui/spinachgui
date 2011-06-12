@@ -249,7 +249,8 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
         }
     }
     oss << endl;
-    if(mMOND) {
+    //To does make sense to use MOND if none of the Lambdas are set
+    if(mMOND && (mLambda20 || mLambda22 || mLambda40 || mLambda42 || mLambda44)) {
         oss << "Exp.MOND = 1;" << endl;
     }
 

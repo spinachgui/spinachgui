@@ -78,6 +78,8 @@ protected:
     void OnDiffRhUnit(wxCommandEvent& e);
     void SetTCorrUnit(unsigned long selection);
     void SetDiffUnit(unsigned long selection);
+    
+    void OnLambda(wxCommandEvent& e);
 
     //Other events
     void OnGenerate(wxCommandEvent& e);

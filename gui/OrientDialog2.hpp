@@ -24,6 +24,9 @@ protected:
     void OnQuaternionEdit(wxCommandEvent& e);
     void OnDCMEdit(wxCommandEvent& e);
     void OnIdentity(wxCommandEvent& e);
+
+    //Non Evetns
+    void UpdateDet();
 private:
     std::vector<TextCtrlFocus*> mEulerAngleCtrls;
     std::vector<TextCtrlFocus*> mMatrixCtrls;

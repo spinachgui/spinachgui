@@ -59,6 +59,7 @@ void OrientDialog2::SetOrient(const Orientation& orient,maybeOrientType typeToKe
     Matrix3f mat3f = Matrix3d2Matrix3f(mat);
     mOrientDisplay3D->GetCamera()->SetRotation(mat3f);
     mOrientDisplay3D->Refresh();
+    UpdateDet();
 }
 
 void OrientDialog2::OnEulerEdit(wxCommandEvent& e) {
@@ -112,6 +113,27 @@ void OrientDialog2::OnDCMEdit(wxCommandEvent& e) {
 
 void OrientDialog2::OnIdentity(wxCommandEvent& e) {
     SetOrient(EulerAngles(0,0,0));
+}
+
+void OrientDialog2::UpdateDet() {
+    //We should always make sure the determinate is for the matrix
+    //being displayed
+    double mat[3][3];
+
+    m00->GetValue().ToDouble(&mat[0][0]);
+    m10->GetValue().ToDouble(&mat[1][0]);
+    m20->GetValue().ToDouble(&mat[2][0]);
+                                       
+    m01->GetValue().ToDouble(&mat[0][1]);
+    m11->GetValue().ToDouble(&mat[1][1]);
+    m21->GetValue().ToDouble(&mat[2][1]);
+                                       
+    m02->GetValue().ToDouble(&mat[0][2]);
+    m12->GetValue().ToDouble(&mat[1][2]);
+    m22->GetValue().ToDouble(&mat[2][2]);
+
+    double determinant = 1; //TODO
+    mTextDet->SetLabel(wxString() << wxT("Det: ") << determinant);
 }
 
 BEGIN_EVENT_TABLE(OrientDialog2,wxDialog)

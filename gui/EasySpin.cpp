@@ -495,17 +495,20 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
     //load faster the second time around
     if(mSpaceGroupDialog->ShowModal() == wxID_OK) {
         mCtrlSpaceGroupTxt->ChangeValue(wxString() << mSpaceGroupDialog->spacegroup);
+        OnSpaceGroupUnfocus();
     }
 }
 
 void EasySpinFrame::OnSpaceGroupTxt(wxCommandEvent& e) {
     //Try to decide which space group the user ment and display that
-    wxString value = mCtrlSpaceGroupTxt->GetValue();
+
+    //NB: Currently this doesn't really seem to work
+    /*wxString value = mCtrlSpaceGroupTxt->GetValue();
 
     string compleated_value = findSpacegroup(string(value.mb_str()));
     if(compleated_value != "") {
         mCtrlSpaceGroupTxt->ChangeValue(wxString(compleated_value.c_str(),wxConvUTF8));
-    }
+        }*/
 }
 
 void EasySpinFrame::OnSpaceGroupFocus() {

@@ -24,6 +24,8 @@ protected:
 
 std::string findSpacegroup(std::string partial);
 std::string nameSpacegroup(unsigned long number);
+unsigned long lookupSpacegroupName(std::string name);
+unsigned long parseStandardForm(std::string str);
 
 //Private
 

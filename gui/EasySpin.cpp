@@ -519,16 +519,12 @@ void EasySpinFrame::OnSpaceGroupFocus() {
 void EasySpinFrame::OnSpaceGroupUnfocus() {
     //Try to decide which space group the user ment and display that
     wxString value = mCtrlSpaceGroupTxt->GetValue();
-    long number;
-    string name;
-    if(value.ToLong(&number)) {
-        //They entered a number, find the name
-        name = nameSpacegroup(number);
-    } else {
-        number = -1;
-    }
-    if(number != -1) {
-        mCtrlSpaceGroupTxt->ChangeValue(wxString() << number << wxT(" (") << wxString(name.c_str(),wxConvUTF8) << wxT(")"));
+    
+    unsigned long number = parseStandardForm(string(value.mb_str()));
+    if(number != 0) {
+        string name = nameSpacegroup(number);
+        mCtrlSpaceGroupTxt->ChangeValue(wxString() << number 
+                                        << wxT(" (") << wxString(name.c_str(),wxConvUTF8) << wxT(")"));
     } else {
         mCtrlSpaceGroupTxt->ChangeValue(wxT("(Unknown space group)"));
     }

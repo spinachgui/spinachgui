@@ -9,6 +9,8 @@
 #include <wx/log.h>
 #include <wx/file.h>
 
+#include <boost/algorithm/string/trim.hpp>
+
 #include <shared/foreach.hpp>
 #include <vector>
 
@@ -17,8 +19,9 @@
 #include <streambuf>
 #include <vector>
 #include <wx/html/htmlwin.h>
+#include <wx/log.h>
 
-/*
+
 #include <shared/formats/spirit_common.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -27,26 +30,84 @@ namespace qi=boost::spirit::qi;
 
 using boost::spirit::qi::char_;
 using boost::spirit::qi::int_;
+using boost::spirit::qi::omit;
 using boost::spirit::qi::alpha;
 using boost::spirit::qi::double_;
+using boost::spirit::qi::long_;
+using boost::spirit::qi::ulong_;
 using boost::spirit::qi::lit;
 using boost::spirit::qi::phrase_parse;
 using boost::spirit::qi::rule;
 using boost::spirit::qi::space;
 using boost::spirit::qi::_1;
+using boost::phoenix::ref;
 
-typedef string::iterator stritor;
-*/
+typedef std::string::iterator stritor;
+
 
 using namespace std;
 
 //NB this number is as likey to change as pi
 #define NUM_SPACEGROUPS 230
 
+struct spacegroupNames_ : qi::symbols<char, unsigned long> {
+    spacegroupNames_() {
+        fstream fin("data/spacegroups.txt",ios::in);
+        if(!fin.is_open()) {
+            wxLogError(wxT("Could not open data/spacegroups.txt, no spacegroups will be available\n"));
+            return;
+        }
+
+        long count = 0;
+        while(!fin.eof()) {
+            string symbol;
+            if(!getline(fin,symbol)) {
+                break;
+            }
+            boost::algorithm::trim(symbol); //Remove whitespace
+            if(symbol == "") {                //Ignore blank lines
+                continue;
+            }
+            add(symbol,count+1);
+            count++;
+        }
+        if(count != NUM_SPACEGROUPS) {
+            wxLogError(wxString() << wxT("Expecting 230 entries in data/spacegroups.txt, found\n") << count);
+            return;
+        }
+    }
+} spacegroupNames;
+
 //================================================================================//
 // Spacegroup Queries
 
 vector<string> gSpaceGroups;
+
+template <typename Expr>
+bool maybeParse(string str, Expr const& expr) {
+	stritor begin = str.begin();
+	if(phrase_parse(begin,str.end(),expr,qi::space)) {
+		//Check we have fully matched the patten
+		if(begin == str.end()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+unsigned long parseStandardForm(string str) {
+    stritor begin = str.begin();
+    unsigned long spaceGroupIndex = 0;
+    if(phrase_parse(begin,
+                    str.end(),
+                    (ulong_ | spacegroupNames | (ulong_ >> omit["(" >> spacegroupNames >> ")"]))[ref(spaceGroupIndex) = _1] ,
+                    qi::space)) {
+        return spaceGroupIndex;
+    } else {
+        return 0;
+    }
+}
 
 string findSpacegroup(string partial) {
     bool found1 = false;
@@ -54,7 +115,7 @@ string findSpacegroup(string partial) {
     foreach(string name,gSpaceGroups) {
         if(name.substr(0,partial.length()) == partial) {
             if(found1) {
-                //Not unambigous
+                //ambiguous
                 return "";
             } else {
                 found1 = true;
@@ -63,6 +124,15 @@ string findSpacegroup(string partial) {
         }
     }
     return found;
+}
+
+unsigned long lookupSpacegroupName(std::string name) {
+    for(unsigned long i = 0;i<gSpaceGroups.size();i++) {
+        if(name == gSpaceGroups[i]) {
+            return i+1;
+        }
+    }
+    return -1;
 }
 
 string nameSpacegroup(unsigned long number) {
@@ -144,7 +214,10 @@ void loadSpaceGroups() {
         //TODO: I'm not sure if this code will work on windows, where
         //wstrings need to be used rather than strings
         string symbol;
-        fin >> symbol;
+        if(!getline(fin,symbol)) {
+            break;
+        }
+        boost::algorithm::trim(symbol); //Remove whitespace
         if(symbol == "") {
             //Ignore blank lines
             continue;

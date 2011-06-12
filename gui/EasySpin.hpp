@@ -7,6 +7,7 @@
 #include <shared/orientation.hpp>
 
 class OrientDialogCombo;
+class SpaceGroupDialog;
 
 namespace SpinXML {
     class SpinSystem;
@@ -105,6 +106,8 @@ protected:
 
     SpinXML::SpinSystem* mSpinSystem;
     long mSpacegroupSelected;
+    SpaceGroupDialog* mSpaceGroupDialog;
+
 
     OrientDialogCombo* mOrientDialogCombo;
 

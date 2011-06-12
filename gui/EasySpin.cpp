@@ -257,6 +257,7 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     //Hide the options sections that should be hidden
     {wxCommandEvent tmp;OnEasySpinFunc(tmp);}
 
+    mSpaceGroupDialog = new SpaceGroupDialog(this);
 
     HideCrystal(true);
 }
@@ -492,12 +493,9 @@ void EasySpinFrame::OnOrientDClick(wxListEvent& e) {
 void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
     //TODO: if we keep the constructed object around it would probably
     //load faster the second time around
-    SpaceGroupDialog* spaceGroupDialog = new SpaceGroupDialog(this);
-    if(spaceGroupDialog->ShowModal() == wxID_OK) {
-        mCtrlSpaceGroupTxt->ChangeValue(wxString() << spaceGroupDialog->spacegroup);
+    if(mSpaceGroupDialog->ShowModal() == wxID_OK) {
+        mCtrlSpaceGroupTxt->ChangeValue(wxString() << mSpaceGroupDialog->spacegroup);
     }
-
-    delete spaceGroupDialog;
 }
 
 void EasySpinFrame::OnSpaceGroupTxt(wxCommandEvent& e) {

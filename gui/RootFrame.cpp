@@ -269,6 +269,9 @@ void RootFrame::InitFrame() {
         (wxObjectEventFunction)(wxEventFunction)(&RootFrame::OnUnitChange);
     Connect(ID_UNIT_START,ID_UNIT_START+mIdToUnit.size(),wxEVT_COMMAND_MENU_SELECTED,afterCast);
 
+    //Setup the easyspin exporter
+    mEasySpin = new EasySpinFrame(this);
+
 }
 
 void RootFrame::OnElementSelect(wxCommandEvent& e) {
@@ -573,9 +576,8 @@ void RootFrame::OnMenu(wxMenuEvent& e) {
 
 void RootFrame::OnExportToEasyspin(wxCommandEvent& e) {
     //TODO: Does this leak memory or will RootFrame clean up?
-    EasySpinFrame* es = new EasySpinFrame(this);
-    es->SetSpinsys(GetRawSS());
-    es->Show();
+    mEasySpin->SetSpinsys(GetRawSS());
+    mEasySpin->Show();
 }
 
 BEGIN_EVENT_TABLE(RootFrame,wxFrame)

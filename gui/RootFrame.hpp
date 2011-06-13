@@ -15,6 +15,7 @@ class wxAuiManager;
 class SpinGrid;
 class Display3D;
 class SpinInterEditPanel;
+class EasySpinFrame;
 
 namespace SpinXML {
         class ISpinSystemLoader;
@@ -95,6 +96,7 @@ private:
     SpinInterEditPanel* mSpinInterEdit;
     Display3D* mDisplay3D;
     FrameTree* mFrameTree;
+    EasySpinFrame* mEasySpin;
 
     SpinXML::ISpinSystemLoader* mSaver;
 

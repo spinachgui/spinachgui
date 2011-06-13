@@ -173,7 +173,7 @@ SpaceGroupDialog::SpaceGroupDialog( wxWindow* parent,
 
         wxHtmlWindow* htmlWindow = new wxHtmlWindow(panel, wxID_ANY);
         wxString filename  =  wxT("data/") + cystalSystemName + wxT(".html");
-        htmlWindow->LoadPage(wxT(filename));
+        htmlWindow->LoadPage(filename);
         innerSizer->Add(htmlWindow, 1, wxALL|wxEXPAND, 5);
 
         mNotebook->AddPage(panel,cystalSystemName,false);

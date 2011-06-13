@@ -85,6 +85,7 @@ protected:
     //Other events
     void OnGenerate(wxCommandEvent& e);
     void OnGenerateNotebook(wxChoicebookEvent& e);
+    void OnGenerateList(wxListEvent& e);
     void OnAutoGen(wxCommandEvent& e);
     void PreviewEdit(wxCommandEvent& e);
     void OnEasySpinFunc(wxCommandEvent& e);

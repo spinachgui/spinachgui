@@ -459,11 +459,13 @@ void EasySpinFrame::RepopulateCrystalOrients() {
 }
 
 void EasySpinFrame::OnAddOrient(wxCommandEvent& e) {
+    e.Skip();
     mOrients.push_back(Orientation());
     RepopulateCrystalOrients();
 }
 
 void EasySpinFrame::OnDeleteOrient(wxCommandEvent& e) {
+    e.Skip();
     long itemIndex = mCtrlOrients->GetNextItem(-1,
                                                wxLIST_NEXT_ALL,
                                                wxLIST_STATE_SELECTED);
@@ -475,6 +477,7 @@ void EasySpinFrame::OnDeleteOrient(wxCommandEvent& e) {
 
 
 void EasySpinFrame::OnOrientDClick(wxListEvent& e) {
+    e.Skip();
     long itemIndex = mCtrlOrients->GetNextItem(-1,
                                                wxLIST_NEXT_ALL,
                                                wxLIST_STATE_SELECTED);
@@ -491,6 +494,7 @@ void EasySpinFrame::OnOrientDClick(wxListEvent& e) {
 }
 
 void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
+    e.Skip();
     //TODO: if we keep the constructed object around it would probably
     //load faster the second time around
     if(mSpaceGroupDialog->ShowModal() == wxID_OK) {
@@ -500,6 +504,7 @@ void EasySpinFrame::OnShowSpaceGroups(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnSpaceGroupTxt(wxCommandEvent& e) {
+    e.Skip();
     //Try to decide which space group the user ment and display that
 
     //NB: Currently this doesn't really seem to work
@@ -571,8 +576,15 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.setMode(gModeSelectOrdering[mCtrlMode->GetSelection()]);
 
     if(mRadioCrystal->GetValue()) {
-        easySpinInput.setSpaceGroup(1);
+        string value = string(mCtrlSpaceGroupTxt->GetValue().mb_str());
+        unsigned long sgNum = parseStandardForm(value);
+        if(sgNum != 0) {
+            easySpinInput.mSpaceGroup = sgNum;
+        }
+        easySpinInput.mOrients = mOrients;
     }
+
+    
 
     if(mCtrlModAmpOn->GetValue()) {
         double modAmp;
@@ -780,6 +792,7 @@ void EasySpinFrame::OnSave(wxCommandEvent& e) {
 }
 
 void EasySpinFrame::OnOrientEdit(wxCommandEvent& e) {
+    e.Skip();
     wxListEvent listEvent;
     //The double click handler isn't compleatly trivial, so re-use the
     //logic by fakeing the call
@@ -952,6 +965,10 @@ void EasySpinFrame::OnGenerateNotebook(wxChoicebookEvent& e) {
     wxCommandEvent commandEvent;
     OnGenerate(commandEvent);
 }
+void EasySpinFrame::OnGenerateList(wxListEvent& e) {
+    wxCommandEvent commandEvent;
+    OnGenerate(commandEvent);
+}
 
 void EasySpinFrame::OnTCorrIsoUnit(wxCommandEvent& e) {
     e.Skip();
@@ -1107,6 +1124,7 @@ EVT_CHECKBOX(wxID_ANY, EasySpinFrame::OnGenerate)
 EVT_CHOICE(wxID_ANY, EasySpinFrame::OnGenerate)
 EVT_RADIOBUTTON(wxID_ANY, EasySpinFrame::OnGenerate)
 EVT_CHOICEBOOK_PAGE_CHANGED(wxID_ANY,EasySpinFrame::OnGenerateNotebook)
+EVT_LIST_ITEM_ACTIVATED(wxID_ANY,EasySpinFrame::OnGenerateList)
 
 END_EVENT_TABLE()
 

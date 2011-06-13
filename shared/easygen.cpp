@@ -1,4 +1,3 @@
-
 #include <shared/easygen.hpp>
 
 #include <string>
@@ -218,6 +217,18 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
         oss << "Exp.ModAmp = " << mModAmp.get() << ";" << endl;}
     if(mTemperature) {
         oss << "Exp.Temperature = " << mTemperature.get() << ";" << endl;}
+
+    if(mSpaceGroup) {
+        oss << "Exp.CrystalSymmetry = " << mSpaceGroup.get() << ";" << endl;
+    }
+    if(mOrients.size() > 0) {
+        oss << "Exp.Orientations = [";
+        for(unsigned long i = 0;i < mOrients.size();i++) {
+            EulerAngles ea = mOrients[i].GetAsEuler();
+            oss << ea.alpha/PI*180 << ", " << ea.beta/PI*180 << ", " << ea.gamma/PI*180 << ";";
+        }
+        oss << "]*PI/180;" << endl; 
+    }
 
     //Brodernings
     if(mGaussianFWHM && mLorentFWHM) {

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <boost/optional.hpp>
 #include <shared/orientation.hpp>
 
@@ -87,10 +88,9 @@ struct EasySpinInput {
     void setSpaceGroup(unsigned long spaceGroup) {
         mSpaceGroup = spaceGroup;
     }
-    boost::optional<unsigned long> mSpaceGroup;
-    //----------------------------------------//
 
-    //TODO: Crystal Orientations
+    boost::optional<unsigned long> mSpaceGroup;
+    std::vector<SpinXML::Orientation> mOrients;
 
     //----------------------------------------//
     //Valid range is 0 to 2Pi

@@ -272,6 +272,25 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
         oss << "Exp.MOND = 1;" << endl;
     }
     
+    if(mEasySpinFunc == GARLIC || mEasySpinFunc == PEPPER) {
+        string methString;
+        if(mMethod == EXACT) {
+            methString = "exact";
+        } else if(mMethod == MATRIX) {
+            methString = "matrix";
+        } else if(mMethod == PERT1) {
+            methString = "perturb1";
+        } else if(mMethod == PERT2) {
+            methString = "perturb2";
+        } else if(mMethod == PERT3) {
+            methString = "perturb3";
+        } else if(mMethod == PERT4) {
+            methString = "perturb4";
+        } else if(mMethod == PERT5) {
+            methString = "perturb5";
+        }
+        oss << "Opt.Method = '" << methString << "';" << endl;
+    }
 
     if(mEasySpinFunc == CHILI) {
         if(mLambda20 || mLambda22 || mLambda40 || mLambda42 || mLambda44) {

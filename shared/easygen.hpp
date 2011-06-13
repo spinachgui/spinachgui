@@ -103,8 +103,12 @@ struct EasySpinInput {
     // Options
     enum Method {
         MATRIX,
+        EXACT,
         PERT1,
-        PERT2
+        PERT2,
+        PERT3,
+        PERT4,
+        PERT5
     };
     Method mMethod;
 

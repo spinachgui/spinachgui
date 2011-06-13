@@ -102,7 +102,8 @@ void drawOrientationIcon(wxBitmap& bitmap,const Orientation& o) {
 //are initalised in the module initalisation code in __init's
 //constructor
 vector<EasySpinInput::Mode        > gModeSelectOrdering;    
-vector<EasySpinInput::Method      > gMethodSelectOrdering;  
+vector<EasySpinInput::Method      > gGarlicMethodSelectOrdering;  
+vector<EasySpinInput::Method      > gPepperMethodSelectOrdering;  
 vector<EasySpinInput::Output      > gOutputSelectOrdering;  
 vector<EasySpinInput::EasySpinFunc> gEasySpinSelectOrdering;
 
@@ -595,9 +596,9 @@ void EasySpinFrame::OnGenerate(wxCommandEvent& e) {
     easySpinInput.mMWPhase = getOptionalValue(mCtrlPhase);
 
     if(mCtrlEasySpinF->GetSelection() == PAGE_PEPPER) {
-        easySpinInput.mMethod = gMethodSelectOrdering[mCtrlPepperMethod->GetSelection()];
+        easySpinInput.mMethod = gPepperMethodSelectOrdering[mCtrlPepperMethod->GetSelection()];
     } else if(mCtrlEasySpinF->GetSelection() == PAGE_GARLIC) {
-        easySpinInput.mMethod = gMethodSelectOrdering[mCtrlGarlicMethod->GetSelection()];
+        easySpinInput.mMethod = gGarlicMethodSelectOrdering[mCtrlGarlicMethod->GetSelection()];
     }
 
     easySpinInput.setNKnots(mCtrlKnots->GetValue());
@@ -1134,9 +1135,16 @@ struct __Init {
         gModeSelectOrdering.push_back(EasySpinInput::PARALLEL);
         gModeSelectOrdering.push_back(EasySpinInput::PERPENDICULAR);
 
-        gMethodSelectOrdering.push_back(EasySpinInput::MATRIX);
-        gMethodSelectOrdering.push_back(EasySpinInput::PERT1);
-        gMethodSelectOrdering.push_back(EasySpinInput::PERT2);
+        gPepperMethodSelectOrdering.push_back(EasySpinInput::PERT1);
+        gPepperMethodSelectOrdering.push_back(EasySpinInput::PERT2);
+        gPepperMethodSelectOrdering.push_back(EasySpinInput::MATRIX);
+
+        gGarlicMethodSelectOrdering.push_back(EasySpinInput::EXACT);
+        gGarlicMethodSelectOrdering.push_back(EasySpinInput::PERT1);
+        gGarlicMethodSelectOrdering.push_back(EasySpinInput::PERT2);
+        gGarlicMethodSelectOrdering.push_back(EasySpinInput::PERT3);
+        gGarlicMethodSelectOrdering.push_back(EasySpinInput::PERT4);
+        gGarlicMethodSelectOrdering.push_back(EasySpinInput::PERT5);
 
         gOutputSelectOrdering.push_back(EasySpinInput::SUMMED);
         gOutputSelectOrdering.push_back(EasySpinInput::SEPERATE);

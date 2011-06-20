@@ -4,7 +4,6 @@
 
 #include <gui/OrientationEdit.hpp>
 #include <gui/TextCtrlFocus.hpp>
-#include <gui/NumericValidators.hpp>
 #include <fstream>
 #include <vector>
 #include <map>

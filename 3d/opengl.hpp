@@ -7,6 +7,7 @@
 #ifdef _WINDOWS
 #include <windows.h>
 #include <GL/gl.h>
+#include <wx/msw/winundef.h>
 #endif
 
 

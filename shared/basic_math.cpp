@@ -38,6 +38,10 @@ Vector3d SpinXML::MakeVector3d(Vector4d v) {
 
 Matrix3f SpinXML::Matrix3d2Matrix3f(const Matrix3d& mat) {
     Matrix3f matf;
+#if _WINDOWS
+//Loss of precision warning on windows
+	#pragma warning (disable : 4244)
+#endif
     matf(0,0) = mat(0,0);
     matf(0,1) = mat(0,1);
     matf(0,2) = mat(0,2);
@@ -50,6 +54,9 @@ Matrix3f SpinXML::Matrix3d2Matrix3f(const Matrix3d& mat) {
     matf(2,1) = mat(2,1);
     matf(2,2) = mat(2,2);
     return matf;
+#if _WINDOWS
+	#pragma warning (default : 4244)
+#endif
 }
 
 Matrix3d SpinXML::Matrix3f2Matrix3d(const Matrix3f& mat) {

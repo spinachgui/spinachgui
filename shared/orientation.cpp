@@ -94,6 +94,13 @@ Orientation::Orientation()
 	: mType(QUATERNION), mQuaternion(Quaterniond(1,0,0,0)) {
 	Invariant();
 }
+
+Orientation::Orientation(const Orientation& o) {
+	//We shouldn't have to check this, in theory.
+	o.Invariant();
+	*this = o;
+}
+
 ///Constructs an orientation from euler angles
 Orientation::Orientation(const EulerAngles& ea) 
 	: mType(EULER),mEuler(ea) {
@@ -138,6 +145,26 @@ const Orientation& Orientation::operator=(const Eigen::Matrix3d& m)     {
 const Orientation& Orientation::operator=(const Eigen::Quaterniond& q)  {
 	mType = QUATERNION;
 	mQuaternion = q;
+	Invariant();
+	return *this;
+}
+
+const Orientation& Orientation::operator=(const Orientation& o) {
+	mType = o.mType;
+	switch(mType) {
+    case EULER:
+        mEuler = o.mEuler;
+		break;
+	case DCM:
+		mMatrix = o.mMatrix;
+		break;
+	case ANGLE_AXIS:
+		mAngleAxis = o.mAngleAxis;
+		break;
+	case QUATERNION:
+		mQuaternion = o.mQuaternion;
+		break;
+	}
 	Invariant();
 	return *this;
 }
@@ -350,6 +377,9 @@ Orientation Orientation::Normalized() const {
 
 
 void Orientation::Invariant() const {
+	if(!(mType == ANGLE_AXIS || mType == DCM || mType == QUATERNION || mType == EULER)) {
+        PANIC("mType set to invalid value.");
+	}
     if(mType == ANGLE_AXIS) {
 		Vector3d axis = mAngleAxis.axis();
 		if(axis.x() == 0 && axis.y() == 0 && axis.z() == 0) {

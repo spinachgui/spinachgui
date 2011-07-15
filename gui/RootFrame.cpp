@@ -1,5 +1,7 @@
 #include <gui/RootFrame.hpp>
 
+
+
 #include <gui/InterDisplaySettings.hpp>
 #include <gui/RightClickMenu.hpp>
 #include <gui/SpinachApp.hpp>
@@ -18,7 +20,7 @@
 #include <shared/foreach.hpp>
 #include <shared/nuclear_data.hpp>
 
-#include <gui/EasySpin.hpp>
+#include <gui/EasySpinFrame.hpp>
 
 //Input and output filters
 #define ID_UNIT_START 12345

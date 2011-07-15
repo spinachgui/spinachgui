@@ -92,6 +92,8 @@ namespace SpinXML {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
         ///Constructs the identity rotation
         Orientation();
+		///Copy constructor
+        Orientation(const Orientation& o);
         ///Constructs an orientation from euler angles
         Orientation(const EulerAngles& ea);
         ///Constructs an orientation from a matrix
@@ -138,6 +140,7 @@ namespace SpinXML {
 
         Eigen::Vector3d Apply(Eigen::Vector3d v) const;
 
+		const Orientation& operator=(const Orientation& o);
         const Orientation& operator=(const EulerAngles& ea);
         const Orientation& operator=(const Eigen::AngleAxisd& aa);
         const Orientation& operator=(const Eigen::Matrix3d& m);   
@@ -161,6 +164,7 @@ namespace SpinXML {
         Eigen::Quaterniond GetAsQuaternion() const;
 
     private:
+
 		Type mType;
 		EulerAngles mEuler;
 		Eigen::AngleAxisd mAngleAxis;

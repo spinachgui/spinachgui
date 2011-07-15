@@ -1,5 +1,5 @@
-
-#include <gui/EasySpin.hpp>
+ 
+#include <gui/EasySpinFrame.hpp>
 #include <wx/valtext.h>
 
 #include <gui/OrientationEdit.hpp>
@@ -25,6 +25,7 @@
 #include <shared/easygen.hpp>
 #include <wx/filedlg.h>
 #include <fstream>
+#include <math.h>
 
 #define ORIENT_ICON_SIZE 41
 
@@ -46,6 +47,12 @@ using namespace SpinXML;
 using boost::optional;
 
 typedef optional<double> maybeDouble;
+
+#ifdef __WINDOWS__
+double round(double r) {
+    return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);
+}
+#endif
 
 //================================================================================//
 // wxChoice decoder functions. Decode an wxChoice index into a
@@ -163,7 +170,13 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
                              const wxPoint& pos,
                              const wxSize& size,
                              long style) 
-    : EasySpinFrameBase(parent,id,title,pos,size,style),mSpinSystem(NULL),mSpacegroupSelected(-1) {
+    : EasySpinFrameBase(parent,id,title,pos,size,style),mSpinSystem(NULL),mSpacegroupSelected(-1),mOrientDialogCombo(NULL) {
+    //It's best to make sure everything is instanciated first before customising properties
+	//in case events get fired. Fun fact, wxSpinCtrl may emit events when wxSpinCtrl::SetRange is called on windows
+	//but it doens't seem to under gtk.
+	mOrientDialogCombo = new OrientDialogCombo(mDynamicsPage,-1);
+	mSpaceGroupDialog = new SpaceGroupDialog(this);
+
     //Add numeric validators to the numeric text boxes
     mCtrlMax->   SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
     mCtrlMin->   SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
@@ -245,9 +258,7 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
 
     mCtrlExchange->SetValidator(wxTextValidator(wxFILTER_NUMERIC,NULL));
 
-    mOrientDialogCombo = new OrientDialogCombo(mDynamicsPage,-1);
-    mOrientDialogCombo->SetOrient(Orientation(EulerAngles(0,0,0)));
-    mSizerRotCorrOrient->Add(mOrientDialogCombo,0,wxALIGN_CENTER,0);
+	mSizerRotCorrOrient->Add(mOrientDialogCombo,0,wxALIGN_CENTER,0);
 
     //Make strain based broaderning hidded until the user selects pepper
     mSizerStrain->Show(false);
@@ -257,7 +268,6 @@ EasySpinFrame::EasySpinFrame(wxWindow* parent,
     //Hide the options sections that should be hidden
     {wxCommandEvent tmp;OnEasySpinFunc(tmp);}
 
-    mSpaceGroupDialog = new SpaceGroupDialog(this);
 
     HideCrystal(true);
 }

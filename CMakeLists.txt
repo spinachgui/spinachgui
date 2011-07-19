@@ -67,7 +67,7 @@ set(wxformbuilderSources
 set(easyspinSources   #For the standalone easyspin version
   ${CMAKE_CURRENT_BINARY_DIR}/auto/SpinachGUI.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/auto/easyspin.cpp
-  gui/EasySpin.cpp
+  gui/EasySpinFrame.cpp
   gui/TextBitmap.cpp
   gui/OrientationEdit.cpp
   gui/Spacegroup.cpp

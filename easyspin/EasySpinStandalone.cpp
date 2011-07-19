@@ -1,6 +1,6 @@
 
 #include <wx/app.h>
-#include <gui/EasySpin.hpp>
+#include <gui/EasySpinFrame.hpp>
 #include <shared/spinsys.hpp>
 
 #include <shared/formats/g03.hpp>

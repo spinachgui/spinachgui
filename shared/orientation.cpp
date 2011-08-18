@@ -377,7 +377,7 @@ Orientation Orientation::Normalized() const {
 
 void Orientation::Invariant() const {
 	if(!(mType == ANGLE_AXIS || mType == DCM || mType == QUATERNION || mType == EULER)) {
-        PANIC("mType set to invalid value.");
+        PANICMSG("mType set to invalid value.");
 	}
     if(mType == ANGLE_AXIS) {
 		Vector3d axis = mAngleAxis.axis();

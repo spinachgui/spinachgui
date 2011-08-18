@@ -548,25 +548,25 @@ void Interaction::valid_or_throw() const {
 class InvariantVisitor : public static_visitor<> {
 public:
     void operator()(const energy& dat) const {
-        NaNPANIC(dat,"Interaction(Energy) is NaN");
+        NaNPANICMSG(dat,"Interaction(Energy) is NaN");
     }
     void operator()(const Matrix3d& dat) const {
-        NaNPANIC(dat,"Interaction(Matrix3d) has a NaN");
+        NaNPANICMSG(dat,"Interaction(Matrix3d) has a NaN");
     }
     void operator()(const Eigenvalues& dat) const {
-        NaNPANIC(dat.xx,"Interaction(Eigenvalues).xx has a NaN");
-        NaNPANIC(dat.yy,"Interaction(Eigenvalues).yy has a NaN");
-        NaNPANIC(dat.zz,"Interaction(Eigenvalues).zz has a NaN");
+        NaNPANICMSG(dat.xx,"Interaction(Eigenvalues).xx has a NaN");
+        NaNPANICMSG(dat.yy,"Interaction(Eigenvalues).yy has a NaN");
+        NaNPANICMSG(dat.zz,"Interaction(Eigenvalues).zz has a NaN");
     }
     void operator()(const AxRhom& dat) const {
-        NaNPANIC(dat.ax ,"Interaction(AxRhom).ax  has a NaN");
-        NaNPANIC(dat.rh ,"Interaction(AxRhom).rh  has a NaN");
-        NaNPANIC(dat.iso,"Interaction(AxRhom).iso has a NaN");
+        NaNPANICMSG(dat.ax ,"Interaction(AxRhom).ax  has a NaN");
+        NaNPANICMSG(dat.rh ,"Interaction(AxRhom).rh  has a NaN");
+        NaNPANICMSG(dat.iso,"Interaction(AxRhom).iso has a NaN");
     }
     void operator()(const SpanSkew& dat) const {
-        NaNPANIC(dat.span ,"Interaction(SpanSkew).span  has a NaN");
-        NaNPANIC(dat.skew ,"Interaction(SpanSkew).skew  has a NaN");
-        NaNPANIC(dat.iso,  "Interaction(SpanSkew).iso   has a NaN");
+        NaNPANICMSG(dat.span ,"Interaction(SpanSkew).span  has a NaN");
+        NaNPANICMSG(dat.skew ,"Interaction(SpanSkew).skew  has a NaN");
+        NaNPANICMSG(dat.iso,  "Interaction(SpanSkew).iso   has a NaN");
     }
 };
 
@@ -582,7 +582,7 @@ void Interaction::Invariant() const {
     case ANY:
     case NMR:
     case EPR:
-        PANIC("Interaction has type ANY,NMR or EPR");
+        PANICMSG("Interaction has type ANY,NMR or EPR");
         break;
     case SCALAR:
     case EXCHANGE:
@@ -590,7 +590,7 @@ void Interaction::Invariant() const {
     case CUSTOM_BILINEAR:
     case DIPOLAR:
         if(mSpin1 == NULL || mSpin2 == NULL)
-            PANIC("Bilinar Interactions but one of mSpin1 or mSpin2 is null!");
+            PANICMSG("Bilinar Interactions but one of mSpin1 or mSpin2 is null!");
         break;
     case CUSTOM_LINEAR:
     case SHIELDING:
@@ -599,10 +599,10 @@ void Interaction::Invariant() const {
     case QUADRUPOLAR:
     case CUSTOM_QUADRATIC:
         if(mSpin1 != NULL && mSpin2 != NULL)
-            PANIC("Linear or quadratic interaction but both mSpin1 and mSpin2 are not null");
+            PANICMSG("Linear or quadratic interaction but both mSpin1 and mSpin2 are not null");
         break;
     default:
-        PANIC("Unknown, invalid type in Interaction");
+        PANICMSG("Unknown, invalid type in Interaction");
     }
 }
 

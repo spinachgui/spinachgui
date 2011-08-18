@@ -4,11 +4,9 @@
 #include <shared/panic.hpp>
 
 #include <iostream>
-#include <shared/assert.hpp>
 
 using namespace SpinXML;
 using namespace Eigen;
-using namespace boost;
 using namespace std;
 
 //============================================================//
@@ -72,12 +70,12 @@ Matrix4d Frame::getTransformToLab() const {
 
 Vector3d SpinXML::ToLabVec3d(const Frame* frame,const Vector3d& v) {
     Vector3d vprime = Affine3d(frame->getTransformToLab()) * v;
-    NaNPANIC(vprime,"ToLabVec3D result is NaN");
+    NaNPANICMSG(vprime,"ToLabVec3D result is NaN");
     return vprime;
 }
 Vector3d SpinXML::FromLabVec3d(const Frame* frame,const Vector3d& v) {
     Vector3d vprime = Affine3d(frame->getTransformFromLab()) * v;
-    NaNPANIC(vprime,"ToLabVec3D result is NaN");
+    NaNPANICMSG(vprime,"ToLabVec3D result is NaN");
     return vprime;
 }
 
@@ -85,14 +83,14 @@ Matrix3d SpinXML::ToLabMatrix3d(const Frame* frame,const Matrix3d& m) {
     Matrix3d RFromLab = Affine3d(frame->getTransformFromLab()).rotation();
     Matrix3d RToLab   = Affine3d(frame->getTransformToLab()).rotation();
     Matrix3d mprime   = RFromLab * m * RToLab;
-    NaNPANIC(mprime,"ToLabMatrix3d result is NaN");
+    NaNPANICMSG(mprime,"ToLabMatrix3d result is NaN");
     return mprime;
 }
 Matrix3d SpinXML::FromLabMatrix3d(const Frame* frame,const Matrix3d& m) {
     Matrix3d RFromLab = Affine3d(frame->getTransformFromLab()).rotation();
     Matrix3d RToLab   = Affine3d(frame->getTransformToLab()).rotation();
     Matrix3d mprime   =  RToLab * m * RFromLab;
-    NaNPANIC(mprime,"ToLabMatrix3d result is NaN");
+    NaNPANICMSG(mprime,"ToLabMatrix3d result is NaN");
     return mprime;
 }
 Orientation ToFromLabOrient(const Frame* frame,const Orientation& o,bool ToLab) {
@@ -109,7 +107,7 @@ Orientation ToFromLabOrient(const Frame* frame,const Orientation& o,bool ToLab) 
 		} else if(o.GetType() == Orientation::ANGLE_AXIS) {
 			return Orientation(ConvertToAngleAxis(qdat));
 		} else {
-			spinxml_assert(false);
+			PANIC();
 			return Orientation();
 		}
 	}
@@ -126,32 +124,32 @@ Orientation SpinXML::FromLabOrient(const Frame* frame,const Orientation& o) {
 
 
 void Frame::Invariant() const {
-    NaNPANIC(mTranslate.x(),"mTranslate.x is NaN");
-    NaNPANIC(mTranslate.y(),"mTranslate.x is NaN");
-    NaNPANIC(mTranslate.z(),"mTranslate.x is NaN");
+    NaNPANICMSG(mTranslate.x(),"mTranslate.x is NaN");
+    NaNPANICMSG(mTranslate.y(),"mTranslate.x is NaN");
+    NaNPANICMSG(mTranslate.z(),"mTranslate.x is NaN");
 
-    NaNPANIC(mAffine(0,0),"mAffine containts a NaN element");
-    NaNPANIC(mAffine(0,1),"mAffine containts a NaN element");
-    NaNPANIC(mAffine(0,2),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(0,0),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(0,1),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(0,2),"mAffine containts a NaN element");
 
-    NaNPANIC(mAffine(1,0),"mAffine containts a NaN element");
-    NaNPANIC(mAffine(1,1),"mAffine containts a NaN element");
-    NaNPANIC(mAffine(1,2),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(1,0),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(1,1),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(1,2),"mAffine containts a NaN element");
 
-    NaNPANIC(mAffine(2,0),"mAffine containts a NaN element");
-    NaNPANIC(mAffine(2,1),"mAffine containts a NaN element");
-    NaNPANIC(mAffine(2,2),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(2,0),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(2,1),"mAffine containts a NaN element");
+    NaNPANICMSG(mAffine(2,2),"mAffine containts a NaN element");
 
-    NaNPANIC(mInvertedAffine(0,0),"mInvertedAffine containts a NaN element");
-    NaNPANIC(mInvertedAffine(0,1),"mInvertedAffine containts a NaN element");
-    NaNPANIC(mInvertedAffine(0,2),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(0,0),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(0,1),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(0,2),"mInvertedAffine containts a NaN element");
 
-    NaNPANIC(mInvertedAffine(1,0),"mInvertedAffine containts a NaN element");
-    NaNPANIC(mInvertedAffine(1,1),"mInvertedAffine containts a NaN element");
-    NaNPANIC(mInvertedAffine(1,2),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(1,0),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(1,1),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(1,2),"mInvertedAffine containts a NaN element");
 
-    NaNPANIC(mInvertedAffine(2,0),"mInvertedAffine containts a NaN element");
-    NaNPANIC(mInvertedAffine(2,1),"mInvertedAffine containts a NaN element");
-    NaNPANIC(mInvertedAffine(2,2),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(2,0),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(2,1),"mInvertedAffine containts a NaN element");
+    NaNPANICMSG(mInvertedAffine(2,2),"mInvertedAffine containts a NaN element");
 }
 

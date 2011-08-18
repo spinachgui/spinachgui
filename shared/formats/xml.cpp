@@ -521,7 +521,7 @@ public:
             Quaterniond q = orient.GetAsQuaternion();
 
             if(q.x() == 0 && q.y() == 0 && q.z() == 0 && q.w() == 0) {
-                PANIC("About to write out the zero quaternion (0,0,0,0)");
+                PANICMSG("About to write out the zero quaternion (0,0,0,0)");
             }
 
             qEl->SetDoubleAttribute("re",q.w());
@@ -545,7 +545,7 @@ public:
             Vector3d axis = aa.axis();
 
             if(axis.x() == 0 && axis.y() == 0 && axis.z() == 0) {
-                PANIC("About to write out an angle-axis axis that is the zero vector");
+                PANICMSG("About to write out an angle-axis axis that is the zero vector");
             }
 
             axisEl->SetDoubleAttribute("x",axis.x());

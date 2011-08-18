@@ -2,7 +2,7 @@
 #include <3d/displaySettings.hpp>
 
 #include <sigc++/sigc++.h>
-#include <shared/assert.hpp>
+#include <shared/panic.hpp>
 
 #include <map>
 
@@ -43,15 +43,15 @@ void SetInterSize   (double s,SpinXML::Interaction::Type t) {
 }
 
 bool GetInterVisible(SpinXML::Interaction::Type t) {
-	spinxml_assert(visableMap.find(t) != visableMap.end());
+	MAYBEPANIC(visableMap.find(t) != visableMap.end());
 	return visableMap[t];
 }
 ColourRGB GetInterColour (SpinXML::Interaction::Type t) {
-	spinxml_assert(colourMap.find(t) != colourMap.end());
+	MAYBEPANIC(colourMap.find(t) != colourMap.end());
 	return colourMap[t];
 }
 double    GetInterSize   (SpinXML::Interaction::Type t) {
-	spinxml_assert(sizeMap.find(t) != sizeMap.end());
+	MAYBEPANIC(sizeMap.find(t) != sizeMap.end());
 	return sizeMap[t];
 }
 

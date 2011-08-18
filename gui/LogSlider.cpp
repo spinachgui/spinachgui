@@ -4,20 +4,20 @@
 #include <iostream>
 #include <cmath>
 #include <stdexcept>
-#include <shared/assert.hpp>
+#include <shared/panic.hpp>
 
 using namespace std;
 
 LogSlider::LogSlider(wxWindow* parent,double value)
     : wxControl(parent,wxID_ANY) {
-	spinxml_assert(value > 0);
+    MAYBEPANIC(value > 0);
     mLogValue=log10(value);
     mLogWidth=4;
     mLogValueDelta=0;
 }
 
 void LogSlider::SetValue(double value) {
-	spinxml_assert(value > 0);
+	MAYBEPANIC(value > 0);
     mLogValue=log10(value);
     wxClientDC dc(this);
     RealPaint(dc);

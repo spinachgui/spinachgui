@@ -14,7 +14,6 @@
 #include <shared/formats/simpson.hpp>
 #include <shared/formats/easyspin.hpp>
 #include <shared/panic.hpp>
-#include <shared/assert.hpp>
 
 #include <shared/foreach.hpp>
 
@@ -287,7 +286,7 @@ void AssertSelectionExists() {
     std::vector<Spin*> spins = GetRawSS()->GetSpins();
     for(itor i = gSelection.begin();i!=gSelection.end();++i) {
         if(find(spins.begin(),spins.end(),*i) == spins.end()) {
-            PANIC("A spin in the selection manager was not present in the spin system");
+            PANICMSG("A spin in the selection manager was not present in the spin system");
         }
     }
 }

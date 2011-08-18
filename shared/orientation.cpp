@@ -7,7 +7,6 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <Eigen/Dense>
-#include <shared/assert.hpp>
 #include <shared/panic.hpp>
 
 using namespace std;
@@ -189,7 +188,7 @@ bool Orientation::operator==(const Orientation& o) const {
 			&& o.mQuaternion.y()==mQuaternion.y()
 			&& o.mQuaternion.z()==mQuaternion.z();
 	}
-	spinxml_assert(false);
+	PANIC();
 	return false;
 }
 
@@ -214,7 +213,7 @@ Matrix3d Orientation::GetAsMatrix() const {
 	if(mType == QUATERNION) {
         return ConvertToDCM(normalized.mQuaternion);
 	}
-	spinxml_assert(false);
+	PANIC();
 	return Matrix3d();
 }
 
@@ -231,25 +230,25 @@ Vector3d Orientation::Apply(Vector3d v) const {
     } else if(mType == QUATERNION)  {
         return mQuaternion*v;
     }
-	spinxml_assert(false);
+	PANIC();
 	return Vector3d();
 }
 
 void Orientation::GetEuler(double* alpha,double* beta,double* gamma) const {
-	spinxml_assert(mType == EULER);
+	MAYBEPANIC(mType == EULER);
     *alpha = mEuler.alpha;
     *beta =  mEuler.beta;
     *gamma = mEuler.gamma;
 }
 
 void Orientation::GetAngleAxis(double* angle,Vector3d* axis) const {
-	spinxml_assert(mType == ANGLE_AXIS);
+	MAYBEPANIC(mType == ANGLE_AXIS);
     *angle = mAngleAxis.angle();
     *axis =  mAngleAxis.axis();
 }
 
 void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) const {
-	spinxml_assert(mType == QUATERNION);
+	MAYBEPANIC(mType == QUATERNION);
     *real = mQuaternion.w();
     *i    = mQuaternion.x();
     *j    = mQuaternion.y();
@@ -257,7 +256,7 @@ void Orientation::GetQuaternion(double* real, double* i, double* j, double* k) c
 }
 
 void Orientation::GetDCM(Matrix3d* matrix) const {
-	spinxml_assert(mType == DCM);
+	MAYBEPANIC(mType == DCM);
     *matrix = mMatrix;
 }
 
@@ -291,7 +290,7 @@ string Orientation::ToString() const {
             << mAngleAxis.axis().z();
         return oss.str();
 	}
-	spinxml_assert(false);
+	MAYBEPANIC(false);
 	return "ERROR";
 }
 
@@ -313,7 +312,7 @@ void Orientation::FromString(std::string string) {
 	if(mType == QUATERNION) {											\
         return function(normalized.mQuaternion);						\
 	}																	\
-	spinxml_assert(false);												
+	MAYBEPANIC(false);												
 
 EulerAngles Orientation::GetAsEuler() const {
 	DEFINE_CONVERTER(AsEulerVisitor,EulerAngles,ConvertToEuler);
@@ -353,7 +352,7 @@ void Orientation::Normalize() {
 	} else if(mType == ANGLE_AXIS) {
         mAngleAxis.axis()=mAngleAxis.axis().normalized();
 	} else {
-		spinxml_assert(false);
+		MAYBEPANIC(false);
 	}
 	Invariant();
 }
@@ -371,7 +370,7 @@ Orientation Orientation::Normalized() const {
 	if(mType == ANGLE_AXIS) {
         return AngleAxisd(mAngleAxis.angle(),mAngleAxis.axis().normalized());
 	}
-	spinxml_assert(false);
+	MAYBEPANIC(false);
 	return Orientation();
 }
 
@@ -383,11 +382,11 @@ void Orientation::Invariant() const {
     if(mType == ANGLE_AXIS) {
 		Vector3d axis = mAngleAxis.axis();
 		if(axis.x() == 0 && axis.y() == 0 && axis.z() == 0) {
-			PANIC("An orientation in angle-axis notation has (0,0,0) as it's axis vector");
+			PANICMSG("An orientation in angle-axis notation has (0,0,0) as it's axis vector");
 		}
     } else if(mType == QUATERNION) {
 		if(mQuaternion.x() == 0 && mQuaternion.y() == 0 && mQuaternion.z() == 0 && mQuaternion.w() == 0) {
-			PANIC("An orientation in quaternion notation is (0,0,0,0)");
+			PANICMSG("An orientation in quaternion notation is (0,0,0,0)");
 		}
 	}
 	

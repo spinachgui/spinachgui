@@ -146,13 +146,11 @@ void SpinGrid::OnEndEdit(wxGridEvent& e) {
 
 bool SpinGrid::DeleteRows(int pos,int numRows,bool updateLables) {
     bool r=wxGrid::DeleteRows(pos,numRows,updateLables);
-    sigRowDelete(pos,numRows);
     return r;
 }
 
 void SpinGrid::RefreshFromSpinSystem() {
     mUpdating=true;
-    sigClearing();
 
     if(GetNumberRows()) {
         //Clear grid only clears the underlying data rather. The cells

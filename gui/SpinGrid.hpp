@@ -48,9 +48,6 @@ public:
     };
 
     sigc::signal<void,SpinXML::Spin*> sigSelect;
-    sigc::signal<void> sigDying;
-    sigc::signal<void> sigClearing;
-    sigc::signal<void,int,int> sigRowDelete;
 protected:
     DECLARE_EVENT_TABLE();
 
@@ -61,7 +58,7 @@ protected:
     void ColourRow(long rowNumber,const wxColor& c);
 
 private:
-    ~SpinGrid() {sigDying();}
+    ~SpinGrid() {}
     struct SpinGridColum {
         COL_TYPE type;
         const char* name;

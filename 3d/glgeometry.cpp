@@ -165,7 +165,11 @@ void ElectronScene::Geometary() const {
                 
         glMultMatrixf(m4x4.data());
         glScalef(10,10,10);
+
+		glPushName(i);
         DrawSpin(spin,i);
+		glPopName();
+
         glPopMatrix();
     }
 }

@@ -5,9 +5,12 @@
 #include <string>
 #include <Eigen/Dense>
 
-#define PANIC()            (PANIC_(__FILE__,__FUNCTION__,__LINE__))
-#define MAYBEPANIC(b)      if(b){PANIC_(__FILE__,__FUNCTION__,__LINE__);}
+#define PANIC()              (PANIC_(__FILE__,__FUNCTION__,__LINE__))
 #define PANICMSG(msg)      (PANIC_(__FILE__,__FUNCTION__,__LINE__,(msg)))
+
+#define MAYBEPANIC(b)        if(!(b)){PANIC_(__FILE__,__FUNCTION__,__LINE__);}
+#define MAYBEPANICMSG(b,msg) if(!(b)){PANIC_(__FILE__,__FUNCTION__,__LINE__,s);}
+
 #define NaNPANIC(n)        (NaNPANIC_(n,__FILE__,__FUNCTION__,__LINE__))
 #define NaNPANICMSG(n,msg) (NaNPANIC_(n,__FILE__,__FUNCTION__,__LINE__,(msg)))
 

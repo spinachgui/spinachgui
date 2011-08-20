@@ -36,22 +36,6 @@ private:
 };
 
 
-///Keeps a collection of renderers and manages gl state common to a
-///scene, such as camera position, global rotation and lighting.
-class Scene : public Renderer {
-public:
-    typedef std::vector<Renderer*> TRenderVec;
-    typedef std::vector<Renderer*>::const_iterator TRenderIt;
-    Scene(const TRenderVec& renderers);
-    ~Scene();
-protected:
-    void Geometary() const;
-private:
-    TRenderVec mRenderers;
-};
-
-
-
 class MoleculeFG : public Renderer {
 public:
     MoleculeFG();
@@ -69,6 +53,7 @@ protected:
     virtual void Geometary() const;
 };
 
+
 class ElectronScene : public Renderer {
 public:
     ElectronScene(Camera* camera);
@@ -76,6 +61,7 @@ protected:
     virtual void Geometary() const;
     Camera* mCamera;
 };
+
 
 class ElectronInterDrawer : public Renderer {
 public:

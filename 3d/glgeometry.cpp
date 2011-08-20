@@ -54,27 +54,6 @@ void Renderer::Draw() const {
 }
 
 
-//============================================================//
-
-///Keeps a collection of renderers and manages gl state common to a
-///scene, such as camera position, global rotation and lighting.
-
-Scene::Scene(const TRenderVec& renderers) 
-    : Renderer(NAME_NONE), mRenderers(renderers) {
-}
-
-Scene::~Scene() {
-    for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
-        delete (*i);
-    }
-}
-
-void Scene::Geometary() const {
-    //loop and render
-    for(TRenderIt i = mRenderers.begin();i != mRenderers.end();++i) {
-        (*i)->Draw();
-    }
-}
 
 //============================================================//
 

@@ -53,8 +53,10 @@ private:
 bool panicHandler(const string& s) {
     wxString str(s.c_str(),wxConvUTF8);
     wxString message;
-    message << wxT("An error occured, try to continue? The error was:\n") << str;
-    int result = wxMessageBox(message,wxT("Non-fatal Error"),wxYES_NO);
+    message << wxT("An error occured, try to continue? The error was:\n") << str 
+            << wxT("\n\n If you continue, you should save your work as soon as possible,")
+            << wxT("preferably as a new file");
+    int result = wxMessageBox(message,wxT("Fatal Error"),wxYES_NO);
     return result != wxYES;
 }
 

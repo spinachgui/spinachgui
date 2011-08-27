@@ -6,7 +6,7 @@
 #include <iostream>
 #include <wx/file.h>
 #include <shared/foreach.hpp>
-
+#include <shared/log.hpp>
 
 
 using namespace std;
@@ -25,6 +25,7 @@ Display3D::Display3D(wxWindow* parent)
                  wxDefaultPosition,wxDefaultSize,
                  WX_GL_DOUBLEBUFFER,wxT("Display3D"),
                  gl_attribs) {
+    TRACE("Creating a new Display3D class");
     mCamera = new Camera;
     mPicking = new GLPicking(2000);
 
@@ -43,28 +44,29 @@ Display3D::Display3D(wxWindow* parent)
 }
 
 void Display3D::ResetView() {
-    cout << "Not implimented Display3D::ResetView()" << endl;
     Refresh();
 }
 
 Display3D::~Display3D() {
+    TRACE("Deleting a Display3D class");
     if(mCamera) {
-	delete mCamera;
+        delete mCamera;
     }
     if(mPicking) {
-	delete mPicking;
+        delete mPicking;
     }
 }
 
 
 
 void Display3D::EnableGL() {
+    TRACE("Initalising openGL")
     if(mGLContext == NULL) {
         mGLContext = new wxGLContext(this);
     }
     this->SetCurrent(*mGLContext);
 
-    cout << "OpenGL version is " << glGetString(GL_VERSION) << endl;
+    TRACE("OpenGL version is " << glGetString(GL_VERSION));
 
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glClearDepth(1.0);

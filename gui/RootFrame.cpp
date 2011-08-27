@@ -21,6 +21,7 @@
 #include <shared/nuclear_data.hpp>
 
 #include <gui/EasySpinFrame.hpp>
+#include <shared/log.hpp>
 
 //Input and output filters
 #define ID_UNIT_START 12345
@@ -70,11 +71,13 @@ class FrameTree : public wxTreeCtrl , public sigc::trackable {
 public:
 
     FrameTree(wxWindow* parent) : wxTreeCtrl(parent) {
+        TRACE("Creating the FrameTree");
         mRoot = AddRoot(wxT("Molecular Frame"),-1,-1,new FramePointer(GetRawSS()->GetLabFrame()));
 
 
         RefreshFromSpinSystem();
         sigFrameChange.connect(mem_fun(this,&FrameTree::SlotFrameChange));
+        TRACE("Finished creating the frame tree");
     }
         
     void RefreshFromSpinSystem() {
@@ -136,9 +139,11 @@ END_EVENT_TABLE()
 class StatusBar : public wxStatusBar,public sigc::trackable {
 public:
     StatusBar(wxWindow* parent) : wxStatusBar(parent) {
+        TRACE("StatusBar::StatusBar");
         int widths_field[] = {-1,80,80};
         SetFieldsCount(3,widths_field);
         SlotLengthUnitChange(GetLengthUnit());
+        TRACE("Done StatusBar::StatusBar");
     }
 
     void SlotLengthUnitChange(unit u) {
@@ -183,6 +188,7 @@ public:
 // RootFrame
 
 void RootFrame::InitFrame() {
+    TRACE("RootFrame::InitFrame");
     //Setup the status bar
     StatusBar* statusBar = new StatusBar(this);
     SetStatusBar(statusBar);
@@ -197,6 +203,7 @@ void RootFrame::InitFrame() {
     Connect(ID_ELEMENT_START,ID_ELEMENT_END,wxEVT_COMMAND_MENU_SELECTED,afterCastElement);
 
     //Set up the AUI, including the view menu function
+    TRACE("Creating the panes/panels");
     mAuiManager=new wxAuiManager(this);
 
     mInterSizePanel= new InterDisplaySettingsPanel(this);
@@ -204,6 +211,7 @@ void RootFrame::InitFrame() {
     mSpinInterEdit = new SpinInterEditPanel(this);
     mDisplay3D     = new SpinsysDisplay3D(this);
     mFrameTree     = new FrameTree(this);
+    TRACE("Done creating the panels/panes");
 
     // add the panes to the manager
     wxAuiPaneInfo display3dinfo;
@@ -273,12 +281,13 @@ void RootFrame::InitFrame() {
 
     //Setup the easyspin exporter
     mEasySpin = new EasySpinFrame(this);
-
+    TRACE("Finished RootFrame::InitFrame");
 }
 
 void RootFrame::OnElementSelect(wxCommandEvent& e) {
-    cout << "OnElement" << endl;
     int element = e.GetId() - ID_ELEMENT_START;
+    TRACE("RootFrame::OnElementSelect, element = " << element);
+
     ClearSelection();
     vector<Spin*> spins = GetRawSS()->GetSpins();
     foreach(Spin* spin,spins) {
@@ -295,6 +304,7 @@ void RootFrame::OnUnitChange(wxCommandEvent& e) {
 }
 
 void RootFrame::OnNew(wxCommandEvent& e) {
+    TRACE("RootFrame::OnNew");
     GetRawSS()->Clear();
     mOpenPath=wxT("Untitled");
     mOpenFile=wxT("Untitled");
@@ -303,10 +313,12 @@ void RootFrame::OnNew(wxCommandEvent& e) {
 }
 
 void RootFrame::OnSupress(wxCommandEvent& e) {
+    TRACE("RootFrame::OnSupress");
     SetSupressedSpins(GetSelection());
 }
 
 void RootFrame::OnUnSupress(wxCommandEvent& e) {
+    TRACE("RootFrame::OnUnSupress");
     set<Spin*> empty; //Empty set
     SetSupressedSpins(empty);
 }
@@ -317,6 +329,7 @@ void RootFrame::UpdateTitle() {
 }
 
 void RootFrame::OnOpen(wxCommandEvent& e) {
+    TRACE("RootFrame::OnOpen");
     wxString filter;
     bool first=true;
     foreach(ISpinSystemLoader* loader,GetIOFilters()) {
@@ -341,10 +354,12 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
     if(fd->ShowModal() == wxID_OK) {
         LoadFromFile(mOpenPath=fd->GetPath(),mOpenDir=fd->GetDirectory(),fd->GetFilename());
     }
-
+    TRACE("Done RootFrame::OnOpen");
 }
 
 void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxString& filename) {
+    TRACE("RootFrame::LoadFromFile");
+
     mOpenPath=path;
     mOpenFile=filename;
     mOpenDir=dir;
@@ -374,21 +389,27 @@ void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxS
     SetFrame(GetRawSS()->GetLabFrame());
     Chkpoint(wxT("Load File"));
     UpdateTitle();
+
+    TRACE("Done RootFrame::LoadFromFile");
 }
 
 void RootFrame::OnSave(wxCommandEvent& e) {
+    TRACE("RootFrame::OnSave");
     if(GetExtension(mOpenFile) == wxT("xml")) {
         SaveToFile(mOpenPath,GetLoaderFromExtension("xml"));
     } else {
         SaveAs();
     }
+    TRACE("Done RootFrame::OnSave");
 }
 
 void RootFrame::OnSaveAs(wxCommandEvent& e) {
+    TRACE("RootFrame::OnSaveAs");
     SaveAs();
 }
 
 void RootFrame::SaveAs() {
+    TRACE("RootFrame::OnSave");
     wxString filter;
     bool first=true;
     foreach(ISpinSystemLoader* ioFilter,GetIOFilters()) {
@@ -431,10 +452,13 @@ void RootFrame::SaveAs() {
         }
         UpdateTitle();
     }
+    TRACE("done RootFrame::OnSave");
 }
 
 void RootFrame::OnExit(wxCommandEvent& e) {
+    TRACE("RootFrame::OnExit");
     delete this;
+    TRACE("Done RootFrame::OnExit");
 }
 
 void RootFrame::SaveToFile(const wxString& filename,ISpinSystemLoader* saver) {

@@ -67,6 +67,7 @@ ofstream logout;
 
 void logHandler(const string& s) {
     logout << s;
+    logout.flush();
 }
 
 void initLogging() {
@@ -193,33 +194,42 @@ int main(int argc,char** argv)
     TRACE("logger started");
     SetPanicHandler(&panicHandler);
     try {
+        TRACE("Creating the app object");
         gApp = new SpinachApp;
+        TRACE("Setting instance, gApp = " << gApp);
+        MAYBEPANIC(gApp != NULL);
         wxApp::SetInstance(gApp);
 #ifdef __LINUX__
+        TRACE("Starting wxWidgets by the linux wxEntry");
         wxEntry(argc,argv);
 #else
+        TRACE("Starting wxWidgets by the windows wxEntry");
         wxEntry(hInstance,hPrevInstance,NULL,nShowCmd);
 #endif
     } catch (logic_error& e) {
         cerr << "Uncaught logic_error what()=" << e.what() << endl;
+        ERROR("Uncaught logic_error what()=" << e.what());
     } catch (runtime_error& e) {
         cerr << "Uncaught runtime_error what()=" << e.what() << endl;
+        ERROR("Uncaught runtime_error what()=" << e.what())
     } catch (...) {
         cerr << "Uncaught unknown exception." << endl;
+        ERROR("Uncaught unknown exception.")
     }
+    TRACE("exiting via the main function");
     return 0;
 }
 
 
 void leakReport() {
     //Print out a memory leak report
-    cout << "========================================" << endl;
-    cout << "             Leak Report" << endl;
-    cout << "========================================" << endl;
-    cout << "Spin:" << Spin::objCount() << endl;
-    cout << "Interaction:" << Interaction::objCount() << endl;
-    cout << "Orientation:" << Orientation::objCount() << endl;
-    cout << "========================================" << endl;
+    TRACE("========================================");
+    TRACE("             Leak Report");
+    TRACE("========================================");
+    TRACE("Spin:" << Spin::objCount());
+    TRACE("Interaction:" << Interaction::objCount());
+    TRACE("Orientation:" << Orientation::objCount());
+    TRACE("========================================");
 }
 
 SpinachApp::~SpinachApp() {
@@ -229,12 +239,13 @@ SpinachApp::~SpinachApp() {
 }
 
 bool SpinachApp::OnInit() {
+    TRACE("OnInit");
     wxInitAllImageHandlers();
 
     //Connect up the selection manager so that when a spin is deleted
     //it also gets unselected
+    TRACE("Connecting Signals");
     sigAnySpinDying.connect(sigc::ptr_fun(RemoveSelection));
-
     sigLengthUnitChange.connect(sigc::ptr_fun(CheesyLengthUnitChangerHandler));
     sigInterUnitChange.connect(sigc::ptr_fun(CheesyInterUnitChangerHandler));
 
@@ -243,8 +254,10 @@ bool SpinachApp::OnInit() {
     //Load the isotopes
 
     try {
+        TRACE("Loading Isotopes");
         LoadIsotopes();
     } catch(runtime_error e) {
+        ERROR("Failed to loaded isotopes");
         cout << "Isotopes not loaded" << endl;
         wxLogError(wxString() <<
                    wxT("Error loading data/isotopes.dat. Is the file present and not corrupt?\n") <<
@@ -253,39 +266,17 @@ bool SpinachApp::OnInit() {
         return false;
     }
 
-
+    TRACE("Created the spin system");
     mSS = new SpinSystem;
     //Set the active frame as the lab frame
+    TRACE("Setting the active frame to the molecular frame");
     SetFrame(mSS->GetLabFrame());
 
-
-    /*
-      Spin* spin1 = new Spin(Vector3d(1e-10,0,0),"Test Spin A",8,16);
-      mSS->InsertSpin(spin1);
-
-      Spin* spin2 = new Spin(Vector3d(0,1e-10,0),"Test Spin B",1,1);
-      mSS->InsertSpin(spin2);
-
-      Spin* spin3 = new Spin(Vector3d(0,0,0)    ,"Test Spin O",1,1);
-      mSS->InsertSpin(spin3);
-
-      mSS->CalcNuclearDipoleDipole();
-
-      mSS->InsertInteraction(new Interaction(10*MHz,Interaction::SHIELDING,spin1));
-
-      mSS->InsertInteraction(new Interaction(Eigenvalues(10*MHz,20*MHz,50*MHz,Orientation()),Interaction::SHIELDING,spin2));
-
-
-      mSS->GetLabFrame()->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
-      Frame* f1 = new Frame(Vector3d(3,-2,0),Orientation(EulerAngles(1,2,0)),GetUnitSystem());
-
-      mSS->GetLabFrame()->AddChild(f1);
-
-      f1->AddChild(new Frame(Vector3d(1,0 ,0),Orientation(EulerAngles(1,1,0)),GetUnitSystem()));
-    */
+    TRACE("About to show the main frame");
     RootFrame* frame = new RootFrame(NULL);
     frame->Show();
 
+    TRACE("Application initalised normally");
     return true;
 }
 

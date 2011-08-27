@@ -140,9 +140,9 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
                 EulerAngles ea_q = q_tensor.mOrient.GetAsEuler();
             
                 APart << "[" << a_tensor.xx << "," << a_tensor.yy << "," << a_tensor.zz << "]" << "," 
-                      << "[" << ea.alpha/PI*180 << "," << ea.beta/PI*180 << "," << ea.gamma/PI*180 << "]*PI/180";
+                      << "[" << ea.alpha/PI*180 << "," << ea.beta/PI*180 << "," << ea.gamma/PI*180 << "]*pi/180";
                 QPart << "[" << q_tensor.xx << "," << q_tensor.yy << "," << q_tensor.zz << "]" << "," 
-                      << "[" << ea_q.alpha/PI*180 << "," << ea_q.beta/PI*180 << "," << ea_q.gamma/PI*180 << "]*PI/180";
+                      << "[" << ea_q.alpha/PI*180 << "," << ea_q.beta/PI*180 << "," << ea_q.gamma/PI*180 << "]*pi/180";
 
                 if(q_tensor.xx != 0 || q_tensor.yy != 0 || q_tensor.zz != 0) {
                     useQ = true;
@@ -227,7 +227,7 @@ string EasySpinInput::generate(SpinSystem* spinsys) const {
             EulerAngles ea = mOrients[i].GetAsEuler();
             oss << ea.alpha/PI*180 << ", " << ea.beta/PI*180 << ", " << ea.gamma/PI*180 << ";";
         }
-        oss << "]*PI/180;" << endl; 
+        oss << "]*pi/180;" << endl; 
     }
 
     //Brodernings

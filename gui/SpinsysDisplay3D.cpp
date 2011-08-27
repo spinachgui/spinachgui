@@ -54,23 +54,24 @@ void SpinsysDisplay3D::DrawForeground() {
     glColor3f(0.0,0.0,0.0);
 
     lighting.On();
+    
+    glPushMatrix(); {
+        //Place the electron tensors along the top of the screne
+        //starting from the left
 
-    glPushMatrix();
-    //Place the electron tensors along the top of the screne
-    //starting from the left
-    glTranslatef(40,mHeight-40,0);
-    mElectronScene.Draw();
+        glTranslatef(40,mHeight-40,0);
 
-    translucent.On();
-    mElectronInterDrawer.Draw();
-    translucent.Off();
+        mElectronScene.Draw();
 
-    wire.On();
-    mElectronInterDrawer.Draw();
-    wire.Off();
+        translucent.On();
+        mElectronInterDrawer.Draw();
+        translucent.Off();
 
-    lighting.Off();         
+        wire.On();
+        mElectronInterDrawer.Draw();
+        wire.Off();
 
+    }
     glPopMatrix();
 
     lighting.Off();

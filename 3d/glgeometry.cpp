@@ -58,18 +58,6 @@ void Renderer::Draw() const {
 //============================================================//
 
 
-MoleculeFG::MoleculeFG() 
-    : Renderer(NAME_FG) {
-    long count=GetRawSS()->GetSpinCount();
-    for(long i=0;i<count;i++) {
-        Spin* spin=GetRawSS()->GetSpin(i);
-        if(spin->GetElement() == 0) {
-            //Now we are only drawing electrons
-            cout << "No longer adding an electron to the forground" << endl;
-        }
-    }
-}
-
 
 void DrawCylinder(Vector3d R1,Vector3d R2,length width) {
     //If the spin is an electron, it should be drawn outside of the
@@ -496,7 +484,7 @@ void FrameDrawer::DrawFrameRecursive(const Frame* frame) const {
         glVertex3f(0,0,5);
     } glEnd();
 
-    //Lable them
+    //Label them
     glRasterPos3f(5,0,0);
     mX.glStamp();
     glRasterPos3f(0,5,0);

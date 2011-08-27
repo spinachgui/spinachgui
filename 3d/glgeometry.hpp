@@ -36,14 +36,6 @@ private:
 };
 
 
-class MoleculeFG : public Renderer {
-public:
-    MoleculeFG();
-    void OnNewElectron(SpinXML::Spin* newSpin,long number);
-protected:
-    virtual void Geometary() const {}
-};
-
 //============================================================//
 
 class SpinDrawer : public Renderer {

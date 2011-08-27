@@ -13,13 +13,16 @@
 #include <shared/formats/castep.hpp>
 #include <shared/formats/simpson.hpp>
 #include <shared/formats/easyspin.hpp>
+
 #include <shared/panic.hpp>
+#include <shared/log.hpp>
 
 #include <shared/foreach.hpp>
 
 #include <wx/filename.h>
 
 #include <shared/unit.hpp>
+#include <fstream>
 
 #include <gui/SpinachApp.hpp>
 
@@ -58,6 +61,20 @@ bool panicHandler(const string& s) {
             << wxT("preferably as a new file");
     int result = wxMessageBox(message,wxT("Fatal Error"),wxYES_NO);
     return result != wxYES;
+}
+
+ofstream logout;
+
+void logHandler(const string& s) {
+    logout << s;
+}
+
+void initLogging() {
+    logout.open("log.txt");
+    if(!logout.is_open()) {
+        wxMessageBox(wxT("Could not open the log file"));
+    }
+    setLogHandler(&logHandler);
 }
 
 //------------------------------------------------------------//
@@ -172,6 +189,8 @@ int main(int argc,char** argv)
 #endif
 {
     atexit(&leakReport);
+    initLogging();
+    TRACE("logger started");
     SetPanicHandler(&panicHandler);
     try {
         gApp = new SpinachApp;

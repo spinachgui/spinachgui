@@ -1,0 +1,210 @@
+#name           Symbol	Mass Number   red    green   blue
+Electron	E	0             0.0    0.0     1.0
+Hydrogen	H	1   	      0.5    0.5     0.5
+Helium		He	4   	      1.0    1.0     1.0
+Lithium		Li	7   	      1.0    1.0     1.0
+Beryllium	Be	9   	      1.0    1.0     1.0
+Boron		B	11  	      1.0    1.0     1.0
+Carbon		C	12  	      0.2    0.2     0.2
+Nitrogen	N	14  	      0.0    0.0     0.3
+Oxygen		O	16  	      0.3    0.0     0.0
+Fluorine	F	19  	      1.0    1.0     1.0
+Neon		Ne	20  	      1.0    1.0     1.0
+Sodium		Na	23  	      1.0    1.0     1.0
+Magnesium	Mg	24  	      1.0    1.0     1.0
+Aluminum	Al	27  	      1.0    1.0     1.0
+Silicon		Si	28  	      1.0    1.0     1.0
+Phosphorus	P	31  	      1.0    1.0     1.0
+Sulfur		S	32  	      1.0    1.0     1.0
+Chlorine	Cl	35  	      1.0    1.0     1.0
+Argon		Ar	40  	      1.0    1.0     1.0
+Potassium	K	39  	      1.0    1.0     1.0
+Calcium		Ca	40  	      1.0    1.0     1.0
+Scandium	Sc	45  	      1.0    1.0     1.0
+Titanium	Ti	48  	      1.0    1.0     1.0
+Vanadium	V	51  	      1.0    1.0     1.0
+Chromium	Cr	52  	      1.0    1.0     1.0
+Manganese	Mn	55  	      1.0    1.0     1.0
+Iron		Fe	56  	      1.0    1.0     1.0
+Cobalt		Co	59  	      1.0    1.0     1.0
+Nickel		Ni	59  	      1.0    1.0     1.0
+Copper		Cu	64  	      1.0    1.0     1.0
+Zinc		Zn	65  	      1.0    1.0     1.0
+Gallium		Ga	70  	      1.0    1.0     1.0
+Germanium	Ge	73  	      1.0    1.0     1.0
+Arsenic		As	75  	      1.0    1.0     1.0
+Selenium	Se	79  	      1.0    1.0     1.0
+Bromine		Br	80  	      1.0    1.0     1.0
+Krypton		Kr	84  	      1.0    1.0     1.0
+Rubidium	Rb	85  	      1.0    1.0     1.0
+Strontium	Sr	88  	      1.0    1.0     1.0
+Yttrium		Y	89  	      1.0    1.0     1.0
+Zirconium	Zr	91  	      1.0    1.0     1.0
+Niobium		Nb	93  	      1.0    1.0     1.0
+Molybdenum	Mo	96  	      1.0    1.0     1.0
+Technetium	Tc	97  	      1.0    1.0     1.0
+Ruthenium	Ru	101 	      1.0    1.0     1.0
+Rhodium		Rh	103 	      1.0    1.0     1.0
+Palladium	Pd	106 	      1.0    1.0     1.0
+Silver		Ag	108 	      1.0    1.0     1.0
+Cadmium		Cd	112 	      1.0    1.0     1.0
+Indium		In	115 	      1.0    1.0     1.0
+Tin		Sn	119 	      1.0    1.0     1.0
+Antimony	Sb	122 	      1.0    1.0     1.0
+Tellurium	Te	128 	      1.0    1.0     1.0
+Iodine		I	127 	      1.0    1.0     1.0
+Xenon		Xe	131 	      1.0    1.0     1.0
+Cesium		Cs	133 	      1.0    1.0     1.0
+Barium		Ba	137 	      1.0    1.0     1.0
+Lanthanum	La	139 	      1.0    1.0     1.0
+Cerium		Ce	140 	      1.0    1.0     1.0
+Praseodymium	Pr	141 	      1.0    1.0     1.0
+Neodymium	Nd	144 	      1.0    1.0     1.0
+Promethium	Pm	145 	      1.0    1.0     1.0
+Samarium	Sm	150 	      1.0    1.0     1.0
+Europium	Eu	152 	      1.0    1.0     1.0
+Gadolinium	Gd	157 	      1.0    1.0     1.0
+Terbium		Tb	159 	      1.0    1.0     1.0
+Dysprosium	Dy	163 	      1.0    1.0     1.0
+Holmium		Ho	165 	      1.0    1.0     1.0
+Erbium		Er	167 	      1.0    1.0     1.0
+Thulium		Tm	169 	      1.0    1.0     1.0
+Ytterbium	Yb	173 	      1.0    1.0     1.0
+Lutetium	Lu	175 	      1.0    1.0     1.0
+Hafnium		Hf	178 	      1.0    1.0     1.0
+Tantalum	Ta	181 	      1.0    1.0     1.0
+Wolfram		W	184 	      1.0    1.0     1.0
+Rhenium		Re	186 	      1.0    1.0     1.0
+Osmium		Os	190 	      1.0    1.0     1.0
+Iridium		Ir	192 	      1.0    1.0     1.0
+Platinum	Pt	195 	      1.0    1.0     1.0
+Gold		Au	197 	      1.0    1.0     1.0
+Mercury		Hg	201 	      1.0    1.0     1.0
+Thallium	Tl	204 	      1.0    1.0     1.0
+Lead		Pb	207 	      1.0    1.0     1.0
+Bismuth		Bi	209 	      1.0    1.0     1.0
+Polonium	Po	209 	      1.0    1.0     1.0
+Astatine	At	210 	      1.0    1.0     1.0
+Radon		Rn	222 	      1.0    1.0     1.0
+Francium	Fr	223 	      1.0    1.0     1.0
+Radium		Ra	226 	      1.0    1.0     1.0
+Actinium	Ac	227 	      1.0    1.0     1.0
+Thorium		Th	232 	      1.0    1.0     1.0
+Protactinium	Pa	231 	      1.0    1.0     1.0
+Uranium		U	238 	      1.0    1.0     1.0
+Neptunium	Np	237 	      1.0    1.0     1.0
+Plutonium	Pu	242 	      1.0    1.0     1.0
+Americium	Am	243 	      1.0    1.0     1.0
+Curium		Cm	247 	      1.0    1.0     1.0
+Berkelium	Bk	247 	      1.0    1.0     1.0
+Californium	Cf	251 	      1.0    1.0     1.0
+Einsteinium	Es	254 	      1.0    1.0     1.0
+Fermium		Fm	257 	      1.0    1.0     1.0
+Mendelevium	Md	257 	      1.0    1.0     1.0
+Nobelium	No	255 	      1.0    1.0     1.0
+Lawrencium	Lr	256 	      1.0    1.0     1.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

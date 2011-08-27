@@ -254,6 +254,8 @@ bool SpinachApp::OnInit() {
     //Load the isotopes
 
     try {
+        TRACE("Loading Elements");
+        LoadElements();
         TRACE("Loading Isotopes");
         LoadIsotopes();
     } catch(runtime_error e) {

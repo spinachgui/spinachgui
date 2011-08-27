@@ -25,9 +25,14 @@ long getIsotopeBySymbol(const char* symb);
 
 //Isotope functions
 
-///Call this somewhere in the initalisation to load the istope data
+///Call this somewhere in the initalisation to load the isotope data
 ///from data/isotopes.dat
 void LoadIsotopes();
+
+///Call this from somewhere in program initalisation to load the
+///element data from data/elements.dat
+void LoadElements();
+
 
 ///Get the number of known isotopes of a given element
 long getIsotopeCount(long protonN);

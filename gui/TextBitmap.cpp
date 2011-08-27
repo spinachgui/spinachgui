@@ -4,8 +4,6 @@
 #include <3d/opengl.hpp>
 #include <wx/image.h>
 
-#include <iostream>
-
 /*
 On MSVC draw text is a macro that is defined as DrawTextW.
 This causes conflicts with wxDC::DrawText, so undef it.
@@ -17,7 +15,6 @@ This causes conflicts with wxDC::DrawText, so undef it.
 using namespace std;
 
 bool isWhite(const unsigned char* p) {
-    //cout << "c1= "<< long(p[0]) << " c2= "<< long(p[1]) << " c3= "<< long(p[2]) << endl;
     return p[0] == 0xff && p[1] == 0xff && p[2] == 0xff;
 }
 
@@ -50,13 +47,6 @@ TextBitmap::TextBitmap(const wxString& text)
     //format.
     const unsigned char* data = image.GetData();
 
-    cout << "wxImage:" << endl;
-    for(long i=0;i<w*h*3;i+=3) {
-        if(i % (w*3) == 0) cout << endl;
-        cout << (!isWhite(data+i) ? "1" : " "); 
-    }
-    cout << endl;
-
     //If w*h is a multipul of 8 the bits fit exeactly into w*h bytes
     //otherwise we need an extra byte.
     long bitmapLen = w*h / 8;
@@ -73,15 +63,6 @@ TextBitmap::TextBitmap(const wxString& text)
 
             unsigned char byte = 0;
 
-            cout << (!isWhite(data+rgbPos     ) ? "1" : " "); 
-            cout << (!isWhite(data+rgbPos + 3 ) ? "1" : " "); 
-            cout << (!isWhite(data+rgbPos + 6 ) ? "1" : " "); 
-            cout << (!isWhite(data+rgbPos + 9 ) ? "1" : " "); 
-            cout << (!isWhite(data+rgbPos + 12) ? "1" : " "); 
-            cout << (!isWhite(data+rgbPos + 15) ? "1" : " "); 
-            cout << (!isWhite(data+rgbPos + 18) ? "1" : " "); 
-            cout << (!isWhite(data+rgbPos + 21) ? "1" : " "); 
-            
             if(!isWhite(data+rgbPos     )) byte |=0x80;
             if(!isWhite(data+rgbPos + 3 )) byte |=0x40;
             if(!isWhite(data+rgbPos + 6 )) byte |=0x20;
@@ -92,23 +73,7 @@ TextBitmap::TextBitmap(const wxString& text)
             if(!isWhite(data+rgbPos + 21)) byte |=0x01;
             mBitmap[(h - rgbRow - 1)*w/8 + rgbCol/8] = byte;
         }
-        cout << endl;
     }
-
-    cout << "mBitmap Contents:" << endl;
-    for(long i = 0; i< bitmapLen; i++) {
-	if(i*8 % w ==0) cout << endl;
-	cout << ((mBitmap[i]&0x80) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x40) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x20) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x10) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x08) == 0x00 ? " " : "1");
-	cout << ((mBitmap[i]&0x04) == 0x00 ? " " : "1");
-        cout << ((mBitmap[i]&0x02) == 0x00 ? " " : "1");
-        cout << ((mBitmap[i]&0x01) == 0x00 ? " " : "1");
-    }
-    cout << endl;
-    //TODO Last 1-7 bits, if applicable
 }
 
 TextBitmap::~TextBitmap() {

@@ -42,7 +42,8 @@ const long NuclearSTLen = 8;
 const Interaction::Type ElectronT[] = 
     {Interaction::EXCHANGE,   
      Interaction::G_TENSER,   
-     Interaction::DIPOLAR,    
+     Interaction::DIPOLAR,
+     Interaction::HFC,
      Interaction::QUADRUPOLAR,
      Interaction::ZFS,        
      Interaction::CUSTOM_LINEAR,     

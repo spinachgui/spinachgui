@@ -314,7 +314,7 @@ void RootFrame::OnNew(wxCommandEvent& e) {
 
 void RootFrame::OnSupress(wxCommandEvent& e) {
     TRACE("RootFrame::OnSupress");
-    SetSupressedSpins(GetSelection());
+    AddToSupressedSpins(GetSelection());
 }
 
 void RootFrame::OnUnSupress(wxCommandEvent& e) {

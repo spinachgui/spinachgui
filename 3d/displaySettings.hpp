@@ -87,7 +87,9 @@ extern sigc::signal<void,SpinXML::Interaction::Type,double>    sigInterSize;
 
 const std::set<SpinXML::Spin*>& GetSuppressedSpins();
 void SetSupressedSpins(const std::set<SpinXML::Spin*>& spins);
+void AddToSupressedSpins(const std::set<SpinXML::Spin*>& spins);
 extern sigc::signal<void,const std::set<SpinXML::Spin*>&> sigSupressedChange;
+
 
 //================================================================================//
 // Static module initalisation (private)

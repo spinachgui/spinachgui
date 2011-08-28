@@ -326,21 +326,22 @@ Spin* GetHover() {
     return gHover;
 }
 
-    //Selection Writers
+//Selection Writers
 
 void ClearSelection() {
+    TRACE("Clearing the selection");
     AssertSelectionExists();
     gSelection.clear();
     sigSelectChange(gSelection);
 }
 
 void DeleteSelectedSpins(){
+    TRACE("Deleting all spins in the current selection, size=" << gSelection.size());
     AssertSelectionExists();
     for(set<Spin*>::iterator i=gSelection.begin();i!=gSelection.end();) {
         //i is about to be invalidated, so save it and incriment before erasing
         set<Spin*>::iterator j = i;
         ++j;
-        cout << "Calling the destructor of spin" << *i << endl;
         delete (*i);
         i = j;
     }
@@ -354,6 +355,7 @@ void SetHover(SpinXML::Spin* spin) {
 
 
 void SetSelection(Spin* spin) {
+    TRACE("Setting the selection to a single spin " << spin << " named " << spin->GetLabel());
     AssertSelectionExists();
     ClearSelection();
 
@@ -364,6 +366,7 @@ void SetSelection(Spin* spin) {
 
 
 void SetSelection(set<SpinXML::Spin*>& selection) {
+    TRACE("Setting the selection to a set of size " << selection.size());
     AssertSelectionExists();
     ClearSelection();
     gSelection = selection;
@@ -373,6 +376,7 @@ void SetSelection(set<SpinXML::Spin*>& selection) {
 
 void AddSelection(SpinXML::Spin* spinToAdd) {
     if(spinToAdd == NULL) return;
+    TRACE("Adding spin " << spinToAdd << " named " << spinToAdd->GetLabel() << " to the selection");
     AssertSelectionExists();
     gSelection.insert(spinToAdd);
     sigSelectChange(gSelection);
@@ -382,6 +386,7 @@ void AddSelection(SpinXML::Spin* spinToAdd) {
 void RemoveSelection(SpinXML::Spin* spin) {
     set<Spin*>::iterator i = gSelection.find(spin);
     if(i != gSelection.end()) {
+        TRACE("Removing spin " << spin << " named " << spin->GetLabel() << " from the selection");
         gSelection.erase(i);
         sigSelectChange(gSelection);
     }

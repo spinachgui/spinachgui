@@ -291,6 +291,7 @@ void ElectronInterDrawer::Geometary() const {
     vector<Interaction*> inters = GetRawSS()->GetAllInteractions();
         
     const set<Spin*> supressed = GetSuppressedSpins();
+
     foreach(Interaction* inter,inters) {
         Interaction::Type t = inter->GetType();
         if(!GetInterVisible(t)) {
@@ -307,7 +308,7 @@ void ElectronInterDrawer::Geometary() const {
         }
 
         if(supressed.find(spin) != supressed.end()) {
-            return;
+            continue;
         }
 
         if(inter->GetIsBilinear()) {
@@ -327,6 +328,7 @@ void ElectronInterDrawer::Geometary() const {
 
 
     }
+    cout << endl;
         
 }
 
@@ -353,7 +355,7 @@ void MonoInterDrawer::Geometary() const {
         Spin* spin = inter->GetSpin1();
 
         if(supressed.find(spin) != supressed.end()) {
-            return;
+            continue;
         }
 
         if(inter->GetIsBilinear()) {

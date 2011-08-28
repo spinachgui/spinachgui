@@ -3,6 +3,8 @@
 
 #include <sigc++/sigc++.h>
 #include <shared/panic.hpp>
+#include <shared/foreach.hpp>
+#include <shared/log.hpp>
 
 #include <map>
 
@@ -104,7 +106,21 @@ set<Spin*> gSupressed;
 const std::set<SpinXML::Spin*>& GetSuppressedSpins() {
     return gSupressed;
 }
+
+void AddToSupressedSpins(const std::set<SpinXML::Spin*>& spins) {
+    TRACE("Adding a set of spins to the suppressed spins set, size" << spins.size());
+    foreach(Spin* spin,spins) {
+        TRACE("    Inserting spin " << spin << " name= " << spin->GetLabel());
+        gSupressed.insert(spin);
+    }
+    TRACE("Done adding to suppressed spins, sending signals");
+    sigSupressedChange(gSupressed);
+    sig3DChange();
+    TRACE("Finished function call");
+}
+
 void SetSupressedSpins(const std::set<SpinXML::Spin*>& spins) {
+    TRACE("Setting the set of suppressed spins to a set of size " << spins.size());
     gSupressed = spins;
     sigSupressedChange(gSupressed);
     sig3DChange();

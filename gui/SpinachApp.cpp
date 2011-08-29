@@ -146,6 +146,9 @@ XYZLoader      gXYZLoader;
 Frame* gFrame = NULL;
 
 void SetFrame(SpinXML::Frame* frame) {
+    TRACE("Setting the active frame, was " << gFrame << " now " << frame);
+    TRACE("frame->getTransformFromLab() = " << frame->getTransformFromLab());
+    TRACE("frame->getTransformToLab()   = " << frame->getTransformToLab());
     gFrame = frame;
     sigFrameChange(frame);
 }

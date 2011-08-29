@@ -8,203 +8,99 @@ Boron		B	11  	      1.0    1.0     1.0
 Carbon		C	12  	      0.2    0.2     0.2
 Nitrogen	N	14  	      0.0    0.0     0.3
 Oxygen		O	16  	      0.3    0.0     0.0
-Fluorine	F	19  	      1.0    1.0     1.0
-Neon		Ne	20  	      1.0    1.0     1.0
-Sodium		Na	23  	      1.0    1.0     1.0
-Magnesium	Mg	24  	      1.0    1.0     1.0
-Aluminum	Al	27  	      1.0    1.0     1.0
-Silicon		Si	28  	      1.0    1.0     1.0
-Phosphorus	P	31  	      1.0    1.0     1.0
-Sulfur		S	32  	      1.0    1.0     1.0
-Chlorine	Cl	35  	      1.0    1.0     1.0
-Argon		Ar	40  	      1.0    1.0     1.0
-Potassium	K	39  	      1.0    1.0     1.0
-Calcium		Ca	40  	      1.0    1.0     1.0
-Scandium	Sc	45  	      1.0    1.0     1.0
-Titanium	Ti	48  	      1.0    1.0     1.0
-Vanadium	V	51  	      1.0    1.0     1.0
-Chromium	Cr	52  	      1.0    1.0     1.0
-Manganese	Mn	55  	      1.0    1.0     1.0
-Iron		Fe	56  	      1.0    1.0     1.0
-Cobalt		Co	59  	      1.0    1.0     1.0
-Nickel		Ni	59  	      1.0    1.0     1.0
-Copper		Cu	64  	      1.0    1.0     1.0
-Zinc		Zn	65  	      1.0    1.0     1.0
-Gallium		Ga	70  	      1.0    1.0     1.0
-Germanium	Ge	73  	      1.0    1.0     1.0
-Arsenic		As	75  	      1.0    1.0     1.0
-Selenium	Se	79  	      1.0    1.0     1.0
-Bromine		Br	80  	      1.0    1.0     1.0
-Krypton		Kr	84  	      1.0    1.0     1.0
-Rubidium	Rb	85  	      1.0    1.0     1.0
-Strontium	Sr	88  	      1.0    1.0     1.0
-Yttrium		Y	89  	      1.0    1.0     1.0
-Zirconium	Zr	91  	      1.0    1.0     1.0
-Niobium		Nb	93  	      1.0    1.0     1.0
-Molybdenum	Mo	96  	      1.0    1.0     1.0
-Technetium	Tc	97  	      1.0    1.0     1.0
-Ruthenium	Ru	101 	      1.0    1.0     1.0
-Rhodium		Rh	103 	      1.0    1.0     1.0
-Palladium	Pd	106 	      1.0    1.0     1.0
-Silver		Ag	108 	      1.0    1.0     1.0
-Cadmium		Cd	112 	      1.0    1.0     1.0
-Indium		In	115 	      1.0    1.0     1.0
-Tin		Sn	119 	      1.0    1.0     1.0
-Antimony	Sb	122 	      1.0    1.0     1.0
-Tellurium	Te	128 	      1.0    1.0     1.0
-Iodine		I	127 	      1.0    1.0     1.0
-Xenon		Xe	131 	      1.0    1.0     1.0
-Cesium		Cs	133 	      1.0    1.0     1.0
-Barium		Ba	137 	      1.0    1.0     1.0
-Lanthanum	La	139 	      1.0    1.0     1.0
-Cerium		Ce	140 	      1.0    1.0     1.0
-Praseodymium	Pr	141 	      1.0    1.0     1.0
-Neodymium	Nd	144 	      1.0    1.0     1.0
-Promethium	Pm	145 	      1.0    1.0     1.0
-Samarium	Sm	150 	      1.0    1.0     1.0
-Europium	Eu	152 	      1.0    1.0     1.0
-Gadolinium	Gd	157 	      1.0    1.0     1.0
-Terbium		Tb	159 	      1.0    1.0     1.0
-Dysprosium	Dy	163 	      1.0    1.0     1.0
-Holmium		Ho	165 	      1.0    1.0     1.0
-Erbium		Er	167 	      1.0    1.0     1.0
-Thulium		Tm	169 	      1.0    1.0     1.0
-Ytterbium	Yb	173 	      1.0    1.0     1.0
-Lutetium	Lu	175 	      1.0    1.0     1.0
-Hafnium		Hf	178 	      1.0    1.0     1.0
-Tantalum	Ta	181 	      1.0    1.0     1.0
-Wolfram		W	184 	      1.0    1.0     1.0
-Rhenium		Re	186 	      1.0    1.0     1.0
-Osmium		Os	190 	      1.0    1.0     1.0
-Iridium		Ir	192 	      1.0    1.0     1.0
-Platinum	Pt	195 	      1.0    1.0     1.0
-Gold		Au	197 	      1.0    1.0     1.0
-Mercury		Hg	201 	      1.0    1.0     1.0
-Thallium	Tl	204 	      1.0    1.0     1.0
-Lead		Pb	207 	      1.0    1.0     1.0
-Bismuth		Bi	209 	      1.0    1.0     1.0
-Polonium	Po	209 	      1.0    1.0     1.0
-Astatine	At	210 	      1.0    1.0     1.0
-Radon		Rn	222 	      1.0    1.0     1.0
-Francium	Fr	223 	      1.0    1.0     1.0
-Radium		Ra	226 	      1.0    1.0     1.0
-Actinium	Ac	227 	      1.0    1.0     1.0
-Thorium		Th	232 	      1.0    1.0     1.0
-Protactinium	Pa	231 	      1.0    1.0     1.0
-Uranium		U	238 	      1.0    1.0     1.0
-Neptunium	Np	237 	      1.0    1.0     1.0
-Plutonium	Pu	242 	      1.0    1.0     1.0
-Americium	Am	243 	      1.0    1.0     1.0
-Curium		Cm	247 	      1.0    1.0     1.0
-Berkelium	Bk	247 	      1.0    1.0     1.0
-Californium	Cf	251 	      1.0    1.0     1.0
-Einsteinium	Es	254 	      1.0    1.0     1.0
-Fermium		Fm	257 	      1.0    1.0     1.0
-Mendelevium	Md	257 	      1.0    1.0     1.0
-Nobelium	No	255 	      1.0    1.0     1.0
-Lawrencium	Lr	256 	      1.0    1.0     1.0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Fluorine	F	19  	      0.05   0.05    0.05
+Neon		Ne	20  	      0.05   0.05    0.05
+Sodium		Na	23  	      0.05   0.05    0.05
+Magnesium	Mg	24  	      0.05   0.05    0.05
+Aluminum	Al	27  	      0.05   0.05    0.05
+Silicon		Si	28  	      0.05   0.05    0.05
+Phosphorus	P	31  	      0.05   0.05    0.05
+Sulfur		S	32  	      0.05   0.05    0.05
+Chlorine	Cl	35  	      0.05   0.05    0.05
+Argon		Ar	40  	      0.05   0.05    0.05
+Potassium	K	39  	      0.05   0.05    0.05
+Calcium		Ca	40  	      0.05   0.05    0.05
+Scandium	Sc	45  	      0.05   0.05    0.05
+Titanium	Ti	48  	      0.05   0.05    0.05
+Vanadium	V	51  	      0.05   0.05    0.05
+Chromium	Cr	52  	      0.05   0.05    0.05
+Manganese	Mn	55  	      0.05   0.05    0.05
+Iron		Fe	56  	      0.05   0.05    0.05
+Cobalt		Co	59  	      0.05   0.05    0.05
+Nickel		Ni	59  	      0.05   0.05    0.05
+Copper		Cu	64  	      0.05   0.05    0.05
+Zinc		Zn	65  	      0.05   0.05    0.05
+Gallium		Ga	70  	      0.05   0.05    0.05
+Germanium	Ge	73  	      0.05   0.05    0.05
+Arsenic		As	75  	      0.05   0.05    0.05
+Selenium	Se	79  	      0.05   0.05    0.05
+Bromine		Br	80  	      0.05   0.05    0.05
+Krypton		Kr	84  	      0.05   0.05    0.05
+Rubidium	Rb	85  	      0.05   0.05    0.05
+Strontium	Sr	88  	      0.05   0.05    0.05
+Yttrium		Y	89  	      0.05   0.05    0.05
+Zirconium	Zr	91  	      0.05   0.05    0.05
+Niobium		Nb	93  	      0.05   0.05    0.05
+Molybdenum	Mo	96  	      0.05   0.05    0.05
+Technetium	Tc	97  	      0.05   0.05    0.05
+Ruthenium	Ru	101 	      0.05   0.05    0.05
+Rhodium		Rh	103 	      0.05   0.05    0.05
+Palladium	Pd	106 	      0.05   0.05    0.05
+Silver		Ag	108 	      0.05   0.05    0.05
+Cadmium		Cd	112 	      0.05   0.05    0.05
+Indium		In	115 	      0.05   0.05    0.05
+Tin		Sn	119 	      0.05   0.05    0.05
+Antimony	Sb	122 	      0.05   0.05    0.05
+Tellurium	Te	128 	      0.05   0.05    0.05
+Iodine		I	127 	      0.05   0.05    0.05
+Xenon		Xe	131 	      0.05   0.05    0.05
+Cesium		Cs	133 	      0.05   0.05    0.05
+Barium		Ba	137 	      0.05   0.05    0.05
+Lanthanum	La	139 	      0.05   0.05    0.05
+Cerium		Ce	140 	      0.05   0.05    0.05
+Praseodymium	Pr	141 	      0.05   0.05    0.05
+Neodymium	Nd	144 	      0.05   0.05    0.05
+Promethium	Pm	145 	      0.05   0.05    0.05
+Samarium	Sm	150 	      0.05   0.05    0.05
+Europium	Eu	152 	      0.05   0.05    0.05
+Gadolinium	Gd	157 	      0.05   0.05    0.05
+Terbium		Tb	159 	      0.05   0.05    0.05
+Dysprosium	Dy	163 	      0.05   0.05    0.05
+Holmium		Ho	165 	      0.05   0.05    0.05
+Erbium		Er	167 	      0.05   0.05    0.05
+Thulium		Tm	169 	      0.05   0.05    0.05
+Ytterbium	Yb	173 	      0.05   0.05    0.05
+Lutetium	Lu	175 	      0.05   0.05    0.05
+Hafnium		Hf	178 	      0.05   0.05    0.05
+Tantalum	Ta	181 	      0.05   0.05    0.05
+Wolfram		W	184 	      0.05   0.05    0.05
+Rhenium		Re	186 	      0.05   0.05    0.05
+Osmium		Os	190 	      0.05   0.05    0.05
+Iridium		Ir	192 	      0.05   0.05    0.05
+Platinum	Pt	195 	      0.05   0.05    0.05
+Gold		Au	197 	      0.05   0.05    0.05
+Mercury		Hg	201 	      0.05   0.05    0.05
+Thallium	Tl	204 	      0.05   0.05    0.05
+Lead		Pb	207 	      0.05   0.05    0.05
+Bismuth		Bi	209 	      0.05   0.05    0.05
+Polonium	Po	209 	      0.05   0.05    0.05
+Astatine	At	210 	      0.05   0.05    0.05
+Radon		Rn	222 	      0.05   0.05    0.05
+Francium	Fr	223 	      0.05   0.05    0.05
+Radium		Ra	226 	      0.05   0.05    0.05
+Actinium	Ac	227 	      0.05   0.05    0.05
+Thorium		Th	232 	      0.05   0.05    0.05
+Protactinium	Pa	231 	      0.05   0.05    0.05
+Uranium		U	238 	      0.05   0.05    0.05
+Neptunium	Np	237 	      0.05   0.05    0.05
+Plutonium	Pu	242 	      0.05   0.05    0.05
+Americium	Am	243 	      0.05   0.05    0.05
+Curium		Cm	247 	      0.05   0.05    0.05
+Berkelium	Bk	247 	      0.05   0.05    0.05
+Californium	Cf	251 	      0.05   0.05    0.05
+Einsteinium	Es	254 	      0.05   0.05    0.05
+Fermium		Fm	257 	      0.05   0.05    0.05
+Mendelevium	Md	257 	      0.05   0.05    0.05
+Nobelium	No	255 	      0.05   0.05    0.05
+Lawrencium	Lr	256 	      0.05   0.05    0.05
 

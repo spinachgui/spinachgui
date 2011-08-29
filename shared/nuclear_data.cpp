@@ -154,9 +154,9 @@ void LoadElements() {
             if(stream.eof()) {throw runtime_error("Corupt file when reading mass number");}
             stream >> red;
             if(stream.eof()) {throw runtime_error("Corupt file when reading red");}
-            stream >> blue;
-            if(stream.eof()) {throw runtime_error("Corupt file when reading green");}
             stream >> green;
+            if(stream.eof()) {throw runtime_error("Corupt file when reading green");}
+            stream >> blue;
             if(!stream.eof()) {throw runtime_error("Corupt file when reading blue");}
 
             gElements.push_back(Element(name,symbol,m,red,green,blue));

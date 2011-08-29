@@ -349,7 +349,7 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
                                       wxString(wxT("Choose a file")),
                                       wxString(wxT("")), //Default file
                                       wxString(wxT("")), //Default dir
-                                      wxString(filter) ,
+                                      wxString(wxString() << wxT("All Files|*.*|") << filter) ,
                                       wxFD_OPEN);
     if(fd->ShowModal() == wxID_OK) {
         LoadFromFile(mOpenPath=fd->GetPath(),mOpenDir=fd->GetDirectory(),fd->GetFilename());

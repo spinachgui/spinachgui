@@ -90,8 +90,8 @@ void LogSlider::OnMouseMove(wxMouseEvent&e) {
 
         mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
 	    sigChange(pow(10,mLogValue+mLogValueDelta));
+        Refresh();
 	}
-    Refresh();
 }
 
 void LogSlider::OnResize(wxSizeEvent& e) {

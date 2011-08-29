@@ -476,10 +476,9 @@ void G03Loader::LoadFile(SpinSystem* ss,const char* filename) const {
 			guardParse(shieldLines[i+1],lit("XY=") >> readDbl(xy) >> lit("YY=") >> readDbl(yy) >> lit("ZY=") >> readDbl(zy),shieldingError);
 			guardParse(shieldLines[i+2],lit("XZ=") >> readDbl(xz) >> lit("YZ=") >> readDbl(yz) >> lit("ZZ=") >> readDbl(zz),shieldingError);
 			guardParse(shieldLines[i+3],lit("Eigenvalues:") >> readDbl(XX) >> readDbl(YY) >> readDbl(ZZ) ,shieldingError);
-			Orientation o(MakeMatrix3d(xx,yx,zx,  
-									   xy,yy,zy,
-									   xz,yz,zz));
-			inter.payload = Eigenvalues(XX,YY,ZZ,o);
+			inter.payload = MakeMatrix3d(xx,yx,zx,  
+                                         xy,yy,zy,
+                                         xz,yz,zz);
 			inter.spin1 = counter;
 			inter.type = Interaction::SHIELDING;
 			inter.label = "";

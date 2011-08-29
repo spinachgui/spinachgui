@@ -407,7 +407,9 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
             continue;
         }
         if(Interaction::GetFormFromType(p.first) == Interaction::BILINEAR) {
-
+            //With this scaling the strongest interaction will just
+            //have the strongest line drawn
+            SetInterSize(p.first,p.first);
         } else {
             TRACE("Largest eigenvalue for interaction of type " << Interaction::GetTypeName(p.first)
                   << " was " << p.second);

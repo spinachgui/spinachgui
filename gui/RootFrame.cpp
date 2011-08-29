@@ -354,6 +354,64 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
     if(fd->ShowModal() == wxID_OK) {
         LoadFromFile(mOpenPath=fd->GetPath(),mOpenDir=fd->GetDirectory(),fd->GetFilename());
     }
+
+    TRACE("Searching for sensible tensor sizes in newly loaded file");
+    
+    //Iterate though the interactions and record the maximum absolute
+    //value of an eigenvalue (mono) or norm (binary)
+
+    map<Interaction::Type,double> type_map =
+        Interaction::MakeTypeContainer(-numeric_limits<double>::infinity());
+
+    foreach(Interaction* inter,GetRawSS()->GetAllInteractions()) {
+        Interaction::Type type = inter->GetType();
+        if(Interaction::GetFormFromType(type) == Interaction::BILINEAR) {
+            //Handle binary interactions
+            double candidate = inter->AsMatrix().norm()/MHz;
+            if(candidate > type_map[type]) {
+                type_map[type] = candidate;
+            }
+        } else {
+            unit u = inter->GetType() == Interaction::SHIELDING ? Unitless : MHz;
+            //Handle mono interactions
+            Eigenvalues ev = inter->AsEigenvalues();
+            TRACE("Interaction of type " << Interaction::GetTypeName(inter->GetType()) << " and eigenvalues " 
+                  << ev.xx << "," << ev.yy << "," << ev.zz);
+            double max_xy = abs(abs(ev.xx) > abs(ev.yy) ? ev.xx : ev.yy);
+            double max_xyz = max_xy > abs(ev.zz) ? max_xy : abs(ev.zz);
+            double candidate = max_xyz/u;
+            if(candidate > type_map[type]) {
+                type_map[type] = candidate;
+            }
+        }
+    }
+    //We now have a map of TYPES->Their maximum values or negative
+    //inifinities.  If we have negative infinities we don't need to
+    //touch the scaling, otherwise we set the scaling so the biggest
+    //tensor is one angstrom in length.
+
+    //If the scaling factor is 1, then by default g-tenosrs and
+    //shieldings are drawn at 1 per angrstrom whereas by otherwise
+    TRACE("Setting sensible tensor sizes based on the file we are have loaded");
+
+    typedef pair<Interaction::Type,double> pair_t;
+    foreach(pair_t p,type_map) {
+        if(-numeric_limits<double>::infinity() == p.second) {
+            //Don't chance anything; this type of interaction wasn't
+            //present in the file
+            TRACE("Didn't find any interactions of type " << Interaction::GetTypeName(p.first)
+                  << " so not changing the value");
+            continue;
+        }
+        if(Interaction::GetFormFromType(p.first) == Interaction::BILINEAR) {
+
+        } else {
+            TRACE("Largest eigenvalue for interaction of type " << Interaction::GetTypeName(p.first)
+                  << " was " << p.second);
+            SetInterSize(1/p.second,p.first);
+        }
+    }
+
     TRACE("Done RootFrame::OnOpen");
 }
 

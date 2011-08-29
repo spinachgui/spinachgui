@@ -32,7 +32,7 @@ void InterDisplaySettings::SlotVisible(SpinXML::Interaction::Type t,bool v) {
 
 void InterDisplaySettings::SlotScaleChange(SpinXML::Interaction::Type t,double v) {
     if(t != mType) {
-	return;
+        return;
     }
     mLogSlider->SetValue(v);
 }
@@ -52,6 +52,7 @@ InterDisplaySettings::InterDisplaySettings(wxWindow* parent,Interaction::Type t)
 
     sigInterVisible.connect(mem_fun(this,&InterDisplaySettings::SlotVisible));
     sigInterColour.connect(mem_fun(this,&InterDisplaySettings::SlotColourChange));
+    sigInterSize.connect(mem_fun(this,&InterDisplaySettings::SlotScaleChange));
 }
 
 BEGIN_EVENT_TABLE(InterDisplaySettings,wxPanel)

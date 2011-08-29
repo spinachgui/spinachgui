@@ -8,6 +8,7 @@
 
 #include <shared/spin.hpp>
 #include <shared/orientation.hpp>
+#include <map>
 
 namespace SpinXML {
     ///============================================================//
@@ -206,6 +207,24 @@ namespace SpinXML {
                         
             TYPE_END
         };
+
+        template<typename T>
+        static std::map<Type,T> MakeTypeContainer(T val) {
+            typedef std::pair<Type,T> ThisTupple;
+            std::map<Type,T> out;
+            out.insert(ThisTupple(HFC,val));
+            out.insert(ThisTupple(G_TENSER,val));
+            out.insert(ThisTupple(ZFS,val));
+            out.insert(ThisTupple(EXCHANGE,val));
+            out.insert(ThisTupple(SHIELDING,val));
+            out.insert(ThisTupple(SCALAR,val));
+            out.insert(ThisTupple(QUADRUPOLAR,val));
+            out.insert(ThisTupple(DIPOLAR,val));
+            out.insert(ThisTupple(CUSTOM_LINEAR,val));
+            out.insert(ThisTupple(CUSTOM_BILINEAR,val));
+            out.insert(ThisTupple(CUSTOM_QUADRATIC,val));
+            return out;
+        }
 
 		///Set a flag indicating the physical source of this interaction.
 		void SetType(Type st, Spin* spin1, Spin* spin2=NULL);

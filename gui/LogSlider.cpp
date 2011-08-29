@@ -5,12 +5,14 @@
 #include <cmath>
 #include <stdexcept>
 #include <shared/panic.hpp>
+#include <shared/log.hpp>
 
 using namespace std;
 
 LogSlider::LogSlider(wxWindow* parent,double value)
     : wxControl(parent,wxID_ANY) {
     MAYBEPANIC(value > 0);
+    TRACE("Creating a new log slider, inital value = " << value);
     mLogValue=log10(value);
     mLogWidth=4;
     mLogValueDelta=0;
@@ -18,6 +20,7 @@ LogSlider::LogSlider(wxWindow* parent,double value)
 
 void LogSlider::SetValue(double value) {
 	MAYBEPANIC(value > 0);
+    TRACE("Setting value to " << value);
     mLogValue=log10(value);
     wxClientDC dc(this);
     RealPaint(dc);

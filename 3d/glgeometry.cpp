@@ -406,25 +406,15 @@ void BilinearInterDrawer::Geometary() const {
 
         //We don't currently visualise bilinear interactions involving
         //electrons
-        if(spin1->GetElement() == 0) {
+        if(spin1->GetElement() == 0 || spin2->GetElement() == 0) {
             continue;
         }
-        if(spin2->GetElement() == 0) {
-            continue;
-        }
-
         GetInterColour(t).SetMaterial(0.5);
 
         double minCuttoff=GetInterSize(t);
         double maxCuttoff=minCuttoff*2;
 
-		energy norm;
-		if(inter->GetType() == Interaction::DIPOLAR) {
-			norm = inter->AsMatrix().norm()/MHz;
-		} else {
-			norm = inter->AsMatrix().trace()/MHz;
-		}
-		norm=abs(norm);
+		energy norm = abs(inter->AsMatrix().norm()/MHz);
 
         if(minCuttoff < norm) {
             double width=(norm > maxCuttoff) ? 1.0 : (norm-minCuttoff)/(maxCuttoff-minCuttoff);

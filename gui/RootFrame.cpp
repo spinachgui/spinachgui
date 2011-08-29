@@ -353,15 +353,18 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
                                       wxFD_OPEN);
     if(fd->ShowModal() == wxID_OK) {
         LoadFromFile(mOpenPath=fd->GetPath(),mOpenDir=fd->GetDirectory(),fd->GetFilename());
+    } else {
+        return;
     }
-
     TRACE("Searching for sensible tensor sizes in newly loaded file");
     
-    //Iterate though the interactions and record the maximum absolute
-    //value of an eigenvalue (mono) or norm (binary)
-
+    //First, get a custom map from Type to a double, and initalise
+    //each with -infinity
     map<Interaction::Type,double> type_map =
         Interaction::MakeTypeContainer(-numeric_limits<double>::infinity());
+
+    //Iterate though the interactions and record the maximum absolute
+    //value of an eigenvalue (mono) or norm (binary)
 
     foreach(Interaction* inter,GetRawSS()->GetAllInteractions()) {
         Interaction::Type type = inter->GetType();
@@ -375,10 +378,10 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
             unit u = inter->GetType() == Interaction::SHIELDING ? Unitless : MHz;
             //Handle mono interactions
             Eigenvalues ev = inter->AsEigenvalues();
-            TRACE("Interaction of type " << Interaction::GetTypeName(inter->GetType()) << " and eigenvalues " 
-                  << ev.xx << "," << ev.yy << "," << ev.zz);
             double max_xy = abs(abs(ev.xx) > abs(ev.yy) ? ev.xx : ev.yy);
             double max_xyz = max_xy > abs(ev.zz) ? max_xy : abs(ev.zz);
+            TRACE("Interaction of type " << Interaction::GetTypeName(inter->GetType()) << " and eigenvalues " 
+                  << ev.xx << "," << ev.yy << "," << ev.zz << " max of those three is " << max_xyz);
             double candidate = max_xyz/u;
             if(candidate > type_map[type]) {
                 type_map[type] = candidate;
@@ -416,7 +419,7 @@ void RootFrame::OnOpen(wxCommandEvent& e) {
 }
 
 void RootFrame::LoadFromFile(const wxString& path,const wxString& dir, const wxString& filename) {
-    TRACE("RootFrame::LoadFromFile");
+    TRACE("RootFrame::LoadFromFile, path=" << path.mb_str() << " dir=" << dir.mb_str() << " filename=" << filename.mb_str());
 
     mOpenPath=path;
     mOpenFile=filename;

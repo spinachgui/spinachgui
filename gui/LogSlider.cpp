@@ -10,7 +10,7 @@
 using namespace std;
 
 LogSlider::LogSlider(wxWindow* parent,double value)
-    : wxControl(parent,wxID_ANY) {
+    : wxControl(parent,wxID_ANY),mListenToSignals(true) {
     MAYBEPANIC(value > 0);
     TRACE("Creating a new log slider, inital value = " << value);
     mLogValue=log10(value);
@@ -20,7 +20,12 @@ LogSlider::LogSlider(wxWindow* parent,double value)
 
 void LogSlider::SetValue(double value) {
 	MAYBEPANIC(value > 0);
-    TRACE("Setting value to " << value);
+    if(mListenToSignals) {
+        TRACE("Setting value to " << value);
+    } else {
+        TRACE("Not setting value to " << value);
+        return;
+    }
     mLogValue=log10(value);
     wxClientDC dc(this);
     RealPaint(dc);
@@ -92,7 +97,11 @@ void LogSlider::OnMouseMove(wxMouseEvent&e) {
         int w=size.GetWidth();
 
         mLogValueDelta=double(mStartDrag-e.GetX())/double(w) * mLogWidth;
+
+        mListenToSignals = false;
 	    sigChange(pow(10,mLogValue+mLogValueDelta));
+        mListenToSignals = true;
+
         Refresh();
 	}
 }

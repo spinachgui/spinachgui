@@ -28,6 +28,8 @@ protected:
     int mStartDrag;
     ///The Number of orders of magnitude to show
     double mLogWidth; 
+    ///When sending out a signal, ignore any incoming signals.
+    bool mListenToSignals;
 private:
 };
 

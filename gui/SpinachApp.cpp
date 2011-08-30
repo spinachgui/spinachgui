@@ -211,13 +211,13 @@ int main(int argc,char** argv)
 #endif
     } catch (logic_error& e) {
         cerr << "Uncaught logic_error what()=" << e.what() << endl;
-        ERROR("Uncaught logic_error what()=" << e.what());
+        _ERROR_("Uncaught logic_error what()=" << e.what());
     } catch (runtime_error& e) {
         cerr << "Uncaught runtime_error what()=" << e.what() << endl;
-        ERROR("Uncaught runtime_error what()=" << e.what())
+        _ERROR_("Uncaught runtime_error what()=" << e.what())
     } catch (...) {
         cerr << "Uncaught unknown exception." << endl;
-        ERROR("Uncaught unknown exception.")
+        _ERROR_("Uncaught unknown exception.")
     }
     TRACE("exiting via the main function");
     return 0;
